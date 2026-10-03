@@ -1,0 +1,1398 @@
+// Anahtar CRM v3.13 · 3 Ekim 2026
+// ============================================================================
+//  Anahtar.ai — Prisma Şeması (AŞAMA 2 v3.1; v3.3: konut, kaynak, konum öğrenme, ayarlar; v3.4: kişi bağları, işlenmiş mesaj; v3.5: yetkili portföy)
+//  Tarih: 30 Eylül 2026  |  Önceki: v2.0 (14–18 Eylül 2026)
+//
+//  v3.0 ile gelenler:
+//   1. Genişletilmiş kategori & işlem tipi enum'ları (portal kategori ağacıyla uyumlu)
+//   2. MulkOzellik: ticari/endüstriyel teknik donanımlar için STANDART kolonlar
+//      (AI serbest metin üretmez → enum/sayı/boolean alanları doldurur)
+//   3. İlan sahibi tipi (Malik/Emlakçı/Müteahhit/Firma/Partner/Portal) + veri kanalı ayrımı
+//   4. Türkiye geneli Il → Ilce → Mahalle hiyerarşisi + AltBolge (ticari bölge) + alias tablosu
+//
+//  Konvansiyon: Tüm teknik alanlar NULLABLE.
+//   - PORTFÖY kaydında  → mülkün gerçek değeri   (null = bilinmiyor → "eksik bilgi")
+//   - TALEP kaydında    → minimum şart / istenen (null = önemsiz)
+//   - Boolean? üç durumlu: true = var/şart, false = yok/istenmiyor, null = bilinmiyor/önemsiz
+// ============================================================================
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// v3.14 — Cloudflare Workers için ayrı istemci (runtime = "workerd"); src/lib/db.ts "#prisma-istemci" ile seçer
+generator client_worker {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma-worker"
+  runtime  = "workerd"
+}
+
+// Prisma 7: bağlantı URL'leri prisma.config.ts'de (Migrate) ve PrismaClient adapter'ında (runtime)
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+//  ENUM'LAR — KAYIT TEMEL
+// ============================================================================
+
+enum KayitTipi {
+  PORTFOY
+  TALEP
+}
+
+/// Durum makinesi (SRS v3.0 §3) — değişmedi
+enum Durum {
+  ACTIVE
+  PASSIVE
+  EXPIRED
+  ARSIV
+}
+
+enum Aciliyet {
+  DUSUK
+  NORMAL
+  YUKSEK
+  ACIL
+}
+
+/// Üst kategori — Sahibinden/Hepsiemlak "Emlak" ağacının 1. seviyesi ile birebir
+enum AnaKategori {
+  KONUT
+  ISYERI          // ticari + endüstriyel
+  ARSA
+  BINA            // komple bina
+  TURISTIK_TESIS
+  DEVRE_MULK
+}
+
+/// Detay mülk tipi — AnaKategori ile birlikte kullanılır (eşleme: src/lib/domain/kategori.ts)
+enum MulkTipi {
+  // ---- KONUT ----
+  DAIRE
+  REZIDANS
+  MUSTAKIL_EV
+  VILLA
+  CIFTLIK_EVI
+  KOSK_KONAK
+  YALI
+  YAZLIK
+  PREFABRIK_EV
+  KOOPERATIF
+
+  // ---- İŞYERİ: ENDÜSTRİYEL ----
+  DEPO_ANTREPO
+  FABRIKA_URETIM_TESISI
+  IMALATHANE
+  ATOLYE
+  SOGUK_HAVA_DEPOSU
+  LOJISTIK_MERKEZI
+  TAMIRHANE_OTO_SERVIS
+  ENERJI_SANTRALI
+  MADEN_OCAGI
+
+  // ---- İŞYERİ: TİCARİ / PERAKENDE ----
+  DUKKAN_MAGAZA
+  SHOWROOM
+  AVM
+  PAZAR_YERI
+  BUFE_KANTIN
+  RESTORAN_LOKANTA
+  CAFE_BAR
+  PASTANE_FIRIN
+  AKARYAKIT_ISTASYONU
+  OTO_YIKAMA
+  OTOPARK_GARAJ
+
+  // ---- İŞYERİ: OFİS ----
+  BURO_OFIS
+  OFIS_APARTMAN_DAIRESI
+  PLAZA
+  PLAZA_KATI_OFIS
+  REZIDANS_KATI_OFIS
+  IS_HANI_KATI
+
+  // ---- İŞYERİ: HİZMET / SOSYAL ----
+  SAGLIK_MERKEZI_KLINIK
+  EGITIM_KURUMU
+  KRES
+  YURT
+  SPOR_TESISI
+  SPA_HAMAM
+  DUGUN_SALONU
+  SINEMA_KONFERANS
+  KIR_KAHVALTI_BAHCESI
+  CIFTLIK
+
+  // ---- ARSA ----
+  ARSA
+  TARLA
+  BAG_BAHCE
+  ZEYTINLIK
+
+  // ---- BİNA ----
+  KOMPLE_BINA
+
+  // ---- TURİSTİK TESİS ----
+  OTEL
+  BUTIK_OTEL
+  APART_OTEL
+  TATIL_KOYU
+  MOTEL
+  PANSIYON
+  HOSTEL
+  KAMP_ALANI
+
+  // ---- DEVRE MÜLK ----
+  DEVRE_MULK
+
+  DIGER
+}
+
+/// İşlem tipi — "Devirlik" = DEVREN_*, Notion'daki "Proje" = KAT_KARSILIGI
+enum IslemTipi {
+  SATILIK
+  KIRALIK
+  DEVREN_SATILIK   // işletme + kira hakkı devri
+  DEVREN_KIRALIK   // kira sözleşmesi devri (işletmesiz)
+  KAT_KARSILIGI
+  GUNLUK_KIRALIK
+  SEZONLUK_KIRALIK
+  TAKAS
+}
+
+enum ParaBirimi {
+  TRY
+  USD
+  EUR
+  GBP
+}
+
+/// Fiyatın periyodu — "Yıllık peşin 4 milyon" ile "aylık 330 bin" karışmasın
+enum FiyatPeriyodu {
+  TOPLAM
+  AYLIK
+  YILLIK
+  GUNLUK
+}
+
+/// Arsa imar durumu — portal ağacıyla uyumlu
+enum ImarDurumu {
+  KONUT
+  TICARI
+  TICARI_KONUT
+  SANAYI
+  DEPO_ANTREPO
+  TURIZM
+  TURIZM_KONUT
+  TURIZM_TICARI
+  TARLA
+  BAG_BAHCE
+  ZEYTINLIK
+  SERA
+  EGITIM
+  SAGLIK
+  ENERJI
+  OZEL_KULLANIM
+  SIT_ALANI
+  IMARSIZ
+  DIGER
+}
+
+// ============================================================================
+//  ENUM'LAR — KAYNAK / SAHİPLİK  (Madde 3)
+// ============================================================================
+
+/// İlan/talebi kimin verdiği — "kiminle muhatap olacağım?"
+enum IlanSahibiTipi {
+  MALIK
+  EMLAKCI
+  MUTEAHHIT
+  FIRMA
+  PARTNER       // anlaşmalı meslektaş / iş ortağı
+  PORTAL        // portal ilanı, sahibi henüz tespit edilmedi
+  BILINMIYOR
+}
+
+/// Verinin hangi kanaldan sisteme girdiği — "nereden duydum?"
+enum VeriKanali {
+  WHATSAPP
+  SAHIBINDEN
+  HEPSIEMLAK
+  EMLAKJET
+  NOTION
+  KENDI_CRM
+  MANUEL
+  CSV
+  SESLI_NOT
+}
+
+/// Eşleştirme havuzu (GELISTIRMELER: Talep → Kendi → Partner → Web → Fırsat)
+enum Havuz {
+  KENDI_PORTFOY
+  PARTNER
+  DIS_ILAN
+}
+
+enum PortfoyAlinabilirlik {
+  COK_YUKSEK
+  YUKSEK
+  ORTA
+  DUSUK
+  BILINMIYOR
+}
+
+/// Talep sahibinin size nasıl ulaştığı (Notion: "Müşteri nereden geldi?")
+enum MusteriKaynagi {
+  SAHA
+  REFERANS
+  REKLAM
+  ILAN
+  WHATSAPP_GRUBU
+  PORTAL
+  DIGER
+}
+
+enum KisiRolu {
+  ALICI
+  SATICI
+  KIRACI
+  KIRAYA_VEREN
+  YATIRIMCI
+  EMLAKCI
+  MUTEAHHIT
+  FIRMA
+  IS_ORTAGI
+  AL_SAT        // v3.4 — Notion "AL-SAT"
+  YATIRIMCI_VIP // v3.4 — Notion "YATIRIMCI++"
+}
+
+/// v3.4 — Kişinin bir kayıttaki rolü (bir kayıtta birden fazla kişi olabilir)
+enum KayitKisiRolu {
+  SAHIP       // mülk sahibi / malik
+  MUSTERI     // alıcı, kiracı, talep sahibi
+  EMLAKCI     // ilanı/ talebi getiren meslektaş
+  ARACI       // aracı, referans veren
+  IRTIBAT     // şirket içi irtibat, bekçi, yönetici vb.
+  DIGER
+}
+
+enum KisiKaynagi {
+  WHATSAPP
+  GOOGLE
+  NOTION
+  MANUEL
+  CSV
+}
+
+// ============================================================================
+//  ENUM'LAR — TEKNİK DONANIM  (Madde 2)
+// ============================================================================
+
+/// Sıralı: eşleştirmede ">=" karşılaştırması yapılır (TIR girebiliyorsa kamyon da girer)
+enum AracErisimi {
+  YOK
+  BINEK
+  PANELVAN
+  KAMYONET
+  KAMYON
+  TIR
+}
+
+enum RuhsatDurumu {
+  RUHSATLI
+  YAPI_KAYITLI
+  KAYITSIZ
+  INSAAT_HALINDE
+}
+
+enum TapuTipi {
+  KAT_MULKIYETI
+  KAT_IRTIFAKI
+  MUSTAKIL_PARSEL
+  HISSELI
+  ARSA_TAPULU
+  KOOPERATIF
+  TAHSIS
+}
+
+enum CatiTipi {
+  SANDVIC_PANEL
+  TRAPEZ_SAC
+  YALITIMLI_TRAPEZ
+  BETONARME
+  PREFABRIK
+  DIGER
+}
+
+enum DuvarTipi {
+  BETON
+  SANDVIC_PANEL
+  TRAPEZ_SAC
+  TUGLA_BRIKET
+  PREFABRIK
+  KARMA          // örn. 3 m beton + üstü sac
+}
+
+enum ZeminTipi {
+  HELIKOPTER_BETON
+  EPOKSI
+  SAHA_BETONU
+  SERAMIK_KAROLAJ
+  TOPRAK
+  DIGER
+}
+
+enum YapiSistemi {
+  CELIK_KONSTRUKSIYON
+  BETONARME
+  PREFABRIK
+  YIGMA
+  KARMA
+}
+
+enum OtoparkDurumu {
+  YOK
+  ACIK
+  KAPALI
+  ACIK_VE_KAPALI
+  CADDE_USTU
+}
+
+enum TrafikSeviyesi {
+  DUSUK
+  ORTA
+  YUKSEK
+  COK_YUKSEK
+}
+
+enum KiraOdemeSekli {
+  AYLIK
+  UC_AYLIK
+  ALTI_AYLIK_PESIN
+  YILLIK_PESIN
+}
+
+enum TurizmBelgesi {
+  BAKANLIK_BELGELI
+  BELEDIYE_BELGELI
+  YOK
+}
+
+/// Uygun / istenen kullanım amacı (portföyde "uygun olduğu", talepte "yapacağı iş")
+enum KullanimAmaci {
+  DEPOLAMA
+  LOJISTIK_DAGITIM
+  URETIM
+  GIDA_URETIM
+  GIDA_DEPOLAMA
+  SOGUK_ZINCIR
+  E_TICARET
+  SHOWROOM
+  PERAKENDE
+  MARKET
+  RESTORAN_KAFE
+  OFIS
+  BANKA_SUBE
+  EGITIM
+  SAGLIK
+  SPOR
+  OTO_SERVIS
+  KONAKLAMA
+  ETKINLIK
+  TARIM
+  YATIRIM_KIRA_GELIRI
+  DIGER
+}
+
+/// Eşleştirmede "öldürücü / esnek kriter" ve "eksik bilgi" referansı.
+/// Her değer MulkOzellik veya Kayit üzerindeki bir alan grubuna karşılık gelir.
+enum TeknikAlan {
+  MULK_TIPI
+  ISLEM_TIPI
+  LOKASYON
+  FIYAT
+  ALAN
+  KAPALI_ALAN
+  ACIK_ALAN
+  ARSA_ALANI
+  YUKSEKLIK
+  KAPI
+  ARAC_ERISIMI
+  RAMPA
+  VINC
+  ELEKTRIK
+  TRAFO
+  SANAYI_ELEKTRIGI
+  YANGIN_SISTEMI
+  SPRINKLER
+  ISKAN
+  RUHSAT
+  SOGUK_HAVA
+  GIDAYA_UYGUNLUK
+  CATI_DUVAR
+  OFIS_SOSYAL
+  OTOPARK
+  YAYA_TRAFIGI
+  ARAC_TRAFIGI
+  CEPHE_VITRIN
+  ZEMIN_KAT_GIRIS
+  KULLANIM_AMACI
+  KIRA_SURESI
+  ODA_SAYISI
+  IMAR
+  // v3.3 — konut ve genel
+  BANYO
+  ISINMA
+  ESYA
+  SITE_GUVENLIK
+  CEPHE_YON
+  BINA_YASI
+  KAT
+  BALKON_BAHCE
+  MANZARA
+  KREDI
+}
+
+// ============================================================================
+//  ENUM'LAR — KONUT (v3.3)
+// ============================================================================
+
+enum IsinmaTipi {
+  DOGALGAZ_KOMBI
+  MERKEZI
+  MERKEZI_PAY_OLCER
+  YERDEN_ISITMA
+  KLIMA
+  ISI_POMPASI
+  SOBA
+  GUNES_ENERJISI
+  YOK
+}
+
+enum EsyaDurumu {
+  ESYALI
+  YARI_ESYALI
+  ESYASIZ
+}
+
+enum Yon {
+  KUZEY
+  GUNEY
+  DOGU
+  BATI
+}
+
+// ============================================================================
+//  ENUM'LAR — LOKASYON  (Madde 4)
+// ============================================================================
+
+enum YerlesimTipi {
+  MAHALLE
+  KOY
+  KOY_MAHALLESI
+  BELDE_MAHALLESI
+}
+
+enum AltBolgeTipi {
+  SEMT              // Lara, Altınova, Varsak — resmi olmayan ama piyasanın kullandığı bölge
+  TICARI_AKS        // Barınaklar Bulvarı, Işıklar Caddesi
+  OSB
+  SANAYI_SITESI
+  TURIZM_BOLGESI
+  DIGER
+}
+
+enum LokasyonSeviyesi {
+  IL
+  ILCE
+  MAHALLE
+  ALTBOLGE
+}
+
+/// v3.3 — alias'ın türü: yazım farkı ("Murtpaşa") mı, bir yerin yakınını tarif eden referans nokta mı ("Cender Otel")
+enum AliasTipi {
+  YAZIM
+  REFERANS_NOKTA
+  SEMT
+}
+
+/// v3.3 — konum öğrenme adayının durumu
+enum AdayDurumu {
+  BEKLIYOR
+  ONAYLANDI
+  REDDEDILDI
+}
+
+// ============================================================================
+//  ENUM'LAR — EŞLEŞME & SİSTEM (v2.0'dan)
+// ============================================================================
+
+enum MatchDurum {
+  BEKLIYOR
+  BILDIRILDI
+  GORUSULDU
+  GOSTERIM
+  PAZARLIK
+  KAPANDI
+  REDDEDILDI
+}
+
+/// "Eşleşme" ≠ "Sunulabilir eşleşme" (GELISTIRMELER §5) — motor Aşama 3'te doldurur
+enum Uygunluk {
+  SUNULABILIR
+  KOSULLU        // kritik engel yok ama eksik bilgi var
+  UYGUN_DEGIL    // öldürücü kriter karşılanmıyor
+}
+
+enum PortalIlanDurum {
+  HAM
+  ONIZLEME
+  ONAYLANDI
+  REDDEDILDI
+}
+
+enum SyncDurum {
+  BASARILI
+  HATA
+  TEKRAR_DENENECEK
+  CAKISMA // v3.6
+}
+
+/// v3.6 — dış bağlantılar
+enum EntegrasyonSaglayici {
+  GOOGLE_KISILER
+  NOTION
+}
+
+enum EntegrasyonDurum {
+  BAGLI_DEGIL
+  BAGLI
+  HATA
+  YENIDEN_YETKI // Google erişimi geri alınmış / süresi dolmuş
+}
+
+enum CakismaDurum {
+  ACIK
+  YEREL_SECILDI
+  UZAK_SECILDI
+}
+
+// ============================================================================
+//  LOKASYON MODELLERİ  (Madde 4)
+//  Kaynak: PTT posta kodu listesi → prisma/seed/data/*.json (81 il / 973 ilçe / 73.305 yerleşim)
+// ============================================================================
+
+model Il {
+  id        Int     @id // plaka kodu (7 = Antalya)
+  plaka     String  @unique @db.Char(2)
+  ad        String
+  slug      String  @unique
+
+  ilceler    Ilce[]
+  altBolgeler AltBolge[]
+  aliaslar   LokasyonAlias[]
+  kayitLokasyonlari KayitLokasyon[]
+  portalIlanlari PortalIlan[]
+
+  @@map("il")
+}
+
+model Ilce {
+  id    Int    @id
+  ilId  Int
+  ad    String
+  slug  String
+
+  il          Il            @relation(fields: [ilId], references: [id])
+  mahalleler  Mahalle[]
+  altBolgeler AltBolge[]
+  komsular    IlceKomsuluk[] @relation("IlceKomsu_kaynak")
+  komsuOlduklari IlceKomsuluk[] @relation("IlceKomsu_hedef")
+  aliaslar    LokasyonAlias[]
+  kayitLokasyonlari KayitLokasyon[]
+  portalIlanlari PortalIlan[]
+
+  @@unique([ilId, slug])
+  @@index([ilId])
+  @@map("ilce")
+}
+
+model Mahalle {
+  id              Int          @id @default(autoincrement())
+  ilceId          Int
+  ad              String       // "Altınova Düden"  (Mah/Köyü eki tip alanında)
+  slug            String
+  tip             YerlesimTipi @default(MAHALLE)
+  bagliOlduguYer  String?      // köy mahallesi ise bağlı köy/belde adı
+  postaKodu       String?      @db.VarChar(5)
+  enlem           Float?
+  boylam          Float?
+
+  ilce            Ilce               @relation(fields: [ilceId], references: [id])
+  altBolgeler     AltBolgeMahalle[]
+  aliaslar        LokasyonAlias[]
+  kayitLokasyonlari KayitLokasyon[]
+  portalIlanlari  PortalIlan[]
+
+  @@unique([ilceId, slug])
+  @@index([ilceId])
+  @@index([ad])
+  @@map("mahalle")
+}
+
+/// Piyasa bölgesi: resmi sınır değil, emlakçının kullandığı kırılım (Lara, Altınova, OSB…)
+/// Birden fazla mahalleyi kapsar; ilçe sınırını aşabilir (ilceId null).
+model AltBolge {
+  id         Int           @id @default(autoincrement())
+  ilId       Int
+  ilceId     Int?
+  ad         String
+  slug       String
+  tip        AltBolgeTipi  @default(SEMT)
+  aciklama   String?
+  dogrulandi Boolean       @default(false) // kullanıcı onaylayana kadar false
+  enlem      Float?
+  boylam     Float?
+
+  il         Il                @relation(fields: [ilId], references: [id])
+  ilce       Ilce?             @relation(fields: [ilceId], references: [id])
+  mahalleler AltBolgeMahalle[]
+  aliaslar   LokasyonAlias[]
+  kayitLokasyonlari KayitLokasyon[]
+  portalIlanlari PortalIlan[]
+
+  @@unique([ilId, slug])
+  @@map("alt_bolge")
+}
+
+model AltBolgeMahalle {
+  altBolgeId Int
+  mahalleId  Int
+
+  altBolge AltBolge @relation(fields: [altBolgeId], references: [id], onDelete: Cascade)
+  mahalle  Mahalle  @relation(fields: [mahalleId], references: [id], onDelete: Cascade)
+
+  @@id([altBolgeId, mahalleId])
+  @@map("alt_bolge_mahalle")
+}
+
+/// Komşu ilçe ilişkisi — lokasyon puanlamasında -15 (elenmez) kuralı için. Çift yönlü kaydedilir.
+model IlceKomsuluk {
+  ilceId      Int
+  komsuIlceId Int
+
+  ilce      Ilce @relation("IlceKomsu_kaynak", fields: [ilceId], references: [id], onDelete: Cascade)
+  komsuIlce Ilce @relation("IlceKomsu_hedef", fields: [komsuIlceId], references: [id], onDelete: Cascade)
+
+  @@id([ilceId, komsuIlceId])
+  @@map("ilce_komsuluk")
+}
+
+/// Serbest metin → lokasyon çözümleme sözlüğü ("Murtpaşa", "Düden Mh.", "Lara", "OSB")
+/// AI ham metni buraya çözer; bulunamazsa kayıt "lokasyonHam" ile işaretlenir.
+model LokasyonAlias {
+  id         Int              @id @default(autoincrement())
+  alias      String           // normalize edilmiş (küçük harf, Türkçe karakter sadeleştirilmiş)
+  seviye     LokasyonSeviyesi
+  ilId       Int?
+  ilceId     Int?
+  mahalleId  Int?
+  altBolgeId Int?
+  kaynak     String?          // "notion", "whatsapp", "manuel", "kullanici", "ogrenme"
+  // v3.3 — konum öğrenme
+  tip            AliasTipi @default(YAZIM)
+  onaylandi      Boolean   @default(true)
+  kullanimSayisi Int       @default(0)
+  aciklama       String?   // "Cender Otel çevresi — Işıklar'a yakın"
+  createdAt      DateTime  @default(now())
+
+  il       Il?       @relation(fields: [ilId], references: [id])
+  ilce     Ilce?     @relation(fields: [ilceId], references: [id])
+  mahalle  Mahalle?  @relation(fields: [mahalleId], references: [id])
+  altBolge AltBolge? @relation(fields: [altBolgeId], references: [id])
+
+  @@unique([alias, seviye, ilId])
+  @@index([alias])
+  @@map("lokasyon_alias")
+}
+
+/// v3.3 — Konum öğrenme adayı. Çözülemeyen ifadeler burada birikir; aynı mesajlarda birlikte geçtiği
+/// çözülmüş konumlar sayılır ("cender otel" 5 mesajda "Gençlik" ile geçti). Kullanıcı onaylayınca LokasyonAlias olur.
+model LokasyonAday {
+  id           String      @id @default(cuid())
+  ilId         Int         @default(7)
+  ifade        String      // normalize edilmiş
+  ornekMetin   String?     // ilk görüldüğü mesajdan kısa alıntı
+  gorulme      Int         @default(1)
+  /// { "<mahalleId|altBolgeId|ilceId anahtarı>": birlikte geçiş sayısı }
+  birlikteGecis Json       @default("{}")
+  durum        AdayDurumu  @default(BEKLIYOR)
+  sonGorulme   DateTime    @default(now())
+  createdAt    DateTime    @default(now())
+
+  @@unique([ilId, ifade])
+  @@index([durum, gorulme])
+  @@map("lokasyon_aday")
+}
+
+/// v3.3 — Kullanıcının ekrandan değiştirebildiği ayarlar (TTL gün sayıları vb.)
+model Ayar {
+  anahtar   String   @id   // "ttl"
+  deger     Json           // { "PORTFOY": 90, "TALEP": 60, "TALEP_ACIL": 30 }
+  updatedAt DateTime @updatedAt
+
+  @@map("ayar")
+}
+
+/// Kayıt ↔ lokasyon (çoktan-çoğa). Portföyde 1 satır (birincil), talepte N satır
+/// ("Aksu / Yenigöl / Altınova olur"). Her satır farklı seviyede olabilir.
+model KayitLokasyon {
+  id         String  @id @default(cuid())
+  kayitId    String
+  ilId       Int
+  ilceId     Int?
+  mahalleId  Int?
+  altBolgeId Int?
+  birincil   Boolean @default(false)
+  sira       Int     @default(0)
+
+  kayit    Kayit     @relation(fields: [kayitId], references: [id], onDelete: Cascade)
+  il       Il        @relation(fields: [ilId], references: [id])
+  ilce     Ilce?     @relation(fields: [ilceId], references: [id])
+  mahalle  Mahalle?  @relation(fields: [mahalleId], references: [id])
+  altBolge AltBolge? @relation(fields: [altBolgeId], references: [id])
+
+  @@index([kayitId])
+  @@index([ilceId])
+  @@index([mahalleId])
+  @@index([altBolgeId])
+  @@map("kayit_lokasyon")
+}
+
+// ============================================================================
+//  ANA KAYIT (Portföy + Talep)
+// ============================================================================
+
+model Kayit {
+  id            String       @id @default(cuid())
+  tip           KayitTipi
+  durum         Durum        @default(ACTIVE)
+  aciliyet      Aciliyet     @default(NORMAL)
+
+  // ---- Kategori & işlem (Madde 1) ----
+  anaKategori   AnaKategori
+  mulkTipi      MulkTipi
+  /// Talep "Fabrika veya Depo" diyorsa alternatifler; portföyde "Depo, atölye olarak da kullanılabilir"
+  alternatifMulkTipleri MulkTipi[]
+  islemTipi     IslemTipi
+  alternatifIslemTipleri IslemTipi[]
+
+  // ---- Fiyat ----
+  fiyat         Decimal?     @db.Decimal(16, 2) // portföy
+  minFiyat      Decimal?     @db.Decimal(16, 2) // talep
+  maxFiyat      Decimal?     @db.Decimal(16, 2) // talep
+  paraBirimi    ParaBirimi   @default(TRY)
+  fiyatPeriyodu FiyatPeriyodu @default(TOPLAM)
+  krediyeUygun  Boolean?
+
+  // ---- Ana alan (hızlı filtre) — detaylar MulkOzellik'te ----
+  m2            Float?       // portföy: ana kullanım alanı (brüt)
+  netM2         Float?
+  minM2         Float?       // talep
+  maxM2         Float?       // talep
+  m2ToleransYuzde Float?     // talep: esneklik (örn. 20 = ±%20)
+  odaSayisi     String?      // "3+1", "5 oda ofis"
+
+  // ---- Lokasyon ----
+  lokasyonlar   KayitLokasyon[]
+  lokasyonHam   String?      // AI çözemediyse ham metin (manuel eşleme kuyruğu)
+  adres         String?
+  enlem         Float?
+  boylam        Float?
+
+  // ---- Kaynak / sahiplik (Madde 3) ----
+  veriKanali      VeriKanali     @default(WHATSAPP)
+  ilanSahibiTipi  IlanSahibiTipi @default(BILINMIYOR)
+  havuz           Havuz          @default(KENDI_PORTFOY)
+  /// v3.5 — yetki belgeli portföy (havuz akışında 1. sıra: Yetkili → CRM → Partner → Web ilanı)
+  yetkili         Boolean        @default(false)
+  yetkiBitis      DateTime?
+  musteriKaynagi  MusteriKaynagi?
+  portfoyAlinabilirlik PortfoyAlinabilirlik @default(BILINMIYOR)
+  kisiId          String?
+  kisi            Kisi?          @relation(fields: [kisiId], references: [id])
+  kisiBaglari     KayitKisi[]
+
+  // ---- İletişim snapshot (v2.0) ----
+  gondeAdi      String?
+  gondeTelefon  String?      // +905xxxxxxxxx
+  gondeSirket   String?
+  kayitGrubu    String?      // WhatsApp grup adı
+  // ---- Kaynak bilgisi (v3.3) ----
+  mesajTarihi   DateTime?    // mesajın gönderildiği an (WhatsApp satırındaki tarih-saat)
+  kaynakDosya   String?      // içe aktarılan dosya adı ("WhatsApp Sohbeti - EMLAK BORSASI.txt")
+  ingestionId   String?      // hangi içe aktarma işinden geldi (IngestionLog.id)
+
+  // ---- Portal (v3.0) ----
+  portalUrl       String?
+  portalIlanNo    String?
+  portalIlanSahibi String?
+
+  // ---- Metin alanları ----
+  baslik        String?
+  ozet          String?      // AI'ın yapılandırılmış kısa özeti (tek cümle)
+  hamMetin      String?      // orijinal mesaj — kısaltılmaz
+  operasyonNotu String?
+  arsivNotu     String?
+  /// v2 uyumluluğu: standart kolona dönüşemeyen nadir şartlar (kontrollü liste, serbest paragraf değil)
+  ozelSartlar   String[]
+
+  // ---- Yaşam döngüsü ----
+  validUntil          DateTime
+  ttlUyariGonderildi  Boolean  @default(false)
+  fingerprint         String   @unique
+
+  // ---- Notion ----
+  notionId       String?  @unique
+  notionSonSync  DateTime?
+  /// v3.6 — son içe aktarılan Notion alanları (+ __tablo, __duzenleme) ve son geri yazılan değerler
+  notionSnapshot Json?
+  /// v3.7 — görüşme / not akışı
+  gorusmeNotlari KayitNot[]
+  /// v3.10 — portföy fotoğrafları (ilk sıradaki = kapak)
+  fotolar        KayitFoto[]
+  notionGeriYazim Json?
+
+  // ---- AI meta ----
+  /// Alan bazlı çıkarım güveni: { "ozellik.elektrikGucuKw": 0.92, ... }
+  alanGuvenleri  Json?
+  aiModelVersiyon String?
+
+  ozellik       MulkOzellik?
+  talepMatchleri   Match[]  @relation("TalepMatch")
+  portfoyMatchleri Match[]  @relation("PortfoyMatch")
+  portalKaynagi    PortalIlan? @relation("PortalIlanKayit")
+  auditLoglari     AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tip, durum])
+  @@index([anaKategori, mulkTipi])
+  @@index([islemTipi])
+  @@index([validUntil])
+  @@index([gondeTelefon])
+  @@index([kisiId])
+  @@map("kayit")
+  @@index([portalIlanNo]) // v3.7 — toplu içe aktarmada aynı ilanı tanımak için
+}
+
+// ============================================================================
+//  MÜLK ÖZELLİK — STANDART TEKNİK KOLONLAR  (Madde 2)
+//  Kayit (iç havuz) veya PortalIlan (dış havuz) ile 1:1. Eşleştirme motoru tek kod yoluyla
+//  her iki havuzu da aynı kolonlar üzerinden tarar.
+//  Birimler: alan m², uzunluk metre, güç kW / kVA, sıcaklık °C, mesafe metre.
+// ============================================================================
+
+model MulkOzellik {
+  id           String  @id @default(cuid())
+  kayitId      String? @unique
+  portalIlanId String? @unique
+
+  // ---- ALANLAR ----
+  kapaliAlanM2     Float?
+  acikAlanM2       Float?
+  arsaAlanM2       Float?
+  sundurmaM2       Float?
+  ofisAlanM2       Float?
+  girisKatM2       Float?   // dükkan zemin kat
+  asmaKatM2        Float?
+  bodrumM2         Float?
+  bolunebilir      Boolean?
+  minBolumM2       Float?
+
+  // ---- YÜKSEKLİK ----
+  netYukseklikM        Float?
+  makasAltiYukseklikM  Float?
+
+  // ---- KAPI & ARAÇ ERİŞİMİ ----
+  kapiSayisi        Int?
+  kapiGenislikM     Float?
+  kapiYukseklikM    Float?
+  otomatikKapi      Boolean?
+  aracErisimi       AracErisimi?   // girebilen en büyük araç (sıralı)
+  tirManevraAlani   Boolean?
+  rampa             Boolean?
+  rampaSayisi       Int?
+  vinc              Boolean?
+  vincKapasitesiTon Float?
+  yukAsansoru       Boolean?
+
+  // ---- ENERJİ ----
+  elektrikGucuKw    Float?   // normalize kW (kVA verildiyse ×0.8 — bkz. ALTYAPI §11)
+  elektrikGucuKva   Float?   // ilanda kVA yazıyorsa ham değer
+  elektrikGucuHam   String?  // "60 KWA", "400 kw özel trafolu"
+  trafo             Boolean?
+  trafoGucuKva      Float?
+  sanayiElektrigi   Boolean?
+  jenerator         Boolean?
+
+  // ---- YANGIN & GÜVENLİK ----
+  yanginSistemi     Boolean?  // söndürme tesisatı / hidrant
+  sprinkler         Boolean?
+  yanginAlgilama    Boolean?
+  paratoner         Boolean?
+
+  // ---- HUKUKİ ----
+  iskan             Boolean?
+  ruhsatDurumu      RuhsatDurumu?
+  isyeriAcmaRuhsati Boolean?
+  numarataj         Boolean?
+  tapuTipi          TapuTipi?
+  imarDurumu        ImarDurumu?
+  adaNo             String?
+  parselNo          String?
+  emsalKaks         Float?
+  taks              Float?
+
+  // ---- İKLİM / SOĞUK HAVA ----
+  sogukHava         Boolean?
+  sogukHavaM2       Float?
+  sogukHavaMinC     Float?
+  sogukHavaMaxC     Float?
+  iklimlendirme     Boolean?
+  havalandirma      Boolean?
+  gidayaUygun       Boolean?
+
+  // ---- YAPI ----
+  yapiSistemi       YapiSistemi?
+  catiTipi          CatiTipi?
+  duvarTipi         DuvarTipi?
+  zeminTipi         ZeminTipi?
+  zeminYukTasimaTonM2 Float?
+  binaYasi          Int?
+  katSayisi         Int?
+  bulunduguKat      Int?     // 0 = zemin/giriş, -1 = bodrum
+
+  // ---- SOSYAL ALANLAR ----
+  ofis              Boolean?
+  ofisOdaSayisi     Int?
+  wc                Boolean?
+  wcSayisi          Int?
+  mutfak            Boolean?
+  personelAlani     Boolean? // soyunma / duş / yemekhane
+  sundurma          Boolean?
+  sondaj            Boolean?
+
+  // ---- PERAKENDE / DÜKKAN ----
+  cepheUzunluguM    Float?
+  cepheSayisi       Int?
+  vitrin            Boolean?
+  koseKonum         Boolean?
+  anaCaddeUzeri     Boolean?
+  duzGiris          Boolean?
+  asmaKat           Boolean?
+  bodrum            Boolean?
+  baca              Boolean?
+  asansor           Boolean?
+  otoparkDurumu     OtoparkDurumu?
+  otoparkKapasitesi Int?
+  yayaTrafigi       TrafikSeviyesi?
+  aracTrafigi       TrafikSeviyesi?
+
+  // ---- ERİŞİLEBİLİRLİK (metre) ----
+  anaYolaMesafeM     Int?
+  cevreYolunaMesafeM Int?
+  havalimaninaMesafeM Int?
+  limanaMesafeM      Int?
+  denizeMesafeM      Int?
+  osbIcinde          Boolean?
+
+  // ---- KULLANIM ----
+  /// portföy: uygun olduğu işler | talep: yapılacak iş
+  kullanimAmaclari  KullanimAmaci[]
+
+  // ---- KONUT (v3.3) ----
+  // Oda sayısı Kayit.odaSayisi'nde ("3+1") — eşleştirmede ayrıştırılır
+  banyoSayisi       Int?
+  isinmaTipi        IsinmaTipi?
+  esyaDurumu        EsyaDurumu?
+  siteIcinde        Boolean?
+  guvenlik          Boolean?
+  balkon            Boolean?
+  teras             Boolean?
+  bahce             Boolean?
+  dubleks           Boolean?
+  ebeveynBanyosu    Boolean?
+  cepheYonleri      Yon[]
+  denizManzarasi    Boolean?
+  engelliErisimi    Boolean?
+
+  // ---- TURİSTİK TESİS ----
+  otelOdaSayisi     Int?
+  yatakKapasitesi   Int?
+  yildiz            Int?
+  turizmBelgesi     TurizmBelgesi?
+  havuz             Boolean?
+
+  // ---- KİRA / DEVİR KOŞULLARI ----
+  kiraOdemeSekli    KiraOdemeSekli?
+  depozitoAy        Float?
+  minKiraSuresiYil  Float?   // talep: istenen süre
+  bosalmaTarihi     DateTime?
+  kiracili          Boolean?
+  mevcutKiraGeliri  Decimal? @db.Decimal(16, 2)
+  devirBedeli       Decimal? @db.Decimal(16, 2)
+  aidat             Decimal? @db.Decimal(12, 2)
+
+  // ---- TALEP DNA (sadece TALEP kayıtlarında) ----
+  kritikKriterler     TeknikAlan[]  // öldürücü: karşılanmazsa UYGUN_DEGIL
+  esnekKriterler      TeknikAlan[]
+  /// AI tespiti: bu kayıt için kritik ama bilinmeyen alanlar ("4 kritik bilgi eksik")
+  eksikBilgiler       TeknikAlan[]
+
+  kayit      Kayit?      @relation(fields: [kayitId], references: [id], onDelete: Cascade)
+  portalIlan PortalIlan? @relation(fields: [portalIlanId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+
+  // Ön-filtre (matematik katmanı) için en sık sorgulanan kolonlar
+  @@index([kapaliAlanM2])
+  @@index([elektrikGucuKw])
+  @@index([netYukseklikM])
+  @@index([aracErisimi])
+  @@index([ruhsatDurumu])
+  @@map("mulk_ozellik")
+}
+
+// ============================================================================
+//  KİŞİ
+// ============================================================================
+
+model Kisi {
+  id             String         @id @default(cuid())
+  adSoyad        String
+  telefon        String?        @unique // normalize +905…
+  ikincilTelefon String?
+  email          String?
+  sirket         String?
+  roller         KisiRolu[]
+  ilanSahibiTipi IlanSahibiTipi @default(BILINMIYOR)
+  kaynak         KisiKaynagi    @default(MANUEL)
+  notlar         String?
+  googleResourceName String?    @unique
+  notionId       String?        @unique
+  // v3.6 — senkron: son senkronda dış kaynaktan alınan alanların fotoğrafı (üç yönlü birleştirme için)
+  googleEtag     String?
+  googleSnapshot Json?
+  notionSnapshot Json?
+  /// Dış kaynakta silindiğinde (Google/Notion) — kişi Anahtar'da silinmez, yalnızca işaretlenir
+  kaynaktaSilindi DateTime?
+  /// v3.7 — bu kişiyle yapılan görüşme notları
+  kayitNotlari   KayitNot[]
+  // v3.4 — Notion "Müşteri-Yatırımcılar-Kişiler" alanları
+  uzmanlikAileleri String[]     // emlakçılar için: ["DEPO","DUKKAN"] (Notion: EMLAKÇI DEPO / TİCARİ)
+  referans       String?
+  whatsappGruplari String[]     // mesajlarının görüldüğü gruplar
+  sonIletisim    DateTime?
+
+  kayitlar  Kayit[]
+  kayitBaglari KayitKisi[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([adSoyad])
+  @@map("kisi")
+}
+
+/// v3.4 — Kayıt ↔ kişi (çoktan-çoğa, rol ile). Kayit.kisiId geriye dönük uyumluluk için kalır (birincil kişi).
+model KayitKisi {
+  id       String        @id @default(cuid())
+  kayitId  String
+  kisiId   String
+  rol      KayitKisiRolu @default(DIGER)
+  birincil Boolean       @default(false)
+  kayit    Kayit         @relation(fields: [kayitId], references: [id], onDelete: Cascade)
+  kisi     Kisi          @relation(fields: [kisiId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@unique([kayitId, kisiId, rol])
+  @@index([kisiId])
+  @@map("kayit_kisi")
+}
+
+/// v3.4 — Yapay zekâya bir kez gönderilmiş mesajlar. Aynı dosya / aynı mesaj tekrar yüklendiğinde
+/// yeniden ayrıştırılmaz (AI kredisi boşa harcanmaz).
+model IslenmisMesaj {
+  parmakIzi   String   @id      // normalize edilmiş metin özeti
+  grup        String?
+  mesajTarihi DateTime?
+  ingestionId String?
+  kayitSayisi Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([grup, mesajTarihi])
+  @@map("islenmis_mesaj")
+}
+
+// ============================================================================
+//  EŞLEŞME
+// ============================================================================
+
+model Match {
+  id          String     @id @default(cuid())
+  talepId     String
+  portfoyId   String?
+  portalIlanId String?   // dış havuz eşleşmesi
+  havuz       Havuz      @default(KENDI_PORTFOY)
+
+  matematikSkor Float
+  lokasyonBonus Float    @default(0)
+  aiSkor        Float?
+  finalSkor     Float
+  aiAnaliz      String?
+
+  // v3.0 Aşama 2 — motor mantığı Aşama 3'te
+  uygunluk       Uygunluk?
+  kritikEngeller TeknikAlan[]
+  eksikBilgiler  TeknikAlan[]
+  /// Kriter bazlı puan dökümü: { "ELEKTRIK": {"skor":1,"not":"60≥50 kW"}, ... }
+  kriterDokumu   Json?
+
+  durum          MatchDurum @default(BEKLIYOR)
+  /// v3.8 — "Eşleşmeyi kopar": durum REDDEDILDI + neden (YANLIS, BEGENMEDI, SAHIP_ISTEMEDI, BASKA_ANLASTI, FIYAT, DIGER); bir daha önerilmez
+  kopmaNedeni    String?
+  koparilma      DateTime?
+  operasyonNotu  String?
+  notGuncellendi DateTime?
+
+  talepSahibiAdi   String?
+  talepSahibiTel   String?
+  portfoySahibiAdi String?
+  portfoySahibiTel String?
+
+  talep      Kayit       @relation("TalepMatch", fields: [talepId], references: [id], onDelete: Cascade)
+  portfoy    Kayit?      @relation("PortfoyMatch", fields: [portfoyId], references: [id], onDelete: Cascade)
+  portalIlan PortalIlan? @relation(fields: [portalIlanId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([talepId, portfoyId])
+  @@unique([talepId, portalIlanId])
+  @@index([finalSkor])
+  @@index([durum])
+  @@map("match")
+}
+
+// ============================================================================
+//  PORTAL İLANI (dış havuz, ham → onay → Kayit)
+// ============================================================================
+
+model PortalIlan {
+  id             String          @id @default(cuid())
+  kanal          VeriKanali
+  url            String          @unique
+  ilanNo         String?
+  baslik         String?
+  hamIcerik      String?
+  ilanSahibiAdi  String?
+  ilanSahibiTel  String?
+  ilanSahibiTipi IlanSahibiTipi  @default(PORTAL)
+  anaKategori    AnaKategori?
+  mulkTipi       MulkTipi?
+  islemTipi      IslemTipi?
+  fiyat          Decimal?        @db.Decimal(16, 2)
+  paraBirimi     ParaBirimi      @default(TRY)
+  fiyatPeriyodu  FiyatPeriyodu   @default(TOPLAM)
+  m2             Float?
+  ilId           Int?
+  ilceId         Int?
+  mahalleId      Int?
+  altBolgeId     Int?
+  ilkGorulme     DateTime        @default(now())
+  sonGorulme     DateTime        @default(now())
+  fiyatGecmisi   Json?           // [{tarih, fiyat}] → "fiyat düşmüş" sinyali
+  portfoyEdinmeSkoru Float?
+  durum          PortalIlanDurum @default(HAM)
+
+  il       Il?       @relation(fields: [ilId], references: [id])
+  ilce     Ilce?     @relation(fields: [ilceId], references: [id])
+  mahalle  Mahalle?  @relation(fields: [mahalleId], references: [id])
+  altBolge AltBolge? @relation(fields: [altBolgeId], references: [id])
+  ozellik  MulkOzellik?
+  matchler Match[]
+  kayitId  String?   @unique
+  kayit    Kayit?    @relation("PortalIlanKayit", fields: [kayitId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([kanal, durum])
+  @@index([ilceId])
+  @@map("portal_ilan")
+}
+
+// ============================================================================
+//  LOG TABLOLARI (v2.0)
+// ============================================================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  kayitId   String
+  alan      String
+  eskiDeger Json?
+  yeniDeger Json?
+  kaynak    String   @default("kullanici") // kullanici | ai | notion_sync | cron
+  kayit     Kayit    @relation(fields: [kayitId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([kayitId])
+  @@map("audit_log")
+}
+
+model IngestionLog {
+  id            String     @id @default(cuid())
+  kanal         VeriKanali
+  dosyaAdi      String?
+  grupAdi       String?
+  toplamMesaj   Int        @default(0)
+  gurultu       Int        @default(0)
+  yeniKayit     Int        @default(0)
+  duplicate     Int        @default(0)
+  lokasyonCozulemedi Int   @default(0)
+  dosyaParmakIzleri  String[]  // v3.4 — aynı dosyanın tekrar yüklendiğini anlamak için
+  oncedenIslenmis    Int      @default(0) // v3.4 — daha önce yapay zekâya gönderildiği için atlanan mesaj
+  hata          Int        @default(0)
+  detay         Json?
+  createdAt     DateTime   @default(now())
+
+  @@map("ingestion_log")
+}
+
+/// v3.6 — Google Kişiler / Notion bağlantısı (sağlayıcı başına tek satır)
+model Entegrasyon {
+  id          String               @id @default(cuid())
+  saglayici   EntegrasyonSaglayici @unique
+  durum       EntegrasyonDurum     @default(BAGLI_DEGIL)
+  hesap       String?              // bağlanan Google e-postası / Notion çalışma alanı
+  tokenSifreli String?             // AES-256-GCM (src/lib/guvenlik/sifre.ts) — Google yenileme anahtarı
+  syncToken   String?              // Google People API artımlı senkron anahtarı
+  /// Notion: tablo başına { sonDuzenleme }; Google: { sayfaToken }
+  imlec       Json?
+  /// { otomatik: boolean, aralikDk: 15, geriYaz: boolean, sadeceEtiketler: string[] }
+  ayarlar     Json?
+  sonSenkron  DateTime?
+  sonHata     String?
+  kilitBitis  DateTime?            // aynı anda iki senkron çalışmasın
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@map("entegrasyon")
+}
+
+/// v3.6 — her senkron çalışmasının özeti (Bağlantılar ekranındaki geçmiş)
+model SenkronCalisma {
+  id          String               @id @default(cuid())
+  saglayici   EntegrasyonSaglayici
+  tetik       String               @default("zamanlayici") // zamanlayici | kullanici | ilk
+  baslangic   DateTime             @default(now())
+  bitis       DateTime?
+  durum       SyncDurum            @default(BASARILI)
+  yeni        Int                  @default(0)
+  guncellenen Int                  @default(0)
+  baglanan    Int                  @default(0)
+  cakisma     Int                  @default(0)
+  atlanan     Int                  @default(0)
+  silinen     Int                  @default(0)
+  geriYazilan Int                  @default(0)
+  /// Zaman bütçesi doldu, kalan sayfalar bir sonraki çalışmada
+  devamEdecek Boolean              @default(false)
+  ozet        Json?
+  hata        String?
+
+  @@index([saglayici, baslangic])
+  @@map("senkron_calisma")
+}
+
+/// v3.6 — iki tarafta da değişmiş alan: kullanıcı hangisinin kalacağını seçer
+model SenkronCakisma {
+  id         String               @id @default(cuid())
+  saglayici  EntegrasyonSaglayici
+  hedefTip   String               // KISI | KAYIT
+  hedefId    String
+  alan       String
+  onceki     Json?
+  yerel      Json?
+  uzak       Json?
+  durum      CakismaDurum         @default(ACIK)
+  createdAt  DateTime             @default(now())
+  cozuldu    DateTime?
+
+  @@index([hedefId])
+  @@index([durum])
+  @@map("senkron_cakisma")
+}
+
+model NotionSyncLog {
+  id        String     @id @default(cuid())
+  kayitId   String?
+  notionId  String?
+  yon       String     @default("supabase_to_notion")
+  durum     SyncDurum
+  hata      String?
+  createdAt DateTime   @default(now())
+
+  @@index([durum])
+  @@map("notion_sync_log")
+}
+
+// ============================================================================
+//  v3.7 — GÖRÜŞME / NOT AKIŞI (talep ve portföy içinde)
+// ============================================================================
+enum NotTuru {
+  GORUSME
+  ARAMA
+  WHATSAPP
+  GOSTERIM
+  NOT
+}
+
+model KayitNot {
+  id        String   @id @default(cuid())
+  kayitId   String
+  kayit     Kayit    @relation(fields: [kayitId], references: [id], onDelete: Cascade)
+  tur       NotTuru  @default(NOT)
+  metin     String
+  kisiId    String?
+  kisi      Kisi?    @relation(fields: [kisiId], references: [id], onDelete: SetNull)
+  tarih     DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@index([kayitId, tarih])
+  @@index([kisiId])
+  @@map("kayit_not")
+}
+
+/// v3.10 — Portföy fotoğrafı. Dosya Supabase Storage'da (özel kova); burada yalnızca yol ve künye durur.
+/// Fotoğraf tarayıcıda küçültülerek yüklenir (uzun kenar 1600 px); kayıt başına en fazla 8 (bkz. src/lib/domain/foto.ts).
+model KayitFoto {
+  id         String   @id @default(cuid())
+  kayitId    String
+  kayit      Kayit    @relation(fields: [kayitId], references: [id], onDelete: Cascade)
+  /// 0 = kapak
+  sira       Int      @default(0)
+  ad         String
+  /// Kova içindeki yol: <kayitId>/<fotoId>.jpg
+  depoYolu   String
+  icerikTuru String   @default("image/jpeg")
+  en         Int
+  boy        Int
+  boyut      Int
+  createdAt  DateTime @default(now())
+
+  @@index([kayitId, sira])
+  @@map("kayit_foto")
+}

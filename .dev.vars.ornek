@@ -1,0 +1,10 @@
+# Yerel deneme için (wrangler dev). Bu dosyayı ".dev.vars" adıyla kopyalayın; GERÇEK anahtarları buraya yazmayın, depoya girmez (.gitignore).
+DATABASE_URL=postgresql://postgres:pg@127.0.0.1:5432/crm
+DIRECT_URL=postgresql://postgres:pg@127.0.0.1:5432/crm
+SUPABASE_URL=http://127.0.0.1:9001
+SUPABASE_ANON_KEY=yerel-deneme
+SUPABASE_SERVICE_ROLE_KEY=svc-test
+SUPABASE_JWT_SECRET=test-gizli-anahtar-en-az-32-karakter-olmali-123
+IZINLI_EPOSTALAR=ozgur@test.com
+AI_API_KEY=
+CRON_SECRET=cron-test

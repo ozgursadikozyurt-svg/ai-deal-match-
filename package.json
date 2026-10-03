@@ -1,1 +1,62 @@
-{"name":"ai-deal-match","private":true,"version":"3.0.0","type":"module","scripts":{"dev":"vite","build":"vite build","preview":"vite preview"},"dependencies":{"react":"^18.3.1","react-dom":"^18.3.1","recharts":"^2.12.7"},"devDependencies":{"@vitejs/plugin-react":"^4.3.1","vite":"^5.4.2"}}
+{
+  "name": "anahtarcrm",
+  "version": "3.14.0",
+  "description": "Anahtar CRM — yapay zekâ destekli talep / portföy eşleştirme (canlı sürüm: Cloudflare Workers + Supabase)",
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:seed:antalya": "LOKASYON_KAPSAM=07 prisma db seed",
+    "lokasyon:build": "python3 scripts/build_lokasyon_data.py",
+    "typecheck": "tsc -p .",
+    "test:db": "./scripts/test-db.sh",
+    "demo": "tsx scripts/demo-build.ts",
+    "surum:damgala": "tsx scripts/surum-damgala.ts",
+    "canli:rotalar": "tsx scripts/canli-rotalar.ts",
+    "canli:gomulu": "tsx scripts/canli-gomulu.ts",
+    "canli:arayuz": "tsx scripts/canli-arayuz.ts",
+    "canli:build": "npm run canli:rotalar && npm run canli:gomulu && npm run canli:arayuz",
+    "canli:dene": "wrangler dev",
+    "canli:test": "tsx scripts/canli-uctan-uca.ts",
+    "canli:yayinla": "npm run canli:build && wrangler deploy",
+    "canli:istemci": "prisma generate",
+    "canli:test:depo": "tsx scripts/canli-depo-testi.ts",
+    "canli:test:giris": "tsx scripts/canli-jwks-testi.ts",
+    "canli:test:arayuz": "tsx scripts/canli-yedek-uret.ts && node scripts/canli-arayuz-testi.mjs"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@electric-sql/pglite-socket": "^0.2.11",
+    "@prisma/schema-engine-wasm": "^7.10.0-4.0edf323efd1d98336f3f0a68684b56f689b900d3",
+    "@types/node": "^26.6.3",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "prisma": "^7.10.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsx": "^4.23.15",
+    "turkey-neighbourhoods": "^4.0.3",
+    "typescript": "^7.0.2",
+    "zod": "^3.25.76",
+    "wrangler": "^4",
+    "esbuild": "^0.25",
+    "jsdom": "^26"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "dotenv": "^18.0.4",
+    "fflate": "^0.8.2",
+    "pg": "^8.23.0",
+    "jose": "^6"
+  },
+  "private": true,
+  "imports": {
+    "#prisma-istemci": {
+      "workerd": "./src/generated/prisma-worker/client.ts",
+      "default": "./src/generated/prisma/client.ts"
+    }
+  }
+}

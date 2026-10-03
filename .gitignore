@@ -1,0 +1,11 @@
+dist
+node_modules
+.env
+.wrangler
+src/canli/rotalar.generated.ts
+src/canli/gomulu.generated.ts
+demo/antalya-veri.json
+demo/turkiye-veri.json
+.dev.vars
+# NOT: src/generated (Prisma istemcisi) bilerek pakette durur — Cloudflare derlemesi ağdan motor indirmeye bağımlı olmasın.
+# Şema değişirse: npm run canli:istemci
