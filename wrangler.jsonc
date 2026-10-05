@@ -8,7 +8,6 @@
   "assets": { "directory": "dist/canli", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"], "binding": "ASSETS" },
   "triggers": { "crons": ["0 3 * * *", "0 4 * * 0"] },
   "observability": { "enabled": true },
-  "vars": { "FOTO_KOVA": "portfoy" }
   // Gizli değerler Cloudflare panelinde: Settings → Variables and Secrets (bkz. CANLIYA_ALMA_REHBERI):
   //   DATABASE_URL, DIRECT_URL, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, IZINLI_EPOSTALAR, AI_API_KEY, CRON_SECRET
 }
