@@ -9,11 +9,13 @@ import { BAGLAM, konumOner, lokEtiket, type KonumOnerisi } from "./lokasyon";
 import { kalanGun, type DepoDurumu, type Kayit, type Veri, type OrnekHata } from "./depo";
 
 // ───────── Bağlam ─────────
-export type Ekran =
+/** donus: bir formdan "Vazgeç / Kaydet" ile geri dönülüyor — içe aktarma / veri girişi ekranları yüklü dosya ve seçimlerini korur (demo/hafiza.ts) */
+export type Ekran = (
   | { ad: "ana" } | { ad: "liste"; tip: "TALEP" | "PORTFOY"; filtre?: any } | { ad: "detay"; id: string }
-  | { ad: "form"; tip: "TALEP" | "PORTFOY"; id?: string; taslak?: Partial<Veri>; adayId?: string }
+  | { ad: "form"; tip: "TALEP" | "PORTFOY"; id?: string; taslak?: Partial<Veri>; adayId?: string; geri?: Ekran }
   | { ad: "eslesmeler" } | { ad: "eslesme"; tid: string; pid: string }
-  | { ad: "veri"; alt?: "dosya" | "mesaj" | "wa" | "el"; metin?: string } | { ad: "konumlar" } | { ad: "kisiler" } | { ad: "kisi"; id: string } | { ad: "ayarlar" } | { ad: "baglantilar" };
+  | { ad: "veri"; alt?: "metin" | "dosya" | "mesaj" | "wa" | "el"; metin?: string } | { ad: "konumlar" } | { ad: "kisiler" } | { ad: "kisi"; id: string } | { ad: "ayarlar" } | { ad: "baglantilar" }
+) & { donus?: boolean };
 export interface Ctx {
   d: DepoDurumu;
   guncelle: (f: (d: DepoDurumu) => DepoDurumu) => void;

@@ -21,7 +21,8 @@ import { metinParmakIzi } from "../src/lib/ingest/whatsapp";
 import { etiket, VERI_KANALI_ETIKET } from "./etiketler";
 import { BAGLAM, INDEKS, coz, cozulenToKayitLok, calismaIliOku, ilAdiOf, type KonumOnerisi } from "./lokasyon";
 import { BUGUN, varsayilanValidUntil, yeniId, kayitliMetinIzleri, kisiRolleriOf, aiAyari, type Kayit, type Veri } from "./depo";
-import { useDepo, cx, Pill, IslemPill, Skor, UYGUNLUK, baslikOf, fiyatOf, m2Of, oneCikanlar, lokEtiket, aiJson, telYaz } from "./ortak";
+import { useDepo, cx, Pill, IslemPill, Skor, UYGUNLUK, baslikOf, fiyatOf, m2Of, oneCikanlar, lokEtiket, aiJson, telYaz, type Ekran } from "./ortak";
+import { hafizaBaslat, useKalici } from "./hafiza";
 import { bosFiltre, filtreUygula, type Filtre } from "./filtre";
 import { kisiEkle } from "./kisiler";
 import { EksikUyarisi, FirsatBandi, HavuzRozeti } from "./motor-ui";
@@ -142,21 +143,24 @@ const ORNEKLER = (toplantiNotu: string): [string, string][] => [
   ["Yeni kişi", "Mert Aksoy 0555 000 07 01"],
 ];
 
-export function AkilliKutu({ gomulu = false, baslangic = "" }: { gomulu?: boolean; baslangic?: string }) {
+export function AkilliKutu({ gomulu = false, baslangic = "", donus }: { gomulu?: boolean; baslangic?: string; donus?: boolean }) {
   const { d, sample, git, kayitKaydet, guncelle, bildir } = useDepo();
-  const [metin, setMetin] = useState(baslangic);
-  const [islenen, setIslenen] = useState("");
-  const [yorum, setYorum] = useState(null as Yorum | null);
-  const [ai, setAi] = useState(null as { kayitlar: any[]; aciklama: string; tur: string } | null);
-  const [soru, setSoru] = useState(null as any);
-  const [secim, setSecim] = useState("OTO" as TipSecimi);
-  const [secili, setSecili] = useState(new Set<number>());
-  const [acik, setAcik] = useState(null as number | null);
+  const HK = gomulu ? "vg.ak." : "ana.ak."; // v3.15: forma gidip "Vazgeç" ile dönülünce yorumlanan metin ve sonuçlar yerinde kalır
+  hafizaBaslat(HK, donus);
+  const GERI: Ekran = gomulu ? { ad: "veri", alt: "metin" } : { ad: "ana" };
+  const [metin, setMetin] = useKalici(HK + "metin", baslangic);
+  const [islenen, setIslenen] = useKalici(HK + "islenen", "");
+  const [yorum, setYorum] = useKalici(HK + "yorum", null as Yorum | null);
+  const [ai, setAi] = useKalici(HK + "ai", null as { kayitlar: any[]; aciklama: string; tur: string } | null);
+  const [soru, setSoru] = useKalici(HK + "soru", null as any);
+  const [secim, setSecim] = useKalici(HK + "secim", "OTO" as TipSecimi);
+  const [secili, setSecili] = useKalici(HK + "secili", new Set<number>());
+  const [acik, setAcik] = useKalici(HK + "acik", null as number | null);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [aiCalisiyor, setAiCalisiyor] = useState(false);
   const [hata, setHata] = useState(null as string | null);
-  const [basari, setBasari] = useState(null as { metin: string; talep: number; portfoy: number } | null);
-  const [eklenenKisi, setEklenenKisi] = useState(false);
+  const [basari, setBasari] = useKalici(HK + "basari", null as { metin: string; talep: number; portfoy: number } | null);
+  const [eklenenKisi, setEklenenKisi] = useKalici(HK + "eklenenKisi", false);
   const onbellek = useRef(new Map<string, any>());
   const otoBekleyen = useRef(false);
 
@@ -467,7 +471,7 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
             )}
             <div className="satir sar oz-eylem">
               <button className="btn birincil genis-btn" disabled={!tek.veri || tek.tekrar} onClick={() => tekKaydet(tek)}>{tek.taslak.tip === "TALEP" ? "Talebi kaydet" : "Portföyü kaydet"}</button>
-              <button className="btn" onClick={() => git({ ad: "form", tip: tek.taslak.tip, taslak: tek.veri ?? tek.taslak })}>Düzenle</button>
+              <button className="btn" onClick={() => git({ ad: "form", tip: tek.taslak.tip, taslak: tek.veri ?? tek.taslak, geri: GERI })}>Düzenle</button>
             </div>
           </div>
         </div>
@@ -516,7 +520,7 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
                 {s.p.notlar.length > 0 && <div className="cs-not">{s.p.notlar.join(" · ")}</div>}
                 <div className="cs-alt">
                   <button className="link-btn" onClick={() => setAcik(acik === i ? null : i)}>{acik === i ? "Metni gizle" : "Metni göster"}</button>
-                  <button className="link-btn" onClick={() => git({ ad: "form", tip: v.tip, taslak: s.veri ?? s.taslak })}>Düzenle</button>
+                  <button className="link-btn" onClick={() => git({ ad: "form", tip: v.tip, taslak: s.veri ?? s.taslak, geri: GERI })}>Düzenle</button>
                 </div>
                 {acik === i && <pre className="ham cs-ham">{s.p.metin}</pre>}
               </div>

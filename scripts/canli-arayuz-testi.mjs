@@ -1,4 +1,4 @@
-// Anahtar CRM v3.14 · 3 Ekim 2026 — canlı arayüz sınaması (sanal tarayıcı: jsdom). Hazırlık: bkz. README › Canlı sürümü yerelde sınama
+// Anahtar CRM v3.15 · 5 Ekim 2026 — canlı arayüz sınaması (sanal tarayıcı: jsdom). Hazırlık: bkz. README › Canlı sürümü yerelde sınama
 import { JSDOM, VirtualConsole } from "jsdom";
 import fs from "node:fs";
 import { SignJWT } from "jose";
@@ -23,7 +23,7 @@ async function ac({ oturum, hash = "" }) {
 // A) oturumsuz → giriş ekranı
 { const a = await ac({}); const ok = await bekle(() => a.metin().includes("Giriş bağlantısı gönder"));
   tamam("oturumsuz açılış: giriş ekranı", ok, ok ? "" : a.metin().slice(0, 120));
-  tamam("giriş ekranı: sürüm etiketi v3.14", a.metin().includes("v3.14"));
+  tamam("giriş ekranı: sürüm etiketi v3.15", a.metin().includes("v3.15"));
   tamam("giriş ekranı: e-posta alanı var", !!a.w.document.getElementById("gi-eposta")); a.w.close(); }
 
 // B) izinsiz e-posta → 403 mesajı
@@ -32,8 +32,8 @@ async function ac({ oturum, hash = "" }) {
 
 // C) izinli oturum → uygulama açılır
 { const t = await jwt("ozgur@test.com"); const a = await ac({ oturum: { access: t, refresh: "x", bitis: Date.now() + 3600e3, eposta: "ozgur@test.com" } });
-  const ok = await bekle(() => a.metin().includes("Ana Sayfa") && a.metin().includes("Kaydedildi"), 15000);
-  tamam("izinli oturum: uygulama açıldı, 'Kaydedildi ✓' göstergesi var", ok, ok ? "" : a.metin().slice(0, 200) + " | " + a.hatalar.slice(0, 2).join(" ; "));
+  const ok = await bekle(() => a.metin().includes("Ana Sayfa"), 15000);
+  tamam("izinli oturum: uygulama açıldı; açılışta 'Kaydedildi ✓' göstergesi ekranda kalmıyor (v3.15)", ok && !a.metin().includes("Kaydedildi"), ok ? "" : a.metin().slice(0, 200) + " | " + a.hatalar.slice(0, 2).join(" ; "));
   tamam("canlıda 'Bağlantılar' menüsü gizli", !/Bağlantılar/.test(a.metin()));
   const aday = [...a.w.document.querySelectorAll("#kok button, #kok a")].filter((b) => /Ayarlar/.test(b.textContent ?? "")); console.log("   Ayarlar adayları:", aday.map((b) => b.tagName + ":" + (b.textContent ?? "").trim().slice(0, 20)).join(" | ")); const nav = aday[0];
   tamam("menüde Ayarlar var", !!nav);
@@ -80,7 +80,7 @@ async function ac({ oturum, hash = "" }) {
     const kaydedildi = sonra.kayitlar.length >= once + 26;
     tamam(`yedek sunucuya kendiliğinden kaydedildi (${once} → ${sonra.kayitlar.length} kayıt, ${sonra.kisiler.length} kişi)`, kaydedildi);
   }
-  tamam("gösterge 'Kaydedildi ✓' durumuna döndü", await bekle(() => a.metin().includes("Kaydedildi"), 8000));
+  tamam("'Kaydedildi ✓' göstergesi ~3 sn sonra kendiliğinden kayboldu (v3.15)", await bekle(() => !a.metin().includes("Kaydedildi") && !/Kaydedilecek|Kaydediliyor/.test(a.metin()), 8000));
   tamam("bu akışta beklenmeyen JS hatası yok", a.hatalar.length === 0, a.hatalar.slice(0, 2).join(" ; ")); a.w.close(); }
 
 console.log(`\n${gecen} geçti, ${kalan} kaldı`); process.exit(kalan ? 1 : 0);

@@ -85,6 +85,8 @@ export interface DepoDurumu {
   cakismalar: DemoCakisma[];
   /** v3.7 demo — telefonda Google'a kaydedilmiş, sonraki çekimde gelecek kişiler */
   googleBekleyen?: import("../src/lib/google/kisiler").GooglePerson[];
+  /** v3.15 — Ayarlar › Kişi rolleri: özel roller + sistem rollerinin yeniden adlandırılmış etiketleri (canlıda Ayar tablosu, demoda tarayıcı) */
+  roller?: import("../src/lib/domain/roller").RolTanim[];
 }
 export interface DemoBaglanti { durum: "BAGLI_DEGIL" | "BAGLI"; hesap: string | null; tur: number; sonSenkron: string | null; ayar: { otomatik: boolean; aralikDk: number; geriYaz: boolean; googleYaz: boolean; sadeceEtiketler: string[] } }
 export interface DemoCalisma { id: string; saglayici: "GOOGLE_KISILER" | "NOTION"; tarih: string; tetik: string; ozet: Record<string, number>; kontrol: { id: string | null; baslik: string; nedenler: string[] }[]; yeniEslesme: number; geriYazim: { id: string; baslik: string; deger: Record<string, unknown> }[]; atlanan: { ad: string; neden: string }[] }
@@ -187,7 +189,7 @@ export function depoYukle(): { durum: DepoDurumu; hatalar: OrnekHata[]; yenilend
     const d = JSON.parse(ham) as Partial<DepoDurumu>;
     // Örnek veri yapısı değiştiyse kayıtları yenile; test notları, ayarlar ve öğrenilen konumlar korunur
     if (d.veriSurumu !== ORNEK_VERI_SURUMU)
-      return { durum: { ...bos, testler: d.testler ?? {}, geriBildirim: d.geriBildirim ?? "", ayarlar: ayarlariOku(d.ayarlar), ogrenilen: d.ogrenilen ?? [] }, hatalar, yenilendi: true };
+      return { durum: { ...bos, testler: d.testler ?? {}, geriBildirim: d.geriBildirim ?? "", ayarlar: ayarlariOku(d.ayarlar), ogrenilen: d.ogrenilen ?? [], roller: d.roller ?? [] }, hatalar, yenilendi: true };
     // v3.11 — v3.10'da yanlış ilçeye yazılmış aynı adlı mahalleleri onar ("Fener, Çağlayan" → Muratpaşa / Çağlayan)
     if (Array.isArray(d.kayitlar)) d.kayitlar = d.kayitlar.map((k) => { const r = belirsizKonumOnar((k.veri?.lokasyonlar ?? []) as any[]); return r.degisti ? { ...k, veri: { ...k.veri, lokasyonlar: r.lokasyonlar } } : k; }) as typeof d.kayitlar;
     return { durum: { ...bos, ...d, ayarlar: ayarlariOku(d.ayarlar) } as DepoDurumu, hatalar, yenilendi: false };

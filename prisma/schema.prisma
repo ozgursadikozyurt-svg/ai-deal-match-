@@ -796,6 +796,8 @@ model Kayit {
   paraBirimi    ParaBirimi   @default(TRY)
   fiyatPeriyodu FiyatPeriyodu @default(TOPLAM)
   krediyeUygun  Boolean?
+  /// v3.15 — takasa açık (portföy ve talep); null = belirtilmemiş. Eşleştirmede iki taraf da true ise küçük bonus.
+  takasaAcik    Boolean?
 
   // ---- Ana alan (hızlı filtre) — detaylar MulkOzellik'te ----
   m2            Float?       // portföy: ana kullanım alanı (brüt)
@@ -975,6 +977,8 @@ model MulkOzellik {
   binaYasi          Int?
   katSayisi         Int?
   bulunduguKat      Int?     // 0 = zemin/giriş, -1 = bodrum
+  /// v3.15 — TALEPTE istenen katlar (çoklu): "-1" bodrum, "0" giriş/zemin, "1"…"N", "ARA" (ara kat), "SON" (son kat). Portföy tek kat tutar (bulunduguKat).
+  istenenKatlar     String[]
 
   // ---- SOSYAL ALANLAR ----
   ofis              Boolean?
@@ -1078,7 +1082,8 @@ model Kisi {
   ikincilTelefon String?
   email          String?
   sirket         String?
-  roller         KisiRolu[]
+  /// v3.15 — rol kodları (ALICI, SATICI … + Ayarlar'dan eklenen özel roller). Eskiden KisiRolu enum dizisiydi; artık serbest metin dizisi.
+  roller         String[]
   ilanSahibiTipi IlanSahibiTipi @default(BILINMIYOR)
   kaynak         KisiKaynagi    @default(MANUEL)
   notlar         String?

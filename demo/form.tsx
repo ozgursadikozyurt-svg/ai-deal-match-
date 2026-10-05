@@ -9,14 +9,14 @@ import { talepDnasi } from "../src/lib/eslestirme/talep-dna";
 import { EksikUyarisi } from "./motor-ui";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { KayitCreateSchema, MulkOzellikSchema } from "../src/lib/validation/kayit";
-import { MULK_OZELLIK_META, alanGruptaMi, type MulkOzellikAlani } from "../src/lib/domain/teknik-alanlar";
+import { MULK_OZELLIK_META, alanGruptaMi, KAT_SECENEKLERI, type MulkOzellikAlani } from "../src/lib/domain/teknik-alanlar";
 import { anaKategoriOf, islemKategoriUyumlu, MULK_AILELERI, aileOf, benzerAileler } from "../src/lib/domain/kategori";
 import { ONEMLI_ALANLAR, TEMEL_EKSTRA } from "../src/lib/domain/form-alanlari";
 import { adaylariGuncelle } from "../src/lib/lokasyon/ogrenme";
 import { etiket, KRITER_ETIKET, ISLEM_TIPI_ETIKET, ILAN_SAHIBI_ETIKET, VERI_KANALI_ETIKET, MULK_TIPI_META, HAVUZ_ETIKET } from "./etiketler";
 import { coz, cozulenToKayitLok, lokEtiket, ilAdiOf, calismaIliOku } from "./lokasyon";
 import { BUGUN, varsayilanValidUntil, yeniId, sureUzat, type Kayit, type Veri } from "./depo";
-import { useDepo, cx, Bolum, KonumSecici, tarihYaz, telYaz } from "./ortak";
+import { useDepo, cx, Bolum, KonumSecici, tarihYaz, telYaz, type Ekran } from "./ortak";
 import { konumOgret } from "./konumlar";
 import { KisiSecici } from "./kisiler";
 import { ttlGun } from "../src/lib/domain/gecerlilik";
@@ -131,13 +131,14 @@ function TeknikAlanlar({ f, setO, talep }: { f: any; setO: (k: string, v: any) =
   const grup = MULK_TIPI_META[f.mulkTipi as keyof typeof MULK_TIPI_META]?.grup ?? "DIGER";
   const [tumu, setTumu] = useState(false);
   const [kva, setKva] = useState<boolean>(f.ozellik.elektrikGucuKw == null && f.ozellik.elektrikGucuKva != null);
-  const tum = (Object.keys(MULK_OZELLIK_META) as Alan[]).filter((a) => alanGruptaMi(a, grup) && (MULK_OZELLIK_META[a] as any).formda !== false && !["kritikKriterler", "esnekKriterler", "eksikBilgiler"].includes(a));
+  const tum = (Object.keys(MULK_OZELLIK_META) as Alan[]).filter((a) => alanGruptaMi(a, grup) && (MULK_OZELLIK_META[a] as any).formda !== false && !["kritikKriterler", "esnekKriterler", "eksikBilgiler"].includes(a) && (talep ? a !== "bulunduguKat" : a !== "istenenKatlar"));
   const onemli = ONEMLI_ALANLAR[grup].filter((a) => tum.includes(a));
   const diger = tum.filter((a) => !onemli.includes(a));
   const dolu = (a: Alan) => f.ozellik[a] != null && !(Array.isArray(f.ozellik[a]) && !f.ozellik[a].length);
   const girdi = (a: Alan) => {
     const m = MULK_OZELLIK_META[a] as any, t = alanTuru(a), v = f.ozellik[a], idx = "oz-" + a;
     const ek = talep ? (m.karsilastirma === "min" || m.karsilastirma === "sirali" ? " · en az" : m.karsilastirma === "max" ? " · en fazla" : "") : "";
+    if (a === "istenenKatlar") return <div key={a} className="alan genis"><label>İstenen kat(lar) · birden fazla seçilebilir</label><div className="cip-satir">{KAT_SECENEKLERI.map(([k, l]) => { const on = ((v as string[] | undefined) ?? []).includes(k); return <button type="button" key={k} className={cx("cip secilir", on && "on")} onClick={() => setO(a, on ? (v as string[]).filter((y) => y !== k) : [...((v as string[] | undefined) ?? []), k])}>{l}</button>; })}</div></div>;
     if (a === "elektrikGucuKw") return <div key={a} className="alan"><label htmlFor={idx}>Elektrik gücü{ek}</label>
       <div className="birimli"><SayiGir id={idx} deger={kva ? f.ozellik.elektrikGucuKva : v} onChange={(x) => { if (kva) { setO("elektrikGucuKva", x); setO("elektrikGucuKw", null); } else { setO("elektrikGucuKw", x); setO("elektrikGucuKva", null); } }} />
         <div className="uc mini">{(["kW", "kVA"] as const).map((b) => <button type="button" key={b} className={cx((b === "kVA") === kva && "on")} onClick={() => setKva(b === "kVA")}>{b}</button>)}</div></div>
@@ -167,7 +168,7 @@ const TUM_KRITERLER = Object.keys(KRITER_ETIKET).filter((k) => !["MULK_TIPI", "I
 const ODA_SECENEK = ["1+0", "1+1", "2+1", "3+1", "4+1", "5+1", "6+1"];
 const KAYIT_ROL_VARSAYILAN = (tip: string, sahip: string) => (sahip === "EMLAKCI" ? "EMLAKCI" : tip === "PORTFOY" ? "SAHIP" : "MUSTERI");
 
-export function KayitFormu({ tip, id, taslak, adayId }: { tip: "TALEP" | "PORTFOY"; id?: string; taslak?: Partial<Veri>; adayId?: string }) {
+export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "PORTFOY"; id?: string; taslak?: Partial<Veri>; adayId?: string; geri?: Ekran }) {
   const { d, kayitKaydet, git, bildir, guncelle } = useDepo();
   const mevcut = id ? d.kayitlar.find((k) => k.id === id) : undefined;
   const talep = tip === "TALEP";
@@ -217,11 +218,12 @@ export function KayitFormu({ tip, id, taslak, adayId }: { tip: "TALEP" | "PORTFO
     kayitKaydet(kayit);
     if (adayId) {
       guncelle((dd) => (dd.aktifIceAktarma ? { ...dd, aktifIceAktarma: { ...dd.aktifIceAktarma, adaylar: dd.aktifIceAktarma.adaylar.map((a) => (a.id === adayId ? { ...a, durum: "EKLENDI" as const } : a)) } } : dd));
-      bildir("Havuza eklendi"); git({ ad: "veri", alt: "wa" }); return;
+      bildir("Havuza eklendi"); git({ ad: "veri", alt: "wa", donus: true }); return;
     }
-    bildir("Kaydedildi — doğrulamadan geçti"); git({ ad: "detay", id: kayit.id });
+    bildir("Kaydedildi — doğrulamadan geçti"); git(geri ? { ...geri, donus: true } : { ad: "detay", id: kayit.id });
   }
-  const vazgec = () => (adayId ? git({ ad: "veri", alt: "wa" }) : mevcut ? git({ ad: "detay", id: mevcut.id }) : git({ ad: "liste", tip }));
+  // v3.15: form bir içe aktarma / veri girişi ekranından açıldıysa (geri) oraya, değilse eskisi gibi döner
+  const vazgec = () => (geri ? git({ ...geri, donus: true }) : adayId ? git({ ad: "veri", alt: "wa", donus: true }) : mevcut ? git({ ad: "detay", id: mevcut.id }) : git({ ad: "liste", tip }));
 
   return <div className="yigin" ref={ust}>
     <button className="btn kucuk geri" onClick={vazgec}>← Vazgeç</button>
@@ -251,6 +253,7 @@ export function KayitFormu({ tip, id, taslak, adayId }: { tip: "TALEP" | "PORTFO
         <div className="alan genis"><label htmlFor="f-baslik">Başlık</label><input id="f-baslik" maxLength={160} value={f.baslik ?? ""} onChange={(e) => set("baslik", e.target.value)} placeholder="Kısa, tek satır" /></div>
       </div>
       {ekstra.includes("krediyeUygun") && <div className="cip-satir bool-satir"><button type="button" className={cx("bool-cip", f.krediyeUygun === true && "evet", f.krediyeUygun === false && "hayir")} onClick={() => set("krediyeUygun", f.krediyeUygun == null ? true : f.krediyeUygun ? false : null)}><span className="isaret">{f.krediyeUygun === true ? "✓" : f.krediyeUygun === false ? "✕" : "+"}</span>Krediye uygun</button></div>}
+      <div className="cip-satir bool-satir"><button type="button" className={cx("bool-cip", f.takasaAcik === true && "evet", f.takasaAcik === false && "hayir")} onClick={() => set("takasaAcik", f.takasaAcik == null ? true : f.takasaAcik ? false : null)}><span className="isaret">{f.takasaAcik === true ? "✓" : f.takasaAcik === false ? "✕" : "+"}</span>Takasa açık</button></div>
     </Bolum>
 
     <Bolum baslik="Lokasyon" acik ozet={f.lokasyonlar.length ? `${f.lokasyonlar.length} konum` : undefined}><LokasyonDuzenle lok={f.lokasyonlar} setLok={(l) => set("lokasyonlar", l)} portfoy={!talep} /></Bolum>

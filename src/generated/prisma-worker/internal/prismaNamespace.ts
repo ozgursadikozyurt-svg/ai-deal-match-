@@ -2470,6 +2470,7 @@ export const KayitScalarFieldEnum = {
   paraBirimi: 'paraBirimi',
   fiyatPeriyodu: 'fiyatPeriyodu',
   krediyeUygun: 'krediyeUygun',
+  takasaAcik: 'takasaAcik',
   m2: 'm2',
   netM2: 'netM2',
   minM2: 'minM2',
@@ -2583,6 +2584,7 @@ export const MulkOzellikScalarFieldEnum = {
   binaYasi: 'binaYasi',
   katSayisi: 'katSayisi',
   bulunduguKat: 'bulunduguKat',
+  istenenKatlar: 'istenenKatlar',
   ofis: 'ofis',
   ofisOdaSayisi: 'ofisOdaSayisi',
   wc: 'wc',
@@ -3529,20 +3531,6 @@ export type ListEnumTeknikAlanFieldRefInput<$PrismaModel> = FieldRefInputType<$P
  * Reference to a field of type 'TeknikAlan'
  */
 export type EnumTeknikAlanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TeknikAlan'>
-    
-
-
-/**
- * Reference to a field of type 'KisiRolu[]'
- */
-export type ListEnumKisiRoluFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'KisiRolu[]'>
-    
-
-
-/**
- * Reference to a field of type 'KisiRolu'
- */
-export type EnumKisiRoluFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'KisiRolu'>
     
 
 

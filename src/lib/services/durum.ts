@@ -10,12 +10,13 @@ import { KayitTemel, MulkOzellikObje, KayitCreateSchema } from "../validation/ka
 import { fingerprint, ttlAyarlari } from "./kayit";
 import { varsayilanValidUntil as vu, TtlAyarSchema } from "../domain/gecerlilik";
 import { AiAyarSchema, PaylasimAyarSchema, aiAyarNormalize, paylasimNormalize, calismaIliNormalize } from "../domain/ayarlar";
+import { RolTanimSchema, rolNormalize, ROL_SINIRI } from "../domain/roller";
 
 const KAYIT_ALANLARI = [...new Set([...Object.keys(KayitTemel.shape), "anaKategori"])].filter((k) => !["lokasyonlar", "kisiler", "ozellik", "kisiId"].includes(k)); // kisiId: kayıtta kisiler[0]'dan türetilir; arayüzdeki kişi kimlikleri cuid değildir
 const OZELLIK_ALANLARI = Object.keys((MulkOzellikObje as any).shape ?? (MulkOzellikObje as any)._def?.schema?.shape ?? {});
 const sade = (v: unknown): unknown => (v == null ? null : v instanceof Date ? v.toISOString() : typeof v === "object" && v && "toNumber" in (v as any) ? Number(v) : v);
 const ARAYUZ = "arayuz";
-const AYAR_ANAHTARLARI = ["ttl", "ai", "paylasim", "calismaIli", ARAYUZ];
+const AYAR_ANAHTARLARI = ["ttl", "ai", "paylasim", "calismaIli", "roller", ARAYUZ];
 
 // ───────── Okuma ─────────
 export async function durumGetir(prisma: PrismaClient) {
@@ -35,7 +36,7 @@ export async function durumGetir(prisma: PrismaClient) {
     }),
     kisiler: kisiler.map((k) => ({ id: k.id, adSoyad: k.adSoyad, telefon: k.telefon, ikincilTelefon: k.ikincilTelefon, email: k.email, sirket: k.sirket, roller: k.roller, uzmanlikAileleri: k.uzmanlikAileleri, referans: k.referans, notlar: k.notlar, whatsappGruplari: k.whatsappGruplari, olusturma: k.createdAt.toISOString(), sonIletisim: k.sonIletisim?.toISOString() ?? null, kaynak: k.kaynak === "CSV" ? "MANUEL" : k.kaynak, ilanSahibiTipi: k.ilanSahibiTipi, googleResourceName: k.googleResourceName, kaynaktaSilindi: k.kaynaktaSilindi?.toISOString() ?? null })),
     eslesmeNotlari: Object.fromEntries(eslesmeler.map((m) => [`${m.talepId}~${m.portfoyId}`, { durum: m.durum === "BEKLIYOR" ? "YENI" : m.durum, not: m.operasyonNotu ?? "", ...(m.kopmaNedeni ? { neden: m.kopmaNedeni } : {}), ...(m.koparilma ? { tarih: m.koparilma.toISOString() } : {}) }])),
-    ayarlar: { ttl: TtlAyarSchema.parse({ ...((ayarlar.find((a) => a.anahtar === "ttl")?.deger as object) ?? {}) }), ai: aiAyarNormalize(ayarlar.find((a) => a.anahtar === "ai")?.deger), paylasim: paylasimNormalize(ayarlar.find((a) => a.anahtar === "paylasim")?.deger), calismaIli: calismaIliNormalize(ayarlar.find((a) => a.anahtar === "calismaIli")?.deger) },
+    ayarlar: { ttl: TtlAyarSchema.parse({ ...((ayarlar.find((a) => a.anahtar === "ttl")?.deger as object) ?? {}) }), ai: aiAyarNormalize(ayarlar.find((a) => a.anahtar === "ai")?.deger), paylasim: paylasimNormalize(ayarlar.find((a) => a.anahtar === "paylasim")?.deger), calismaIli: calismaIliNormalize(ayarlar.find((a) => a.anahtar === "calismaIli")?.deger), roller: rolNormalize(ayarlar.find((a) => a.anahtar === "roller")?.deger) },
     arayuz: (ayarlar.find((a) => a.anahtar === ARAYUZ)?.deger ?? {}) as Record<string, unknown>,
   };
 }
@@ -53,7 +54,7 @@ export const DegisiklikSchema = z.object({
   kayitlar: z.array(KayitZ).max(5000).default([]), kayitSil: z.array(z.string()).max(5000).default([]),
   kisiler: z.array(KisiZ).max(5000).default([]), kisiSil: z.array(z.string()).max(5000).default([]),
   eslesmeNotlari: z.record(EsNotZ).default({}),
-  ayarlar: z.object({ ttl: z.record(z.number()).optional(), ai: AiAyarSchema.optional(), paylasim: PaylasimAyarSchema.optional(), calismaIli: z.number().int().optional() }).optional(),
+  ayarlar: z.object({ ttl: z.record(z.number()).optional(), ai: AiAyarSchema.optional(), paylasim: PaylasimAyarSchema.optional(), calismaIli: z.number().int().optional(), roller: z.array(RolTanimSchema).max(ROL_SINIRI).optional() }).optional(),
   arayuz: z.record(z.unknown()).optional(),
 });
 export type Degisiklik = z.output<typeof DegisiklikSchema>;
@@ -120,6 +121,7 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
     if (g.ayarlar.ai) await yaz("ai", g.ayarlar.ai);
     if (g.ayarlar.paylasim) await yaz("paylasim", g.ayarlar.paylasim);
     if (g.ayarlar.calismaIli != null) await yaz("calismaIli", g.ayarlar.calismaIli);
+    if (g.ayarlar.roller) await yaz("roller", rolNormalize(g.ayarlar.roller)); // v3.15: özel roller + yeniden adlandırmalar
   }
   if (g.arayuz) await prisma.ayar.upsert({ where: { anahtar: ARAYUZ }, update: { deger: g.arayuz as any }, create: { anahtar: ARAYUZ, deger: g.arayuz as any } });
   return { tamam: hatalar.length === 0, hatalar };

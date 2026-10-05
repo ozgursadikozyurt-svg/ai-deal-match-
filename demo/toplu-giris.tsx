@@ -7,6 +7,7 @@
  *  • Toplu mesaj: haftalık toplantı notu gibi tek mesajdaki birden çok talep/portföy ayrı kayıtlara bölünür.
  */
 import React, { useMemo, useRef, useState } from "react";
+import { useKalici } from "./hafiza";
 import { dosyaOku, csvOku, type Sayfa } from "../src/lib/ingest/xlsx";
 import { dosyaSatirlari, dosyaTuruTahmin, satirDonustur, satirHazirla, ALAN_ETIKET, type DosyaTuru, type TabloAlan, type Eslesme, type HazirSatir } from "../src/lib/ingest/tablo";
 import { mesajiBol } from "../src/lib/ingest/toplu-mesaj";
@@ -64,21 +65,21 @@ export function topluEkle(x: DepoDurumu, girdiler: { veri: Veri; kisi?: { adSoya
 // ───────────────────────────── Dosya ─────────────────────────────
 export function DosyaAktarma() {
   const { d, guncelle, bildir, git } = useDepo();
-  const [dosya, setDosya] = useState<{ ad: string; sayfalar: Sayfa[] } | null>(null);
-  const [vcf, setVcf] = useState<{ ad: string; kisiler: VcfKisi[] } | null>(null);
-  const [hata, setHata] = useState<string | null>(null);
-  const [esOzel, setEsOzel] = useState<Record<string, TabloAlan[]>>({});
-  const [tur, setTur] = useState<DosyaTuru | null>(null);
-  const [varsayilanSahip, setVarsayilanSahip] = useState<"MALIK" | "EMLAKCI" | "PARTNER">("EMLAKCI");
-  const [varsayilanIslem, setVarsayilanIslem] = useState<"SATILIK" | "KIRALIK">("SATILIK");
-  const [ilanGun, setIlanGun] = useState<number>(d.ayarlar.ttl.DIS_ILAN ?? 90);
-  const [sahipF, setSahipF] = useState<"HEPSI" | "SAHIBI" | "OFIS" | "DIGER">("HEPSI");
-  const [durumF, setDurumF] = useState<"HEPSI" | "HAZIR" | "KONTROL" | "TEKRAR" | "HATALI">("HEPSI");
-  const [secim, setSecim] = useState<Set<string>>(new Set());
-  const [eklenen, setEklenen] = useState<Set<string>>(new Set());
-  const [goster, setGoster] = useState(40);
-  const [sr, setSr] = useState<Siralama>({ alan: "satir", yon: "artan" });
-  const [rapor, setRapor] = useState<string | null>(null);
+  const [dosya, setDosya] = useKalici<{ ad: string; sayfalar: Sayfa[] } | null>("vg.dosya.dosya", null);
+  const [vcf, setVcf] = useKalici<{ ad: string; kisiler: VcfKisi[] } | null>("vg.dosya.vcf", null);
+  const [hata, setHata] = useKalici<string | null>("vg.dosya.hata", null);
+  const [esOzel, setEsOzel] = useKalici<Record<string, TabloAlan[]>>("vg.dosya.esOzel", {});
+  const [tur, setTur] = useKalici<DosyaTuru | null>("vg.dosya.tur", null);
+  const [varsayilanSahip, setVarsayilanSahip] = useKalici<"MALIK" | "EMLAKCI" | "PARTNER">("vg.dosya.varsayilanSahip", "EMLAKCI");
+  const [varsayilanIslem, setVarsayilanIslem] = useKalici<"SATILIK" | "KIRALIK">("vg.dosya.varsayilanIslem", "SATILIK");
+  const [ilanGun, setIlanGun] = useKalici<number>("vg.dosya.ilanGun", d.ayarlar.ttl.DIS_ILAN ?? 90);
+  const [sahipF, setSahipF] = useKalici<"HEPSI" | "SAHIBI" | "OFIS" | "DIGER">("vg.dosya.sahipF", "HEPSI");
+  const [durumF, setDurumF] = useKalici<"HEPSI" | "HAZIR" | "KONTROL" | "TEKRAR" | "HATALI">("vg.dosya.durumF", "HEPSI");
+  const [secim, setSecim] = useKalici<Set<string>>("vg.dosya.secim", new Set());
+  const [eklenen, setEklenen] = useKalici<Set<string>>("vg.dosya.eklenen", new Set());
+  const [goster, setGoster] = useKalici("vg.dosya.goster", 40);
+  const [sr, setSr] = useKalici<Siralama>("vg.dosya.sr", { alan: "satir", yon: "artan" });
+  const [rapor, setRapor] = useKalici<string | null>("vg.dosya.rapor", null);
   const girdi = useRef<HTMLInputElement>(null);
 
   const yukle = async (f: File) => {
@@ -212,7 +213,7 @@ export function DosyaAktarma() {
         <div className="kk-alt">{s.veri?.lokasyonlar.length ? s.veri.lokasyonlar.map((l) => lokEtiket(l as any)).join(" · ") : s.girdi.lokasyonHam ?? "Konum yok"} · {fiyatOf(s.girdi as any)}{m2Of(s.girdi as any) ? " · " + m2Of(s.girdi as any) : ""}{s.kisi ? ` · ${s.kisi.adSoyad}${s.kisi.sirket ? " (" + s.kisi.sirket + ")" : ""}` : ""}</div>
         {(s.kontrol.length > 0 || s.hatalar.length > 0) && <div className="ipucu uyari-metin">{[...s.kontrol, ...s.hatalar].join(" · ")}</div>}
         {s.durumX === "TEKRAR" && <div className="ipucu">{tip === "TALEP" ? "Bu talep zaten kayıtlı (aynı kişi, mülk, bütçe ve konum)" : "Bu ilan zaten kayıtlı (aynı ilan no / bağlantı ya da aynı sahip, fiyat ve konum)"} — eklenmez.</div>}
-        {s.veri && s.durumX === "KONTROL" && <div className="satir"><button className="btn kucuk" onClick={() => { setEklenen((e) => new Set([...e, s.key])); git({ ad: "form", tip, taslak: { ...s.veri, kisiler: s.veri!.kisiler } as any }); }}>Formda düzelt ve kaydet</button></div>}
+        {s.veri && s.durumX === "KONTROL" && <div className="satir"><button className="btn kucuk" onClick={() => { git({ ad: "form", tip, taslak: { ...s.veri, kisiler: s.veri!.kisiler } as any, geri: { ad: "veri", alt: "dosya" } }); }}>Formda düzelt ve kaydet</button></div>}
       </div>)}
       {gorunen.length > goster && <button className="btn" onClick={() => setGoster(goster + 60)}>Daha fazla göster ({gorunen.length - goster})</button>}
       {!gorunen.length && <p className="bos">Bu seçimde satır yok.</p>}

@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.14 · 3 Ekim 2026
+ * Anahtar CRM v3.15 · 5 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.14";
-export const TARIH = "3 Ekim 2026";
+export const SURUM = "3.15";
+export const TARIH = "5 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.14_3Ekim2026";
+export const DOSYA_EKI = "v3.15_5Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,29 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.15",
+    tarih: "5 Ekim 2026",
+    baslik: "Çoklu kat, takasa açık, dinamik kişi rolleri, Kişiler'de toplu işlemler; 3 arayüz hatası düzeltildi",
+    degisenler: [
+      "Düzeltme: sağ üstteki 'Kaydedildi ✓' göstergesi artık ekranda takılı kalmaz; kayıttan sonra 3 saniye görünüp kaybolur (açılışta hiç görünmez). 'Kaydediliyor…' ve hata mesajları çözülene kadar kalır.",
+      "Düzeltme: Veri girişi / içe aktarma ekranından bir kaydı (Excel-CSV satırı ya da yapay zekâ kutusu sonucu) forma açıp 'Vazgeç' ya da 'Kaydet' deyince genel listeye değil, geldiğiniz ekrana dönülür; yüklü dosya, ayrıştırılmış satırlar ve seçimler yerinde kalır (menüden girişte sıfırlanır).",
+      "Düzeltme: Eşleşme kartlarında mülk tipinin yanında işlem tipi rozeti (Satılık / Kiralık / Devren) gösterilir.",
+      "Çoklu kat: talepte istenen kat tek seçim yerine çoklu seçim (Bodrum, Giriş/Zemin, 1–10. kat, Ara kat, Son kat). Eşleştirme: seçeneklerden biri portföyün katına uyuyorsa karşılanır; ara/son kat binanın kat sayısına göre hesaplanır. Eski tek değerli talep katı da okunur. Liste filtresinde de çoklu kat var.",
+      "Takasa açık: portföy ve talep formlarında Evet / Hayır; detayda gösterilir; liste filtresinde 'Takas'; eşleştirmede iki taraf da takasa açıksa puana +3 bonus (uygunluk kararını değiştirmez).",
+      "Kişi rolleri: 11 rolün tamamı (Alıcı … İş ortağı) tüm filtre ve seçicilerde. Ayarlar › Kişi rolleri: koda dokunmadan yeni rol ekle, yeniden adlandır, kullanılmayan özel rolü kaldır.",
+      "Kişiler: her kişinin yanında onay kutusu + onaylı 'Toplu sil'; listeden hızlı düzenleme (ad, telefon, şirket, e-posta, roller); arama e-posta, referans ve rol adını da tarar; yeni filtreler: rolü yok, talebi / portföyü / kaydı olmayanlar, telefonu olan / olmayan.",
+      "Veritabanı: migration 20261005090000_v315_kat_takas_roller — mulk_ozellik.istenenKatlar (metin dizisi; eski talep katları taşınır), kayit.takasaAcik, kisi.roller enum dizisinden metin dizisine (mevcut roller aynen korunur). Özel rol tanımları Ayar tablosunda 'roller' anahtarıyla durur.",
+    ],
+    testEt: [
+      "Canlıda bir portföy kaydedin: sağ üstte 'Kaydedildi ✓' çıkıp ~3 saniye sonra kaybolmalı; sayfayı yenileyince açılışta görünmemeli.",
+      "Veri girişi › Dosya yükle: bir Excel/CSV yükleyin, 'Formda düzelt ve kaydet' › 'Vazgeç': aynı ekranda yüklü satırlar durmalı. Aynısını Yapıştır sekmesinde 'Düzenle' ile deneyin.",
+      "Bir talepte Giriş + 3. kat + Ara kat seçip kaydedin; 3. katta bir portföyle eşleşmede 'Kat' satırı ✓ olmalı.",
+      "Aynı talebi ve bir portföyü 'Takasa açık: Evet' yapın: eşleşme detayında 'Takasa açık' satırı ve +3 puan görünmeli. Listede Filtre › Takas çalışmalı.",
+      "Ayarlar › Kişi rolleri: 'Banka personeli' ekleyin; Kişiler filtresinde ve kişi formunda görünmeli.",
+      "Kişiler: iki kişiyi onaylayıp 'Toplu sil': sayıları gösteren onay çıkmalı; ✎ Düzenle ile ad / rol değiştirin.",
+    ],
+  },
   {
     surum: "3.14",
     tarih: "3 Ekim 2026",

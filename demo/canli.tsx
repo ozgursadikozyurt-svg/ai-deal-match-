@@ -10,6 +10,7 @@ import { fotoEsle } from "./foto";
 import { OturumYoneticisi, type Yapilandirma } from "./canli-oturum";
 import { sunucudanDurum } from "./canli-esle";
 import { kaydediciKur, type KaydetDurumu } from "./canli-kaydet";
+import { KaydetGostergesi } from "./canli-gosterge";
 import { MARKA } from "../src/lib/marka";
 import { SURUM, TARIH } from "../src/lib/surum";
 
@@ -47,20 +48,6 @@ function Giris({ o, mesaj, bitti }: { o: OturumYoneticisi; mesaj?: string; bitti
       {hata && <div className="hata-kutu" role="alert">{hata}</div>}
     </section>
   </Cerceve>;
-}
-
-function KaydetGostergesi({ s }: { s: KaydetDurumu }) {
-  const [ac, setAc] = useState(false);
-  const ton = s.ad === "kayitli" ? "iyi" : s.ad === "hata" ? "kotu" : "uyari";
-  const metin = s.ad === "kayitli" ? "Kaydedildi ✓" : s.ad === "bekliyor" ? "Kaydedilecek…" : s.ad === "kaydediliyor" ? "Kaydediliyor…" : (s.mesaj ?? "Kaydedilemedi");
-  return <div style={{ position: "fixed", top: "calc(env(safe-area-inset-top, 0px) + 8px)", right: 10, zIndex: 60, maxWidth: "80vw" }}>
-    <button className={"pill p-" + ton} style={{ border: 0, cursor: s.hatalar.length ? "pointer" : "default" }} onClick={() => s.hatalar.length && setAc(!ac)} aria-live="polite">{metin}</button>
-    {ac && s.hatalar.length > 0 && <div className="kart" style={{ marginTop: 6, maxHeight: "50vh", overflow: "auto", fontSize: 13 }}>
-      <b>Sunucunun kabul etmediği kayıtlar</b>
-      <ul>{s.hatalar.slice(0, 12).map((h) => <li key={h.id}><b>{h.id}:</b> {h.mesaj}</li>)}</ul>
-      {s.hatalar.length > 12 && <p className="ipucu">… ve {s.hatalar.length - 12} tane daha</p>}
-    </div>}
-  </div>;
 }
 
 function Canli({ cfg }: { cfg: Yapilandirma }) {

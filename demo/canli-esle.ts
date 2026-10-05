@@ -8,12 +8,13 @@ import { bosBaglanti, bosGoogleBaglanti, aiAyari, paylasimAyari, calismaIli, typ
 import { ORNEK_VERI_SURUMU } from "./ornek-veri";
 import { aiAyarNormalize, paylasimNormalize, calismaIliNormalize } from "../src/lib/domain/ayarlar";
 import { ttlNormalize } from "../src/lib/domain/gecerlilik";
+import { rolNormalize } from "../src/lib/domain/roller";
 
 export interface SunucuDurumu {
   kayitlar: { id: string; olusturma: string; veri: Record<string, unknown>; notionId?: string | null; notlar?: Kayit["notlar"]; fotolar?: { id: string; ad: string; en: number; boy: number; boyut: number }[] }[];
   kisiler: Record<string, any>[];
   eslesmeNotlari: DepoDurumu["eslesmeNotlari"];
-  ayarlar: { ttl?: unknown; ai?: unknown; paylasim?: unknown; calismaIli?: unknown };
+  ayarlar: { ttl?: unknown; ai?: unknown; paylasim?: unknown; calismaIli?: unknown; roller?: unknown };
   arayuz: Record<string, any>;
 }
 
@@ -29,6 +30,7 @@ export function sunucudanDurum(s: SunucuDurumu): DepoDurumu {
     testler: a.testler ?? {}, geriBildirim: a.geriBildirim ?? "",
     ayarlar: { ttl: ttlNormalize(s.ayarlar?.ttl), ai: aiAyarNormalize(s.ayarlar?.ai), paylasim: paylasimNormalize(s.ayarlar?.paylasim), calismaIli: calismaIliNormalize(s.ayarlar?.calismaIli) },
     ogrenilen: a.ogrenilen ?? [], adaylar: a.adaylar ?? [], aktifIceAktarma: null, iceAktarmaGecmisi: a.iceAktarmaGecmisi ?? [],
+    roller: rolNormalize(s.ayarlar?.roller),
     kisiler: s.kisiler.map((k) => nullAt(k)) as unknown as Kisi[],
     islenmisMesajlar: a.islenmisMesajlar ?? [], dosyaIzleri: a.dosyaIzleri ?? {},
     baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleBekleyen: [],
@@ -41,7 +43,7 @@ const KISI_ALANLARI = ["id", "adSoyad", "telefon", "ikincilTelefon", "email", "s
 const kisiYuku = (k: Kisi) => Object.fromEntries(KISI_ALANLARI.map((a) => [a, (k as any)[a]]).filter(([, v]) => v !== undefined));
 const kayitYuku = (k: Kayit) => ({ id: k.id, olusturma: k.olusturma, veri: k.veri, notlar: k.notlar ?? [] });
 const arayuzYuku = (d: DepoDurumu) => ({ testler: d.testler, geriBildirim: d.geriBildirim, ogrenilen: d.ogrenilen, adaylar: d.adaylar, iceAktarmaGecmisi: d.iceAktarmaGecmisi, islenmisMesajlar: d.islenmisMesajlar, dosyaIzleri: d.dosyaIzleri });
-const ayarYuku = (d: DepoDurumu) => ({ ttl: d.ayarlar.ttl, ai: aiAyari(d), paylasim: paylasimAyari(d), calismaIli: calismaIli(d) });
+const ayarYuku = (d: DepoDurumu) => ({ ttl: d.ayarlar.ttl, ai: aiAyari(d), paylasim: paylasimAyari(d), calismaIli: calismaIli(d), roller: d.roller ?? [] });
 
 export function imzaAl(d: DepoDurumu): Imza {
   const ay = ayarYuku(d);

@@ -7,7 +7,7 @@
  */
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { MULK_OZELLIK_META, SIRALAMA } from "../src/lib/domain/teknik-alanlar";
+import { MULK_OZELLIK_META, SIRALAMA, katYaz } from "../src/lib/domain/teknik-alanlar";
 import { MULK_AILELERI, aileOf } from "../src/lib/domain/kategori";
 import { type Uygunluk } from "../src/lib/eslestirme/onizleme";
 import { SURUM, TARIH, SURUM_GECMISI } from "../src/lib/surum";
@@ -25,7 +25,8 @@ import { kopmaEtiket } from "../src/lib/eslestirme/kopar";
 import { IletisimDugmeleri } from "./kisiler";
 import { selamMetni } from "../src/lib/iletisim";
 import { FiltrePaneli, bosFiltre, filtreUygula, SiralaDugmesi, kayitSiralama, siralaUygula, type Filtre, type Siralama } from "./filtre";
-import { Kisiler, KisiKarti, KisiSecici, KAYIT_ROLLERI } from "./kisiler";
+import { Kisiler, KisiKarti, KisiSecici, KAYIT_ROLLERI, rolleriUygula } from "./kisiler";
+import { RolYonetimi } from "./roller";
 import { EslesmeCekmecesi } from "./cekmece";
 import { TTL_ETIKET, ttlGun, type TtlAyar } from "../src/lib/domain/gecerlilik";
 import { portalLinkleri } from "../src/lib/portal/arama-linkleri";
@@ -45,7 +46,7 @@ import { PortfoyPaylas } from "./paylas";
 type Alan = keyof typeof MULK_OZELLIK_META;
 
 // ───────────────────────────── Ana Sayfa ─────────────────────────────
-function AnaSayfa() {
+function AnaSayfa({ donus }: { donus?: boolean } = {}) {
   const { d, git } = useDepo();
   const es = useEslesmeler();
   const aktif = d.kayitlar.filter((k) => k.veri.durum === "ACTIVE");
@@ -55,7 +56,7 @@ function AnaSayfa() {
   const bag = d.baglantilar ?? { google: bosBaglanti(), notion: bosBaglanti() };
   return <div className="yigin">
     <div className="karsilama"><h1>{(() => { const h = new Date().getHours(); return h < 11 ? "Günaydın" : h < 18 ? "İyi günler" : "İyi akşamlar"; })()} Özgür</h1><p>{aktif.filter((k) => k.veri.tip === "TALEP").length} aktif talep, {aktif.filter((k) => k.veri.tip === "PORTFOY").length} portföy ve {sunulabilir.length} sunulabilir eşleşme seni bekliyor.</p></div>
-    <AkilliKutu />
+    <AkilliKutu donus={donus} />
     {(bag.notion.durum !== "BAGLI" || bag.google.durum !== "BAGLI") && <Kapanir id="baglan-davet"><button className="kart baglan-davet" onClick={() => git({ ad: "baglantilar" })}>
       <span className="bd-logolar"><span className="bk-logo notion">N</span><span className="bk-logo google">G</span></span>
       <span><b>{bag.notion.durum !== "BAGLI" && bag.google.durum !== "BAGLI" ? "Notion ve Google Kişiler'i bağlayın" : bag.notion.durum !== "BAGLI" ? "Notion'u da bağlayın" : "Google Kişiler'i de bağlayın"}</b><br /><small>Mevcut talep, portföy ve kişileriniz tek seferde gelsin, hemen eşleştirmeye girsin.</small></span>
@@ -131,6 +132,7 @@ function Liste({ tip, baslangic }: { tip: "TALEP" | "PORTFOY"; baslangic?: Filtr
 const GRUP_SIRASI = ["Alan", "Konut", "Yükseklik & Erişim", "Enerji", "Yangın & Güvenlik", "Hukuki", "İklim & Gıda", "Yapı", "Sosyal alanlar", "Cephe & Trafik", "Konum avantajı", "Kullanım", "Turizm", "Kira & Devir"];
 function degerYaz(alan: Alan, v: unknown, talep: boolean): string {
   const m = MULK_OZELLIK_META[alan] as any;
+  if (alan === "istenenKatlar") return katYaz(v as string[]); // v3.15
   if (v instanceof Date || (typeof v === "string" && /^\d{4}-\d\d-\d\dT/.test(v))) return new Date(v as string).toLocaleDateString("tr-TR");
   let s = etiket(v);
   if (m.birim && typeof v === "number") s += " " + m.birim;
@@ -182,6 +184,7 @@ function Detay({ id }: { id: string }) {
         {v.odaSayisi && <div><span>Oda</span><b>{v.odaSayisi}</b></div>}
         {v.netM2 != null && <div><span>Net alan</span><b>{v.netM2.toLocaleString("tr-TR")} m²</b></div>}
         {v.krediyeUygun != null && <div><span>Krediye uygun</span><b>{v.krediyeUygun ? (talep ? "İstiyor" : "Evet") : "Hayır"}</b></div>}
+        {v.takasaAcik != null && <div><span>Takasa açık</span><b>{v.takasaAcik ? "Evet" : "Hayır"}</b></div>}
         <div><span>Kayda giriş</span><b>{tarihYaz(k.olusturma)}</b></div>
       </div>
       <div className="gecerlilik">
@@ -364,6 +367,7 @@ function Ayarlar() {
     <AiAyarlari />
     <PaylasimAyarlari />
     <CalismaIliAyari />
+    <RolYonetimi />
     <DisaAktar />
     <section className="kart">
       <h3>Varsayılan geçerlilik süreleri</h3>
@@ -429,6 +433,7 @@ export function Uygulama() {
   const [surumAcik, setSurumAcik] = useState(false);
   const [sample, setSample] = useState<any>(undefined);
   ogrenilenleriYukle(d.ogrenilen, calismaIli(d)); // öğrenilen konumlar çözücüye (render'dan önce, eşzamanlı)
+  rolleriUygula(d.roller);                         // v3.15: özel roller + yeniden adlandırmalar (render'dan önce, eşzamanlı)
   useEffect(() => klavyeIzle(), []);
   useEffect(() => { depoKaydet(d); }, [d]);
   useEffect(() => { let iptal = false; (async () => { try { const s = CANLI.acik ? CANLI.sample : await (window as any).claude?.use("sample"); if (!iptal) setSample(() => s ?? null); /* fonksiyon doğrudan verilirse React onu güncelleyici sanıp çağırıyordu → v3.3 hatası "n.json is not a function" */ } catch { if (!iptal) setSample(null); } })(); return () => { iptal = true; }; }, []);
@@ -464,13 +469,13 @@ export function Uygulama() {
     </header>
     {yuk.hatalar.length > 0 && <div className="sarici"><div className="hata-kutu">Örnek veride {yuk.hatalar.length} kayıt güncel şemaya uymuyor. Ayrıntı: Ayarlar.</div></div>}
     <main className="sarici">
-      {ekran.ad === "ana" && <AnaSayfa />}
+      {ekran.ad === "ana" && <AnaSayfa donus={ekran.donus} />}
       {ekran.ad === "liste" && <Liste key={ekran.tip + (ekran.filtre ? JSON.stringify(ekran.filtre).length : "")} tip={ekran.tip} baslangic={ekran.filtre} />}
       {ekran.ad === "detay" && <Detay id={ekran.id} />}
-      {ekran.ad === "form" && <KayitFormu key={(ekran.id ?? ekran.adayId ?? "yeni") + ekran.tip} tip={ekran.tip} id={ekran.id} taslak={ekran.taslak} adayId={ekran.adayId} />}
+      {ekran.ad === "form" && <KayitFormu key={(ekran.id ?? ekran.adayId ?? "yeni") + ekran.tip} tip={ekran.tip} id={ekran.id} taslak={ekran.taslak} adayId={ekran.adayId} geri={ekran.geri} />}
       {ekran.ad === "eslesmeler" && <Eslesmeler />}
       {ekran.ad === "eslesme" && <EslesmeDetay tid={ekran.tid} pid={ekran.pid} />}
-      {ekran.ad === "veri" && <VeriGirisi key={(ekran.alt ?? "") + (ekran.metin?.length ?? "")} alt={ekran.alt} metin={ekran.metin} />}
+      {ekran.ad === "veri" && <VeriGirisi key={(ekran.alt ?? "") + (ekran.metin?.length ?? "")} alt={ekran.alt} metin={ekran.metin} donus={ekran.donus} />}
       {ekran.ad === "kisiler" && <Kisiler />}
       {ekran.ad === "kisi" && <KisiKarti key={ekran.id} id={ekran.id} />}
       {ekran.ad === "konumlar" && <Konumlar />}

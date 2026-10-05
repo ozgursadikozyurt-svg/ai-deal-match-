@@ -427,6 +427,7 @@ export type MulkOzellikCountAggregateOutputType = {
   binaYasi: number
   katSayisi: number
   bulunduguKat: number
+  istenenKatlar: number
   ofis: number
   ofisOdaSayisi: number
   wc: number
@@ -891,6 +892,7 @@ export type MulkOzellikCountAggregateInputType = {
   binaYasi?: true
   katSayisi?: true
   bulunduguKat?: true
+  istenenKatlar?: true
   ofis?: true
   ofisOdaSayisi?: true
   wc?: true
@@ -1102,6 +1104,7 @@ export type MulkOzellikGroupByOutputType = {
   binaYasi: number | null
   katSayisi: number | null
   bulunduguKat: number | null
+  istenenKatlar: string[]
   ofis: boolean | null
   ofisOdaSayisi: number | null
   wc: boolean | null
@@ -1249,6 +1252,7 @@ export type MulkOzellikWhereInput = {
   binaYasi?: Prisma.IntNullableFilter<"MulkOzellik"> | number | null
   katSayisi?: Prisma.IntNullableFilter<"MulkOzellik"> | number | null
   bulunduguKat?: Prisma.IntNullableFilter<"MulkOzellik"> | number | null
+  istenenKatlar?: Prisma.StringNullableListFilter<"MulkOzellik">
   ofis?: Prisma.BoolNullableFilter<"MulkOzellik"> | boolean | null
   ofisOdaSayisi?: Prisma.IntNullableFilter<"MulkOzellik"> | number | null
   wc?: Prisma.BoolNullableFilter<"MulkOzellik"> | boolean | null
@@ -1375,6 +1379,7 @@ export type MulkOzellikOrderByWithRelationInput = {
   binaYasi?: Prisma.SortOrderInput | Prisma.SortOrder
   katSayisi?: Prisma.SortOrderInput | Prisma.SortOrder
   bulunduguKat?: Prisma.SortOrderInput | Prisma.SortOrder
+  istenenKatlar?: Prisma.SortOrder
   ofis?: Prisma.SortOrderInput | Prisma.SortOrder
   ofisOdaSayisi?: Prisma.SortOrderInput | Prisma.SortOrder
   wc?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -1504,6 +1509,7 @@ export type MulkOzellikWhereUniqueInput = Prisma.AtLeast<{
   binaYasi?: Prisma.IntNullableFilter<"MulkOzellik"> | number | null
   katSayisi?: Prisma.IntNullableFilter<"MulkOzellik"> | number | null
   bulunduguKat?: Prisma.IntNullableFilter<"MulkOzellik"> | number | null
+  istenenKatlar?: Prisma.StringNullableListFilter<"MulkOzellik">
   ofis?: Prisma.BoolNullableFilter<"MulkOzellik"> | boolean | null
   ofisOdaSayisi?: Prisma.IntNullableFilter<"MulkOzellik"> | number | null
   wc?: Prisma.BoolNullableFilter<"MulkOzellik"> | boolean | null
@@ -1630,6 +1636,7 @@ export type MulkOzellikOrderByWithAggregationInput = {
   binaYasi?: Prisma.SortOrderInput | Prisma.SortOrder
   katSayisi?: Prisma.SortOrderInput | Prisma.SortOrder
   bulunduguKat?: Prisma.SortOrderInput | Prisma.SortOrder
+  istenenKatlar?: Prisma.SortOrder
   ofis?: Prisma.SortOrderInput | Prisma.SortOrder
   ofisOdaSayisi?: Prisma.SortOrderInput | Prisma.SortOrder
   wc?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -1762,6 +1769,7 @@ export type MulkOzellikScalarWhereWithAggregatesInput = {
   binaYasi?: Prisma.IntNullableWithAggregatesFilter<"MulkOzellik"> | number | null
   katSayisi?: Prisma.IntNullableWithAggregatesFilter<"MulkOzellik"> | number | null
   bulunduguKat?: Prisma.IntNullableWithAggregatesFilter<"MulkOzellik"> | number | null
+  istenenKatlar?: Prisma.StringNullableListFilter<"MulkOzellik">
   ofis?: Prisma.BoolNullableWithAggregatesFilter<"MulkOzellik"> | boolean | null
   ofisOdaSayisi?: Prisma.IntNullableWithAggregatesFilter<"MulkOzellik"> | number | null
   wc?: Prisma.BoolNullableWithAggregatesFilter<"MulkOzellik"> | boolean | null
@@ -1884,6 +1892,7 @@ export type MulkOzellikCreateInput = {
   binaYasi?: number | null
   katSayisi?: number | null
   bulunduguKat?: number | null
+  istenenKatlar?: Prisma.MulkOzellikCreateistenenKatlarInput | string[]
   ofis?: boolean | null
   ofisOdaSayisi?: number | null
   wc?: boolean | null
@@ -2010,6 +2019,7 @@ export type MulkOzellikUncheckedCreateInput = {
   binaYasi?: number | null
   katSayisi?: number | null
   bulunduguKat?: number | null
+  istenenKatlar?: Prisma.MulkOzellikCreateistenenKatlarInput | string[]
   ofis?: boolean | null
   ofisOdaSayisi?: number | null
   wc?: boolean | null
@@ -2132,6 +2142,7 @@ export type MulkOzellikUpdateInput = {
   binaYasi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   katSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bulunduguKat?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  istenenKatlar?: Prisma.MulkOzellikUpdateistenenKatlarInput | string[]
   ofis?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   ofisOdaSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   wc?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -2258,6 +2269,7 @@ export type MulkOzellikUncheckedUpdateInput = {
   binaYasi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   katSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bulunduguKat?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  istenenKatlar?: Prisma.MulkOzellikUpdateistenenKatlarInput | string[]
   ofis?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   ofisOdaSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   wc?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -2382,6 +2394,7 @@ export type MulkOzellikCreateManyInput = {
   binaYasi?: number | null
   katSayisi?: number | null
   bulunduguKat?: number | null
+  istenenKatlar?: Prisma.MulkOzellikCreateistenenKatlarInput | string[]
   ofis?: boolean | null
   ofisOdaSayisi?: number | null
   wc?: boolean | null
@@ -2504,6 +2517,7 @@ export type MulkOzellikUpdateManyMutationInput = {
   binaYasi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   katSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bulunduguKat?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  istenenKatlar?: Prisma.MulkOzellikUpdateistenenKatlarInput | string[]
   ofis?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   ofisOdaSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   wc?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -2628,6 +2642,7 @@ export type MulkOzellikUncheckedUpdateManyInput = {
   binaYasi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   katSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bulunduguKat?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  istenenKatlar?: Prisma.MulkOzellikUpdateistenenKatlarInput | string[]
   ofis?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   ofisOdaSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   wc?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -2781,6 +2796,7 @@ export type MulkOzellikCountOrderByAggregateInput = {
   binaYasi?: Prisma.SortOrder
   katSayisi?: Prisma.SortOrder
   bulunduguKat?: Prisma.SortOrder
+  istenenKatlar?: Prisma.SortOrder
   ofis?: Prisma.SortOrder
   ofisOdaSayisi?: Prisma.SortOrder
   wc?: Prisma.SortOrder
@@ -3212,6 +3228,10 @@ export type MulkOzellikUncheckedUpdateOneWithoutKayitNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MulkOzellikUpdateToOneWithWhereWithoutKayitInput, Prisma.MulkOzellikUpdateWithoutKayitInput>, Prisma.MulkOzellikUncheckedUpdateWithoutKayitInput>
 }
 
+export type MulkOzellikCreateistenenKatlarInput = {
+  set: string[]
+}
+
 export type MulkOzellikCreatekullanimAmaclariInput = {
   set: $Enums.KullanimAmaci[]
 }
@@ -3262,6 +3282,11 @@ export type NullableEnumDuvarTipiFieldUpdateOperationsInput = {
 
 export type NullableEnumZeminTipiFieldUpdateOperationsInput = {
   set?: $Enums.ZeminTipi | null
+}
+
+export type MulkOzellikUpdateistenenKatlarInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 export type NullableEnumOtoparkDurumuFieldUpdateOperationsInput = {
@@ -3406,6 +3431,7 @@ export type MulkOzellikCreateWithoutKayitInput = {
   binaYasi?: number | null
   katSayisi?: number | null
   bulunduguKat?: number | null
+  istenenKatlar?: Prisma.MulkOzellikCreateistenenKatlarInput | string[]
   ofis?: boolean | null
   ofisOdaSayisi?: number | null
   wc?: boolean | null
@@ -3530,6 +3556,7 @@ export type MulkOzellikUncheckedCreateWithoutKayitInput = {
   binaYasi?: number | null
   katSayisi?: number | null
   bulunduguKat?: number | null
+  istenenKatlar?: Prisma.MulkOzellikCreateistenenKatlarInput | string[]
   ofis?: boolean | null
   ofisOdaSayisi?: number | null
   wc?: boolean | null
@@ -3668,6 +3695,7 @@ export type MulkOzellikUpdateWithoutKayitInput = {
   binaYasi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   katSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bulunduguKat?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  istenenKatlar?: Prisma.MulkOzellikUpdateistenenKatlarInput | string[]
   ofis?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   ofisOdaSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   wc?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3792,6 +3820,7 @@ export type MulkOzellikUncheckedUpdateWithoutKayitInput = {
   binaYasi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   katSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bulunduguKat?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  istenenKatlar?: Prisma.MulkOzellikUpdateistenenKatlarInput | string[]
   ofis?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   ofisOdaSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   wc?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3914,6 +3943,7 @@ export type MulkOzellikCreateWithoutPortalIlanInput = {
   binaYasi?: number | null
   katSayisi?: number | null
   bulunduguKat?: number | null
+  istenenKatlar?: Prisma.MulkOzellikCreateistenenKatlarInput | string[]
   ofis?: boolean | null
   ofisOdaSayisi?: number | null
   wc?: boolean | null
@@ -4038,6 +4068,7 @@ export type MulkOzellikUncheckedCreateWithoutPortalIlanInput = {
   binaYasi?: number | null
   katSayisi?: number | null
   bulunduguKat?: number | null
+  istenenKatlar?: Prisma.MulkOzellikCreateistenenKatlarInput | string[]
   ofis?: boolean | null
   ofisOdaSayisi?: number | null
   wc?: boolean | null
@@ -4176,6 +4207,7 @@ export type MulkOzellikUpdateWithoutPortalIlanInput = {
   binaYasi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   katSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bulunduguKat?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  istenenKatlar?: Prisma.MulkOzellikUpdateistenenKatlarInput | string[]
   ofis?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   ofisOdaSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   wc?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4300,6 +4332,7 @@ export type MulkOzellikUncheckedUpdateWithoutPortalIlanInput = {
   binaYasi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   katSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bulunduguKat?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  istenenKatlar?: Prisma.MulkOzellikUpdateistenenKatlarInput | string[]
   ofis?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   ofisOdaSayisi?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   wc?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4426,6 +4459,7 @@ export type MulkOzellikSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   binaYasi?: boolean
   katSayisi?: boolean
   bulunduguKat?: boolean
+  istenenKatlar?: boolean
   ofis?: boolean
   ofisOdaSayisi?: boolean
   wc?: boolean
@@ -4552,6 +4586,7 @@ export type MulkOzellikSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   binaYasi?: boolean
   katSayisi?: boolean
   bulunduguKat?: boolean
+  istenenKatlar?: boolean
   ofis?: boolean
   ofisOdaSayisi?: boolean
   wc?: boolean
@@ -4678,6 +4713,7 @@ export type MulkOzellikSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   binaYasi?: boolean
   katSayisi?: boolean
   bulunduguKat?: boolean
+  istenenKatlar?: boolean
   ofis?: boolean
   ofisOdaSayisi?: boolean
   wc?: boolean
@@ -4804,6 +4840,7 @@ export type MulkOzellikSelectScalar = {
   binaYasi?: boolean
   katSayisi?: boolean
   bulunduguKat?: boolean
+  istenenKatlar?: boolean
   ofis?: boolean
   ofisOdaSayisi?: boolean
   wc?: boolean
@@ -4865,7 +4902,7 @@ export type MulkOzellikSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MulkOzellikOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kayitId" | "portalIlanId" | "kapaliAlanM2" | "acikAlanM2" | "arsaAlanM2" | "sundurmaM2" | "ofisAlanM2" | "girisKatM2" | "asmaKatM2" | "bodrumM2" | "bolunebilir" | "minBolumM2" | "netYukseklikM" | "makasAltiYukseklikM" | "kapiSayisi" | "kapiGenislikM" | "kapiYukseklikM" | "otomatikKapi" | "aracErisimi" | "tirManevraAlani" | "rampa" | "rampaSayisi" | "vinc" | "vincKapasitesiTon" | "yukAsansoru" | "elektrikGucuKw" | "elektrikGucuKva" | "elektrikGucuHam" | "trafo" | "trafoGucuKva" | "sanayiElektrigi" | "jenerator" | "yanginSistemi" | "sprinkler" | "yanginAlgilama" | "paratoner" | "iskan" | "ruhsatDurumu" | "isyeriAcmaRuhsati" | "numarataj" | "tapuTipi" | "imarDurumu" | "adaNo" | "parselNo" | "emsalKaks" | "taks" | "sogukHava" | "sogukHavaM2" | "sogukHavaMinC" | "sogukHavaMaxC" | "iklimlendirme" | "havalandirma" | "gidayaUygun" | "yapiSistemi" | "catiTipi" | "duvarTipi" | "zeminTipi" | "zeminYukTasimaTonM2" | "binaYasi" | "katSayisi" | "bulunduguKat" | "ofis" | "ofisOdaSayisi" | "wc" | "wcSayisi" | "mutfak" | "personelAlani" | "sundurma" | "sondaj" | "cepheUzunluguM" | "cepheSayisi" | "vitrin" | "koseKonum" | "anaCaddeUzeri" | "duzGiris" | "asmaKat" | "bodrum" | "baca" | "asansor" | "otoparkDurumu" | "otoparkKapasitesi" | "yayaTrafigi" | "aracTrafigi" | "anaYolaMesafeM" | "cevreYolunaMesafeM" | "havalimaninaMesafeM" | "limanaMesafeM" | "denizeMesafeM" | "osbIcinde" | "kullanimAmaclari" | "banyoSayisi" | "isinmaTipi" | "esyaDurumu" | "siteIcinde" | "guvenlik" | "balkon" | "teras" | "bahce" | "dubleks" | "ebeveynBanyosu" | "cepheYonleri" | "denizManzarasi" | "engelliErisimi" | "otelOdaSayisi" | "yatakKapasitesi" | "yildiz" | "turizmBelgesi" | "havuz" | "kiraOdemeSekli" | "depozitoAy" | "minKiraSuresiYil" | "bosalmaTarihi" | "kiracili" | "mevcutKiraGeliri" | "devirBedeli" | "aidat" | "kritikKriterler" | "esnekKriterler" | "eksikBilgiler" | "updatedAt", ExtArgs["result"]["mulkOzellik"]>
+export type MulkOzellikOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kayitId" | "portalIlanId" | "kapaliAlanM2" | "acikAlanM2" | "arsaAlanM2" | "sundurmaM2" | "ofisAlanM2" | "girisKatM2" | "asmaKatM2" | "bodrumM2" | "bolunebilir" | "minBolumM2" | "netYukseklikM" | "makasAltiYukseklikM" | "kapiSayisi" | "kapiGenislikM" | "kapiYukseklikM" | "otomatikKapi" | "aracErisimi" | "tirManevraAlani" | "rampa" | "rampaSayisi" | "vinc" | "vincKapasitesiTon" | "yukAsansoru" | "elektrikGucuKw" | "elektrikGucuKva" | "elektrikGucuHam" | "trafo" | "trafoGucuKva" | "sanayiElektrigi" | "jenerator" | "yanginSistemi" | "sprinkler" | "yanginAlgilama" | "paratoner" | "iskan" | "ruhsatDurumu" | "isyeriAcmaRuhsati" | "numarataj" | "tapuTipi" | "imarDurumu" | "adaNo" | "parselNo" | "emsalKaks" | "taks" | "sogukHava" | "sogukHavaM2" | "sogukHavaMinC" | "sogukHavaMaxC" | "iklimlendirme" | "havalandirma" | "gidayaUygun" | "yapiSistemi" | "catiTipi" | "duvarTipi" | "zeminTipi" | "zeminYukTasimaTonM2" | "binaYasi" | "katSayisi" | "bulunduguKat" | "istenenKatlar" | "ofis" | "ofisOdaSayisi" | "wc" | "wcSayisi" | "mutfak" | "personelAlani" | "sundurma" | "sondaj" | "cepheUzunluguM" | "cepheSayisi" | "vitrin" | "koseKonum" | "anaCaddeUzeri" | "duzGiris" | "asmaKat" | "bodrum" | "baca" | "asansor" | "otoparkDurumu" | "otoparkKapasitesi" | "yayaTrafigi" | "aracTrafigi" | "anaYolaMesafeM" | "cevreYolunaMesafeM" | "havalimaninaMesafeM" | "limanaMesafeM" | "denizeMesafeM" | "osbIcinde" | "kullanimAmaclari" | "banyoSayisi" | "isinmaTipi" | "esyaDurumu" | "siteIcinde" | "guvenlik" | "balkon" | "teras" | "bahce" | "dubleks" | "ebeveynBanyosu" | "cepheYonleri" | "denizManzarasi" | "engelliErisimi" | "otelOdaSayisi" | "yatakKapasitesi" | "yildiz" | "turizmBelgesi" | "havuz" | "kiraOdemeSekli" | "depozitoAy" | "minKiraSuresiYil" | "bosalmaTarihi" | "kiracili" | "mevcutKiraGeliri" | "devirBedeli" | "aidat" | "kritikKriterler" | "esnekKriterler" | "eksikBilgiler" | "updatedAt", ExtArgs["result"]["mulkOzellik"]>
 export type MulkOzellikInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   kayit?: boolean | Prisma.MulkOzellik$kayitArgs<ExtArgs>
   portalIlan?: boolean | Prisma.MulkOzellik$portalIlanArgs<ExtArgs>
@@ -4948,6 +4985,10 @@ export type $MulkOzellikPayload<ExtArgs extends runtime.Types.Extensions.Interna
     binaYasi: number | null
     katSayisi: number | null
     bulunduguKat: number | null
+    /**
+     * v3.15 — TALEPTE istenen katlar (çoklu): "-1" bodrum, "0" giriş/zemin, "1"…"N", "ARA" (ara kat), "SON" (son kat). Portföy tek kat tutar (bulunduguKat).
+     */
+    istenenKatlar: string[]
     ofis: boolean | null
     ofisOdaSayisi: number | null
     wc: boolean | null
@@ -5500,6 +5541,7 @@ export interface MulkOzellikFieldRefs {
   readonly binaYasi: Prisma.FieldRef<"MulkOzellik", 'Int'>
   readonly katSayisi: Prisma.FieldRef<"MulkOzellik", 'Int'>
   readonly bulunduguKat: Prisma.FieldRef<"MulkOzellik", 'Int'>
+  readonly istenenKatlar: Prisma.FieldRef<"MulkOzellik", 'String[]'>
   readonly ofis: Prisma.FieldRef<"MulkOzellik", 'Boolean'>
   readonly ofisOdaSayisi: Prisma.FieldRef<"MulkOzellik", 'Int'>
   readonly wc: Prisma.FieldRef<"MulkOzellik", 'Boolean'>

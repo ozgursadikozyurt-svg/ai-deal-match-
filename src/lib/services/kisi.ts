@@ -4,7 +4,7 @@
  */
 import { z } from "zod";
 import type { PrismaClient } from "../../generated/prisma/client";
-import { KisiRolu, KayitKisiRolu, IlanSahibiTipi } from "../../generated/prisma/enums";
+import { KayitKisiRolu, IlanSahibiTipi } from "../../generated/prisma/enums";
 import { telNormalize } from "../ingest/whatsapp";
 
 export const KisiSchema = z.object({
@@ -12,7 +12,7 @@ export const KisiSchema = z.object({
   telefon: z.string().max(30).nullish().transform((t) => telNormalize(t) ?? (t?.trim() || null)),
   sirket: z.string().trim().max(120).nullish(),
   email: z.string().email().nullish(),
-  roller: z.array(z.nativeEnum(KisiRolu)).max(6).default([]),
+  roller: z.array(z.string().regex(/^[A-Z0-9_]{2,40}$/)).max(14).default([]), // v3.15: dinamik roller (Ayarlar › Kişi rolleri)
   ilanSahibiTipi: z.nativeEnum(IlanSahibiTipi).default("BILINMIYOR"),
   uzmanlikAileleri: z.array(z.string().max(20)).max(10).default([]),
   referans: z.string().max(200).nullish(),

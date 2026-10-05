@@ -14,6 +14,7 @@
 import React, { useRef, useState } from "react";
 import { unzipSync, strFromU8 } from "fflate";
 import { DosyaAktarma } from "./toplu-giris";
+import { hafizaBaslat } from "./hafiza";
 import { AkilliKutu, satirKur } from "./ai-kutusu";
 import { mesajiYorumla } from "../src/lib/ai/yorumlayici";
 import { mevcutAnahtarlar } from "./toplu-giris";
@@ -400,9 +401,10 @@ function adaylariGuncelleBirlestir(liste: KonumAdayi[], yeni: KonumAdayi): Konum
 }
 
 /** v3.9 — Veri Girişi: Yapıştır (akıllı kutu) · Dosya yükle (Excel/CSV/vCard + WhatsApp .txt/.zip) · Elle giriş */
-export function VeriGirisi({ alt, metin }: { alt?: string; metin?: string } = {}) {
+export function VeriGirisi({ alt, metin, donus }: { alt?: string; metin?: string; donus?: boolean } = {}) {
   const { git, d } = useDepo();
-  const surenIs = !alt && !!d.aktifIceAktarma; // v3.12: yarım kalan içe aktarma varsa menüden girince oraya düşer (veriler kaybolmuş gibi görünmesin)
+  hafizaBaslat("vg.", donus); // v3.15: forma gidip "Vazgeç" ile dönülünce yüklü dosya / seçimler yerinde kalır; menüden girişte sıfırlanır
+  const surenIs = !alt && !donus && !!d.aktifIceAktarma; // v3.12: yarım kalan içe aktarma varsa menüden girince oraya düşer (veriler kaybolmuş gibi görünmesin)
   const ilk = alt === "dosya" || alt === "wa" || surenIs ? "dosya" : alt === "el" ? "el" : "metin";
   const [sekme, setSekme] = useState(ilk);
   const [dosyaTuru, setDosyaTuru] = useState(alt === "wa" || surenIs ? "wa" : "tablo");
@@ -412,7 +414,7 @@ export function VeriGirisi({ alt, metin }: { alt?: string; metin?: string } = {}
       <div className="sekme3" role="tablist">
         {([["metin", "Yapıştır"], ["dosya", "Dosya yükle"], ["el", "Elle gir"]] as const).map(([k, e]) => <button key={k} role="tab" aria-selected={sekme === k} className={sekme === k ? "on" : ""} onClick={() => setSekme(k)}>{e}</button>)}
       </div>
-      {sekme === "metin" && <AkilliKutu gomulu baslangic={metin ?? ""} />}
+      {sekme === "metin" && <AkilliKutu gomulu donus={donus} baslangic={metin ?? ""} />}
       {sekme === "dosya" && (
         <div className="yigin">
           <div className="uc tam" role="group" aria-label="Dosya türü">

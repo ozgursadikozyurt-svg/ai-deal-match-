@@ -8,7 +8,7 @@
 import { SayiGir } from "./girdi";
 import React, { useMemo, useState } from "react";
 import { MULK_AILELERI, aileOf, MULK_TIPI_META } from "../src/lib/domain/kategori";
-import { MULK_OZELLIK_META, SIRALAMA, odaSayisiAyristir, type MulkOzellikAlani } from "../src/lib/domain/teknik-alanlar";
+import { MULK_OZELLIK_META, SIRALAMA, odaSayisiAyristir, KAT_SECENEKLERI, katUyumu, katYaz, istenenKatlarOf, type MulkOzellikAlani } from "../src/lib/domain/teknik-alanlar";
 import { ONEMLI_ALANLAR } from "../src/lib/domain/form-alanlari";
 import { etiket, ISLEM_TIPI_ETIKET, VERI_KANALI_ETIKET } from "./etiketler";
 import { BAGLAM, lokEtiket, type KonumOnerisi } from "./lokasyon";
@@ -28,6 +28,8 @@ export interface Filtre {
   fiyatMin?: number | null; fiyatMax?: number | null;
   m2Min?: number | null; m2Max?: number | null;
   acil?: boolean;
+  /** v3.15 — yalnızca takasa açık kayıtlar */
+  takas?: boolean;
   ozellik: Record<string, any>;
 }
 export const bosFiltre = (x: Partial<Filtre> = {}): Filtre => ({ ara: "", aileler: [], islemler: [], konumlar: [], durumlar: [], kisiler: [], kanallar: [], odalar: [], ozellik: {}, ...x });
@@ -56,6 +58,7 @@ export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string
   if (f.kisiler.length && !(v.kisiler ?? []).some((b) => f.kisiler.includes(b.kisiId))) return false;
   if (f.kanallar.length && !f.kanallar.includes(v.veriKanali)) return false;
   if (f.acil && !(v.aciliyet === "ACIL" || v.aciliyet === "YUKSEK")) return false;
+  if (f.takas && v.takasaAcik !== true) return false; // v3.15
   const fiyat = talep ? v.maxFiyat : v.fiyat;
   if (f.fiyatMin != null && !(fiyat != null && fiyat >= f.fiyatMin)) return false;
   if (f.fiyatMax != null && !(talep ? (v.minFiyat ?? 0) <= f.fiyatMax : fiyat != null && fiyat <= f.fiyatMax)) return false;
@@ -72,6 +75,11 @@ export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string
   for (const [a, fv] of Object.entries(f.ozellik)) {
     if (fv == null || fv === "" || (Array.isArray(fv) && !fv.length)) continue;
     const m = MULK_OZELLIK_META[a as MulkOzellikAlani] as any, t = alanTuru(a as MulkOzellikAlani), vv = o[a];
+    if (a === "istenenKatlar") { // v3.15: talepte istenen katlardan biri tutuyorsa; portföyde katı seçilenlerden birine uyuyorsa
+      const fk = fv as string[];
+      const uyar = talep ? istenenKatlarOf(o).some((x) => fk.includes(x)) : katUyumu(fk, o.bulunduguKat, o.katSayisi) === "SAGLANDI";
+      if (!uyar) return false; continue;
+    }
     if (t.tur === "bool") { if (vv !== true) return false; continue; }
     if (t.tur === "enum") {
       if (m.karsilastirma === "sirali") { const s = (SIRALAMA as any)[a] as string[]; if (!vv || s.indexOf(vv) < Math.min(...(fv as string[]).map((x) => s.indexOf(x)))) return false; }
@@ -83,7 +91,7 @@ export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string
   }
   return true;
 }
-export const aktifFiltreSayisi = (f: Filtre) => f.aileler.length + f.islemler.length + f.konumlar.length + f.durumlar.length + f.kisiler.length + f.kanallar.length + f.odalar.length + (f.fiyatMin != null ? 1 : 0) + (f.fiyatMax != null ? 1 : 0) + (f.m2Min != null ? 1 : 0) + (f.m2Max != null ? 1 : 0) + (f.acil ? 1 : 0) + Object.values(f.ozellik).filter((v) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).length;
+export const aktifFiltreSayisi = (f: Filtre) => f.aileler.length + f.islemler.length + f.konumlar.length + f.durumlar.length + f.kisiler.length + f.kanallar.length + f.odalar.length + (f.fiyatMin != null ? 1 : 0) + (f.fiyatMax != null ? 1 : 0) + (f.m2Min != null ? 1 : 0) + (f.m2Max != null ? 1 : 0) + (f.acil ? 1 : 0) + (f.takas ? 1 : 0) + Object.values(f.ozellik).filter((v) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).length;
 
 function CokluCip({ secenekler, secili, degis, ton }: { secenekler: [string, string, number?][]; secili: string[]; degis: (x: string[]) => void; ton?: (k: string) => string }) {
   return <div className="cip-satir">{secenekler.map(([k, l, n]) => { const on = secili.includes(k); return <button type="button" key={k} className={cx("cip secilir", on && "on", on && ton && "t-" + ton(k))} onClick={() => degis(on ? secili.filter((x) => x !== k) : [...secili, k])}>{l}{n != null && <small> {n}</small>}</button>; })}</div>;
@@ -106,7 +114,7 @@ export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: ba�
   const kanalSec = Object.keys(VERI_KANALI_ETIKET).filter((k) => ogeler.some((v) => v.veriKanali === k));
   // Türe özel filtreler: seçilen ailelerin hepsi aynı mülk grubundaysa
   const gruplar = [...new Set(f.aileler.map((a) => MULK_TIPI_META[MULK_AILELERI.find((x) => x.kod === a)!.tipler[0]].grup))];
-  const turAlanlari = gruplar.length === 1 ? ONEMLI_ALANLAR[gruplar[0]] : [];
+  const turAlanlari = gruplar.length === 1 ? ONEMLI_ALANLAR[gruplar[0]].filter((a) => a !== "bulunduguKat") : [];
   const konutVar = f.aileler.some((a) => a === "DAIRE" || a === "MUSTAKIL" || a === "DEVRE_MULK") || (!f.aileler.length && ogeler.some((v) => v.odaSayisi));
   const n = aktifFiltreSayisi(f) + ek.reduce((a, b) => a + b.aktif, 0);
   const setO = (a: string, v: any) => set({ ...f, ozellik: { ...f.ozellik, [a]: v } });
@@ -126,7 +134,8 @@ export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: ba�
     ...(f.m2Min != null ? [{ etiket: `≥ ${f.m2Min} m²`, kaldir: () => set({ ...f, m2Min: null }) }] : []),
     ...(f.m2Max != null ? [{ etiket: `≤ ${f.m2Max} m²`, kaldir: () => set({ ...f, m2Max: null }) }] : []),
     ...(f.acil ? [{ etiket: "Acil", kaldir: () => set({ ...f, acil: false }) }] : []),
-    ...Object.entries(f.ozellik).filter(([, v]) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).map(([a, v]) => ({ etiket: `${(MULK_OZELLIK_META as any)[a]?.etiket}${v === true ? "" : ": " + (Array.isArray(v) ? v.map(etiket).join("/") : typeof v === "number" ? (((MULK_OZELLIK_META as any)[a]?.karsilastirma === "max") ? "≤ " : "≥ ") + v : etiket(v))}`, kaldir: () => setO(a, null) })),
+    ...(f.takas ? [{ etiket: "Takasa açık", kaldir: () => set({ ...f, takas: false }) }] : []),
+    ...Object.entries(f.ozellik).filter(([, v]) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).map(([a, v]) => ({ etiket: `${(MULK_OZELLIK_META as any)[a]?.etiket}${v === true ? "" : ": " + (Array.isArray(v) ? (a === "istenenKatlar" ? katYaz(v) : v.map(etiket).join("/")) : typeof v === "number" ? (((MULK_OZELLIK_META as any)[a]?.karsilastirma === "max") ? "≤ " : "≥ ") + v : etiket(v))}`, kaldir: () => setO(a, null) })),
   ];
 
   const sonucSayisi = ogeler.filter((v) => filtreUygula(v, f, kisiAd)).length;
@@ -137,6 +146,7 @@ export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: ba�
     ...ek,
     ...(!gizle.includes("aile") ? [{ k: "aile", baslik: "Mülk türü", ozet: aileOzet, icerik: <CokluCip secenekler={aileSec.map((a) => [a.kod, a.etiket, sayi((v) => aileOf(v.mulkTipi as any).kod === a.kod)])} secili={f.aileler} degis={(x) => set({ ...f, aileler: x, ozellik: {} })} /> }] : []),
     ...(!gizle.includes("islem") ? [{ k: "islem", baslik: "İşlem", ozet: f.islemler.length ? f.islemler.map(etiket).join(", ") : "Tümü", icerik: <CokluCip secenekler={islemSec.map((i) => [i, etiket(i), sayi((v) => v.islemTipi === i)])} secili={f.islemler} degis={(x) => set({ ...f, islemler: x })} ton={islemTonu} /> }] : []),
+    ...(!gizle.includes("takas") ? [{ k: "takas", baslik: "Takas", ozet: f.takas ? "Takasa açık" : "Tümü", icerik: <CokluCip secenekler={[["EVET", "Takasa açık", sayi((v) => v.takasaAcik === true)]]} secili={f.takas ? ["EVET"] : []} degis={(x) => set({ ...f, takas: x.includes("EVET") })} /> }] : []),
     ...(!gizle.includes("konum") ? [{ k: "konum", baslik: "Konum / mahalle", ozet: f.konumlar.length ? f.konumlar.map((k) => k.etiket.split(" (")[0]).join(", ") : "Tümü", icerik: <div className="yigin kucuk-bosluk">
       <KonumSecici placeholder="İlçe, mahalle, bölge ekle…" onSec={(o) => { if (!f.konumlar.some((x) => x.anahtar === o.anahtar)) set({ ...f, konumlar: [...f.konumlar, o] }); }} />
       {f.konumlar.length > 0 && <div className="cip-satir">{f.konumlar.map((k) => <button type="button" key={k.anahtar} className="cip aktif" onClick={() => set({ ...f, konumlar: f.konumlar.filter((x) => x.anahtar !== k.anahtar) })}>{k.etiket} ×</button>)}</div>}
@@ -147,6 +157,7 @@ export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: ba�
     ...(turAlanlari.length ? [{ k: "tur", baslik: `${MULK_AILELERI.filter((a) => f.aileler.includes(a.kod)).map((a) => a.etiket.split(" /")[0]).join(", ")} özellikleri`, ozet: turSayisi ? `${turSayisi} seçili` : "Tümü", icerik: <div className="fp-tur">
       <div className="alanlar">{turAlanlari.filter((a) => alanTuru(a).tur !== "bool").map((a) => {
         const m = MULK_OZELLIK_META[a] as any, t = alanTuru(a), v = f.ozellik[a];
+        if (a === "istenenKatlar") return <div key={a} className="alan genis"><label>Kat (birden fazla seçilebilir)</label><CokluCip secenekler={KAT_SECENEKLERI.map(([k, l]) => [k, l])} secili={v ?? []} degis={(x) => setO(a, x)} /></div>;
         if (t.tur === "enum" || t.tur === "coklu") return <div key={a} className="alan genis"><label>{m.etiket}{m.karsilastirma === "sirali" ? " (en az)" : ""}</label><CokluCip secenekler={t.degerler.filter((x) => x !== "YOK").map((x) => [x, etiket(x)])} secili={v ?? []} degis={(x) => setO(a, x)} /></div>;
         if (t.tur === "sayi") return <div key={a} className="alan"><label>{m.etiket}{m.birim ? ` (${m.birim})` : ""} · {m.karsilastirma === "max" ? "en fazla" : "en az"}</label><input inputMode="decimal" value={v ?? ""} onChange={(e) => setO(a, sayiYap(e.target.value))} /></div>;
         return null;

@@ -11,7 +11,7 @@
  *    ve müşteriye gönderilecek hazır soru mesajı.
  * Saf fonksiyon: veritabanı ve yapay zekâ gerektirmez (demo, API ve eşleştirme motoru aynı kodu kullanır).
  */
-import { MULK_OZELLIK_META, type MulkOzellikAlani } from "../domain/teknik-alanlar";
+import { MULK_OZELLIK_META, istenenKatlarOf, katYaz, type MulkOzellikAlani } from "../domain/teknik-alanlar";
 import { MULK_TIPI_META, aileOf } from "../domain/kategori";
 
 export type Kriter = string; // TeknikAlan enum değeri (MULK_TIPI, ALAN, ELEKTRIK…)
@@ -107,6 +107,7 @@ export function kriterDegeri(t: DnaGirdi, k: Kriter): string | null {
   if (k === "ODA_SAYISI") return t.odaSayisi ?? null;
   if (k === "KREDI") return t.krediyeUygun ? "İstiyor" : null;
   if (k === "MULK_TIPI") return t.mulkTipi;
+  if (k === "KAT") { const kk = istenenKatlarOf(o); return kk.length ? katYaz(kk) : null; } // v3.15: çoklu kat
   for (const [alan, meta] of Object.entries(MULK_OZELLIK_META)) {
     if ((meta as any).kriter !== k) continue;
     const v = o[alan as MulkOzellikAlani];

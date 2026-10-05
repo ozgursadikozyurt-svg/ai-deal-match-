@@ -56,6 +56,8 @@ export const MulkOzellikObje = z
     zeminTipi: en(ZeminTipi).nullish(), zeminYukTasimaTonM2: pozitif(100).nullish(),
     binaYasi: z.number().int().min(0).max(300).nullish(), katSayisi: z.number().int().min(0).max(150).nullish(),
     bulunduguKat: z.number().int().min(-10).max(150).nullish(),
+    /** v3.15 — talepte çoklu kat: "-1", "0", "1"…"N", "ARA", "SON" */
+    istenenKatlar: z.array(z.string().regex(/^(-?\d{1,3}|ARA|SON)$/)).max(14).default([]),
 
     ofis: bool, ofisOdaSayisi: adet, wc: bool, wcSayisi: adet, mutfak: bool, personelAlani: bool,
     sundurma: bool, sondaj: bool,
@@ -144,6 +146,8 @@ export const KayitTemel = z.object({
   paraBirimi: en(ParaBirimi).default("TRY"),
   fiyatPeriyodu: en(FiyatPeriyodu).default("TOPLAM"),
   krediyeUygun: bool,
+  /** v3.15 — takasa açık (portföy + talep) */
+  takasaAcik: bool,
 
   m2, netM2: m2, minM2: m2, maxM2: m2,
   m2ToleransYuzde: pozitif(100).nullish(),

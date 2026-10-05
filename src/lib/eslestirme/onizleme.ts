@@ -21,7 +21,10 @@
  */
 import { MULK_OZELLIK_META, SIRALAMA, type MulkOzellikAlani } from "../domain/teknik-alanlar";
 import { enIyiTipBenzerligi, MULK_TIPI_META } from "../domain/kategori";
-import { odaSayisiAyristir } from "../domain/teknik-alanlar";
+import { odaSayisiAyristir, istenenKatlarOf, katUyumu, katYaz } from "../domain/teknik-alanlar";
+
+/** v3.15 — iki taraf da takasa açıksa eşleşme puanına eklenen küçük bonus (ayrı kriter satırı; uygunluk kararını değiştirmez). */
+export const TAKAS_BONUS = 3;
 import { MULK_TIPI_META as TIP_META } from "../domain/kategori";
 import { talepDnasi, type TalepDna } from "./talep-dna";
 import type { KomsulukIndeksi, MahalleYakinligi } from "../lokasyon/komsuluk";
@@ -79,6 +82,8 @@ export interface OnizlemeKayit {
   m2ToleransYuzde?: number | null;
   odaSayisi?: string | null;
   krediyeUygun?: boolean | null;
+  /** v3.15 — takasa açık (talep ve portföy) */
+  takasaAcik?: boolean | null;
   aciliyet?: string | null;
   lokasyonlar: OnizlemeLokasyon[];
   ozellik?: Record<string, unknown> & { kritikKriterler?: string[]; esnekKriterler?: string[]; eksikBilgiler?: string[]; kullanimAmaclari?: string[] };
@@ -287,6 +292,16 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
     satirlar.push({ anahtar: "odaSayisi", etiket: "Oda sayısı", talep: String(t.odaSayisi), portfoy: (p.odaSayisi ?? "—") + not, sonuc, kritik: kritik.has("ODA_SAYISI"), puan, bilesen: "ODA" });
   }
   if (t.krediyeUygun) satirlar.push({ anahtar: "krediyeUygun", etiket: "Krediye uygun", talep: "İstiyor", portfoy: p.krediyeUygun == null ? "—" : p.krediyeUygun ? "Var" : "Yok", sonuc: p.krediyeUygun == null ? "BILINMIYOR" : p.krediyeUygun ? "SAGLANDI" : "SAGLANMADI", kritik: kritik.has("KREDI"), bilesen: "KONUT" });
+  // v3.15 — çoklu kat: talep birden çok kata uygun olabilir ("Giriş", "3. kat", "Ara kat"…); biri tutarsa karşılanmış sayılır.
+  // Eski tek değerli talep katı (bulunduguKat) da okunur.
+  const istenenKat = istenenKatlarOf(t.ozellik);
+  if (istenenKat.length) {
+    const pk = typeof p.ozellik?.bulunduguKat === "number" ? p.ozellik.bulunduguKat : null;
+    satirlar.push({ anahtar: "istenenKatlar", etiket: "Kat", talep: katYaz(istenenKat), portfoy: pk == null ? "—" : katYaz([String(pk)]), sonuc: katUyumu(istenenKat, pk, p.ozellik?.katSayisi as number | null | undefined), kritik: kritik.has("KAT"), bilesen: BILESEN.KAT ?? "DIGER" });
+  }
+  // v3.15 — takas: iki taraf da açıksa küçük bonus (aşağıda skora eklenir); matris bileşenlerine girmez
+  const takasUyumu = t.takasaAcik === true && p.takasaAcik === true;
+  if (takasUyumu) satirlar.push({ anahtar: "takasaAcik", etiket: "Takasa açık", talep: "Evet", portfoy: "Evet", sonuc: "SAGLANDI", kritik: false, puan: 1, bilesen: "TIP_SATIR" });
   // Alan (m²) — tolerans DNA'dan: esnek ±%20, değilse ±%10
   const tol = 1 + dna.m2Tolerans / 100;
   if (t.minM2 != null || t.maxM2 != null) {
@@ -351,6 +366,7 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   const sayilan = bilesenler.filter((x) => x.puan != null);
   const toplamW = sayilan.reduce((a, x) => a + x.agirlik, 0);
   let skor = Math.round((100 * sayilan.reduce((a, x) => a + x.agirlik * (x.puan as number), 0)) / Math.max(1, toplamW));
+  if (takasUyumu) skor += TAKAS_BONUS; // v3.15
   skor -= 5 * talepEksikleri.length; // talepte öldürücü bilgi eksikse skor "kesin" görünmesin
   skor = Math.max(0, Math.min(100, skor));
 

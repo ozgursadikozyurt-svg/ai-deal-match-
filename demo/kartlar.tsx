@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import { talepDnasi } from "../src/lib/eslestirme/talep-dna";
 import { kopmaEtiket } from "../src/lib/eslestirme/kopar";
 import { etiket } from "./etiketler";
-import { useDepo, Pill, UYGUNLUK, baslikOf, fiyatOf, m2Of, lokEtiket, eKey, type Eslesme } from "./ortak";
+import { useDepo, Pill, IslemPill, UYGUNLUK, baslikOf, fiyatOf, m2Of, lokEtiket, eKey, type Eslesme } from "./ortak";
 import { EksikUyarisi, HavuzRozeti } from "./motor-ui";
 import { KimPill, KoparDugmesi } from "./kopar";
 import type { Kayit, PipelineDurum } from "./depo";
@@ -52,6 +52,7 @@ export function EslesmeKarti({ e }: { e: Eslesme }) {
     <div className={"es2-taraf " + (ad === "Talep" ? "t" : "p")}>
       <div className="es2-et">
         <span>{ad}</span>
+        <Pill>{etiket(k.veri.mulkTipi)}</Pill><IslemPill islem={k.veri.islemTipi} />
         {ad === "Portföy" && <HavuzRozeti v={k.veri} />}
         {ad === "Portföy" && e.s.tipUyumu.oran < 0.9 && <span className="benzer-rozet">benzer tip</span>}
       </div>

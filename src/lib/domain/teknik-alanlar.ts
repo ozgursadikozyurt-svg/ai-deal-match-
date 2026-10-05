@@ -125,6 +125,7 @@ export const MULK_OZELLIK_META = {
   binaYasi: { etiket: "Bina yaşı", grup: "Yapı", karsilastirma: "max", kriter: "BINA_YASI", gruplar: [...KON, E, ...TIC, B, TU] },
   katSayisi: { etiket: "Binanın kat sayısı", grup: "Yapı", karsilastirma: "bilgi", gruplar: [...KON, ...TIC, B, TU] },
   bulunduguKat: { etiket: "Bulunduğu kat", grup: "Yapı", karsilastirma: "bilgi", kriter: "KAT", gruplar: [...KON, ...TIC] },
+  istenenKatlar: { etiket: "İstenen kat(lar)", grup: "Yapı", karsilastirma: "bilgi", kriter: "KAT", gruplar: [...KON, ...TIC] },
 
   // Sosyal
   ofis: { etiket: "Ofis", grup: "Sosyal alanlar", karsilastirma: "bool", kriter: "OFIS_SOSYAL", gruplar: [E] },
@@ -210,3 +211,31 @@ export function odaSayisiAyristir(s?: string | null): { oda: number; salon?: num
   const n = t.match(/(\d+)\s*oda/);
   return n ? { oda: Number(n[1]) } : null;
 }
+// ───────────────────────── v3.15 — çoklu kat seçimi ─────────────────────────
+/** Talepte seçilebilen katlar: "-1" bodrum, "0" giriş/zemin, "1"…"10", "ARA" (ara kat), "SON" (son kat). */
+export const KAT_SECENEKLERI: readonly (readonly [string, string])[] = [
+  ["-1", "Bodrum"], ["0", "Giriş / Zemin"],
+  ...Array.from({ length: 10 }, (_, i) => [String(i + 1), `${i + 1}. kat`] as const),
+  ["ARA", "Ara kat"], ["SON", "Son kat"],
+];
+export const katYaz = (a: readonly string[]): string => a.map((x) => KAT_SECENEKLERI.find(([k]) => k === x)?.[1] ?? `${x}. kat`).join(", ");
+/**
+ * Talepteki kat seçeneklerinden biri portföyün katına uyuyor mu?
+ *  - Sayılar: aynı kat. "ARA": 1 ≤ kat < binanın kat sayısı. "SON": kat = binanın kat sayısı.
+ *  - Portföyün katı bilinmiyorsa (ya da ARA/SON isteniyor ama bina kat sayısı yoksa) → BILINMIYOR.
+ */
+export function katUyumu(istenen: readonly string[], kat?: number | null, katSayisi?: number | null): "SAGLANDI" | "SAGLANMADI" | "BILINMIYOR" {
+  if (!istenen.length) return "SAGLANDI";
+  if (kat == null) return "BILINMIYOR";
+  if (istenen.some((x) => x !== "ARA" && x !== "SON" && Number(x) === kat)) return "SAGLANDI";
+  const goreli = istenen.filter((x) => x === "ARA" || x === "SON");
+  if (!goreli.length) return "SAGLANMADI";
+  if (katSayisi == null) return "BILINMIYOR";
+  return goreli.some((x) => (x === "ARA" ? kat >= 1 && kat < katSayisi : kat === katSayisi)) ? "SAGLANDI" : "SAGLANMADI";
+}
+/** Talepten istenen katları okur: yeni çoklu alan, yoksa eski tek değerli bulunduguKat. */
+export const istenenKatlarOf = (o?: Record<string, unknown> | null): string[] => {
+  const c = o?.istenenKatlar as string[] | undefined;
+  if (c?.length) return c;
+  return typeof o?.bulunduguKat === "number" ? [String(o.bulunduguKat)] : [];
+};

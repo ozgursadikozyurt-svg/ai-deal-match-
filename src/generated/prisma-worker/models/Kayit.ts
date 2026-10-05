@@ -66,6 +66,7 @@ export type KayitMinAggregateOutputType = {
   paraBirimi: $Enums.ParaBirimi | null
   fiyatPeriyodu: $Enums.FiyatPeriyodu | null
   krediyeUygun: boolean | null
+  takasaAcik: boolean | null
   m2: number | null
   netM2: number | null
   minM2: number | null
@@ -123,6 +124,7 @@ export type KayitMaxAggregateOutputType = {
   paraBirimi: $Enums.ParaBirimi | null
   fiyatPeriyodu: $Enums.FiyatPeriyodu | null
   krediyeUygun: boolean | null
+  takasaAcik: boolean | null
   m2: number | null
   netM2: number | null
   minM2: number | null
@@ -182,6 +184,7 @@ export type KayitCountAggregateOutputType = {
   paraBirimi: number
   fiyatPeriyodu: number
   krediyeUygun: number
+  takasaAcik: number
   m2: number
   netM2: number
   minM2: number
@@ -271,6 +274,7 @@ export type KayitMinAggregateInputType = {
   paraBirimi?: true
   fiyatPeriyodu?: true
   krediyeUygun?: true
+  takasaAcik?: true
   m2?: true
   netM2?: true
   minM2?: true
@@ -328,6 +332,7 @@ export type KayitMaxAggregateInputType = {
   paraBirimi?: true
   fiyatPeriyodu?: true
   krediyeUygun?: true
+  takasaAcik?: true
   m2?: true
   netM2?: true
   minM2?: true
@@ -387,6 +392,7 @@ export type KayitCountAggregateInputType = {
   paraBirimi?: true
   fiyatPeriyodu?: true
   krediyeUygun?: true
+  takasaAcik?: true
   m2?: true
   netM2?: true
   minM2?: true
@@ -537,6 +543,7 @@ export type KayitGroupByOutputType = {
   paraBirimi: $Enums.ParaBirimi
   fiyatPeriyodu: $Enums.FiyatPeriyodu
   krediyeUygun: boolean | null
+  takasaAcik: boolean | null
   m2: number | null
   netM2: number | null
   minM2: number | null
@@ -623,6 +630,7 @@ export type KayitWhereInput = {
   paraBirimi?: Prisma.EnumParaBirimiFilter<"Kayit"> | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFilter<"Kayit"> | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
+  takasaAcik?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
   m2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
   netM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
   minM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
@@ -696,6 +704,7 @@ export type KayitOrderByWithRelationInput = {
   paraBirimi?: Prisma.SortOrder
   fiyatPeriyodu?: Prisma.SortOrder
   krediyeUygun?: Prisma.SortOrderInput | Prisma.SortOrder
+  takasaAcik?: Prisma.SortOrderInput | Prisma.SortOrder
   m2?: Prisma.SortOrderInput | Prisma.SortOrder
   netM2?: Prisma.SortOrderInput | Prisma.SortOrder
   minM2?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -774,6 +783,7 @@ export type KayitWhereUniqueInput = Prisma.AtLeast<{
   paraBirimi?: Prisma.EnumParaBirimiFilter<"Kayit"> | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFilter<"Kayit"> | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
+  takasaAcik?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
   m2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
   netM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
   minM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
@@ -845,6 +855,7 @@ export type KayitOrderByWithAggregationInput = {
   paraBirimi?: Prisma.SortOrder
   fiyatPeriyodu?: Prisma.SortOrder
   krediyeUygun?: Prisma.SortOrderInput | Prisma.SortOrder
+  takasaAcik?: Prisma.SortOrderInput | Prisma.SortOrder
   m2?: Prisma.SortOrderInput | Prisma.SortOrder
   netM2?: Prisma.SortOrderInput | Prisma.SortOrder
   minM2?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -916,6 +927,7 @@ export type KayitScalarWhereWithAggregatesInput = {
   paraBirimi?: Prisma.EnumParaBirimiWithAggregatesFilter<"Kayit"> | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduWithAggregatesFilter<"Kayit"> | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.BoolNullableWithAggregatesFilter<"Kayit"> | boolean | null
+  takasaAcik?: Prisma.BoolNullableWithAggregatesFilter<"Kayit"> | boolean | null
   m2?: Prisma.FloatNullableWithAggregatesFilter<"Kayit"> | number | null
   netM2?: Prisma.FloatNullableWithAggregatesFilter<"Kayit"> | number | null
   minM2?: Prisma.FloatNullableWithAggregatesFilter<"Kayit"> | number | null
@@ -979,6 +991,7 @@ export type KayitCreateInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -1051,6 +1064,7 @@ export type KayitUncheckedCreateInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -1123,6 +1137,7 @@ export type KayitUpdateInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1195,6 +1210,7 @@ export type KayitUncheckedUpdateInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1267,6 +1283,7 @@ export type KayitCreateManyInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -1330,6 +1347,7 @@ export type KayitUpdateManyMutationInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1392,6 +1410,7 @@ export type KayitUncheckedUpdateManyInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1484,6 +1503,7 @@ export type KayitCountOrderByAggregateInput = {
   paraBirimi?: Prisma.SortOrder
   fiyatPeriyodu?: Prisma.SortOrder
   krediyeUygun?: Prisma.SortOrder
+  takasaAcik?: Prisma.SortOrder
   m2?: Prisma.SortOrder
   netM2?: Prisma.SortOrder
   minM2?: Prisma.SortOrder
@@ -1558,6 +1578,7 @@ export type KayitMaxOrderByAggregateInput = {
   paraBirimi?: Prisma.SortOrder
   fiyatPeriyodu?: Prisma.SortOrder
   krediyeUygun?: Prisma.SortOrder
+  takasaAcik?: Prisma.SortOrder
   m2?: Prisma.SortOrder
   netM2?: Prisma.SortOrder
   minM2?: Prisma.SortOrder
@@ -1615,6 +1636,7 @@ export type KayitMinOrderByAggregateInput = {
   paraBirimi?: Prisma.SortOrder
   fiyatPeriyodu?: Prisma.SortOrder
   krediyeUygun?: Prisma.SortOrder
+  takasaAcik?: Prisma.SortOrder
   m2?: Prisma.SortOrder
   netM2?: Prisma.SortOrder
   minM2?: Prisma.SortOrder
@@ -1971,6 +1993,7 @@ export type KayitCreateWithoutLokasyonlarInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -2042,6 +2065,7 @@ export type KayitUncheckedCreateWithoutLokasyonlarInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -2129,6 +2153,7 @@ export type KayitUpdateWithoutLokasyonlarInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -2200,6 +2225,7 @@ export type KayitUncheckedUpdateWithoutLokasyonlarInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -2271,6 +2297,7 @@ export type KayitCreateWithoutOzellikInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -2342,6 +2369,7 @@ export type KayitUncheckedCreateWithoutOzellikInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -2429,6 +2457,7 @@ export type KayitUpdateWithoutOzellikInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -2500,6 +2529,7 @@ export type KayitUncheckedUpdateWithoutOzellikInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -2571,6 +2601,7 @@ export type KayitCreateWithoutKisiInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -2642,6 +2673,7 @@ export type KayitUncheckedCreateWithoutKisiInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -2742,6 +2774,7 @@ export type KayitScalarWhereInput = {
   paraBirimi?: Prisma.EnumParaBirimiFilter<"Kayit"> | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFilter<"Kayit"> | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
+  takasaAcik?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
   m2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
   netM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
   minM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
@@ -2805,6 +2838,7 @@ export type KayitCreateWithoutKisiBaglariInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -2876,6 +2910,7 @@ export type KayitUncheckedCreateWithoutKisiBaglariInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -2963,6 +2998,7 @@ export type KayitUpdateWithoutKisiBaglariInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -3034,6 +3070,7 @@ export type KayitUncheckedUpdateWithoutKisiBaglariInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -3105,6 +3142,7 @@ export type KayitCreateWithoutTalepMatchleriInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -3176,6 +3214,7 @@ export type KayitUncheckedCreateWithoutTalepMatchleriInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -3252,6 +3291,7 @@ export type KayitCreateWithoutPortfoyMatchleriInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -3323,6 +3363,7 @@ export type KayitUncheckedCreateWithoutPortfoyMatchleriInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -3410,6 +3451,7 @@ export type KayitUpdateWithoutTalepMatchleriInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -3481,6 +3523,7 @@ export type KayitUncheckedUpdateWithoutTalepMatchleriInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -3563,6 +3606,7 @@ export type KayitUpdateWithoutPortfoyMatchleriInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -3634,6 +3678,7 @@ export type KayitUncheckedUpdateWithoutPortfoyMatchleriInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -3705,6 +3750,7 @@ export type KayitCreateWithoutPortalKaynagiInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -3776,6 +3822,7 @@ export type KayitUncheckedCreateWithoutPortalKaynagiInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -3863,6 +3910,7 @@ export type KayitUpdateWithoutPortalKaynagiInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -3934,6 +3982,7 @@ export type KayitUncheckedUpdateWithoutPortalKaynagiInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4005,6 +4054,7 @@ export type KayitCreateWithoutAuditLoglariInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -4076,6 +4126,7 @@ export type KayitUncheckedCreateWithoutAuditLoglariInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -4163,6 +4214,7 @@ export type KayitUpdateWithoutAuditLoglariInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4234,6 +4286,7 @@ export type KayitUncheckedUpdateWithoutAuditLoglariInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4305,6 +4358,7 @@ export type KayitCreateWithoutGorusmeNotlariInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -4376,6 +4430,7 @@ export type KayitUncheckedCreateWithoutGorusmeNotlariInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -4463,6 +4518,7 @@ export type KayitUpdateWithoutGorusmeNotlariInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4534,6 +4590,7 @@ export type KayitUncheckedUpdateWithoutGorusmeNotlariInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4605,6 +4662,7 @@ export type KayitCreateWithoutFotolarInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -4676,6 +4734,7 @@ export type KayitUncheckedCreateWithoutFotolarInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -4763,6 +4822,7 @@ export type KayitUpdateWithoutFotolarInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4834,6 +4894,7 @@ export type KayitUncheckedUpdateWithoutFotolarInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4905,6 +4966,7 @@ export type KayitCreateManyKisiInput = {
   paraBirimi?: $Enums.ParaBirimi
   fiyatPeriyodu?: $Enums.FiyatPeriyodu
   krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
   m2?: number | null
   netM2?: number | null
   minM2?: number | null
@@ -4967,6 +5029,7 @@ export type KayitUpdateWithoutKisiInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -5038,6 +5101,7 @@ export type KayitUncheckedUpdateWithoutKisiInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -5109,6 +5173,7 @@ export type KayitUncheckedUpdateManyWithoutKisiInput = {
   paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
   fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
   krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -5256,6 +5321,7 @@ export type KayitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   paraBirimi?: boolean
   fiyatPeriyodu?: boolean
   krediyeUygun?: boolean
+  takasaAcik?: boolean
   m2?: boolean
   netM2?: boolean
   minM2?: boolean
@@ -5330,6 +5396,7 @@ export type KayitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   paraBirimi?: boolean
   fiyatPeriyodu?: boolean
   krediyeUygun?: boolean
+  takasaAcik?: boolean
   m2?: boolean
   netM2?: boolean
   minM2?: boolean
@@ -5394,6 +5461,7 @@ export type KayitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   paraBirimi?: boolean
   fiyatPeriyodu?: boolean
   krediyeUygun?: boolean
+  takasaAcik?: boolean
   m2?: boolean
   netM2?: boolean
   minM2?: boolean
@@ -5458,6 +5526,7 @@ export type KayitSelectScalar = {
   paraBirimi?: boolean
   fiyatPeriyodu?: boolean
   krediyeUygun?: boolean
+  takasaAcik?: boolean
   m2?: boolean
   netM2?: boolean
   minM2?: boolean
@@ -5505,7 +5574,7 @@ export type KayitSelectScalar = {
   updatedAt?: boolean
 }
 
-export type KayitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tip" | "durum" | "aciliyet" | "anaKategori" | "mulkTipi" | "alternatifMulkTipleri" | "islemTipi" | "alternatifIslemTipleri" | "fiyat" | "minFiyat" | "maxFiyat" | "paraBirimi" | "fiyatPeriyodu" | "krediyeUygun" | "m2" | "netM2" | "minM2" | "maxM2" | "m2ToleransYuzde" | "odaSayisi" | "lokasyonHam" | "adres" | "enlem" | "boylam" | "veriKanali" | "ilanSahibiTipi" | "havuz" | "yetkili" | "yetkiBitis" | "musteriKaynagi" | "portfoyAlinabilirlik" | "kisiId" | "gondeAdi" | "gondeTelefon" | "gondeSirket" | "kayitGrubu" | "mesajTarihi" | "kaynakDosya" | "ingestionId" | "portalUrl" | "portalIlanNo" | "portalIlanSahibi" | "baslik" | "ozet" | "hamMetin" | "operasyonNotu" | "arsivNotu" | "ozelSartlar" | "validUntil" | "ttlUyariGonderildi" | "fingerprint" | "notionId" | "notionSonSync" | "notionSnapshot" | "notionGeriYazim" | "alanGuvenleri" | "aiModelVersiyon" | "createdAt" | "updatedAt", ExtArgs["result"]["kayit"]>
+export type KayitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tip" | "durum" | "aciliyet" | "anaKategori" | "mulkTipi" | "alternatifMulkTipleri" | "islemTipi" | "alternatifIslemTipleri" | "fiyat" | "minFiyat" | "maxFiyat" | "paraBirimi" | "fiyatPeriyodu" | "krediyeUygun" | "takasaAcik" | "m2" | "netM2" | "minM2" | "maxM2" | "m2ToleransYuzde" | "odaSayisi" | "lokasyonHam" | "adres" | "enlem" | "boylam" | "veriKanali" | "ilanSahibiTipi" | "havuz" | "yetkili" | "yetkiBitis" | "musteriKaynagi" | "portfoyAlinabilirlik" | "kisiId" | "gondeAdi" | "gondeTelefon" | "gondeSirket" | "kayitGrubu" | "mesajTarihi" | "kaynakDosya" | "ingestionId" | "portalUrl" | "portalIlanNo" | "portalIlanSahibi" | "baslik" | "ozet" | "hamMetin" | "operasyonNotu" | "arsivNotu" | "ozelSartlar" | "validUntil" | "ttlUyariGonderildi" | "fingerprint" | "notionId" | "notionSonSync" | "notionSnapshot" | "notionGeriYazim" | "alanGuvenleri" | "aiModelVersiyon" | "createdAt" | "updatedAt", ExtArgs["result"]["kayit"]>
 export type KayitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lokasyonlar?: boolean | Prisma.Kayit$lokasyonlarArgs<ExtArgs>
   kisi?: boolean | Prisma.Kayit$kisiArgs<ExtArgs>
@@ -5565,6 +5634,10 @@ export type $KayitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     paraBirimi: $Enums.ParaBirimi
     fiyatPeriyodu: $Enums.FiyatPeriyodu
     krediyeUygun: boolean | null
+    /**
+     * v3.15 — takasa açık (portföy ve talep); null = belirtilmemiş. Eşleştirmede iki taraf da true ise küçük bonus.
+     */
+    takasaAcik: boolean | null
     m2: number | null
     netM2: number | null
     minM2: number | null
@@ -6070,6 +6143,7 @@ export interface KayitFieldRefs {
   readonly paraBirimi: Prisma.FieldRef<"Kayit", 'ParaBirimi'>
   readonly fiyatPeriyodu: Prisma.FieldRef<"Kayit", 'FiyatPeriyodu'>
   readonly krediyeUygun: Prisma.FieldRef<"Kayit", 'Boolean'>
+  readonly takasaAcik: Prisma.FieldRef<"Kayit", 'Boolean'>
   readonly m2: Prisma.FieldRef<"Kayit", 'Float'>
   readonly netM2: Prisma.FieldRef<"Kayit", 'Float'>
   readonly minM2: Prisma.FieldRef<"Kayit", 'Float'>

@@ -236,7 +236,7 @@ export type KisiGroupByOutputType = {
   ikincilTelefon: string | null
   email: string | null
   sirket: string | null
-  roller: $Enums.KisiRolu[]
+  roller: string[]
   ilanSahibiTipi: $Enums.IlanSahibiTipi
   kaynak: $Enums.KisiKaynagi
   notlar: string | null
@@ -282,7 +282,7 @@ export type KisiWhereInput = {
   ikincilTelefon?: Prisma.StringNullableFilter<"Kisi"> | string | null
   email?: Prisma.StringNullableFilter<"Kisi"> | string | null
   sirket?: Prisma.StringNullableFilter<"Kisi"> | string | null
-  roller?: Prisma.EnumKisiRoluNullableListFilter<"Kisi">
+  roller?: Prisma.StringNullableListFilter<"Kisi">
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFilter<"Kisi"> | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFilter<"Kisi"> | $Enums.KisiKaynagi
   notlar?: Prisma.StringNullableFilter<"Kisi"> | string | null
@@ -343,7 +343,7 @@ export type KisiWhereUniqueInput = Prisma.AtLeast<{
   ikincilTelefon?: Prisma.StringNullableFilter<"Kisi"> | string | null
   email?: Prisma.StringNullableFilter<"Kisi"> | string | null
   sirket?: Prisma.StringNullableFilter<"Kisi"> | string | null
-  roller?: Prisma.EnumKisiRoluNullableListFilter<"Kisi">
+  roller?: Prisma.StringNullableListFilter<"Kisi">
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFilter<"Kisi"> | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFilter<"Kisi"> | $Enums.KisiKaynagi
   notlar?: Prisma.StringNullableFilter<"Kisi"> | string | null
@@ -400,7 +400,7 @@ export type KisiScalarWhereWithAggregatesInput = {
   ikincilTelefon?: Prisma.StringNullableWithAggregatesFilter<"Kisi"> | string | null
   email?: Prisma.StringNullableWithAggregatesFilter<"Kisi"> | string | null
   sirket?: Prisma.StringNullableWithAggregatesFilter<"Kisi"> | string | null
-  roller?: Prisma.EnumKisiRoluNullableListFilter<"Kisi">
+  roller?: Prisma.StringNullableListFilter<"Kisi">
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiWithAggregatesFilter<"Kisi"> | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiWithAggregatesFilter<"Kisi"> | $Enums.KisiKaynagi
   notlar?: Prisma.StringNullableWithAggregatesFilter<"Kisi"> | string | null
@@ -425,7 +425,7 @@ export type KisiCreateInput = {
   ikincilTelefon?: string | null
   email?: string | null
   sirket?: string | null
-  roller?: Prisma.KisiCreaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiCreaterollerInput | string[]
   ilanSahibiTipi?: $Enums.IlanSahibiTipi
   kaynak?: $Enums.KisiKaynagi
   notlar?: string | null
@@ -453,7 +453,7 @@ export type KisiUncheckedCreateInput = {
   ikincilTelefon?: string | null
   email?: string | null
   sirket?: string | null
-  roller?: Prisma.KisiCreaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiCreaterollerInput | string[]
   ilanSahibiTipi?: $Enums.IlanSahibiTipi
   kaynak?: $Enums.KisiKaynagi
   notlar?: string | null
@@ -481,7 +481,7 @@ export type KisiUpdateInput = {
   ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  roller?: Prisma.KisiUpdaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiUpdaterollerInput | string[]
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
   notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -509,7 +509,7 @@ export type KisiUncheckedUpdateInput = {
   ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  roller?: Prisma.KisiUpdaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiUpdaterollerInput | string[]
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
   notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -537,7 +537,7 @@ export type KisiCreateManyInput = {
   ikincilTelefon?: string | null
   email?: string | null
   sirket?: string | null
-  roller?: Prisma.KisiCreaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiCreaterollerInput | string[]
   ilanSahibiTipi?: $Enums.IlanSahibiTipi
   kaynak?: $Enums.KisiKaynagi
   notlar?: string | null
@@ -562,7 +562,7 @@ export type KisiUpdateManyMutationInput = {
   ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  roller?: Prisma.KisiUpdaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiUpdaterollerInput | string[]
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
   notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -587,7 +587,7 @@ export type KisiUncheckedUpdateManyInput = {
   ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  roller?: Prisma.KisiUpdaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiUpdaterollerInput | string[]
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
   notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -608,14 +608,6 @@ export type KisiUncheckedUpdateManyInput = {
 export type KisiNullableScalarRelationFilter = {
   is?: Prisma.KisiWhereInput | null
   isNot?: Prisma.KisiWhereInput | null
-}
-
-export type EnumKisiRoluNullableListFilter<$PrismaModel = never> = {
-  equals?: $Enums.KisiRolu[] | Prisma.ListEnumKisiRoluFieldRefInput<$PrismaModel> | null
-  has?: $Enums.KisiRolu | Prisma.EnumKisiRoluFieldRefInput<$PrismaModel> | null
-  hasEvery?: $Enums.KisiRolu[] | Prisma.ListEnumKisiRoluFieldRefInput<$PrismaModel>
-  hasSome?: $Enums.KisiRolu[] | Prisma.ListEnumKisiRoluFieldRefInput<$PrismaModel>
-  isEmpty?: boolean
 }
 
 export type KisiCountOrderByAggregateInput = {
@@ -705,7 +697,7 @@ export type KisiUpdateOneWithoutKayitlarNestedInput = {
 }
 
 export type KisiCreaterollerInput = {
-  set: $Enums.KisiRolu[]
+  set: string[]
 }
 
 export type KisiCreateuzmanlikAileleriInput = {
@@ -717,8 +709,8 @@ export type KisiCreatewhatsappGruplariInput = {
 }
 
 export type KisiUpdaterollerInput = {
-  set?: $Enums.KisiRolu[]
-  push?: $Enums.KisiRolu | $Enums.KisiRolu[]
+  set?: string[]
+  push?: string | string[]
 }
 
 export type EnumKisiKaynagiFieldUpdateOperationsInput = {
@@ -772,7 +764,7 @@ export type KisiCreateWithoutKayitlarInput = {
   ikincilTelefon?: string | null
   email?: string | null
   sirket?: string | null
-  roller?: Prisma.KisiCreaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiCreaterollerInput | string[]
   ilanSahibiTipi?: $Enums.IlanSahibiTipi
   kaynak?: $Enums.KisiKaynagi
   notlar?: string | null
@@ -799,7 +791,7 @@ export type KisiUncheckedCreateWithoutKayitlarInput = {
   ikincilTelefon?: string | null
   email?: string | null
   sirket?: string | null
-  roller?: Prisma.KisiCreaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiCreaterollerInput | string[]
   ilanSahibiTipi?: $Enums.IlanSahibiTipi
   kaynak?: $Enums.KisiKaynagi
   notlar?: string | null
@@ -842,7 +834,7 @@ export type KisiUpdateWithoutKayitlarInput = {
   ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  roller?: Prisma.KisiUpdaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiUpdaterollerInput | string[]
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
   notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -869,7 +861,7 @@ export type KisiUncheckedUpdateWithoutKayitlarInput = {
   ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  roller?: Prisma.KisiUpdaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiUpdaterollerInput | string[]
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
   notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -896,7 +888,7 @@ export type KisiCreateWithoutKayitBaglariInput = {
   ikincilTelefon?: string | null
   email?: string | null
   sirket?: string | null
-  roller?: Prisma.KisiCreaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiCreaterollerInput | string[]
   ilanSahibiTipi?: $Enums.IlanSahibiTipi
   kaynak?: $Enums.KisiKaynagi
   notlar?: string | null
@@ -923,7 +915,7 @@ export type KisiUncheckedCreateWithoutKayitBaglariInput = {
   ikincilTelefon?: string | null
   email?: string | null
   sirket?: string | null
-  roller?: Prisma.KisiCreaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiCreaterollerInput | string[]
   ilanSahibiTipi?: $Enums.IlanSahibiTipi
   kaynak?: $Enums.KisiKaynagi
   notlar?: string | null
@@ -966,7 +958,7 @@ export type KisiUpdateWithoutKayitBaglariInput = {
   ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  roller?: Prisma.KisiUpdaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiUpdaterollerInput | string[]
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
   notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -993,7 +985,7 @@ export type KisiUncheckedUpdateWithoutKayitBaglariInput = {
   ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  roller?: Prisma.KisiUpdaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiUpdaterollerInput | string[]
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
   notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1020,7 +1012,7 @@ export type KisiCreateWithoutKayitNotlariInput = {
   ikincilTelefon?: string | null
   email?: string | null
   sirket?: string | null
-  roller?: Prisma.KisiCreaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiCreaterollerInput | string[]
   ilanSahibiTipi?: $Enums.IlanSahibiTipi
   kaynak?: $Enums.KisiKaynagi
   notlar?: string | null
@@ -1047,7 +1039,7 @@ export type KisiUncheckedCreateWithoutKayitNotlariInput = {
   ikincilTelefon?: string | null
   email?: string | null
   sirket?: string | null
-  roller?: Prisma.KisiCreaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiCreaterollerInput | string[]
   ilanSahibiTipi?: $Enums.IlanSahibiTipi
   kaynak?: $Enums.KisiKaynagi
   notlar?: string | null
@@ -1090,7 +1082,7 @@ export type KisiUpdateWithoutKayitNotlariInput = {
   ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  roller?: Prisma.KisiUpdaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiUpdaterollerInput | string[]
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
   notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1117,7 +1109,7 @@ export type KisiUncheckedUpdateWithoutKayitNotlariInput = {
   ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  roller?: Prisma.KisiUpdaterollerInput | $Enums.KisiRolu[]
+  roller?: Prisma.KisiUpdaterollerInput | string[]
   ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
   kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
   notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1317,7 +1309,10 @@ export type $KisiPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     ikincilTelefon: string | null
     email: string | null
     sirket: string | null
-    roller: $Enums.KisiRolu[]
+    /**
+     * v3.15 — rol kodları (ALICI, SATICI … + Ayarlar'dan eklenen özel roller). Eskiden KisiRolu enum dizisiydi; artık serbest metin dizisi.
+     */
+    roller: string[]
     ilanSahibiTipi: $Enums.IlanSahibiTipi
     kaynak: $Enums.KisiKaynagi
     notlar: string | null
@@ -1768,7 +1763,7 @@ export interface KisiFieldRefs {
   readonly ikincilTelefon: Prisma.FieldRef<"Kisi", 'String'>
   readonly email: Prisma.FieldRef<"Kisi", 'String'>
   readonly sirket: Prisma.FieldRef<"Kisi", 'String'>
-  readonly roller: Prisma.FieldRef<"Kisi", 'KisiRolu[]'>
+  readonly roller: Prisma.FieldRef<"Kisi", 'String[]'>
   readonly ilanSahibiTipi: Prisma.FieldRef<"Kisi", 'IlanSahibiTipi'>
   readonly kaynak: Prisma.FieldRef<"Kisi", 'KisiKaynagi'>
   readonly notlar: Prisma.FieldRef<"Kisi", 'String'>
