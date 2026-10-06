@@ -31,6 +31,10 @@ const SATIR = [
   // 14.09.2026 09:15 - Ad: metin   |   9/14/26, 9:15 AM - Ad: metin
   /^‎?(\d{1,2})[./](\d{1,2})[./](\d{2,4}),? (\d{1,2}):(\d{2})(?:\s?([AP]M))? - (.+?):\s([\s\S]*)$/,
 ];
+/** v3.18 — Markdown (.md) dışa aktarımı: tarih "## 1 Haziran 2026" başlığında, satırlar "[9:42] **Ad:** metin" biçiminde */
+const MD_BASLIK = /^#{1,3}\s*(\d{1,2})\s+([\p{L}]+)\s+(\d{4})\s*$/u;
+const MD_SATIR = /^\[(\d{1,2}):(\d{2})(?::\d{2})?\]\s*\*\*(.+?):?\*\*:?\s*([\s\S]*)$/u;
+const AYLAR = ["ocak", "şubat", "mart", "nisan", "mayıs", "haziran", "temmuz", "ağustos", "eylül", "ekim", "kasım", "aralık"];
 const SISTEM = [
   /^‎?\[?(\d{1,2})[./](\d{1,2})[./](\d{2,4}),? (\d{1,2}):(\d{2})(?::\d{2})?(?:\s?[AP]M)?\]?( -)? [^:]+$/,
 ];
@@ -78,6 +82,8 @@ export const metinParmakIzi = (m: string) => m.toLocaleLowerCase("tr").replace(/
 /** Tek bir dışa aktarım dosyasını mesajlara böler (durum henüz atanmamış) */
 export function sohbetiAyristir(icerik: string, dosya: string, grup = grupAdiOf(dosya)): Omit<WaMesaj, "durum" | "kopyalar">[] {
   const satirlar = icerik.replace(/\r\n?/g, "\n").split("\n");
+  // v3.18 — Markdown dışa aktarımı ayrı biçimde: "## 1 Haziran 2026" + "[9:42] **Ad:** metin"
+  if (satirlar.filter((l) => MD_SATIR.test(l)).length >= 3) return mdSohbetiAyristir(satirlar, dosya, grup);
   // Tarih biçimi: ay/gün mü gün.ay mı? İlk 200 satırda ilk sayı 12'yi geçiyorsa gün önce.
   let ayOnce = false;
   const ornek = satirlar.slice(0, 400).map((l) => l.match(/^‎?\[?(\d{1,2})\/(\d{1,2})\/\d{2,4}/)).filter(Boolean) as RegExpMatchArray[];
@@ -98,6 +104,35 @@ export function sohbetiAyristir(icerik: string, dosya: string, grup = grupAdiOf(
     } else if (son && l.trim()) {
       son.metin += "\n" + l.trimEnd();
     }
+  }
+  for (const x of out) if (!x.telefon) { const t = x.metin.match(METIN_TEL); if (t) x.telefon = telNormalize(t[0]); }
+  return out;
+}
+
+/** v3.18 — Markdown biçimli WhatsApp dışa aktarımı (tarih başlıkları + "[saat] **gönderen:** metin") */
+function mdSohbetiAyristir(satirlar: string[], dosya: string, grup: string): Omit<WaMesaj, "durum" | "kopyalar">[] {
+  const out: Omit<WaMesaj, "durum" | "kopyalar">[] = [];
+  let son: (typeof out)[number] | null = null;
+  let gun: { g: number; a: number; y: number } | null = null;
+  let n = 0;
+  for (const ham of satirlar) {
+    const l = ham.replace(/[‎‏‪-‮]/g, "").trimEnd();
+    const b = l.match(MD_BASLIK);
+    if (b) {
+      const ay = AYLAR.indexOf(b[2].toLocaleLowerCase("tr"));
+      if (ay >= 0) { gun = { g: Number(b[1]), a: ay + 1, y: Number(b[3]) }; son = null; }
+      continue;
+    }
+    const m = l.match(MD_SATIR);
+    if (m && gun) {
+      const gonderen = m[3].replace(/^@/, "").trim();
+      son = { id: `${grup}#${++n}`, grup, dosya, tarih: new Date(gun.y, gun.a - 1, gun.g, Number(m[1]), Number(m[2])).toISOString(),
+        gonderen, telefon: telNormalize(gonderen), metin: (m[4] ?? "").trim() };
+      out.push(son!);
+      continue;
+    }
+    if (/^(#|---|Dışa aktarma)/.test(l)) { son = null; continue; }
+    if (son && l.trim()) son.metin += "\n" + l;
   }
   for (const x of out) if (!x.telefon) { const t = x.metin.match(METIN_TEL); if (t) x.telefon = telNormalize(t[0]); }
   return out;

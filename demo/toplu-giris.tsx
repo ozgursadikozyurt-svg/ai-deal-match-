@@ -14,6 +14,10 @@ import { mesajiBol } from "../src/lib/ingest/toplu-mesaj";
 import { vcfOku, type VcfKisi } from "../src/lib/ingest/vcf";
 import { kisiTablosuMu, kisiSutunlariniTani, kisiSatiriOku, paketle, PAKET_BOYU, type KisiSatiri } from "../src/lib/ingest/kisi-tablosu";
 import { KISI_ROLLERI } from "./kisiler";
+import { yorumla, aiYorumIstemi } from "../src/lib/ai/yorumlayici";
+import { GEMINI_RESPONSE_SCHEMA, GEMINI_SISTEM_TALIMATI } from "../src/lib/ai/gemini-cikti-semasi";
+import { aiYanitiniDogrula } from "../src/lib/ai/yorum-dogrula";
+import { hizliAyristir } from "../src/lib/ai/hizli-ayristirici";
 import { telAnahtari } from "../src/lib/senkron/birlestir";
 import { anahtarKumesi, tekrarAnahtarlari } from "../src/lib/ingest/tekrar";
 import { varsayilanValidUntil } from "../src/lib/domain/gecerlilik";
@@ -21,7 +25,7 @@ import { KayitCreateSchema } from "../src/lib/validation/kayit";
 import { siralaUygula, SiralaDugmesi, type Siralama } from "./filtre";
 import { BUGUN, type Kayit, type Kisi, type DepoDurumu, type Veri } from "./depo";
 import { INDEKS, calismaIliOku } from "./lokasyon";
-import { useDepo, cx, Pill, IslemPill, baslikOf, fiyatOf, m2Of, lokEtiket, telYaz } from "./ortak";
+import { useDepo, cx, Pill, IslemPill, baslikOf, fiyatOf, m2Of, lokEtiket, telYaz, aiJson } from "./ortak";
 import { etiket } from "./etiketler";
 import { taslakYap } from "./ai-kutusu";
 import { ORNEK_PORTAL_CSV, ORNEK_TALEP_SAYFALARI, ORNEK_TOPLANTI_NOTU, ORNEK_VCF } from "./ornek-dosyalar";
@@ -66,7 +70,7 @@ export function topluEkle(x: DepoDurumu, girdiler: { veri: Veri; kisi?: { adSoya
 
 // ───────────────────────────── Dosya ─────────────────────────────
 export function DosyaAktarma() {
-  const { d, guncelle, bildir, git } = useDepo();
+  const { d, guncelle, bildir, git, sample } = useDepo();
   const [dosya, setDosya] = useKalici<{ ad: string; sayfalar: Sayfa[] } | null>("vg.dosya.dosya", null);
   const [vcf, setVcf] = useKalici<{ ad: string; kisiler: VcfKisi[] } | null>("vg.dosya.vcf", null);
   const [kisiTablo, setKisiTablo] = useKalici<{ ad: string; satirlar: KisiSatiri[] } | null>("vg.dosya.kisiTablo", null);
@@ -81,13 +85,17 @@ export function DosyaAktarma() {
   const [durumF, setDurumF] = useKalici<"HEPSI" | "HAZIR" | "KONTROL" | "TEKRAR" | "HATALI">("vg.dosya.durumF", "HEPSI");
   const [secim, setSecim] = useKalici<Set<string>>("vg.dosya.secim", new Set());
   const [eklenen, setEklenen] = useKalici<Set<string>>("vg.dosya.eklenen", new Set());
+  const [atlanan, setAtlanan] = useKalici<Set<string>>("vg.dosya.atlanan", new Set());          // v3.18 — "Atla" denen satırlar listeden düşer
+  const [islemF, setIslemF] = useKalici<"HEPSI" | "SATILIK" | "KIRALIK" | "DEVREN">("vg.dosya.islemF", "HEPSI"); // v3.18
+  const [aiCalisiyor, setAiCalisiyor] = useState<string | null>(null);                           // v3.18 — satırı yapay zekâya yorumlatma
+  const [aiSonuc, setAiSonuc] = useKalici<Record<string, Partial<Veri>>>("vg.dosya.aiSonuc", {});
   const [goster, setGoster] = useKalici("vg.dosya.goster", 40);
   const [sr, setSr] = useKalici<Siralama>("vg.dosya.sr", { alan: "satir", yon: "artan" });
   const [rapor, setRapor] = useKalici<string | null>("vg.dosya.rapor", null);
   const girdi = useRef<HTMLInputElement>(null);
 
   const yukle = async (f: File) => {
-    setHata(null); setRapor(null); setEsOzel({}); setTur(null); setSecim(new Set()); setEklenen(new Set()); setVcf(null); setDosya(null); setKisiTablo(null); setKisiIlerleme(null);
+    setHata(null); setRapor(null); setEsOzel({}); setTur(null); setSecim(new Set()); setEklenen(new Set()); setAtlanan(new Set()); setAiSonuc({}); setVcf(null); setDosya(null); setKisiTablo(null); setKisiIlerleme(null);
     try {
       const veri = new Uint8Array(await f.arrayBuffer());
       if (/\.vcf$/i.test(f.name)) { setVcf({ ad: f.name, kisiler: vcfOku(new TextDecoder().decode(veri)) }); return; }
@@ -128,7 +136,8 @@ export function DosyaAktarma() {
   }, [bloklar, dt, varsayilanSahip, ilanGun, varsayilanIslem, d.kayitlar.length]);
 
   const sahipSay = (g: string) => satirlar.filter((s) => g === "HEPSI" || s.grup === g).length;
-  const s1 = satirlar.filter((s) => (sahipF === "HEPSI" || s.grup === sahipF) && !eklenen.has(s.key));
+  const islemTut = (s: { girdi: { islemTipi?: string | null } }) => islemF === "HEPSI" || (islemF === "DEVREN" ? String(s.girdi.islemTipi ?? "").startsWith("DEVREN") : s.girdi.islemTipi === islemF);
+  const s1 = satirlar.filter((s) => (sahipF === "HEPSI" || s.grup === sahipF) && !eklenen.has(s.key) && !atlanan.has(s.key) && islemTut(s));
   const durumSay = (x: string) => s1.filter((s) => x === "HEPSI" || s.durumX === x).length;
   const secenek = [
     { alan: "satir", etiket: "Dosyadaki sıra", deger: (s: (typeof satirlar)[number]) => s.satirNo, varsayilanYon: "artan" as const },
@@ -138,6 +147,30 @@ export function DosyaAktarma() {
   ];
   const gorunen = siralaUygula(s1.filter((s) => durumF === "HEPSI" || s.durumX === durumF), sr, secenek);
   const eklenebilir = (s: (typeof satirlar)[number]) => !!s.veri && s.durumX !== "TEKRAR";
+
+  /**
+   * v3.18 — tek satırı yapay zekâya yorumlatır. Tablo sütunlarından çıkmayan bilgiyi (serbest açıklama metni,
+   * karışık yazılmış fiyat, teknik özellikler) tamamlar. Sonuç doğrudan kaydedilmez; "Düzenle" ile forma taşınır.
+   */
+  const aiYorumla = async (sat: { key: string; girdi: any; veri?: any; hucreler?: string[] }) => {
+    if (!sample) { bildir("Yapay zekâ bu ortamda kapalı (Ayarlar › Yapay zekâ)"); return; }
+    const metin = [sat.girdi.hamMetin, ...(sat.hucreler ?? [])].filter(Boolean).join(" · ").slice(0, 4000);
+    if (!metin.trim()) { bildir("Bu satırda yorumlanacak metin yok"); return; }
+    setAiCalisiyor(sat.key);
+    try {
+      const y = yorumla(metin, INDEKS);
+      const c = await aiJson(sample, aiYorumIstemi(metin, y, GEMINI_SISTEM_TALIMATI, GEMINI_RESPONSE_SCHEMA), { modelTier: "default" });
+      const kayit = aiYanitiniDogrula(c).kayitlar[0];
+      if (!kayit) { bildir("Yapay zekâ bu satırdan ek bilgi çıkaramadı"); return; }
+      const { taslak } = taslakYap(metin, hizliAyristir(metin), { ...kayit, tip });
+      setAiSonuc((x) => ({ ...x, [sat.key]: { ...taslak, ...(sat.veri ?? {}), ...temizle(taslak) } }));
+      bildir("Yapay zekâ satırı yorumladı — 'Düzenle' ile forma taşıyın");
+    } catch (e: any) {
+      bildir(e?.code === "not_granted" ? "Yapay zekâya izin verilmedi" : "Yapay zekâ yanıt veremedi");
+    } finally { setAiCalisiyor(null); }
+  };
+  /** Yapay zekânın doldurduğu, tabloda boş olan alanlar (var olan değerin üzerine yazılmaz) */
+  const temizle = (t: any) => Object.fromEntries(Object.entries(t).filter(([, v]) => v != null && v !== "" && !(Array.isArray(v) && !v.length)));
 
   const ekle = (keys: string[]) => {
     const sec = satirlar.filter((s) => keys.includes(s.key) && eklenebilir(s));
@@ -262,6 +295,13 @@ export function DosyaAktarma() {
       {rapor && <div className="basari-kutu satir-ara"><span>{rapor}</span><button className="btn kucuk" onClick={() => git({ ad: "eslesmeler" } as any)}>Eşleşmelere git</button></div>}
 
       {tip === "PORTFOY" && <div className="filtre">{(["HEPSI", "SAHIBI", "OFIS", "DIGER"] as const).filter((g) => g === "HEPSI" || sahipSay(g)).map((g) => <button key={g} className={cx("fb", sahipF === g && "on")} onClick={() => { setSahipF(g); setSecim(new Set()); }}>{g === "HEPSI" ? "Tümü" : SAHIP_ETIKET[g]} ({sahipSay(g)})</button>)}</div>}
+      {/* v3.18 — işlem tipi hızlı filtresi */}
+      <div className="filtre">{([["HEPSI", "Satılık + kiralık"], ["SATILIK", "Satılık"], ["KIRALIK", "Kiralık"], ["DEVREN", "Devren"]] as const).map(([k, l]) => {
+        const n = satirlar.filter((x) => k === "HEPSI" || (k === "DEVREN" ? String(x.girdi.islemTipi ?? "").startsWith("DEVREN") : x.girdi.islemTipi === k)).length;
+        if (!n && k !== "HEPSI") return null;
+        return <button key={k} className={cx("fb", islemF === k && "on")} onClick={() => { setIslemF(k); setSecim(new Set()); }}>{l} ({n})</button>;
+      })}</div>
+      {atlanan.size > 0 && <div className="satir"><span className="ipucu">{atlanan.size} satır atlandı</span><button className="btn kucuk" onClick={() => setAtlanan(new Set())}>Atlananları geri getir</button></div>}
       <div className="fc">
         <div className="filtre" style={{ flex: 1 }}>{(["HEPSI", "HAZIR", "KONTROL", "TEKRAR", "HATALI"] as const).filter((x) => x === "HEPSI" || durumSay(x)).map((x) => <button key={x} className={cx("fb", durumF === x && "on")} onClick={() => setDurumF(x)}>{{ HEPSI: "Tümü", HAZIR: "Hazır", KONTROL: "Kontrol gerekli", TEKRAR: "Zaten var", HATALI: "Hatalı" }[x]} ({durumSay(x)})</button>)}</div>
         <SiralaDugmesi secenekler={secenek} s={sr} set={setSr} />
@@ -282,7 +322,14 @@ export function DosyaAktarma() {
         <div className="kk-alt">{s.veri?.lokasyonlar.length ? s.veri.lokasyonlar.map((l) => lokEtiket(l as any)).join(" · ") : s.girdi.lokasyonHam ?? "Konum yok"} · {fiyatOf(s.girdi as any)}{m2Of(s.girdi as any) ? " · " + m2Of(s.girdi as any) : ""}{s.kisi ? ` · ${s.kisi.adSoyad}${s.kisi.sirket ? " (" + s.kisi.sirket + ")" : ""}` : ""}</div>
         {(s.kontrol.length > 0 || s.hatalar.length > 0) && <div className="ipucu uyari-metin">{[...s.kontrol, ...s.hatalar].join(" · ")}</div>}
         {s.durumX === "TEKRAR" && <div className="ipucu">{tip === "TALEP" ? "Bu talep zaten kayıtlı (aynı kişi, mülk, bütçe ve konum)" : "Bu ilan zaten kayıtlı (aynı ilan no / bağlantı ya da aynı sahip, fiyat ve konum)"} — eklenmez.</div>}
-        {s.veri && s.durumX === "KONTROL" && <div className="satir"><button className="btn kucuk" onClick={() => { git({ ad: "form", tip, taslak: { ...s.veri, kisiler: s.veri!.kisiler } as any, geri: { ad: "veri", alt: "dosya" } }); }}>Formda düzelt ve kaydet</button></div>}
+        {/* v3.18 — satır işlemleri: Düzenle · Ekle · Atla · yapay zekâya yorumlat */}
+        <div className="satir sar">
+          {s.veri && eklenebilir(s) && <button className="btn kucuk birincil" onClick={() => ekle([s.key])}>Ekle</button>}
+          <button className="btn kucuk" onClick={() => { git({ ad: "form", tip, taslak: { ...(aiSonuc[s.key] ?? {}), ...(s.veri ?? s.girdi), kisiler: s.veri?.kisiler } as any, geri: { ad: "veri", alt: "dosya" } }); }}>Düzenle</button>
+          <button className="btn kucuk" onClick={() => { setAtlanan((x) => new Set([...x, s.key])); setSecim((x) => { const n = new Set(x); n.delete(s.key); return n; }); }}>Atla</button>
+          <button className="btn kucuk" disabled={aiCalisiyor === s.key} onClick={() => aiYorumla(s)}>{aiCalisiyor === s.key ? "Yorumlanıyor…" : "✦ Yapay zekâya yorumlat"}</button>
+        </div>
+        {aiSonuc[s.key] && <div className="ipucu basari-metin">Yapay zekâ tamamladı: {Object.keys(aiSonuc[s.key]).filter((k) => k !== "hamMetin").slice(0, 8).join(", ")} — "Düzenle" ile forma taşıyın.</div>}
       </div>)}
       {gorunen.length > goster && <button className="btn" onClick={() => setGoster(goster + 60)}>Daha fazla göster ({gorunen.length - goster})</button>}
       {!gorunen.length && <p className="bos">Bu seçimde satır yok.</p>}

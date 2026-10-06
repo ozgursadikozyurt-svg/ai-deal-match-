@@ -5,6 +5,24 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.18 · 6 Ekim 2026 — Jargon sözlüğü genişledi, portal bağlantısından okuma, .md sohbet dosyası, dosya ekranında satır işlemleri
+
+- Jargon sözlüğüne 20 yeni kural: eşyalı / eşyasız, güvenlikli site, jeneratör, balkon, teras, doğalgaz-kombi / yerden ısıtma / merkezi, bahçeli, imarlı, tarla vasıflı, cephe yönü (güney / kuzey / doğu / batı) ve nota düşenler (sorunsuz, hisseli, yatırımlık-getiri, teslim-inşaat aşaması, toplu taşımaya yakın, okula yakın, manzaralı).
+- Portal bağlantısından okuma: grupta çoğu ilan yalnızca bağlantı olarak paylaşılıyor. Sahibinden / Emlakjet / Hepsiemlak adresindeki mülk tipi, satılık-kiralık ve oda sayısı artık okunuyor.
+- WhatsApp gürültü temizliği: "güvenlik kodu değişti", [Görsel], [Video], [Sesli mesaj], silinen mesaj ve alıntı satırları ayrıştırmadan önce metinden çıkarılıyor.
+- Ölçüm (gerçek grup dökümü, 1.376 emlak mesajı): yapay zekâsız tam çözülen mesaj oranı %51'den %60'a çıktı.
+- WhatsApp sohbet dosyası artık .md biçiminde de yüklenebilir (tarih başlıklı Markdown dışa aktarımı); .txt, .md ve .zip birlikte kabul ediliyor.
+- Dosya içe aktarma: satır başına Düzenle · Ekle · Atla düğmeleri ve "Yapay zekâya yorumlat" (tablo sütunlarından çıkmayan bilgiyi serbest metinden tamamlar; sonuç doğrudan kaydedilmez, forma taşınır).
+- Dosya içe aktarmada Satılık + kiralık / Satılık / Kiralık / Devren hızlı filtresi; atlanan satırlar listeden düşer, tek tuşla geri getirilir.
+- Cloudflare: wrangler.jsonc içine keep_vars eklendi — panelden elle girilen değişkenler artık her yayında silinmiyor.
+
+**Demo'da test edilecekler**
+
+- [ ] Yalnızca bir sahibinden bağlantısı yapıştırın: mülk tipi, satılık / kiralık ve oda sayısı kendiliğinden dolmalı.
+- [ ] WhatsApp'tan .md olarak aldığınız bir dışa aktarımı Veri girişi › Dosya yükle ile açın: mesajlar ve tarihler doğru okunmalı.
+- [ ] Excel / CSV ilan listesi yükleyin: üstte Satılık / Kiralık filtresini, satırlarda Düzenle · Ekle · Atla ve ✦ Yapay zekâya yorumlat düğmelerini deneyin.
+- [ ] "Eşyalı, güvenlikli site, doğalgaz kombi, güney cepheli" içeren bir ilan yapıştırın: bu alanların işaretlendiğini görün.
+
 ## v3.17 · 6 Ekim 2026 — Emlak jargon sözlüğü, eksik veri cezası, Google Contacts CSV içe aktarma (paketli)
 
 - Emlak jargon sözlüğü (docs/emlak_jargon.md + src/lib/ai/jargon.ts): kurallar yapay zekâdan önce çalışır, böylece yapay zekâ çağrısı ve kota harcaması azalır.

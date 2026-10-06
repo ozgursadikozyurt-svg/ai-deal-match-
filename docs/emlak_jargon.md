@@ -78,6 +78,41 @@ Aşağıdakiler teknik bir alana çevrilmez; bilgi kaybolmasın diye kaydın **o
 | `bahçe katı`, `bahçe dubleksi` | Bahçe katı / bahçe dublesi |
 | `nakit alım` | Nakit alım |
 
+## 4b. v3.18 ile eklenen kurallar
+
+| Yazılan | Alan / Not |
+|---|---|
+| `eşyalı`, `mobilyalı`, `full eşya` / `eşyasız` | Eşya durumu |
+| `güvenlikli`, `24 saat güvenlik` | Güvenlik |
+| `jeneratör` | Jeneratör |
+| `balkonlu` / `teraslı` | Balkon / Teras |
+| `doğalgaz`, `kombi` / `yerden ısıtma` / `merkezi`, `pay ölçer` | Isınma tipi |
+| `bahçeli`, `bahçe kullanımı` | Bahçe |
+| `imarlı`, `konut imarlı` / `tarla vasıflı` | İmar durumu |
+| `güney cepheli`, `doğu batı cepheli` | Cephe yönleri |
+| `sorunsuz` | Not: tapu / kredi yönünden sorunsuz |
+| `hisseli` | Not: hisseli tapu |
+| `yatırımlık`, `kira getirisi var` | Not: yatırımlık |
+| `teslim`, `inşaat aşaması`, `%85 bitmiş` | Not: proje aşamasında, teslim tarihi sorulmalı |
+| `tramvaya yakın`, `otobüs durağına yakın` | Not: toplu taşımaya yakın |
+| `okula / üniversiteye yakın` | Not |
+| `manzaralı`, `şehir / dağ manzarası` | Not: manzaralı (deniz dışı) |
+
+## 4c. Portal bağlantısından okuma
+
+Sahibinden / Emlakjet / Hepsiemlak bağlantısının adresi mülk tipini, işlemi ve oda sayısını taşır:
+
+```
+.../ilan/emlak-konut-satilik-arapsuyu-gursu-da-4-plus1-bahcedubleksi-1317953785/detay
+         └ konut → Daire   └ satılık   └ 4+1              └ ilan no
+```
+
+Grupta paylaşılan ilanların büyük kısmı yalnızca bağlantıdan ibaret olduğu için bu okuma, metin olmayan mesajları da çözülebilir hale getirir.
+
+## 4d. WhatsApp gürültüsü
+
+Ayrıştırmadan önce şu satırlar metinden çıkarılır: `[Görsel]`, `[Video]`, `[Sesli mesaj]`, `[Belge]`, "… kişisinin güvenlik kodu değişti", "Bu mesaj silindi", alıntı satırları (`> _…_`). Bunlar fiyat ve mülk tipi aramasını bozuyordu.
+
 ## 5. İşlem ve havuz terimleri
 
 | Terim | Karşılığı |

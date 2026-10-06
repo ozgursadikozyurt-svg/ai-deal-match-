@@ -11,7 +11,7 @@
  *
  * Saf fonksiyonlar; demo ve sunucu (/api/ai/ara) aynı kodu kullanır.
  */
-import { JARGON_ALANLI, JARGON_NOTLUK, katOku, katJargonu, binaYasiOku, emsalOku, fiyatDuzelt, bosluklukBinlik } from "./jargon";
+import { JARGON_ALANLI, JARGON_NOTLUK, katOku, katJargonu, binaYasiOku, emsalOku, cepheYonleriOku, baglantidanOku, whatsappGurultusuTemizle, fiyatDuzelt, bosluklukBinlik } from "./jargon";
 import { lokasyonAnahtari } from "../lokasyon/normalize";
 import type { LokasyonIndeks } from "../lokasyon/cozumle";
 
@@ -150,7 +150,7 @@ export function paraNormalize(metin: string): string {
 }
 
 export function hizliAyristir(metin0: string): HizliSonuc {
-  const metin = paraNormalize(bosluklukBinlik(metin0)); // v3.17: "13500 000" → "13500000"
+  const metin = paraNormalize(bosluklukBinlik(whatsappGurultusuTemizle(metin0))); // v3.17–v3.18: boşluklu binlik + WhatsApp sistem satırları
   const ham = metin.trim();
   const m = kucuk(ham);
   const bulunan: string[] = [];
@@ -182,15 +182,15 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   // Mülk tipi
   let mulkTipi = TIP_SOZLUK.find(([re]) => re.test(m))?.[1] ?? null;
   const oda = m.match(/\b(\d{1,2})\s*\+\s*(\d)\b/);
-  const odaSayisi = oda ? `${oda[1]}+${oda[2]}` : /st[üu]dyo|1\s*\+\s*0/.test(m) ? "1+0" : null;
+  let odaSayisi = oda ? `${oda[1]}+${oda[2]}` : /st[üu]dyo|1\s*\+\s*0/.test(m) ? "1+0" : null;
   if (!mulkTipi && odaSayisi) mulkTipi = "DAIRE";
-  const aileKodu = AILE_SOZLUK.find(([re]) => re.test(m))?.[1] ?? null;
+  let aileKodu = AILE_SOZLUK.find(([re]) => re.test(m))?.[1] ?? null;
   if (mulkTipi) bul("mülk tipi");
   if (odaSayisi) bul("oda");
 
   // Tip (portföy / talep)
   const tIpucu = TALEP_IPUCU.test(m), pIpucu = PORTFOY_IPUCU.test(m) || !!portal || !!ilanNo;
-  const tip: HizliSonuc["tip"] = tIpucu && !(portal || ilanNo) ? "TALEP" : pIpucu ? "PORTFOY" : tIpucu ? "TALEP"
+  let tip: HizliSonuc["tip"] = tIpucu && !(portal || ilanNo) ? "TALEP" : pIpucu ? "PORTFOY" : tIpucu ? "TALEP"
     : /\d\s*(tl|₺|euro|€|usd|\$|milyon|bin)/.test(m) ? "PORTFOY" : null; // fiyat yazılmış, arama ifadesi yok → ilan
 
   // m²
@@ -272,6 +272,8 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   if (emsal != null) ozellik.emsalKaks = emsal;
   const istenenKat = katJargonu(m);
   if (istenenKat.length) { if (tip === "TALEP") ozellik.istenenKatlar = istenenKat; else if (ozellik.bulunduguKat == null && istenenKat.includes("0")) ozellik.bulunduguKat = 0; }
+  const cepheler = cepheYonleriOku(m);
+  if (cepheler.length) ozellik.cepheYonleri = cepheler;
   const jargonNotlari: string[] = [];
   for (const k of JARGON_ALANLI) {
     if (!k.re.test(m)) continue;
@@ -287,6 +289,15 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   const kiraMi = /KIRALIK/.test(islemTipi ?? "") || fiyatPeriyodu === "AYLIK";
   const duzelt = (x: number | null) => (x == null ? x : fiyatDuzelt(x, { kira: kiraMi }) ?? x);
   fiyat = duzelt(fiyat); maxFiyat = duzelt(maxFiyat); minFiyat = duzelt(minFiyat);
+
+  // v3.18 — grupta çoğu ilan yalnızca bağlantı olarak paylaşılıyor; adresteki bilgiler eksikleri tamamlar
+  if (url) {
+    const b = baglantidanOku(url);
+    if (b.tip && !tip) { tip = b.tip; bulunan.push("tip"); }
+    if (b.mulkTipi && !mulkTipi) { mulkTipi = b.mulkTipi; bulunan.push("mülk tipi"); }
+    if (b.islemTipi && !islemTipi) { islemTipi = b.islemTipi; bulunan.push("işlem"); }
+    if (b.odaSayisi && !odaSayisi) odaSayisi = b.odaSayisi;
+  }
 
   const aciliyet = /\bacil\b/.test(m) ? "ACIL" : null;
   const eksik: string[] = [];

@@ -3,7 +3,7 @@
  * Demo — Veri Girişi: WhatsApp sohbet dosyalarını toplu içe aktarma + güvene göre ayırma + toplu onay.
  *
  * Akış (uzun sohbetlerde kullanıcının her mesajı tek tek onaylamaması için):
- *  1. Dosyalar (.txt / .zip, birden çok grup) → ayrıştır → ön filtre (gürültü, eski mesaj, aynı ilanın kopyaları)
+ *  1. Dosyalar (.txt / .md / .zip, birden çok grup) → ayrıştır → ön filtre (gürültü, eski mesaj, aynı ilanın kopyaları)
  *  2. Kalan mesajlar 10'arlı paketlerle yapay zekâya → şemaya bağlı kayıtlar
  *  3. Her kayıt gerçek doğrulamadan + konum çözücüden geçer ve üçe ayrılır:
  *       HAZIR   → eksiği yok, tek tuşla toplu eklenir
@@ -136,7 +136,7 @@ async function dosyalariOku(files: File[]): Promise<{ dosya: string; icerik: str
   for (const f of files) {
     if (/\.zip$/i.test(f.name)) {
       const z = unzipSync(new Uint8Array(await f.arrayBuffer()));
-      for (const [ad, veri] of Object.entries(z)) if (/\.txt$/i.test(ad)) out.push({ dosya: `${f.name} › ${ad}`, icerik: strFromU8(veri), grup: grupAdiOf(/_chat\.txt$/i.test(ad) ? f.name : ad) });
+      for (const [ad, veri] of Object.entries(z)) if (/\.(txt|md)$/i.test(ad)) out.push({ dosya: `${f.name} › ${ad}`, icerik: strFromU8(veri), grup: grupAdiOf(/_chat\.txt$/i.test(ad) ? f.name : ad) });
     } else out.push({ dosya: f.name, icerik: await f.text(), grup: grupAdiOf(f.name) });
   }
   return out;
@@ -351,12 +351,12 @@ export function TopluIceAktarma() {
 
   const ornekMi = ia?.dosyalar.every((x) => x.includes("(örnek)")) ?? false;
   if (!ia) return <div className="yigin">
-    <p className="ipucu">WhatsApp grubunda <b>⋮ → Diğer → Sohbeti dışa aktar → Medya olmadan</b> ile aldığınız .txt veya .zip dosyalarını buraya bırakın. Birden çok grubu aynı anda seçebilirsiniz.</p>
+    <p className="ipucu">WhatsApp grubunda <b>⋮ → Diğer → Sohbeti dışa aktar → Medya olmadan</b> ile aldığınız .txt, .md veya .zip dosyalarını buraya bırakın. Birden çok grubu aynı anda seçebilirsiniz.</p>
     <div className={cx("birak", surukle && "on")} onDragOver={(e) => { e.preventDefault(); setSurukle(true); }} onDragLeave={() => setSurukle(false)}
       onDrop={async (e) => { e.preventDefault(); setSurukle(false); const f = [...e.dataTransfer.files]; if (f.length) baslat(await dosyalariOku(f)); }}>
       {/* v3.12: telefonda üstüne basınca dosya seçici açılmıyordu (gizli girdi + etiket). Gerçek düğme + kısıtsız `accept` (bazı telefonlar .txt/.zip'i gri gösterir). */}
-      <input ref={dosyaGirdi} type="file" id="wa-dosya" multiple hidden onChange={async (e) => { const f = [...(e.target.files ?? [])].filter((x) => /\.(txt|zip)$/i.test(x.name)); const hepsi = e.target.files?.length ?? 0; e.target.value = ""; if (f.length) baslat(await dosyalariOku(f)); else if (hepsi) setHata("Yalnızca .txt veya .zip sohbet dosyaları okunur."); }} />
-      <button type="button" className="btn birincil genis-btn" onClick={() => dosyaGirdi.current?.click()}>Dosya seç (.txt / .zip)</button>
+      <input ref={dosyaGirdi} type="file" id="wa-dosya" multiple hidden onChange={async (e) => { const f = [...(e.target.files ?? [])].filter((x) => /\.(txt|md|zip)$/i.test(x.name)); const hepsi = e.target.files?.length ?? 0; e.target.value = ""; if (f.length) baslat(await dosyalariOku(f)); else if (hepsi) setHata("Yalnızca .txt veya .zip sohbet dosyaları okunur."); }} />
+      <button type="button" className="btn birincil genis-btn" onClick={() => dosyaGirdi.current?.click()}>Dosya seç (.txt / .md / .zip)</button>
       <span>Birden çok grup dosyasını birlikte seçebilirsiniz · bilgisayarda dosyaları buraya sürükleyip de bırakabilirsiniz</span>
     </div>
     <div className="satir sar"><span className="alan-etiket">Hangi mesajlar?</span>{SON_GUN_SECENEK.map(([g, l]) => <button key={l} className={cx("fb", sonGun === g && "on")} onClick={() => setSonGun(g)}>{l}</button>)}</div>
