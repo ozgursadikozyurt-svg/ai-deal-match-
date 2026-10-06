@@ -8,6 +8,9 @@
   "assets": { "directory": "dist/canli", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"], "binding": "ASSETS" },
   "triggers": { "crons": ["0 3 * * *", "0 4 * * sun"] },
   "observability": { "enabled": true },
+  // v3.17 — Cloudflare panelinden (Settings → Variables and Secrets) elle girilen değişkenler her yayında silinmesin.
+  // Bu dosyada "vars" bloğu YOKTUR; keep_vars olmadan wrangler, paneldeki değişkenleri yayın sırasında temizler.
+  "keep_vars": true,
   // Gizli değerler Cloudflare panelinde: Settings → Variables and Secrets (bkz. CANLIYA_ALMA_REHBERI):
   //   DATABASE_URL, DIRECT_URL, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, IZINLI_EPOSTALAR, AI_API_KEY, CRON_SECRET
 }

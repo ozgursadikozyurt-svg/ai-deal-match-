@@ -59,7 +59,7 @@ test("değer okuyucular: para, şüpheli bütçe, kat, bina yaşı, ilan no, bü
   assert.equal(baslikHarf("ÖZÜM GÜNDEMİR"), "Özüm Gündemir");
 });
 
-test("portal satırı → portföy: sahibi/ofis ayrımı, kişi yalnız ofis için, web havuzu, 90 gün geçerlilik, fiyat düşüşü notu", () => {
+test("portal satırı → portföy: sahibi/ofis ayrımı, kişi yalnız ofis için, web havuzu, 90 gün geçerlilik (v3.16: kayıt gününden), fiyat düşüşü notu", () => {
   const sf = xlsxOku(new Uint8Array(fs.readFileSync("tests/fixtures/v37_ornek.xlsx")));
   const [b] = dosyaSatirlari(sf, ["Portal"]);
   const [ofis, sahibi, eski] = b.satirlar.map((r) => satirHazirla(satirDonustur(r.hucreler, b.eslesme, sec(), r.no), INDEKS));
@@ -70,13 +70,17 @@ test("portal satırı → portföy: sahibi/ofis ayrımı, kişi yalnız ofis iç
   assert.equal(ofis.kisi?.adSoyad, "Ayşe Yılmaz"); assert.equal(ofis.kisi?.sirket, "Örnek Gayrimenkul");
   assert.match(ofis.veri!.operasyonNotu ?? "", /Fiyat düştü/);
   assert.equal((ofis.veri!.ozellik as any).bulunduguKat, 4); assert.equal((ofis.veri!.ozellik as any).binaYasi, 28);
-  assert.equal(Math.round((ofis.veri!.validUntil!.getTime() - new Date(2026, 8, 29, 12).getTime()) / 86_400_000), 90);
+  // v3.16 — geri sayım ilanın yayın tarihinden değil, kaydın sisteme girdiği günden (BUGUN) başlar
+  assert.equal(Math.round((ofis.veri!.validUntil!.getTime() - BUGUN.getTime()) / 86_400_000), 90);
   assert.equal(ofis.veri!.lokasyonlar[0].ilceId != null, true);
   // daire için "devren" anlamsız → satılık kalır; dükkanda devren satılık
   assert.equal(sahibi.veri!.mulkTipi, "DUKKAN_MAGAZA"); assert.equal(sahibi.veri!.islemTipi, "DEVREN_SATILIK");
   assert.equal(sahibi.veri!.ilanSahibiTipi, "MALIK"); assert.equal(sahibi.kisi, null, "bireysel ilan sahibi kişi kartı olarak açılmaz");
   assert.equal(sahibi.veri!.portalIlanNo, "1342746857");
-  assert.equal(eski.veri!.durum, "EXPIRED"); assert.ok(eski.kontrol.some((k) => /90 günden eski/.test(k)));
+  // v3.16 — eski ilan artık süresi dolmuş sayılmaz: uyarı verilir ama süre bugünden başlar
+  assert.equal(eski.veri!.durum, "ACTIVE");
+  assert.ok(eski.kontrol.some((k) => /90 günden eski/.test(k)));
+  assert.equal(Math.round((eski.veri!.validUntil!.getTime() - BUGUN.getTime()) / 86_400_000), 90);
   // meslektaş dosyası → partner havuzu
   const m = satirHazirla(satirDonustur(b.satirlar[0].hucreler, b.eslesme, sec({ dosyaTuru: "MESLEKTAS" }), 2), INDEKS);
   assert.equal(m.veri!.havuz, "PARTNER"); assert.equal(m.veri!.ilanSahibiTipi, "PARTNER");

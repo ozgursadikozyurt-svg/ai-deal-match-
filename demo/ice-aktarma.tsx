@@ -43,12 +43,15 @@ function taslakOlustur(k: any, m: WaMesaj | undefined, ingestionId: string) {
     ...geri, lokasyonlar: lok, lokasyonHam: (lokasyonIfadeleri ?? []).join(", "),
     gondeAdi: kisiAdi ?? (m && !telNormalize(m.gonderen)?.startsWith("+") ? m.gonderen : null), gondeTelefon: telNormalize(telefon) ?? gonderenTel, gondeSirket: firma ?? null,
     hamMetin: m?.metin, veriKanali: "WHATSAPP", kayitGrubu: m?.grup, mesajTarihi: m?.tarih, kaynakDosya: m?.dosya, ingestionId,
+    // v3.16 — WhatsApp emlakçı grubundan gelen portföy: ilan sahibi "emlakçı", havuz "partner" (kendi portföyüm değil);
+    // malik olduğu açıkça yazılıysa (ilanSahibiTipi: MALIK) dokunulmaz.
+    ...(geri.tip === "PORTFOY" && (geri as any).ilanSahibiTipi !== "MALIK" ? { ilanSahibiTipi: (geri as any).ilanSahibiTipi && (geri as any).ilanSahibiTipi !== "BILINMIYOR" ? (geri as any).ilanSahibiTipi : "EMLAKCI", havuz: "PARTNER" } : {}),
     baslik: ozet ? String(ozet).slice(0, 160) : undefined,
   };
   return { taslak, cozulemeyen: r.cozulemeyen, cozulen: r.lokasyonlar };
 }
 function siniflandir(taslak: any, cozulemeyen: string[], kayitlar: Kayit[], ttl: DepoDurumu["ayarlar"]["ttl"]): Pick<IceAktarmaAdayi, "durum" | "nedenler" | "hatalar" | "benzerKayitId"> & { veri?: Veri } {
-  const baslangic = taslak.mesajTarihi ? new Date(taslak.mesajTarihi) : BUGUN;
+  const baslangic = BUGUN; // v3.16 — geri sayım mesajın tarihinden değil, kaydın sisteme girdiği günden başlar
   const p = KayitCreateSchema.safeParse({ ...taslak, validUntil: varsayilanValidUntil(taslak.tip, taslak.islemTipi, taslak.aciliyet, baslangic, ttl) });
   if (!p.success) return { durum: "HATALI", nedenler: ["Şemaya uymuyor"], hatalar: p.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`) };
   const v = p.data, n: string[] = [];
@@ -191,6 +194,7 @@ function AdayKarti({ a, secili, sec, mesaj }: { a: IceAktarmaAdayi; secili: bool
 /** v3.12 — "Düzenle" ekranından dönünce sekme ve filtre kaybolmasın (bileşen yeniden kurulur) */
 let SON_SEKME: "TUMU" | "HAZIR" | "KONTROL" | "HATALI" | "BITEN" = "TUMU";
 let SON_TIP: "" | "TALEP" | "PORTFOY" = "";
+let SON_ISLEM: "" | "SATILIK" | "KIRALIK" = ""; // v3.16 — küçük işlem tipi filtresi
 const SIRA: Record<string, number> = { HAZIR: 0, KONTROL: 1, HATALI: 2, ATLANDI: 3, EKLENDI: 4 };
 
 function Inceleme({ ia }: { ia: IceAktarma }) {
@@ -198,12 +202,14 @@ function Inceleme({ ia }: { ia: IceAktarma }) {
   const [sekme, setSekmeS] = useState<"TUMU" | "HAZIR" | "KONTROL" | "HATALI" | "BITEN">(SON_SEKME);
   const [secim, setSecim] = useState<Set<string>>(new Set());
   const [tipF, setTipFS] = useState<"" | "TALEP" | "PORTFOY">(SON_TIP);
+  const [islemF, setIslemFS] = useState<"" | "SATILIK" | "KIRALIK">(SON_ISLEM);
   const [limit, setLimit] = useState(60); // v3.12: binlerce kart telefonu dondurur; 60'ar 60'ar gösterilir
   const setSekme = (v: typeof sekme) => { SON_SEKME = v; setSekmeS(v); setLimit(60); };
   const setTipF = (v: typeof tipF) => { SON_TIP = v; setTipFS(v); };
+  const setIslemF = (v: typeof islemF) => { SON_ISLEM = v; setIslemFS(v); setLimit(60); };
   const mesaj = new Map(ia.mesajlar.map((m) => [m.id, m]));
   const grupla = (s: string) => ia.adaylar
-    .filter((a) => (s === "TUMU" ? true : s === "BITEN" ? a.durum === "EKLENDI" || a.durum === "ATLANDI" : a.durum === s) && (!tipF || a.taslak.tip === tipF))
+    .filter((a) => (s === "TUMU" ? true : s === "BITEN" ? a.durum === "EKLENDI" || a.durum === "ATLANDI" : a.durum === s) && (!tipF || a.taslak.tip === tipF) && (!islemF || String(a.taslak.islemTipi ?? "").includes(islemF)))
     // Hazır olanlar önce (güveni yüksek olan üstte), kontrol edilecekler sonra, hatalılar, atlanan / eklenenler en sonda
     .sort((x, y) => (SIRA[x.durum] - SIRA[y.durum]) || ((y.guven ?? 0) - (x.guven ?? 0)));
   const liste = grupla(sekme);
@@ -242,6 +248,7 @@ function Inceleme({ ia }: { ia: IceAktarma }) {
         {([["TUMU", "Hepsi"], ["HAZIR", "Hazır"], ["KONTROL", "Kontrol gerekli"], ["HATALI", "Şemaya uymayan"], ["BITEN", "Eklenen / atlanan"]] as const).map(([k, l]) => <button key={k} className={cx("fb", sekme === k && "on")} onClick={() => { setSekme(k); setSecim(new Set()); }}>{l} ({say(k)})</button>)}
       </div>
       <div className="filtre">{([["", "Hepsi"], ["PORTFOY", "Portföyler"], ["TALEP", "Talepler"]] as const).map(([k, l]) => <button key={k} className={cx("fb", tipF === k && "on")} onClick={() => setTipF(k)}>{l}</button>)}</div>
+      <div className="filtre">{([["", "Satılık + kiralık"], ["SATILIK", "Satılık"], ["KIRALIK", "Kiralık"]] as const).map(([k, l]) => <button key={k} className={cx("fb", islemF === k && "on")} onClick={() => setIslemF(k)}>{l}</button>)}</div>
       <div className="satir sar toplu">
         {(sekme === "HAZIR" || sekme === "TUMU") && ia.adaylar.some((a) => a.durum === "HAZIR") && <button className="btn birincil" onClick={() => ekle(ia.adaylar.filter((a) => a.durum === "HAZIR" && (!tipF || a.taslak.tip === tipF)).map((a) => a.id))}>Hazır olanların tümünü ekle ({ia.adaylar.filter((a) => a.durum === "HAZIR" && (!tipF || a.taslak.tip === tipF)).length})</button>}
         {(sekme === "HAZIR" || sekme === "KONTROL" || sekme === "TUMU") && liste.length > 0 && <>

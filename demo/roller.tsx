@@ -33,11 +33,13 @@ export function RolYonetimi() {
     setDuzen(null); bildir("Rol adı güncellendi");
   };
   return <section className="kart yigin kucuk-bosluk" aria-label="Kişi rolleri">
-    <h3>Kişi rolleri</h3>
+    <details>
+    <summary><b>Kişi rolleri</b> <small className="ipucu">{KISI_ROLLERI.length} rol</small></summary>
     <p className="ipucu">Eklediğiniz roller Kişiler ekranındaki filtrelere, kişi formlarına ve rol seçicilere hemen gelir. Sistem rolleri yeniden adlandırılabilir ama kaldırılamaz; özel roller yalnızca hiçbir kişide kullanılmıyorsa kaldırılabilir.</p>
+    <div className="rol-liste">
     {KISI_ROLLERI.map(([kod, etiket]) => {
       const n = kullanan(kod), sistem = sistemRoluMu(kod), degismis = (d.roller ?? []).some((r) => r.kod === kod);
-      return <div key={kod} className="satir sar">
+      return <div key={kod} className="rol-satir">
         {duzen?.kod === kod
           ? <><input aria-label="Rol adı" value={duzen.etiket} onChange={(e) => setDuzen({ ...duzen, etiket: e.target.value })} onKeyDown={(e) => { if (e.key === "Enter") adKaydet(); }} /><button className="btn kucuk birincil" onClick={adKaydet}>Kaydet</button><button className="btn kucuk" onClick={() => setDuzen(null)}>Vazgeç</button></>
           : <><b>{etiket}</b><small className="ipucu">{sistem ? "sistem rolü" : "özel rol"} · {n} kişi</small>
@@ -46,6 +48,8 @@ export function RolYonetimi() {
               {!sistem && <button className={cx("btn kucuk tehlike")} disabled={n > 0} title={n ? "Kişilerde kullanılıyor; önce kişilerden çıkarın" : "Rolü kaldır"} onClick={() => { yaz((r) => r.filter((x) => x.kod !== kod)); bildir("Rol kaldırıldı"); }}>Kaldır</button>}</>}
       </div>;
     })}
+    </div>
     <div className="satir"><input aria-label="Yeni rol adı" placeholder="Yeni rol adı (örn. Banka personeli)" value={yeni} onChange={(e) => setYeni(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ekle(); }} /><button className="btn birincil" disabled={yeni.trim().length < 2} onClick={ekle}>Yeni rol ekle</button></div>
+    </details>
   </section>;
 }

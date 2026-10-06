@@ -23,6 +23,10 @@ export interface Ctx {
   bildir: (m: string) => void;
   ornekHatalari: OrnekHata[];
   git: (s: Ekran) => void;
+  /** v3.16 — bir önceki ekrana dön (geçmiş boşsa Ana Sayfa) */
+  geri: () => void;
+  /** v3.16 — geçmişte dönülebilecek ekran var mı (Ana Sayfa'da gizlenir) */
+  geriVar: boolean;
   sample: any | null | undefined; // yapay zekâ (undefined = henüz bilinmiyor, null = yok)
 }
 export const C = createContext<Ctx>(null as any);

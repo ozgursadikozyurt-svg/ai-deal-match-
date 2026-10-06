@@ -15,6 +15,7 @@ import { BAGLAM, lokEtiket, type KonumOnerisi } from "./lokasyon";
 import { kalanGun, type Veri } from "./depo";
 import { useDepo, cx, KonumSecici, islemTonu, baslikOf } from "./ortak";
 import { alanTuru } from "./form";
+import { KISI_ROLLERI } from "./kisiler";
 
 export interface Filtre {
   ara: string;
@@ -30,9 +31,11 @@ export interface Filtre {
   acil?: boolean;
   /** v3.15 — yalnızca takasa açık kayıtlar */
   takas?: boolean;
+  /** v3.16 — kayda bağlı kişilerin rolüne göre (Alıcı, Yatırımcı, Emlakçı…) */
+  roller: string[];
   ozellik: Record<string, any>;
 }
-export const bosFiltre = (x: Partial<Filtre> = {}): Filtre => ({ ara: "", aileler: [], islemler: [], konumlar: [], durumlar: [], kisiler: [], kanallar: [], odalar: [], ozellik: {}, ...x });
+export const bosFiltre = (x: Partial<Filtre> = {}): Filtre => ({ ara: "", aileler: [], islemler: [], konumlar: [], durumlar: [], kisiler: [], kanallar: [], odalar: [], roller: [], ozellik: {}, ...x });
 const ODALAR = ["1+0", "1+1", "2+1", "3+1", "4+1", "5+"];
 const DURUMLAR: [string, string][] = [["ACTIVE", "Aktif"], ["PASSIVE", "Pasif"], ["ARSIV", "Arşiv"], ["EXPIRED", "Süresi doldu"]];
 
@@ -44,7 +47,7 @@ function konumTutar(v: Veri, secim: KonumOnerisi[]): boolean {
     return l.ilceId === s.lok.ilceId;
   }));
 }
-export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string): boolean {
+export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string, kisiRol?: (id: string) => string[]): boolean {
   const o = (v.ozellik ?? {}) as any, talep = v.tip === "TALEP";
   if (f.ara) {
     const q = f.ara.toLocaleLowerCase("tr");
@@ -59,6 +62,8 @@ export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string
   if (f.kanallar.length && !f.kanallar.includes(v.veriKanali)) return false;
   if (f.acil && !(v.aciliyet === "ACIL" || v.aciliyet === "YUKSEK")) return false;
   if (f.takas && v.takasaAcik !== true) return false; // v3.15
+  // v3.16 — kayda bağlı kişilerin rolü (kişi kartındaki roller; kayıttaki bağ rolü değil)
+  if ((f.roller ?? []).length && !(v.kisiler ?? []).some((b) => (kisiRol?.(b.kisiId) ?? []).some((r) => f.roller.includes(r)))) return false;
   const fiyat = talep ? v.maxFiyat : v.fiyat;
   if (f.fiyatMin != null && !(fiyat != null && fiyat >= f.fiyatMin)) return false;
   if (f.fiyatMax != null && !(talep ? (v.minFiyat ?? 0) <= f.fiyatMax : fiyat != null && fiyat <= f.fiyatMax)) return false;
@@ -91,7 +96,7 @@ export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string
   }
   return true;
 }
-export const aktifFiltreSayisi = (f: Filtre) => f.aileler.length + f.islemler.length + f.konumlar.length + f.durumlar.length + f.kisiler.length + f.kanallar.length + f.odalar.length + (f.fiyatMin != null ? 1 : 0) + (f.fiyatMax != null ? 1 : 0) + (f.m2Min != null ? 1 : 0) + (f.m2Max != null ? 1 : 0) + (f.acil ? 1 : 0) + (f.takas ? 1 : 0) + Object.values(f.ozellik).filter((v) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).length;
+export const aktifFiltreSayisi = (f: Filtre) => f.aileler.length + f.islemler.length + f.konumlar.length + f.durumlar.length + f.kisiler.length + f.kanallar.length + f.odalar.length + (f.fiyatMin != null ? 1 : 0) + (f.fiyatMax != null ? 1 : 0) + (f.m2Min != null ? 1 : 0) + (f.m2Max != null ? 1 : 0) + (f.acil ? 1 : 0) + (f.takas ? 1 : 0) + (f.roller ?? []).length + Object.values(f.ozellik).filter((v) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).length;
 
 function CokluCip({ secenekler, secili, degis, ton }: { secenekler: [string, string, number?][]; secili: string[]; degis: (x: string[]) => void; ton?: (k: string) => string }) {
   return <div className="cip-satir">{secenekler.map(([k, l, n]) => { const on = secili.includes(k); return <button type="button" key={k} className={cx("cip secilir", on && "on", on && ton && "t-" + ton(k))} onClick={() => degis(on ? secili.filter((x) => x !== k) : [...secili, k])}>{l}{n != null && <small> {n}</small>}</button>; })}</div>;
@@ -135,10 +140,12 @@ export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: ba�
     ...(f.m2Max != null ? [{ etiket: `≤ ${f.m2Max} m²`, kaldir: () => set({ ...f, m2Max: null }) }] : []),
     ...(f.acil ? [{ etiket: "Acil", kaldir: () => set({ ...f, acil: false }) }] : []),
     ...(f.takas ? [{ etiket: "Takasa açık", kaldir: () => set({ ...f, takas: false }) }] : []),
+    ...(f.roller ?? []).map((r) => ({ etiket: `Rol: ${KISI_ROLLERI.find(([k]) => k === r)?.[1] ?? r}`, kaldir: () => set({ ...f, roller: f.roller.filter((x) => x !== r) }) })),
     ...Object.entries(f.ozellik).filter(([, v]) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).map(([a, v]) => ({ etiket: `${(MULK_OZELLIK_META as any)[a]?.etiket}${v === true ? "" : ": " + (Array.isArray(v) ? (a === "istenenKatlar" ? katYaz(v) : v.map(etiket).join("/")) : typeof v === "number" ? (((MULK_OZELLIK_META as any)[a]?.karsilastirma === "max") ? "≤ " : "≥ ") + v : etiket(v))}`, kaldir: () => setO(a, null) })),
   ];
 
-  const sonucSayisi = ogeler.filter((v) => filtreUygula(v, f, kisiAd)).length;
+  const kisiRol = (id: string) => d.kisiler.find((k) => k.id === id)?.roller ?? [];
+  const sonucSayisi = ogeler.filter((v) => filtreUygula(v, f, kisiAd, kisiRol)).length;
   const aileOzet = f.aileler.length ? MULK_AILELERI.filter((a) => f.aileler.includes(a.kod)).map((a) => a.etiket.split(" /")[0]).join(", ") : "Tüm mülkler";
   const aralikOzet = (a?: number | null, b?: number | null, birim = "") => a == null && b == null ? "Tümü" : `${a != null ? a.toLocaleString("tr-TR") : "…"} – ${b != null ? b.toLocaleString("tr-TR") : "…"}${birim}`;
   const turSayisi = Object.values(f.ozellik).filter((v) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).length;
@@ -166,6 +173,7 @@ export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: ba�
       <div className="cip-satir">{turAlanlari.filter((a) => alanTuru(a).tur === "bool").map((a) => <button type="button" key={a} className={cx("cip secilir", f.ozellik[a] && "on")} onClick={() => setO(a, f.ozellik[a] ? null : true)}>{f.ozellik[a] ? "✓ " : ""}{(MULK_OZELLIK_META as any)[a].etiket}</button>)}</div>
     </div> }] : []),
     ...(!gizle.includes("durum") ? [{ k: "durum", baslik: "Durum", ozet: f.durumlar.map((a) => DURUMLAR.find((x) => x[0] === a)?.[1]).join(", ") || "Tümü", icerik: <CokluCip secenekler={DURUMLAR.map(([k, l]) => [k, l])} secili={f.durumlar} degis={(x) => set({ ...f, durumlar: x })} /> }] : []),
+    ...(!gizle.includes("rol") ? [{ k: "rol", baslik: "Kişi rolü", ozet: (f.roller ?? []).map((r) => KISI_ROLLERI.find(([k]) => k === r)?.[1] ?? r).join(", ") || "Tümü", icerik: <CokluCip secenekler={KISI_ROLLERI.map(([k, l]) => [k, l])} secili={f.roller ?? []} degis={(x) => set({ ...f, roller: x })} /> }] : []),
     ...(!gizle.includes("kisi") ? [{ k: "kisi", baslik: "Kişi", ozet: f.kisiler.map(kisiAd).join(", ") || "Tümü", icerik: <div className="yigin kucuk-bosluk">
       <input placeholder="Kişi ara…" value={kisiQ} onChange={(e) => setKisiQ(e.target.value)} />
       {kisiQ.trim().length >= 2 && <div className="cip-satir">{d.kisiler.filter((k) => `${k.adSoyad} ${k.telefon ?? ""} ${k.sirket ?? ""}`.toLocaleLowerCase("tr").includes(kisiQ.toLocaleLowerCase("tr"))).slice(0, 8).map((k) => <button type="button" key={k.id} className="cip secilir" onClick={() => { if (!f.kisiler.includes(k.id)) set({ ...f, kisiler: [...f.kisiler, k.id] }); setKisiQ(""); }}>{k.adSoyad}</button>)}</div>}

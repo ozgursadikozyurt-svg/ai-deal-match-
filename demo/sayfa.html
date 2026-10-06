@@ -61,6 +61,7 @@ button.kart:hover{border-color:color-mix(in srgb,var(--acc) 45%,var(--line))}
 .btn.tehlike{background:var(--kotu);border-color:var(--kotu);color:#fff}
 .btn.kucuk{padding:.3rem .7rem;font-size:.8rem}
 .geri{align-self:flex-start}
+.genel-geri{margin-bottom:4px}
 .detay-ust{display:flex;justify-content:space-between;align-items:center;gap:8px}.detay-ust .geri{align-self:center}
 .genis-btn{flex:1;padding:.75rem}
 .yapiskan{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:5}
@@ -268,6 +269,11 @@ button.kisi-kart{display:flex!important;cursor:pointer}
 
 /* v3.5 — kompakt filtre çubuğu + filtre sayfası */
 .fc{display:flex;gap:6px;align-items:stretch;min-width:0}
+.fp-kisi summary{cursor:pointer;font-weight:600;padding:.35rem 0}
+.fp-kisi summary small{font-weight:400;margin-left:.4rem}
+.rol-liste{max-height:min(46vh,380px);overflow:auto;display:flex;flex-direction:column;gap:2px}
+.rol-satir{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:.3rem 0;border-bottom:1px solid var(--line)}
+.rol-satir b{flex:1;min-width:8rem}
 .fc-ara{flex:1;position:relative;min-width:0}
 .fc-ara span{position:absolute;left:.7rem;top:50%;transform:translateY(-52%);color:var(--mut);font-size:1.05rem;pointer-events:none}
 .fc-ara input{padding-left:2rem;height:40px;border-radius:10px}

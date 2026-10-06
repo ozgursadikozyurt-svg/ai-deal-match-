@@ -54,7 +54,7 @@ const { kayitlar, kisiler } = ornekVeriyiKur();
 const aktif = kayitlar.filter((k) => k.veri.durum === "ACTIVE");
 const ilk = (() => { for (const t of aktif.filter((k) => k.veri.tip === "TALEP")) for (const p of aktif.filter((k) => k.veri.tip === "PORTFOY")) if (temelUyum(t.veri as any, p.veri as any) && eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM).uygunluk === "SUNULABILIR") return { t, p }; throw new Error("örnek eşleşme yok"); })();
 const durum = (notlar: DepoDurumu["eslesmeNotlari"]): DepoDurumu => ({ veriSurumu: "t", kayitlar, eslesmeNotlari: notlar, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN }, ogrenilen: [], adaylar: [], aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [] });
-const ciz = (d: DepoDurumu, el: React.ReactElement) => renderToStaticMarkup(React.createElement(C.Provider, { value: { d, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, sample: null } as Ctx }, el));
+const ciz = (d: DepoDurumu, el: React.ReactElement) => renderToStaticMarkup(React.createElement(C.Provider, { value: { d, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, geri: () => {}, geriVar: false, sample: null } as Ctx }, el));
 const say = (h: string, metin: string) => h.split(metin).length - 1;
 
 test("kopar: koparılan eşleşme listeden düşer, 'Koparılanlar' sekmesi çıkar", () => {

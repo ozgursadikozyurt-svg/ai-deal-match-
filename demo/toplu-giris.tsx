@@ -12,6 +12,8 @@ import { dosyaOku, csvOku, type Sayfa } from "../src/lib/ingest/xlsx";
 import { dosyaSatirlari, dosyaTuruTahmin, satirDonustur, satirHazirla, ALAN_ETIKET, type DosyaTuru, type TabloAlan, type Eslesme, type HazirSatir } from "../src/lib/ingest/tablo";
 import { mesajiBol } from "../src/lib/ingest/toplu-mesaj";
 import { vcfOku, type VcfKisi } from "../src/lib/ingest/vcf";
+import { kisiTablosuMu, kisiSutunlariniTani, kisiSatiriOku, paketle, PAKET_BOYU, type KisiSatiri } from "../src/lib/ingest/kisi-tablosu";
+import { KISI_ROLLERI } from "./kisiler";
 import { telAnahtari } from "../src/lib/senkron/birlestir";
 import { anahtarKumesi, tekrarAnahtarlari } from "../src/lib/ingest/tekrar";
 import { varsayilanValidUntil } from "../src/lib/domain/gecerlilik";
@@ -19,7 +21,7 @@ import { KayitCreateSchema } from "../src/lib/validation/kayit";
 import { siralaUygula, SiralaDugmesi, type Siralama } from "./filtre";
 import { BUGUN, type Kayit, type Kisi, type DepoDurumu, type Veri } from "./depo";
 import { INDEKS, calismaIliOku } from "./lokasyon";
-import { useDepo, cx, Pill, IslemPill, baslikOf, fiyatOf, m2Of, lokEtiket } from "./ortak";
+import { useDepo, cx, Pill, IslemPill, baslikOf, fiyatOf, m2Of, lokEtiket, telYaz } from "./ortak";
 import { etiket } from "./etiketler";
 import { taslakYap } from "./ai-kutusu";
 import { ORNEK_PORTAL_CSV, ORNEK_TALEP_SAYFALARI, ORNEK_TOPLANTI_NOTU, ORNEK_VCF } from "./ornek-dosyalar";
@@ -67,6 +69,8 @@ export function DosyaAktarma() {
   const { d, guncelle, bildir, git } = useDepo();
   const [dosya, setDosya] = useKalici<{ ad: string; sayfalar: Sayfa[] } | null>("vg.dosya.dosya", null);
   const [vcf, setVcf] = useKalici<{ ad: string; kisiler: VcfKisi[] } | null>("vg.dosya.vcf", null);
+  const [kisiTablo, setKisiTablo] = useKalici<{ ad: string; satirlar: KisiSatiri[] } | null>("vg.dosya.kisiTablo", null);
+  const [kisiIlerleme, setKisiIlerleme] = useState<{ yazilan: number; toplam: number } | null>(null);
   const [hata, setHata] = useKalici<string | null>("vg.dosya.hata", null);
   const [esOzel, setEsOzel] = useKalici<Record<string, TabloAlan[]>>("vg.dosya.esOzel", {});
   const [tur, setTur] = useKalici<DosyaTuru | null>("vg.dosya.tur", null);
@@ -83,11 +87,21 @@ export function DosyaAktarma() {
   const girdi = useRef<HTMLInputElement>(null);
 
   const yukle = async (f: File) => {
-    setHata(null); setRapor(null); setEsOzel({}); setTur(null); setSecim(new Set()); setEklenen(new Set()); setVcf(null); setDosya(null);
+    setHata(null); setRapor(null); setEsOzel({}); setTur(null); setSecim(new Set()); setEklenen(new Set()); setVcf(null); setDosya(null); setKisiTablo(null); setKisiIlerleme(null);
     try {
       const veri = new Uint8Array(await f.arrayBuffer());
       if (/\.vcf$/i.test(f.name)) { setVcf({ ad: f.name, kisiler: vcfOku(new TextDecoder().decode(veri)) }); return; }
       const sf = dosyaOku(f.name, veri);
+      // v3.17 — Google Contacts / Outlook CSV'si ilan tablosu değil kişi listesidir: ayrı ekranda işlenir
+      const basliklar = sf.flatMap((x) => x.satirlar.slice(0, 3)).find((r) => kisiTablosuMu(r));
+      if (basliklar) {
+        const sut = kisiSutunlariniTani(basliklar);
+        const sayfa = sf.find((x) => x.satirlar.some((r) => r === basliklar))!;
+        const bas = sayfa.satirlar.indexOf(basliklar);
+        const satirlar = sayfa.satirlar.slice(bas + 1).filter((r) => r.some((c) => (c ?? "").trim()))
+          .map((r, i) => kisiSatiriOku(r, sut, bas + 2 + i, KISI_ROLLERI)).filter((k) => k.durum !== "BOS");
+        setKisiTablo({ ad: f.name, satirlar }); return;
+      }
       if (!dosyaSatirlari(sf).length) throw new Error("Başlık satırı bulunamadı. İlk satırlarda 'Fiyat', 'm2', 'İlçe', 'Bütçe', 'İsim' gibi sütun başlıkları olmalı.");
       setDosya({ ad: f.name, sayfalar: sf });
     } catch (e: any) { setHata(e?.message ?? String(e)); }
@@ -134,6 +148,42 @@ export function DosyaAktarma() {
     const m = `${sec.length} kayıt eklendi${r?.yeniKisi ? `, ${r.yeniKisi} yeni kişi` : ""}. Eşleşmeler hemen hesaplandı.`;
     setRapor(m); bildir(m);
   };
+  /** v3.17 — kişi tablosunu paketler halinde yazar: 7.000 satırlık dosya tek seferde yazılınca sunucu zaman aşımına düşüyordu. */
+  const kisiTablosunuEkle = async () => {
+    if (!kisiTablo) return;
+    const paketler = paketle(kisiTablo.satirlar, PAKET_BOYU);
+    let yeni = 0, guncel = 0, yazilan = 0;
+    setKisiIlerleme({ yazilan: 0, toplam: kisiTablo.satirlar.length });
+    for (const paket of paketler) {
+      guncelle((x) => {
+        const kisiler = [...x.kisiler];
+        const telIx = new Map(kisiler.map((k, i) => [k.telefon, i] as const));
+        const adIx = new Map(kisiler.map((k, i) => [k.adSoyad.toLocaleLowerCase("tr"), i] as const));
+        for (const s of paket) {
+          const ix = (s.telefon != null ? telIx.get(s.telefon) : undefined) ?? (s.telefon ? undefined : adIx.get(s.adSoyad.toLocaleLowerCase("tr")));
+          if (ix != null) { // mevcut kişi: yalnızca boş alanlar doldurulur, roller birleşir
+            const k = kisiler[ix];
+            kisiler[ix] = { ...k, email: k.email ?? s.email, sirket: k.sirket ?? s.sirket, ikincilTelefon: k.ikincilTelefon ?? s.ikincilTelefon,
+              notlar: k.notlar ?? s.notlar, roller: [...new Set([...k.roller, ...s.etiketler])] };
+            guncel++;
+          } else {
+            const k: Kisi = { id: `KC${Date.now().toString(36).slice(-4).toUpperCase()}${(yeni + 1).toString(36)}`, adSoyad: s.adSoyad, telefon: s.telefon,
+              ikincilTelefon: s.ikincilTelefon, email: s.email, sirket: s.sirket, roller: s.etiketler, uzmanlikAileleri: [], referans: null,
+              notlar: s.notlar, whatsappGruplari: [], olusturma: BUGUN.toISOString(), sonIletisim: null, kaynak: "MANUEL", ilanSahibiTipi: "BILINMIYOR" } as Kisi;
+            kisiler.push(k); telIx.set(k.telefon, kisiler.length - 1); adIx.set(k.adSoyad.toLocaleLowerCase("tr"), kisiler.length - 1);
+            yeni++;
+          }
+        }
+        return { ...x, kisiler };
+      });
+      yazilan += paket.length;
+      setKisiIlerleme({ yazilan, toplam: kisiTablo.satirlar.length });
+      await new Promise((r) => setTimeout(r, 0)); // paket arası: arayüz donmasın, canlıda kaydetme kuyruğu yetişsin
+    }
+    setKisiIlerleme(null); setKisiTablo(null);
+    bildir(`${yeni} yeni kişi eklendi${guncel ? `, ${guncel} kişi güncellendi` : ""}`);
+  };
+
   const vcfEkle = () => {
     if (!vcf) return;
     let yeni = 0, birlesen = 0;
@@ -163,6 +213,25 @@ export function DosyaAktarma() {
       </div>
       {hata && <div className="uyari-kutu">{hata}</div>}
     </div>
+
+    {kisiTablo && <section className="kart yigin kucuk-bosluk">
+      <h3>{kisiTablo.ad} — {kisiTablo.satirlar.length} kişi</h3>
+      <p className="ipucu">Kişi listesi olarak okundu: ad, telefon, <b>e-posta, şirket, not ve etiketten rol</b> alınır. Aynı numara varsa kişi ikinci kez açılmaz, eksik alanları tamamlanır.
+        {kisiTablo.satirlar.length > PAKET_BOYU && <> Büyük dosya {PAKET_BOYU}'erli paketler halinde yazılır (sunucu tek istekte boğulmasın).</>}</p>
+      <div className="filtre">
+        <span className="fb">Hazır: {kisiTablo.satirlar.filter((k) => k.durum === "HAZIR").length}</span>
+        <span className="fb">Kontrol gerekli: {kisiTablo.satirlar.filter((k) => k.durum === "KONTROL").length}</span>
+        <span className="fb">Telefonsuz: {kisiTablo.satirlar.filter((k) => !k.telefon).length}</span>
+      </div>
+      {kisiTablo.satirlar.filter((k) => k.uyarilar.length).slice(0, 5).map((k) => <div key={k.satirNo} className="ipucu uyari-metin">satır {k.satirNo} · {k.adSoyad}: {k.uyarilar.join(" · ")}</div>)}
+      {kisiTablo.satirlar.filter((k) => k.uyarilar.length).length > 5 && <div className="ipucu">… ve {kisiTablo.satirlar.filter((k) => k.uyarilar.length).length - 5} satır daha (numarası düzeltilmeden eklenir, telefon boş kalır)</div>}
+      {kisiTablo.satirlar.slice(0, 20).map((k) => <div key={k.satirNo} className="satir-ara">
+        <span><b>{k.adSoyad}</b>{k.sirket ? <span className="ipucu"> · {k.sirket}</span> : null}{k.email ? <span className="ipucu"> · {k.email}</span> : null}{k.etiketler.length ? <span className="ipucu"> · {k.etiketler.join(", ")}</span> : null}</span>
+        <span className="tel">{k.telefon ? telYaz(k.telefon) : "—"}</span></div>)}
+      {kisiTablo.satirlar.length > 20 && <div className="ipucu">… ve {kisiTablo.satirlar.length - 20} kişi daha</div>}
+      {kisiIlerleme && <div className="ipucu">Yazılıyor: {kisiIlerleme.yazilan} / {kisiIlerleme.toplam}</div>}
+      <div className="satir"><button className="btn birincil" disabled={!!kisiIlerleme} onClick={() => kisiTablosunuEkle()}>Kişilere ekle ({kisiTablo.satirlar.length})</button></div>
+    </section>}
 
     {vcf && <section className="kart yigin kucuk-bosluk">
       <h3>{vcf.ad} — {vcf.kisiler.length} kişi</h3>

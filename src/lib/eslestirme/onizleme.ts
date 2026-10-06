@@ -25,6 +25,26 @@ import { odaSayisiAyristir, istenenKatlarOf, katUyumu, katYaz } from "../domain/
 
 /** v3.15 — iki taraf da takasa açıksa eşleşme puanına eklenen küçük bonus (ayrı kriter satırı; uygunluk kararını değiştirmez). */
 export const TAKAS_BONUS = 3;
+
+/** v3.17 — skorun tavana çıkabilmesi için karşılaştırılabilmiş olması gereken alan sayısı */
+export const VERI_YETERLI = 6;
+/** v3.17 — eksik her alan için skor tavanından düşülen puan */
+export const EKSIK_VERI_CEZASI = 7;
+
+/** v3.17 — iki kayıtta da boş olan ve skoru şüpheli kılan temel alanlar (kullanıcıya "tamamlayın" denir) */
+export function eksikVeriUyarilari(t: OnizlemeKayit, p: OnizlemeKayit): string[] {
+  const u: string[] = [];
+  const talepAlan = t.minM2 == null && t.maxM2 == null, portfoyAlan = p.m2 == null;
+  if (talepAlan || portfoyAlan) u.push(`m² bilgisi yok (${talepAlan && portfoyAlan ? "talep ve portföy" : talepAlan ? "talep" : "portföy"})`);
+  if (!t.odaSayisi && !p.odaSayisi) u.push("oda sayısı yok");
+  if (t.maxFiyat == null && t.minFiyat == null) u.push("talepte bütçe yok");
+  if (p.fiyat == null) u.push("portföyde fiyat yok");
+  const mahalle = (x: OnizlemeKayit) => x.lokasyonlar.some((l) => l.mahalleId != null || l.altBolgeId != null);
+  if (!mahalle(t) && !mahalle(p)) u.push("konum yalnızca ilçe düzeyinde");
+  const oz = (x: OnizlemeKayit) => Object.keys(x.ozellik ?? {}).length;
+  if (oz(t) + oz(p) === 0) u.push("teknik özellik girilmemiş");
+  return u;
+}
 import { MULK_TIPI_META as TIP_META } from "../domain/kategori";
 import { talepDnasi, type TalepDna } from "./talep-dna";
 import type { KomsulukIndeksi, MahalleYakinligi } from "../lokasyon/komsuluk";
@@ -136,6 +156,8 @@ export interface OnizlemeSonucu {
   matris: { ad: string; bilesenler: MatrisBileseni[] };
   /** v3.5 — talepte eksik öldürücü bilgiler (müşteriye sorulacak) */
   talepEksikleri: string[];
+  /** v3.17 — "Genel özellikler eksik, tamamlayın": skorun güvenilir olması için doldurulması gereken alanlar */
+  veriEksikleri: string[];
   dna: TalepDna;
 }
 
@@ -367,6 +389,14 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   const toplamW = sayilan.reduce((a, x) => a + x.agirlik, 0);
   let skor = Math.round((100 * sayilan.reduce((a, x) => a + x.agirlik * (x.puan as number), 0)) / Math.max(1, toplamW));
   if (takasUyumu) skor += TAKAS_BONUS; // v3.15
+
+  // ───── v3.17 — eksik veri cezası: iki kayıt da yalnızca ilçe + fiyat taşıyorsa skor "kesin" görünmemeli.
+  // Yüksek skor, çok sayıda alanın karşılaştırılabilmiş olmasını gerektirir; karşılaştırılan alan azsa tavan düşer.
+  const veriEksikleri = eksikVeriUyarilari(t, p);
+  const olculen = sayilan.length + satirlar.filter((x) => x.sonuc !== "BILINMIYOR" && x.anahtar !== "takasaAcik").length; // takas bonus satırı "ölçülen alan" sayılmaz
+  const tavan = olculen >= VERI_YETERLI ? 100 : 100 - EKSIK_VERI_CEZASI * (VERI_YETERLI - olculen);
+  if (veriEksikleri.length) skor = Math.min(skor, tavan);
+
   skor -= 5 * talepEksikleri.length; // talepte öldürücü bilgi eksikse skor "kesin" görünmesin
   skor = Math.max(0, Math.min(100, skor));
 
@@ -376,6 +406,6 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
       || lok.belirsiz || (lok.kademe !== "IL_GENELI" && lok.kademe !== "BILINMIYOR" && lok.oran < A.kosulluAlti) || satirlar.some((s) => s.sonuc === "SAGLANDI" && s.puan != null && s.puan < A.kosulluAlti) ? "KOSULLU" : "SUNULABILIR";
   return {
     uygunluk, tipUyumu, skor: uygunluk === "UYGUN_DEGIL" ? Math.min(skor, 40) : skor, lokasyonPuani: lok.puan, lokasyonOrani: lok.oran, lokasyonKademe: lok.kademe, lokasyonMesafeM: lok.mesafeM, lokasyonAciklama: lok.aciklama,
-    kriterler: satirlar, kritikEngeller, bilinmeyenKritikler, matris: { ad: M.ad, bilesenler }, talepEksikleri, dna,
+    kriterler: satirlar, kritikEngeller, bilinmeyenKritikler, matris: { ad: M.ad, bilesenler }, talepEksikleri, veriEksikleri, dna,
   };
 }

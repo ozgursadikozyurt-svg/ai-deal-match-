@@ -25,7 +25,7 @@ import { ORNEK_TOPLANTI_NOTU } from "../demo/ornek-dosyalar";
 
 const { kayitlar, kisiler } = ornekVeriyiKur();
 const durum: DepoDurumu = { veriSurumu: "t", kayitlar, eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN }, ogrenilen: [], adaylar: [], aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [] } as any;
-const ciz = (el: React.ReactElement) => renderToStaticMarkup(React.createElement(C.Provider, { value: { d: durum, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, sample: null } as Ctx }, el));
+const ciz = (el: React.ReactElement) => renderToStaticMarkup(React.createElement(C.Provider, { value: { d: durum, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, geri: () => {}, geriVar: false, sample: null } as Ctx }, el));
 
 test("portal ilan sayfası: etiket–değer satırları tek portföy olur (v3.8'de 15+ kayda bölünüyordu)", () => {
   assert.ok(portalSayfasiMi(ORNEK_PORTAL_SAYFASI));

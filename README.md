@@ -4,7 +4,7 @@
 
 Prisma 7 · PostgreSQL (Supabase) · Zod · Route Handler dosyaları Cloudflare Worker'da çalışır (Next.js yok) · Arayüz: React (tek HTML; demo ve canlı aynı ekranlar)
 
-## Canlı sürüm (v3.14): Cloudflare Worker + Supabase
+## Canlı sürüm: Cloudflare Worker + Supabase
 - Yayına alma adımları (sizin yapacaklarınız): **`CANLIYA_ALMA_REHBERI_v3.14_3Ekim2026.md`**. Mimari, güvenlik, riskler: **`ANAHTAR_CRM_EK_v3.14_3Ekim2026.md`** (§52–60).
 - Derleme: `npm ci --ignore-scripts && npm run canli:build` → `dist/canli/` (arayüz) + Worker; yayın: `npx wrangler deploy` (Cloudflare Git bağlantısı bunu push'ta kendisi yapar).
 - Üretilmiş Prisma istemcisi (`src/generated/`) bilerek pakettedir; şema değişirse `npm run canli:istemci`.
@@ -19,6 +19,32 @@ npx wrangler dev --port 8799 --local --test-scheduled &
 npm run canli:test && npm run canli:test:depo && npm run canli:test:giris && npm run canli:test:arayuz
 ```
 (`canli:test` boş veritabanı bekler. `canli:test:arayuz` jsdom kullanır.)
+
+## Emlak jargonu
+
+WhatsApp ve ilan metinlerindeki kısaltmalar `docs/emlak_jargon.md` dosyasında tablolanmış, karşılıkları `src/lib/ai/jargon.ts` içinde kodlanmıştır. Kurallar yapay zekâdan **önce** çalışır; sık tekrar eden bir ifadeyi kayıt notunda görüyorsanız sözlüğe kural olarak ekleyin, o andan sonra yapay zekâ gerekmez.
+
+## Veritabanı değişiklikleri nasıl uygulanır? (şema → migration → Supabase)
+
+Kısa cevap: **şema dosyasını değiştirmek yetmez, Supabase'deki tablolar kendiliğinden değişmez.** Yeni bir alan (örn. `takasaAcik`) ya da yeni bir tablo eklenince şu zincir izlenir:
+
+| Adım | Ne yapılır | Otomatik mi? |
+|---|---|---|
+| 1. Şema | `prisma/schema.prisma` içine alan / model yazılır | hayır — elle yazılır (kod değişikliğinin parçası) |
+| 2. Migration | `prisma/migrations/<tarih>_<ad>/migration.sql` dosyası oluşturulur (`ALTER TABLE …`) | yarı — `npx prisma migrate dev --name <ad>` üretir, gözden geçirilir |
+| 3. Prisma istemcisi | `npx prisma generate` → `src/generated/` yenilenir (bu klasör depoda durur) | hayır — elle çalıştırılır, commit edilir |
+| 4. Supabase'e uygulama | Worker ilk açılışta `/api/kurulum` ile bekleyen migration'ları uygular; arayüzde "İlk kurulum" ekranı çıkarsa "Kurulumu tamamla" düğmesine basılır | **evet** — yayın sonrası uygulamadan tetiklenir |
+| 5. Doğrulama | `npm run test:db` (PGlite üzerinde tüm migration'lar + testler) | hayır — elle çalıştırılır |
+
+Önemli noktalar:
+
+- **Supabase panelinde elle tablo açmak gerekmez.** Veritabanının şekli migration dosyalarından gelir; panelden elle yapılan değişiklikler bir sonraki migration ile çakışabilir.
+- **Migration dosyaları geri alınamaz biçimde birikir.** Yayınlanmış bir migration dosyası sonradan düzenlenmez; düzeltme yeni bir migration ile yapılır.
+- **Veri kaybı riski olan değişikliklerde** (kolon silme, tip daraltma) migration elle yazılır ve önce `npm run test:db` ile denenir. Örnek: v3.15'te `kisi.roller` enum dizisinden metin dizisine çevrilirken `USING "roller"::TEXT[]` kullanıldı, mevcut roller korundu.
+- **Panel değişkenleri yayında silinmez.** `wrangler.jsonc` içinde `"keep_vars": true` vardır: bu olmadan her yayın (GitHub → Cloudflare otomatik derleme dahil) panelden elle girilen değişkenleri temizler. Bu satırı kaldırmayın.
+- **Bağlantı ve anahtarlar koda yazılmaz.** `DATABASE_URL`, `SUPABASE_*` ve `AI_API_KEY` Cloudflare › Settings › Variables and Secrets üzerinden verilir; `wrangler.jsonc` içinde `vars` bloğu **bilerek yoktur** — olsaydı her yayında paneldeki değerlerin üzerine yazardı. Yerel deneme için `.dev.vars` kullanılır (`.gitignore` içinde, depoya girmez).
+- **Yeni bir alan eklendiğinde dokunulan yerler** (v3.15–v3.16 örneği): `prisma/schema.prisma` → migration → `src/lib/validation/kayit.ts` (doğrulama) → `src/lib/services/durum.ts` (sunucu ↔ arayüz köprüsü) → `demo/` ekranları (form, detay, filtre) → eşleştirme motoru gerekiyorsa `src/lib/eslestirme/` → test.
+
 
 ## Hızlı test — demo uygulama (kurulum gerekmez)
 - claude.ai'de: https://claude.ai/artifact/9SDMmSyeTmx1zbWR42TYJN (her sürümde aynı bağlantı güncellenir)

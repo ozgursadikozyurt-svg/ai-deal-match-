@@ -11,6 +11,7 @@
  *
  * Saf fonksiyonlar; demo ve sunucu (/api/ai/ara) aynı kodu kullanır.
  */
+import { JARGON_ALANLI, JARGON_NOTLUK, katOku, katJargonu, binaYasiOku, emsalOku, fiyatDuzelt, bosluklukBinlik } from "./jargon";
 import { lokasyonAnahtari } from "../lokasyon/normalize";
 import type { LokasyonIndeks } from "../lokasyon/cozumle";
 
@@ -75,6 +76,10 @@ export interface HizliSonuc {
   telefon: string | null;
   /** Telefonun önündeki kişi adı (varsa) */
   kisiAdi: string | null;
+  /** v3.17 — alan karşılığı olmayan jargon (yabancıya satış, kapalı portföy…): kaydın notuna yazılır */
+  jargonNotlari: string[];
+  /** v3.17 — jargondan çıkan kayıt alanları: krediyeUygun, takasaAcik */
+  kayitAlanlari: Record<string, unknown>;
   portal: "SAHIBINDEN" | "EMLAKJET" | "HEPSIEMLAK" | null;
   portalUrl: string | null;
   ilanNo: string | null;
@@ -119,7 +124,8 @@ function paralar(m: string): { deger: number; acik: boolean; kadar: boolean; ayl
     if (n == null) continue;
     const deger = n * CARPAN(buyuk);
     if (!buyuk && !birim && deger < 1000) continue; // "3. kat", "8 yaşında"
-    if (deger < 1000) continue;
+    if (deger < 1000 && !birim) continue;
+    if (deger < 1000 && birim) { r.push({ acik: true, deger, kadar: !!kadar, aylik: /ayl[ıi]k|kira/.test(once + sonra), para: /euro|eur|€/.test(birim) ? "EUR" : /usd|dolar|\$/.test(birim) ? "USD" : /gbp|sterlin/.test(birim) ? "GBP" : "TRY" }); continue; } // v3.17: "15.5 TL" → jargon düzeltmesi fiyatı milyona çevirir
     const para: HizliSonuc["paraBirimi"] = /euro|eur|€/.test(birim ?? "") ? "EUR" : /usd|dolar|\$/.test(birim ?? "") ? "USD" : /gbp|sterlin/.test(birim ?? "") ? "GBP" : "TRY";
     r.push({ acik: !!(buyuk || birim) || /\./.test(sayi), deger, kadar: !!kadar || /kadar|max|en\s*fazla|b[üu]t[çc]e/.test(sonra + once), aylik: /ayl[ıi]k|kira/.test(once + sonra), para });
   }
@@ -144,7 +150,7 @@ export function paraNormalize(metin: string): string {
 }
 
 export function hizliAyristir(metin0: string): HizliSonuc {
-  const metin = paraNormalize(metin0);
+  const metin = paraNormalize(bosluklukBinlik(metin0)); // v3.17: "13500 000" → "13500000"
   const ham = metin.trim();
   const m = kucuk(ham);
   const bulunan: string[] = [];
@@ -226,6 +232,7 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   // Talepte tek m² → alt sınır (±%10 toleransla eşleşir)
   if (tip === "TALEP" && m2 != null) { minM2 = m2; m2 = null; }
 
+  const kayitAlanlari: Record<string, unknown> = {}; // v3.17 — jargondan gelen kayıt alanları (krediyeUygun, takasaAcik)
   // Teknik alanlar
   const kw = m.match(/(\d[\d.,]*)\s*(kw|kilovat)/), kva = m.match(/(\d[\d.,]*)\s*kva/);
   if (kw) ozellik.elektrikGucuKw = sayiOku(kw[1]);
@@ -255,7 +262,31 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   if (/deniz\s*manzara/.test(m)) ozellik.denizManzarasi = true;
   const amac = tip === "TALEP" ? AMAC_SOZLUK.filter(([re]) => re.test(m)).map(([, a]) => a) : [];
   if (amac.length) ozellik.kullanimAmaclari = [...new Set(amac)];
+  // ───── v3.17 — jargon sözlüğü (docs/emlak_jargon.md): kat, bina yaşı, emsal ve anahtar kelimeler
+  const kat = katOku(m);
+  if (kat.bulunduguKat != null) ozellik.bulunduguKat = kat.bulunduguKat;
+  if (kat.katSayisi != null) ozellik.katSayisi = kat.katSayisi;
+  const yas = binaYasiOku(m);
+  if (yas != null) ozellik.binaYasi = yas;
+  const emsal = emsalOku(m);
+  if (emsal != null) ozellik.emsalKaks = emsal;
+  const istenenKat = katJargonu(m);
+  if (istenenKat.length) { if (tip === "TALEP") ozellik.istenenKatlar = istenenKat; else if (ozellik.bulunduguKat == null && istenenKat.includes("0")) ozellik.bulunduguKat = 0; }
+  const jargonNotlari: string[] = [];
+  for (const k of JARGON_ALANLI) {
+    if (!k.re.test(m)) continue;
+    if (k.kayitAlani) kayitAlanlari[k.alan!] = k.deger;
+    else if (k.alan && ozellik[k.alan] == null) ozellik[k.alan] = k.deger;
+  }
+  // Alan karşılığı olmayan jargon kaybolmasın: "Notlar" alanına yazılır
+  for (const k of JARGON_NOTLUK) if (k.re.test(m)) jargonNotlari.push(k.not);
+
   if (Object.keys(ozellik).length) bul("teknik");
+
+  // v3.17 — fiyat jargonu: "15.5 TL" satılıkta 15.500.000, "25" kirada 25.000 (bkz. docs/emlak_jargon.md)
+  const kiraMi = /KIRALIK/.test(islemTipi ?? "") || fiyatPeriyodu === "AYLIK";
+  const duzelt = (x: number | null) => (x == null ? x : fiyatDuzelt(x, { kira: kiraMi }) ?? x);
+  fiyat = duzelt(fiyat); maxFiyat = duzelt(maxFiyat); minFiyat = duzelt(minFiyat);
 
   const aciliyet = /\bacil\b/.test(m) ? "ACIL" : null;
   const eksik: string[] = [];
@@ -266,6 +297,7 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   return {
     tur: metinTuru(ham), tip, mulkTipi, aileKodu, islemTipi, fiyat, minFiyat, maxFiyat, fiyatPeriyodu, paraBirimi, m2, minM2, maxM2, m2Esnek, odaSayisi,
     telefon, kisiAdi, portal, portalUrl: url, ilanNo, sirket, ilanSahibiTipi, aciliyet, islemTahmini, ozellik, bulunan, eksik, yeterli: eksik.length === 0,
+    jargonNotlari, kayitAlanlari,
   };
 }
 

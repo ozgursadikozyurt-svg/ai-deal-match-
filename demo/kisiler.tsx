@@ -106,7 +106,8 @@ export function Kisiler() {
   const [yeni, setYeni] = useState({ adSoyad: "", telefon: "", rol: "" });
   const [secili, setSecili] = useState<Set<string>>(new Set());            // v3.15: toplu işlem seçimi
   const [silOnay, setSilOnay] = useState(false);
-  const [duzenId, setDuzenId] = useState<string | null>(null);              // v3.15: listede hızlı düzenleme
+  const [duzenId, setDuzenId] = useState<string | null>(null);
+  const [filtreAcik, setFiltreAcik] = useState(false);              // v3.15: listede hızlı düzenleme
   const ql = q.toLocaleLowerCase("tr");
   const kayitSay = (id: string, tip?: string) => kisininKayitlari(d.kayitlar, id).filter((x) => !tip || x.veri.tip === tip).length;
   const kSay = (id: string) => kayitSay(id);
@@ -127,7 +128,9 @@ export function Kisiler() {
   const [sr, setSr] = useState<Siralama>({ alan: "ad", yon: "artan" });
   const sirali = siralaUygula(liste, sr, kisiSiralama(kSay));
   const gorunenSecili = sirali.filter((k) => secili.has(k.id)); // yalnızca ekranda görünen ve seçili olanlar işlenir (filtre değişince gizli seçimler silinmez)
-  const filtreVar = !!(q || roller.length || kaynaklar.length || bag || tel);
+  const filtreSayisi = roller.length + kaynaklar.length + (bag ? 1 : 0) + (tel ? 1 : 0);
+  const filtreVar = !!(q || filtreSayisi);
+  const temizle = () => { setQ(""); setRoller([]); setKaynaklar([]); setBag(""); setTel(""); };
   const topluSil = () => {
     const ids = new Set(gorunenSecili.map((k) => k.id));
     guncelle((x) => ({
@@ -147,14 +150,31 @@ export function Kisiler() {
       <div className="alan"><label htmlFor="nk-tel">Telefon</label><TelGirdisi id="nk-tel" deger={yeni.telefon} onChange={(v) => setYeni({ ...yeni, telefon: v })} /></div>
       <div className="alan"><label htmlFor="nk-rol">Rol</label><select id="nk-rol" value={yeni.rol} onChange={(e) => setYeni({ ...yeni, rol: e.target.value })}><option value="">—</option>{KISI_ROLLERI.map(([r, l]) => <option key={r} value={r}>{l}</option>)}</select></div>
     </div><div className="satir"><button className="btn birincil" disabled={yeni.adSoyad.trim().length < 2 || !!telUyarisi(yeni.telefon)} onClick={() => { const id = kisiEkle(guncelle, d, { adSoyad: yeni.adSoyad, telefon: yeni.telefon, roller: yeni.rol ? [yeni.rol] : [] }); setYeni({ adSoyad: "", telefon: "", rol: "" }); setYeniAcik(false); git({ ad: "kisi", id }); }}>Ekle ve kartı aç</button></div></div>}
-    <div className="fc"><div className="fc-ara"><span aria-hidden="true">⌕</span><input type="search" aria-label="Kişi ara" placeholder="Ara: ad, şirket, telefon, e-posta, rol, not…" value={q} onChange={(e) => setQ(e.target.value)} /></div><SiralaDugmesi secenekler={kisiSiralama(kSay)} s={sr} set={setSr} /></div>
-    <div className="cip-satir" aria-label="Rol filtresi">{[...KISI_ROLLERI, [ROLSUZ, "Rolü yok"] as [string, string]].map(([r, l]) => { const n = r === ROLSUZ ? d.kisiler.filter((k) => !k.roller.length).length : d.kisiler.filter((k) => k.roller.includes(r)).length; const on = roller.includes(r); if (!n && !on && r === ROLSUZ) return null; return <button key={r} className={cx("cip secilir", on && "on")} style={!n && !on ? { opacity: 0.55 } : undefined} onClick={() => setRoller(on ? roller.filter((x) => x !== r) : [...roller, r])}>{l} <small>{n}</small></button>; })}</div>
-    <div className="cip-satir">{["GOOGLE", "NOTION", "WHATSAPP", "MANUEL"].map((x) => { const n = d.kisiler.filter((k) => kaynakTutar(k, x)).length; if (!n) return null; const on = kaynaklar.includes(x); return <button key={x} className={cx("cip secilir", on && "on")} onClick={() => setKaynaklar(on ? kaynaklar.filter((y) => y !== x) : [...kaynaklar, x])}>{KAYNAK_ETIKET[x]} <small>{n}</small></button>; })}</div>
-    <div className="satir sar">
-      <select aria-label="Bağlı kayıt" value={bag} onChange={(e) => setBag(e.target.value as typeof bag)}><option value="">Kayıt: hepsi</option><option value="TALEP">Talebi olanlar</option><option value="PORTFOY">Portföyü olanlar</option><option value="YOK">Kaydı olmayanlar</option></select>
-      <select aria-label="Telefon" value={tel} onChange={(e) => setTel(e.target.value as typeof tel)}><option value="">Telefon: hepsi</option><option value="VAR">Telefonu olanlar</option><option value="YOK">Telefonu olmayanlar</option></select>
-      {filtreVar && <button className="btn kucuk" onClick={() => { setQ(""); setRoller([]); setKaynaklar([]); setBag(""); setTel(""); }}>Filtreleri temizle</button>}
-    </div>
+    <div className="fc"><div className="fc-ara"><span aria-hidden="true">⌕</span><input type="search" aria-label="Kişi ara" placeholder="Ara: ad, şirket, telefon, e-posta, rol, not…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+      <button type="button" className={cx("fc-btn", filtreSayisi > 0 && "on")} onClick={() => setFiltreAcik(!filtreAcik)} aria-expanded={filtreAcik}>Filtrele{filtreSayisi > 0 && <b className="fc-rozet">{filtreSayisi}</b>}</button>
+      <SiralaDugmesi secenekler={kisiSiralama(kSay)} s={sr} set={setSr} /></div>
+    {/* v3.16 — dağınık çip satırları tek "Filtrele" menüsünde toplandı (rol · kaynak · kayıt · telefon) */}
+    {filtreSayisi > 0 && <div className="aktif-filtreler">{[
+      ...roller.map((r) => ({ e: r === ROLSUZ ? "Rolü yok" : rolAd(r), k: () => setRoller(roller.filter((x) => x !== r)) })),
+      ...kaynaklar.map((x) => ({ e: KAYNAK_ETIKET[x], k: () => setKaynaklar(kaynaklar.filter((y) => y !== x)) })),
+      ...(bag ? [{ e: bag === "YOK" ? "Kaydı olmayanlar" : bag === "TALEP" ? "Talebi olanlar" : "Portföyü olanlar", k: () => setBag("") }] : []),
+      ...(tel ? [{ e: tel === "VAR" ? "Telefonu olanlar" : "Telefonu olmayanlar", k: () => setTel("") }] : []),
+    ].map((c, i) => <button key={i} className="cip" onClick={c.k}>{c.e} <span aria-hidden="true">×</span></button>)}
+      <button className="fc-temizle" onClick={temizle}>Temizle</button></div>}
+    {filtreAcik && <div className="kart yigin kucuk-bosluk fp-kisi">
+      <details open><summary>Rol <small className="ipucu">{roller.length ? `${roller.length} seçili` : "Tümü"}</small></summary>
+        <div className="cip-satir">{[...KISI_ROLLERI, [ROLSUZ, "Rolü yok"] as [string, string]].map(([r, l]) => { const n = r === ROLSUZ ? d.kisiler.filter((k) => !k.roller.length).length : d.kisiler.filter((k) => k.roller.includes(r)).length; const on = roller.includes(r); if (!n && !on && r === ROLSUZ) return null; return <button key={r} className={cx("cip secilir", on && "on")} style={!n && !on ? { opacity: 0.55 } : undefined} onClick={() => setRoller(on ? roller.filter((x) => x !== r) : [...roller, r])}>{l} <small>{n}</small></button>; })}</div>
+      </details>
+      <details><summary>Kaynak <small className="ipucu">{kaynaklar.length ? `${kaynaklar.length} seçili` : "Tümü"}</small></summary>
+        <div className="cip-satir">{["GOOGLE", "NOTION", "WHATSAPP", "MANUEL"].map((x) => { const n = d.kisiler.filter((k) => kaynakTutar(k, x)).length; if (!n) return null; const on = kaynaklar.includes(x); return <button key={x} className={cx("cip secilir", on && "on")} onClick={() => setKaynaklar(on ? kaynaklar.filter((y) => y !== x) : [...kaynaklar, x])}>{KAYNAK_ETIKET[x]} <small>{n}</small></button>; })}</div>
+      </details>
+      <details><summary>Kayıt ve telefon <small className="ipucu">{[bag ? "kayıt" : "", tel ? "telefon" : ""].filter(Boolean).join(", ") || "Tümü"}</small></summary>
+        <div className="satir sar">
+          <select aria-label="Bağlı kayıt" value={bag} onChange={(e) => setBag(e.target.value as typeof bag)}><option value="">Kayıt: hepsi</option><option value="TALEP">Talebi olanlar</option><option value="PORTFOY">Portföyü olanlar</option><option value="YOK">Kaydı olmayanlar</option></select>
+          <select aria-label="Telefon" value={tel} onChange={(e) => setTel(e.target.value as typeof tel)}><option value="">Telefon: hepsi</option><option value="VAR">Telefonu olanlar</option><option value="YOK">Telefonu olmayanlar</option></select>
+        </div>
+      </details>
+    </div>}
     <div className="satir sar secim-bar">
       <label className="cip secilir"><input type="checkbox" aria-label="Listedeki tüm kişileri seç" checked={hepsiSecili} onChange={(e) => setSecili(e.target.checked ? new Set([...secili, ...sirali.map((k) => k.id)]) : new Set([...secili].filter((id) => !sirali.some((k) => k.id === id))))} /> {filtreVar ? "Süzülenlerin" : "Tümünün"} seçimi ({sirali.length})</label>
       <span className="ipucu">{liste.length} kişi{gorunenSecili.length > 0 && ` · ${gorunenSecili.length} seçili`}</span>
@@ -196,6 +216,8 @@ function HizliDuzen({ k, kapat }: { k: Kisi; kapat: () => void }) {
       <div className="alan"><label htmlFor={`hd-sirket-${k.id}`}>Şirket</label><input id={`hd-sirket-${k.id}`} value={f.sirket ?? ""} onChange={(e) => setF({ ...f, sirket: e.target.value || null })} /></div>
       <div className="alan"><label htmlFor={`hd-eposta-${k.id}`}>E-posta</label><input id={`hd-eposta-${k.id}`} type="email" value={f.email ?? ""} onChange={(e) => setF({ ...f, email: e.target.value || null })} /></div>
     </div>
+    {/* v3.17 — not listeden de yazılabilir */}
+    <div className="alan genis"><label htmlFor={`hd-not-${k.id}`}>Açıklama / notlar</label><textarea id={`hd-not-${k.id}`} rows={2} value={f.notlar ?? ""} onChange={(e) => setF({ ...f, notlar: e.target.value || null })} /></div>
     <div className="alan-etiket">Roller</div>
     <div className="cip-satir">{KISI_ROLLERI.map(([r, l]) => { const on = f.roller.includes(r); return <button key={r} type="button" className={cx("cip secilir", on && "on")} onClick={() => setF({ ...f, roller: on ? f.roller.filter((x) => x !== r) : [...f.roller, r] })}>{l}</button>; })}</div>
     <div className="satir"><button className="btn birincil" onClick={kaydet}>Kaydet</button><button className="btn" onClick={kapat}>Vazgeç</button></div>
@@ -208,14 +230,13 @@ export function KisiKarti({ id }: { id: string }) {
   const es = useEslesmeler();
   const [duzen, setDuzen] = useState(false);
   const [f, setF] = useState<Kisi | null>(k ?? null);
-  if (!k || !f) return <div className="yigin"><button className="btn kucuk geri" onClick={() => git({ ad: "kisiler" })}>← Kişiler</button><p className="bos">Kişi bulunamadı.</p></div>;
+  if (!k || !f) return <div className="yigin"><p className="bos">Kişi bulunamadı.</p></div>;
   const ky = kisininKayitlari(d.kayitlar, id);
   const idler = new Set(ky.map((x) => x.id));
   const kisiEs = es.filter((e) => (idler.has(e.t.id) || idler.has(e.p.id)) && e.s.uygunluk !== "UYGUN_DEGIL");
   const kaydet = () => { if (telUyarisi(f.telefon)) { bildir(telUyarisi(f.telefon)!); return; } guncelle((x) => ({ ...x, kisiler: x.kisiler.map((y) => (y.id === id ? { ...f, telefon: telNormalize(f.telefon) || null } : y)) })); setDuzen(false); bildir("Kişi güncellendi"); };
   const rolBagi = (kayit: Kayit) => (kayit.veri.kisiler ?? []).filter((b) => b.kisiId === id).map((b) => rolAd(b.rol, KAYIT_ROLLERI)).join(", ");
   return <div className="yigin">
-    <button className="btn kucuk geri" onClick={() => git({ ad: "kisiler" })}>← Kişiler</button>
     <section className="kart kisi-bas">
       <div className="avatar buyuk">{k.adSoyad[0]?.toLocaleUpperCase("tr")}</div>
       <div className="yigin kucuk-bosluk" style={{ flex: 1 }}>

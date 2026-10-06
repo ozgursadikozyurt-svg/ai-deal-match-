@@ -56,8 +56,15 @@ export function taslakYap(metin: string, h: HizliSonuc, ai: any | null): { tasla
     lokasyonlar: cozulenToKayitLok(r.lokasyonlar, !talep).map(({ etiket, seviye, ...l }) => l), lokasyonHam: ifadeler.join(", "),
     gondeAdi: kisiAdi ?? h.kisiAdi ?? null, gondeTelefon: telefon ?? h.telefon, gondeSirket: firma ?? h.sirket,
     ilanSahibiTipi: ai?.ilanSahibiTipi && ai.ilanSahibiTipi !== "BILINMIYOR" ? ai.ilanSahibiTipi : h.ilanSahibiTipi ?? "BILINMIYOR",
-    veriKanali: kanal, havuz: !talep && h.portal ? "DIS_ILAN" : "KENDI_PORTFOY", portalUrl: h.portalUrl ?? undefined, portalIlanNo: h.ilanNo ?? undefined,
+    veriKanali: kanal,
+    // v3.16 — kaynak otomasyonu: "Kendi portföyüm" yalnızca elle girişte varsayılan. Portal ilanı → dış ilan;
+    // WhatsApp / emlakçı kaynaklı ya da sahibi belli olmayan kayıtlar partner havuzuna düşer, kullanıcı isterse formda değiştirir.
+    havuz: talep ? "KENDI_PORTFOY" : h.portal ? "DIS_ILAN" : (ai?.ilanSahibiTipi ?? h.ilanSahibiTipi) === "MALIK" ? "KENDI_PORTFOY" : kanal === "MANUEL" ? "KENDI_PORTFOY" : "PARTNER",
+    portalUrl: h.portalUrl ?? undefined, portalIlanNo: h.ilanNo ?? undefined,
     hamMetin: metin, baslik: (ozet ? String(ozet) : ozetYaz(h, r.lokasyonlar.map((l) => l.etiket), talep)).slice(0, 160),
+    // v3.17 — jargon sözlüğünden çıkan kayıt alanları (krediye uygun, takasa açık) ve karşılığı olmayan jargon notları
+    ...(h.kayitAlanlari ?? {}),
+    ...(h.jargonNotlari?.length ? { operasyonNotu: [aiGeri?.operasyonNotu, ...h.jargonNotlari].filter(Boolean).join(" · ").slice(0, 2000) } : {}),
   };
   for (const k of Object.keys(taslak)) if (taslak[k] === undefined || taslak[k] === null) delete taslak[k];
   return { taslak, cozulemeyen: r.cozulemeyen };

@@ -54,12 +54,15 @@ test("eşleştirme: talep birden çok kata uygunsa biri tutunca karşılanır; h
 });
 
 test("eşleştirme: takas bonusu yalnızca iki taraf da açıksa; uygunluğu bozmaz; tavan 100", () => {
-  const a = es(T, P), b = es({ ...T, takasaAcik: true }, { ...P, takasaAcik: true }), c = es({ ...T, takasaAcik: true }, P), d = es(T, { ...P, takasaAcik: true });
+  // v3.17 — eksik veri cezası bonusu yutmasın diye alanları dolu kayıtlar kullanılır
+  const T2: OnizlemeKayit = { ...T, maxFiyat: 6_000_000, minM2: 100, odaSayisi: "2+1", ozellik: { asansor: true }, lokasyonlar: [{ ilId: 7, ilceId: 1, mahalleId: 5, altBolgeId: null, birincil: false }] };
+  const P2: OnizlemeKayit = { ...P, fiyat: 5_800_000, m2: 110, odaSayisi: "2+1", ozellik: { asansor: true, binaYasi: 5 }, lokasyonlar: [{ ilId: 7, ilceId: 1, mahalleId: 5, altBolgeId: null, birincil: true }] };
+  const a = es(T2, P2), b = es({ ...T2, takasaAcik: true }, { ...P2, takasaAcik: true }), c = es({ ...T2, takasaAcik: true }, P2), d = es(T2, { ...P2, takasaAcik: true });
   assert.equal(c.skor, a.skor); assert.equal(d.skor, a.skor);
   assert.equal(b.skor, Math.min(100, a.skor + TAKAS_BONUS));
   assert.ok(b.kriterler.some((x) => x.anahtar === "takasaAcik" && x.sonuc === "SAGLANDI"));
   assert.equal(b.uygunluk, a.uygunluk);
-  const kotu = es({ ...T, takasaAcik: true, maxFiyat: 1_000_000 }, { ...P, takasaAcik: true, fiyat: 9_000_000 });
+  const kotu = es({ ...T2, takasaAcik: true, maxFiyat: 1_000_000 }, { ...P2, takasaAcik: true, fiyat: 9_000_000 });
   assert.notEqual(kotu.uygunluk, "SUNULABILIR");
 });
 
@@ -83,16 +86,34 @@ test("roller: 11 sistem rolü, özel rol ekleme, yeniden adlandırma, kod üreti
 
 const { kayitlar, kisiler } = ornekVeriyiKur();
 const dur = (x: Partial<DepoDurumu> = {}): DepoDurumu => ({ ...(ornekVeriyiKur() as any), veriSurumu: "t", kayitlar, kisiler, testler: {}, geriBildirim: "", ayarlar: { ttl: {} as any }, ogrenilen: [], adaylar: [], aktifIceAktarma: null, iceAktarmaGecmisi: [], islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], eslesmeNotlari: {}, ...x }) as DepoDurumu;
-const ciz = (el: React.ReactElement, d: DepoDurumu) => renderToStaticMarkup(React.createElement(C.Provider, { value: { d, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, sample: null } as Ctx }, el));
+const ciz = (el: React.ReactElement, d: DepoDurumu) => renderToStaticMarkup(React.createElement(C.Provider, { value: { d, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, geri: () => {}, geriVar: false, sample: null } as Ctx }, el));
 
-test("kişiler ekranı: onay kutusu, hızlı düzenleme, toplu sil, tüm roller ve yeni filtreler", () => {
+test("kişiler ekranı: onay kutusu, hızlı düzenleme, toplu sil; filtreler tek 'Filtrele' menüsünde (v3.16)", () => {
   rolleriUygula([{ kod: "BANKA_PERSONELI", etiket: "Banka personeli" }]);
   const h = ciz(React.createElement(Kisiler), dur({ roller: [{ kod: "BANKA_PERSONELI", etiket: "Banka personeli" }] }));
-  assert.match(h, /type="checkbox"/); assert.match(h, /hızlı düzenle/); assert.match(h, /Banka personeli/);
-  for (const [, l] of SISTEM_ROLLERI) assert.ok(h.includes(l), l);
-  assert.match(h, /Talebi olanlar/); assert.match(h, /Telefonu olmayanlar/); assert.match(h, /Listedeki tüm kişileri seç/);
+  assert.match(h, /type="checkbox"/); assert.match(h, /hızlı düzenle/);
+  assert.match(h, /Filtrele/, "tek filtre düğmesi");
+  assert.match(h, /Listedeki tüm kişileri seç/);
+  // v3.16: çip satırları artık kapalı menünün içinde — ekran açılışta sade
+  assert.ok(!h.includes("Telefonu olmayanlar"), "filtre seçenekleri kapalı menüde durmalı");
   assert.equal(KISI_ROLLERI.length, 12);
   rolleriUygula([]); assert.equal(KISI_ROLLERI.length, 11);
+});
+
+test("kişiler: 'Filtrele' açılınca rol, kaynak, kayıt ve telefon seçenekleri gelir (v3.16)", async () => {
+  rolleriUygula([{ kod: "BANKA_PERSONELI", etiket: "Banka personeli" }]);
+  const dom = new JSDOM("<div id=k></div>", { pretendToBeVisual: true });
+  (globalThis as any).window = dom.window; (globalThis as any).document = dom.window.document; (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
+  const { createRoot } = await import("react-dom/client"); const { act } = await import("react");
+  const kok = createRoot(dom.window.document.getElementById("k")!);
+  const d2 = dur({ roller: [{ kod: "BANKA_PERSONELI", etiket: "Banka personeli" }] });
+  await act(async () => kok.render(React.createElement(C.Provider, { value: { d: d2, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, geri: () => {}, geriVar: false, sample: null } as Ctx }, React.createElement(Kisiler))));
+  const dugme = [...dom.window.document.querySelectorAll("button")].find((b) => (b.textContent ?? "").trim().startsWith("Filtrele"))!;
+  await act(async () => dugme.click());
+  const t = dom.window.document.getElementById("k")!.textContent!;
+  for (const x of ["Banka personeli", "Alıcı", "Yatırımcı ++", "Talebi olanlar", "Telefonu olmayanlar"]) assert.ok(t.includes(x), x);
+  await act(async () => kok.unmount());
+  rolleriUygula([]);
 });
 
 test("ayarlar: rol yönetimi bileşeni çizilir", () => {

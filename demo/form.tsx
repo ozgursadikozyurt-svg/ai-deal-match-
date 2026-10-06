@@ -257,8 +257,8 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
     </Bolum>
 
     <Bolum baslik="Lokasyon" acik ozet={f.lokasyonlar.length ? `${f.lokasyonlar.length} konum` : undefined}><LokasyonDuzenle lok={f.lokasyonlar} setLok={(l) => set("lokasyonlar", l)} portfoy={!talep} /></Bolum>
-
     <Bolum baslik="Teknik özellikler" ozet={doluSayisi ? `${doluSayisi} alan dolu` : "boş"}><TeknikAlanlar f={f} setO={setO} talep={talep} /></Bolum>
+
 
     {talep && <Bolum baslik="Olmazsa olmazlar" acik={!!talepDnasi({ lokasyonlar: [], ...f }).uyari} ozet={talepDnasi({ lokasyonlar: [], ...f }).uyari ? "⚠ kritik bilgi eksik" : dnaOzet || "belirtilmedi"}>
       <EksikUyarisi v={f} telefon={f.gondeTelefon} />

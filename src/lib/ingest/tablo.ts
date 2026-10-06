@@ -224,9 +224,10 @@ export function satirDonustur(s: string[], e: Eslesme, o: AktarimSecenek, satirN
   const ilanNo = v.ilanNo ?? ilanNoOku(url ?? "");
   const tarih = tarihOku(v.tarih);
   const dosyadanIlan = tip === "PORTFOY" && (o.dosyaTuru === "PORTAL" || o.dosyaTuru === "MESLEKTAS");
-  const taban = dosyadanIlan && tarih ? tarih : o.bugun;
-  const validUntil = tip === "PORTFOY" && dosyadanIlan ? new Date(taban.getTime() + o.ilanGun * 86_400_000) : undefined;
-  if (validUntil && validUntil < o.bugun) kontrol.push(`İlan ${o.ilanGun} günden eski (${v.tarih})`);
+  // v3.16 — geri sayım ilanın yayın tarihinden değil, kaydın sisteme girdiği günden başlar (o.bugun).
+  // İlanın kendi tarihi yalnızca "eski ilan" uyarısı için kullanılır.
+  const validUntil = tip === "PORTFOY" && dosyadanIlan ? new Date(o.bugun.getTime() + o.ilanGun * 86_400_000) : undefined;
+  if (validUntil && tarih && o.bugun.getTime() - tarih.getTime() > o.ilanGun * 86_400_000) kontrol.push(`İlan ${o.ilanGun} günden eski (${v.tarih}) — süre yine de bugünden başlar`);
   if (v.ilanDurumu && !/aktif|yay[ıi]nda/.test(kucuk(v.ilanDurumu))) kontrol.push(`İlan durumu: ${v.ilanDurumu}`);
   const notlar: string[] = [];
   if (ilk.deger && fiyat.deger && ilk.deger > fiyat.deger) notlar.push(`Fiyat düştü: ${ilk.deger.toLocaleString("tr-TR")} → ${fiyat.deger.toLocaleString("tr-TR")}`);

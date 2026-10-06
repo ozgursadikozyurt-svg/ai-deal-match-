@@ -30,7 +30,7 @@ import { Fotograflar } from "../demo/fotograflar";
 
 const { kayitlar, kisiler } = ornekVeriyiKur();
 const durum = { veriSurumu: "t", kayitlar, eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN }, ogrenilen: [], adaylar: [], aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], baglantilar: { google: bosBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [] } as unknown as DepoDurumu;
-const ciz = (el: React.ReactElement, d: DepoDurumu = durum) => renderToStaticMarkup(React.createElement(C.Provider, { value: { d, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, sample: null } as Ctx }, el));
+const ciz = (el: React.ReactElement, d: DepoDurumu = durum) => renderToStaticMarkup(React.createElement(C.Provider, { value: { d, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, geri: () => {}, geriVar: false, sample: null } as Ctx }, el));
 const etiketler = (m: string) => coz(konumBul(m, INDEKS)).lokasyonlar.map((l) => lokEtiket(l));
 
 test("para simgeleri: ₺, $, €, '.-TL' ve '8.5M TL' okunur (v3.9'da ₺ fiyatı kaçırıyordu)", () => {

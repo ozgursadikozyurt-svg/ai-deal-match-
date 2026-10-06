@@ -19,7 +19,7 @@ import { ORNEK_TOPLANTI_NOTU } from "../demo/ornek-dosyalar";
 
 const { kayitlar, kisiler } = ornekVeriyiKur();
 const d: DepoDurumu = { veriSurumu: "t", kayitlar: kayitlar.map((k, i) => (i === 0 ? { ...k, notlar: [{ id: "n1", tarih: "2026-09-30T10:00:00Z", tur: "GORUSME", metin: "Bütçeyi artırabilir", kisiId: k.veri.kisiler?.[0]?.kisiId ?? null }] } : k)), eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN }, ogrenilen: [], adaylar: [], aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [] };
-const ctx: Ctx = { d, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, sample: null };
+const ctx: Ctx = { d, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, geri: () => {}, geriVar: false, sample: null };
 const ciz = (el: React.ReactElement) => renderToStaticMarkup(React.createElement(C.Provider, { value: ctx }, el));
 
 test("listeler: sıralama düğmesi var", () => {

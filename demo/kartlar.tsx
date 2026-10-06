@@ -90,6 +90,8 @@ export function EslesmeKarti({ e }: { e: Eslesme }) {
         <span className="es2-n">{String(e.s.lokasyonAciklama).replace(/\s*\([+−-]?\d+\)/, "")}</span>
         {engel && <span className="es2-n kotu">Engel: {engel}</span>}
         {sorulacak.length > 0 && <span className="es2-n uyari">Sorulacak: {sorulacak.slice(0, 3).join(", ")}{sorulacak.length > 3 ? ` +${sorulacak.length - 3}` : ""}</span>}
+        {/* v3.17 — skor yalnızca birkaç alana bakılarak çıktıysa kullanıcı bilsin */}
+        {(e.s.veriEksikleri ?? []).length > 0 && <span className="es2-n uyari">Genel özellikler eksik, tamamlayın: {(e.s.veriEksikleri ?? []).slice(0, 3).join(", ")}</span>}
       </div>
     </div>
   );

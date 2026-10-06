@@ -4,10 +4,10 @@
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.15";
-export const TARIH = "5 Ekim 2026";
+export const SURUM = "3.17";
+export const TARIH = "6 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.15_5Ekim2026";
+export const DOSYA_EKI = "v3.17_6Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,56 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.17",
+    tarih: "6 Ekim 2026",
+    baslik: "Emlak jargon sözlüğü, eksik veri cezası, Google Contacts CSV içe aktarma (paketli)",
+    degisenler: [
+      "Emlak jargon sözlüğü (docs/emlak_jargon.md + src/lib/ai/jargon.ts): kurallar yapay zekâdan önce çalışır, böylece yapay zekâ çağrısı ve kota harcaması azalır.",
+      "Fiyat okuma: '17 MTL' = 17.000.000 · satılıkta '15.5 TL' = 15.500.000 · '13500 000' = 13.500.000 · kirada '25 bin' = 25.000. Telefon numaraları fiyat sanılmaz.",
+      "Kat jargonu: '8/9' (9 katlının 8'i), '12/6', '3. kat', '5 katlı', 'katta' / 'arakat' (ara kat), 'yüksek giriş' / 'zemin' (giriş katı), 'son kat', 'bodrum'. Talepte çoklu kat alanına, portföyde bulunduğu kat alanına yazılır.",
+      "Teknik jargon: SIFIR = bina yaşı 0, '15 yıllık' = 15, '0.70 emsal', krediye uygun, takaslı, iskanlı, ebeveyn banyolu, kapalı otopark, havuzlu, asansörlü, site içinde, deniz manzaralı, dubleks, tek tapu tek imza.",
+      "Alan karşılığı olmayan jargon (yabancıya satışa uygun, Eminevim, kapalı portföy, paylaşıma açık, kentsel dönüşüm, GES'e uygun, marjinal rapor, amerikan mutfak…) kaydın notuna yazılır — bilgi kaybolmaz.",
+      "Eşleştirme: eksik veri cezası. Yalnızca ilçe ve fiyata bakılarak yüksek skor çıkmaz; kartta 'Genel özellikler eksik, tamamlayın' uyarısı ve hangi alanların eksik olduğu görünür.",
+      "Google Contacts / Outlook CSV'si artık kişi listesi olarak tanınır: ad, telefon, ikinci telefon, e-posta, şirket, unvan, not ve etiketten rol ayrıştırılır (önceden yalnızca ad ve telefon alınıyordu).",
+      "Büyük kişi dosyaları 500'erli paketler halinde yazılır (7.000 kişilik dosyada sunucu zaman aşımına düşüyordu); ilerleme ekranda görünür. Eksik ya da hatalı numaralar satır numarasıyla uyarı listesinde toplanır, kişi yine de eklenir.",
+      "Aynı numaradaki kişi ikinci kez açılmaz: var olan kişinin boş alanları (e-posta, şirket, not) doldurulur, rolleri birleştirilir.",
+      "Kişiler listesinde hızlı düzenlemeye 'Açıklama / notlar' alanı eklendi.",
+    ],
+    testEt: [
+      "Yapıştır kutusuna 'Lara 8/9 katta 2+1 SIFIR bina full krediye uygun takaslı 15.5 TL' yazın: kat 8/9, bina yaşı 0, krediye uygun ve takas işaretli, fiyat 15.500.000 çıkmalı.",
+      "'Vatandaşlığa uygun kapalı portföy' içeren bir ilan yapıştırın: bu ifadeler kaydın notuna düşmeli.",
+      "Google Contacts'tan dışa aktardığınız CSV'yi Veri girişi › Dosya yükle ile açın: e-posta, şirket, not ve etiketlerin göründüğünü, büyük dosyada paket ilerlemesinin aktığını kontrol edin.",
+      "Yalnızca ilçe ve fiyatı olan bir talep–portföy çiftine bakın: eşleşme kartında 'Genel özellikler eksik, tamamlayın' uyarısı çıkmalı ve skor %90'a ulaşmamalı.",
+    ],
+  },
+  {
+    surum: "3.16",
+    tarih: "6 Ekim 2026",
+    baslik: "Her ekranda Geri, kişi rolüne göre filtre, derli toplu Kişiler filtresi, kaynak ve geri sayım düzeltmeleri",
+    degisenler: [
+      "Her ekranda '← Geri': bir önceki ekrana döner (hangi yoldan geldiyseniz oraya). Ekranlara özel geri düğmeleri kaldırıldı.",
+      "Kişiler: dağınık filtre çipleri tek bir 'Filtrele' menüsünde toplandı (Rol · Kaynak · Kayıt ve telefon); seçilenler arama satırının altında çip olarak görünür, tek tuşla temizlenir.",
+      "Kişi rolüne göre filtre artık Talepler, Portföyler ve Eşleşmeler ekranlarında da var (kayda bağlı kişinin rolü: Alıcı, Yatırımcı, Emlakçı…).",
+      "Eşleşmeler: ana ekranda Tümü / Satılık / Kiralık / Devren hızlı filtresi. 'Filtre neye uygulansın' seçimi kaldırıldı — filtre artık talep ve portföy tarafına birlikte uygulanır. Detaylı filtredeki 'Kişi' bölümü kaldırıldı (rol filtresi yeterli).",
+      "Ayarlar › Kişi rolleri kompaktlaştı: kapalı açılır bölüm, kaydırılabilir rol listesi.",
+      "Kaynak otomasyonu: WhatsApp ve benzeri kaynaklardan gelen portföylerde artık 'Kendi portföyüm' otomatik seçilmez. Emlakçı grubundan gelen kayıt 'İlan sahibi: Emlakçı' + 'Partner portföyü' olur, kişi de 'Emlakçı' rolüyle açılır; sahibinden olduğu yazılıysa dokunulmaz. 'Kendi portföyüm' yalnızca elle girişte ya da malik olduğu belliyse seçilir.",
+      "Geri sayım (TTL): içe aktarılan portföylerde süre ilanın yayın tarihinden değil, kaydın sisteme girdiği günden başlar. Eski ilan uyarısı durur.",
+      "İçe aktarma gözden geçirme: Hazır adaylar zaten üstte; yanına Satılık / Kiralık hızlı filtresi eklendi (talep/portföy ve durum filtreleriyle birlikte).",
+      "Talepler ve Portföyler ekranında 'Listeyi paylaş': seçtiğiniz (ya da tüm) kayıtlar hazır metne dönüşür, kopyalanır veya WhatsApp'a verilir. Kişi adı ve telefonu isteğe bağlı, varsayılan olarak çıkmaz.",
+      "Formda 'Teknik özellikler' bölümü Lokasyon'un hemen altına alındı. Kayıt detayında 'Portallarda ara' bölümü katlanır ve kapalı başlar.",
+      "Cloudflare: wrangler.jsonc içine keep_vars eklendi — panelden elle girilen değişkenler (DATABASE_URL, SUPABASE_*, IZINLI_EPOSTALAR, AI_API_KEY) artık her yayında silinmiyor.",
+      "Belgeler: README'ye 'Veritabanı değişiklikleri nasıl uygulanır?' bölümü eklendi (şema → migration → Supabase akışı, otomatik olan ve olmayan adımlar).",
+    ],
+    testEt: [
+      "Herhangi bir kayda girip '← Geri' deyin: geldiğiniz listeye dönmeli. Kişi → kayıt → eşleşme gibi uzun bir yolda da adım adım geri gitmeli.",
+      "Kişiler › Filtrele: rol, kaynak, kayıt ve telefon filtrelerinin tek menüde olduğunu görün; seçince üstte çip çıkmalı.",
+      "Eşleşmeler: Satılık / Kiralık düğmeleriyle süzün; Filtrele › Kişi rolü ile 'Yatırımcı' seçip sonucu görün.",
+      "WhatsApp sohbet dosyası aktarın: gelen portföyde 'İlan sahibi: Emlakçı' ve 'Partner portföyü' görünmeli, 'Kendi portföyüm' olmamalı.",
+      "Excel/CSV ile eski tarihli bir ilan aktarın: geri sayım bugünden başlamalı (ilan tarihinden değil).",
+      "Talepler › 'Listeyi paylaş': metni kopyalayın; kişi bilgisi kutusunu işaretleyince ad ve telefon eklenmeli.",
+    ],
+  },
   {
     surum: "3.15",
     tarih: "5 Ekim 2026",

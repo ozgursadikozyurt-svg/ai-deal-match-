@@ -23,7 +23,7 @@ async function ac({ oturum, hash = "" }) {
 // A) oturumsuz → giriş ekranı
 { const a = await ac({}); const ok = await bekle(() => a.metin().includes("Giriş bağlantısı gönder"));
   tamam("oturumsuz açılış: giriş ekranı", ok, ok ? "" : a.metin().slice(0, 120));
-  tamam("giriş ekranı: sürüm etiketi v3.15", a.metin().includes("v3.15"));
+  tamam("giriş ekranı: sürüm etiketi v3.17", a.metin().includes("v3.17"));
   tamam("giriş ekranı: e-posta alanı var", !!a.w.document.getElementById("gi-eposta")); a.w.close(); }
 
 // B) izinsiz e-posta → 403 mesajı
