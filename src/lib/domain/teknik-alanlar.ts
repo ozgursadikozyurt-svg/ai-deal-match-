@@ -211,6 +211,21 @@ export function odaSayisiAyristir(s?: string | null): { oda: number; salon?: num
   const n = t.match(/(\d+)\s*oda/);
   return n ? { oda: Number(n[1]) } : null;
 }
+/**
+ * v3.19 — talepte oda sayısı çoklu seçimdir ("2+1, 3+1"); veritabanında virgülle ayrılmış metin olarak saklanır
+ * (şema değişmez). Tek değerli eski kayıtlar da aynen okunur.
+ */
+export function odaListesi(s?: string | null): { etiket: string; oda: number; salon?: number }[] {
+  if (!s) return [];
+  return s.split(/[,;|]|\s+(?:veya|ya da)\s+/i).map((x) => x.trim()).filter(Boolean)
+    .map((x) => { const r = odaSayisiAyristir(x); return r ? { etiket: x.replace(/\s+/g, ""), ...r } : null; })
+    .filter((x): x is { etiket: string; oda: number; salon?: number } => !!x);
+}
+export const odaYaz = (liste: readonly string[]): string => liste.join(", ");
+/** Oda farkına göre kısmi puan: tam 1 · bir oda fazla `fazla1` · iki+ fazla `fazla2` · eksik 0 */
+export function odaFarkPuani(fark: number, fazla1: number, fazla2: number): number {
+  return fark === 0 ? 1 : fark === 1 ? fazla1 : fark >= 2 ? fazla2 : 0;
+}
 // ───────────────────────── v3.15 — çoklu kat seçimi ─────────────────────────
 /** Talepte seçilebilen katlar: "-1" bodrum, "0" giriş/zemin, "1"…"10", "ARA" (ara kat), "SON" (son kat). */
 export const KAT_SECENEKLERI: readonly (readonly [string, string])[] = [

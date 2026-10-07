@@ -4,6 +4,8 @@
  */
 import React, { createContext, useContext, useMemo, useRef, useState } from "react";
 import { eslesmeOnizle, temelUyum, type OnizlemeSonucu, type Uygunluk } from "../src/lib/eslestirme/onizleme";
+import { firsatDegerlendir, type FirsatSonuc } from "../src/lib/eslestirme/firsat";
+import { kimOf } from "../src/lib/domain/kim";
 import { etiket, tl } from "./etiketler";
 import { BAGLAM, konumOner, lokEtiket, type KonumOnerisi } from "./lokasyon";
 import { kalanGun, type DepoDurumu, type Kayit, type Veri, type OrnekHata } from "./depo";
@@ -13,7 +15,7 @@ import { kalanGun, type DepoDurumu, type Kayit, type Veri, type OrnekHata } from
 export type Ekran = (
   | { ad: "ana" } | { ad: "liste"; tip: "TALEP" | "PORTFOY"; filtre?: any } | { ad: "detay"; id: string }
   | { ad: "form"; tip: "TALEP" | "PORTFOY"; id?: string; taslak?: Partial<Veri>; adayId?: string; geri?: Ekran }
-  | { ad: "eslesmeler" } | { ad: "eslesme"; tid: string; pid: string }
+  | { ad: "eslesmeler" } | { ad: "eslesme"; tid: string; pid: string } | { ad: "izleme" }
   | { ad: "veri"; alt?: "metin" | "dosya" | "mesaj" | "wa" | "el"; metin?: string } | { ad: "konumlar" } | { ad: "kisiler" } | { ad: "kisi"; id: string } | { ad: "ayarlar" } | { ad: "baglantilar" }
 ) & { donus?: boolean };
 export interface Ctx {
@@ -100,7 +102,8 @@ export function Bolum({ baslik, ozet, acik = false, children, id }: { baslik: st
 }
 
 // ───────── Eşleşme hesabı ─────────
-export interface Eslesme { t: Kayit; p: Kayit; s: OnizlemeSonucu }
+/** f: v3.19 fırsat önceliği — kim ↔ kim (mülk sahibi/müşteri öncelikli, emlakçı↔emlakçı ikinci planda) */
+export interface Eslesme { t: Kayit; p: Kayit; s: OnizlemeSonucu; f: FirsatSonuc }
 /** v3.8: koparılan eşleşmeler (durum REDDEDILDI) varsayılan olarak hariç; Eşleşmeler ekranı ve eşleşme detayı dahil eder */
 export function useEslesmeler(koparilanDahil = false): Eslesme[] {
   const { d } = useDepo();
@@ -108,10 +111,16 @@ export function useEslesmeler(koparilanDahil = false): Eslesme[] {
     const aktif = d.kayitlar.filter((k) => k.veri.durum === "ACTIVE");
     const T = aktif.filter((k) => k.veri.tip === "TALEP"), P = aktif.filter((k) => k.veri.tip === "PORTFOY");
     const r: Eslesme[] = [];
-    for (const t of T) for (const p of P) if (temelUyum(t.veri as any, p.veri as any)) r.push({ t, p, s: eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM) });
+    const kimler = new Map<string, ReturnType<typeof kimOf>>();
+    const kim = (k: Kayit) => { let x = kimler.get(k.id); if (!x) { x = kimOf(k.veri as any, d.kisiler); kimler.set(k.id, x); } return x; };
+    for (const t of T) for (const p of P) if (temelUyum(t.veri as any, p.veri as any)) {
+      const f = firsatDegerlendir(kim(t).tur, kim(p).tur, { islemTipi: String(p.veri.islemTipi), fiyat: p.veri.fiyat ?? null, butce: t.veri.maxFiyat ?? null });
+      r.push({ t, p, s: eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM), f });
+    }
     const sira: Record<Uygunluk, number> = { SUNULABILIR: 0, KOSULLU: 1, UYGUN_DEGIL: 2 };
-    return r.sort((a, b) => sira[a.s.uygunluk] - sira[b.s.uygunluk] || b.s.skor - a.s.skor);
-  }, [d.kayitlar, d.ogrenilen]);
+    // v3.19 — önce uygunluk, sonra fırsat kademesi (sahibinden ↔ müşteri önde), sonra skor
+    return r.sort((a, b) => sira[a.s.uygunluk] - sira[b.s.uygunluk] || b.f.sira - a.f.sira || b.s.skor - a.s.skor);
+  }, [d.kayitlar, d.kisiler, d.ogrenilen]);
   return useMemo(() => (koparilanDahil ? tum : tum.filter((e) => d.eslesmeNotlari[`${e.t.id}~${e.p.id}`]?.durum !== "REDDEDILDI")), [tum, d.eslesmeNotlari, koparilanDahil]);
 }
 export const eKey = (tid: string, pid: string) => `${tid}~${pid}`;

@@ -7,7 +7,8 @@ import { talepDnasi } from "../src/lib/eslestirme/talep-dna";
 import { kopmaEtiket } from "../src/lib/eslestirme/kopar";
 import { etiket } from "./etiketler";
 import { useDepo, Pill, IslemPill, UYGUNLUK, baslikOf, fiyatOf, m2Of, lokEtiket, eKey, type Eslesme } from "./ortak";
-import { EksikUyarisi, HavuzRozeti } from "./motor-ui";
+import { EksikUyarisi } from "./motor-ui";
+import { AnahtarDugmesi, favEslesme } from "./favori";
 import { KimPill, KoparDugmesi } from "./kopar";
 import type { Kayit, PipelineDurum } from "./depo";
 
@@ -40,8 +41,19 @@ export function Kapanir({ id, children }: { id: string; children: any }) {
   );
 }
 
-/** Eşleşme kartı: üstte skor + durum, ortada talep ↔ portföy iki satır, altta "neden" şeridi. */
-export function EslesmeKarti({ e }: { e: Eslesme }) {
+/** v3.19 — fırsat rozeti: mülk sahibi ↔ müşteri "Öncelikli", emlakçı ↔ emlakçı "Düşük" */
+export function FirsatRozeti({ f, komisyon = false }: { f: Eslesme["f"]; komisyon?: boolean }) {
+  return <span className={"pill firsat firsat-" + f.kademe.toLowerCase()} title={f.aciklama + (f.tahminiKomisyon != null ? ` · tahmini komisyon ≈ ${f.tahminiKomisyon.toLocaleString("tr-TR")} TL` : "")}>
+    <i aria-hidden="true" />{f.etiket} fırsat{komisyon && f.tahminiKomisyon != null ? <small> · ≈ {kisaTl(f.tahminiKomisyon)}</small> : null}
+  </span>;
+}
+const kisaTl = (n: number) => (n >= 1_000_000 ? (n / 1_000_000).toLocaleString("tr-TR", { maximumFractionDigits: 1 }) + " mn" : n >= 1000 ? Math.round(n / 1000).toLocaleString("tr-TR") + " bin" : String(n)) + " ₺";
+
+/**
+ * Eşleşme kartı (v3.19 sadeleştirildi): üstte skor + uygunluk + fırsat; işlem (Satılık/Kiralık) ve mülk tipi bir kez yazılır.
+ * Taraflarda yalnızca kim olduğu (rol), başlık, konum ve fiyat görünür. "Web ilanı" gibi katman etiketleri kim etiketinde zaten var.
+ */
+export function EslesmeKarti({ e, sec }: { e: Eslesme; sec?: { acik: boolean; degis: () => void } }) {
   const { git, d } = useDepo();
   const not = d.eslesmeNotlari[eKey(e.t.id, e.p.id)];
   const u = UYGUNLUK[e.s.uygunluk as keyof typeof UYGUNLUK];
@@ -50,18 +62,12 @@ export function EslesmeKarti({ e }: { e: Eslesme }) {
   const konum = (v: any) => (v.lokasyonlar ?? []).slice(0, 2).map(lokEtiket).map((s: string) => s.split(" / ").pop()).join(", ") + ((v.lokasyonlar ?? []).length > 2 ? ` +${v.lokasyonlar.length - 2}` : "");
   const Taraf = ({ k, ad }: { k: any; ad: "Talep" | "Portföy" }) => (
     <div className={"es2-taraf " + (ad === "Talep" ? "t" : "p")}>
-      <div className="es2-et">
-        <span>{ad}</span>
-        <Pill>{etiket(k.veri.mulkTipi)}</Pill><IslemPill islem={k.veri.islemTipi} />
-        {ad === "Portföy" && <HavuzRozeti v={k.veri} />}
-        {ad === "Portföy" && e.s.tipUyumu.oran < 0.9 && <span className="benzer-rozet">benzer tip</span>}
-      </div>
+      <div className="es2-et"><span>{ad}</span><KimPill v={k.veri} />{ad === "Portföy" && e.s.tipUyumu.oran < 0.9 && <span className="benzer-rozet">benzer tip</span>}</div>
       <div className="es2-bas">
         <b>{baslikOf(k.veri)}</b>
         <span className="es2-rakam">{fiyatOf(k.veri)}</span>
       </div>
       <div className="es2-alt">
-        <KimPill v={k.veri} />
         {konum(k.veri) && <span>{konum(k.veri)}</span>}
         {m2Of(k.veri) && <span>{m2Of(k.veri)}</span>}
       </div>
@@ -69,19 +75,25 @@ export function EslesmeKarti({ e }: { e: Eslesme }) {
   );
   const engel = e.s.kritikEngeller.length ? e.s.kritikEngeller.join(", ") : null;
   const sorulacak = !engel ? [...e.s.bilinmeyenKritikler, ...e.s.talepEksikleri.map((x: string) => x + " (müşteriye)")] : [];
+  const eksik = (e.s.veriEksikleri ?? []) as string[];
   return (
-    <div className={"es2 s-" + u.ton + (kopuk ? " soluk" : "")} role="button" tabIndex={0} onClick={ac} onKeyDown={(ev: any) => { if (ev.key === "Enter") ac(); }}>
+    <div className={"es2 s-" + u.ton + (kopuk ? " soluk" : "") + (sec?.acik ? " secili" : "")} role="button" tabIndex={0} onClick={sec ? sec.degis : ac} onKeyDown={(ev: any) => { if (ev.key === "Enter") (sec ? sec.degis : ac)(); }}>
       <div className="es2-ust">
+        {sec && <input type="checkbox" className="es2-sec" checked={sec.acik} aria-label="Eşleşmeyi seç" onClick={(ev) => ev.stopPropagation()} onChange={sec.degis} />}
         <div className={"es2-skor s-" + u.ton}><b>{e.s.skor}</b><small>puan</small></div>
         <div className="es2-durum">
-          <span className={"es2-uygun s-" + u.ton}>{u.e}</span>
+          <div className="es2-satir1">
+            <span className={"es2-uygun s-" + u.ton}>{u.e}</span>
+            <FirsatRozeti f={e.f} komisyon />
+          </div>
           <div className="pill-satir">
+            <IslemPill islem={e.p.veri.islemTipi} /><Pill>{etiket(e.p.veri.mulkTipi)}</Pill>
             {not && not.durum !== "YENI" && !kopuk && <Pill ton="mavi">{PIPELINE.find((x: any) => x[0] === not.durum)?.[1]}</Pill>}
             {not?.not && <Pill>Not var</Pill>}
             {kopuk && <Pill ton="kotu">{kopmaEtiket(not?.neden)}</Pill>}
           </div>
         </div>
-        <div className="es-aksiyon"><KoparDugmesi tid={e.t.id} pid={e.p.id} kucuk /></div>
+        <div className="es-aksiyon"><AnahtarDugmesi anahtar={favEslesme(e.t.id, e.p.id)} />{!sec && <KoparDugmesi tid={e.t.id} pid={e.p.id} kucuk />}</div>
       </div>
       <Taraf k={e.t} ad="Talep" />
       <div className="es2-bag" aria-hidden="true"><span /></div>
@@ -90,8 +102,8 @@ export function EslesmeKarti({ e }: { e: Eslesme }) {
         <span className="es2-n">{String(e.s.lokasyonAciklama).replace(/\s*\([+−-]?\d+\)/, "")}</span>
         {engel && <span className="es2-n kotu">Engel: {engel}</span>}
         {sorulacak.length > 0 && <span className="es2-n uyari">Sorulacak: {sorulacak.slice(0, 3).join(", ")}{sorulacak.length > 3 ? ` +${sorulacak.length - 3}` : ""}</span>}
-        {/* v3.17 — skor yalnızca birkaç alana bakılarak çıktıysa kullanıcı bilsin */}
-        {(e.s.veriEksikleri ?? []).length > 0 && <span className="es2-n uyari">Genel özellikler eksik, tamamlayın: {(e.s.veriEksikleri ?? []).slice(0, 3).join(", ")}</span>}
+        {/* v3.19 — eksik bilgi puanı düşürür; hangi bilgi eksik, kısaca */}
+        {eksik.length > 0 && <span className="es2-n uyari" title="Bu bilgiler tamamlanınca puan netleşir">Eksik: {eksik.slice(0, 3).join(", ")}{eksik.length > 3 ? ` +${eksik.length - 3}` : ""}</span>}
       </div>
     </div>
   );

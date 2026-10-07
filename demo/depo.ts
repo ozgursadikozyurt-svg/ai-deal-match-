@@ -87,6 +87,8 @@ export interface DepoDurumu {
   googleBekleyen?: import("../src/lib/google/kisiler").GooglePerson[];
   /** v3.15 — Ayarlar › Kişi rolleri: özel roller + sistem rollerinin yeniden adlandırılmış etiketleri (canlıda Ayar tablosu, demoda tarayıcı) */
   roller?: import("../src/lib/domain/roller").RolTanim[];
+  /** v3.19 — anahtar (favori) işaretleri: "t:<talepId>", "p:<portföyId>", "e:<talepId>~<portföyId>" */
+  favoriler?: string[];
 }
 export interface DemoBaglanti { durum: "BAGLI_DEGIL" | "BAGLI"; hesap: string | null; tur: number; sonSenkron: string | null; ayar: { otomatik: boolean; aralikDk: number; geriYaz: boolean; googleYaz: boolean; sadeceEtiketler: string[] } }
 export interface DemoCalisma { id: string; saglayici: "GOOGLE_KISILER" | "NOTION"; tarih: string; tetik: string; ozet: Record<string, number>; kontrol: { id: string | null; baslik: string; nedenler: string[] }[]; yeniEslesme: number; geriYazim: { id: string; baslik: string; deger: Record<string, unknown> }[]; atlanan: { ad: string; neden: string }[] }

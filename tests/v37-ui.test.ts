@@ -24,7 +24,7 @@ const ciz = (el: React.ReactElement) => renderToStaticMarkup(React.createElement
 
 test("listeler: sıralama düğmesi var", () => {
   for (const tip of ["TALEP", "PORTFOY"] as const) assert.match(ciz(React.createElement(Liste, { tip })), /sirala-btn/);
-  assert.match(ciz(React.createElement(Eslesmeler)), /Skor/);
+  assert.match(ciz(React.createElement(Eslesmeler)), /Fırsat önceliği/); // v3.19: varsayılan sıralama
 });
 test("detay: görüşme notları ve not akışı", () => {
   const h = ciz(React.createElement(Detay, { id: kayitlar[0].id }));

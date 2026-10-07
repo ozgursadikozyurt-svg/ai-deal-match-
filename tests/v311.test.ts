@@ -13,6 +13,9 @@ import { SURUM, SURUM_GECMISI } from "../src/lib/surum";
 const lok = (ham: string, portfoy: boolean) => coz(ham).lokasyonlar.map((l, i) => ({ ilId: l.ilId, ilceId: l.ilceId, mahalleId: l.mahalleId, altBolgeId: l.altBolgeId, birincil: portfoy && i === 0 }));
 const T = (ham: string, v: Partial<OnizlemeKayit> = {}): OnizlemeKayit => ({ tip: "TALEP", mulkTipi: "DAIRE", islemTipi: "SATILIK", lokasyonlar: lok(ham, false), ...v });
 const P = (ham: string, v: Partial<OnizlemeKayit> = {}): OnizlemeKayit => ({ tip: "PORTFOY", mulkTipi: "DAIRE", islemTipi: "SATILIK", lokasyonlar: lok(ham, true), ...v });
+/** v3.19 — alan ve oda bilgisi tam kayıtlar: konum/fiyat davranışı eksik veri cezasından bağımsız sınanır */
+const TAM_T: Partial<OnizlemeKayit> = { odaSayisi: "2+1", minM2: 80, maxM2: 120, maxFiyat: 6_000_000 };
+const TAM_P: Partial<OnizlemeKayit> = { odaSayisi: "2+1", m2: 100, fiyat: 5_000_000 };
 const mah = (ham: string) => coz(ham).lokasyonlar[0].mahalleId!;
 const es = (t: OnizlemeKayit, p: OnizlemeKayit) => eslesmeOnizle(t, p, BAGLAM);
 
@@ -38,7 +41,7 @@ test("komşuluk: Fener ↔ Çağlayan sınır komşusu, Fener ↔ Doğuyaka ~3,9
 test("komşuluk ilçe sınırını aşar: Meltem (Muratpaşa) ↔ Arapsuyu (Konyaaltı)", () => {
   const y = KOMSULUK.mahalle(mah("Muratpaşa / Meltem"), mah("Konyaaltı / Arapsuyu"));
   assert.equal(y?.komsu, true);
-  const s = es(T("Muratpaşa / Meltem"), P("Konyaaltı / Arapsuyu"));
+  const s = es(T("Muratpaşa / Meltem", TAM_T), P("Konyaaltı / Arapsuyu", TAM_P));
   assert.equal(s.lokasyonKademe, "KOMSU_MAHALLE");
   assert.equal(s.lokasyonOrani, MODEL.lok.komsu);
   assert.equal(s.uygunluk, "SUNULABILIR");
@@ -95,7 +98,7 @@ test("portföyün mahallesi girilmemişse (yalnızca ilçe) mahalle isteyen tale
 });
 
 test("sınır verisi olmayan il (İzmir): eski ilçe kuralı — aynı ilçe farklı mahalle 0,75, sunulabilir", () => {
-  const s = es(T("İzmir Bornova Kazımdirik", { maxFiyat: 6_000_000 }), P("İzmir Bornova Erzene", { fiyat: 5_500_000 }));
+  const s = es(T("İzmir Bornova Kazımdirik", { ...TAM_T, maxFiyat: 6_000_000 }), P("İzmir Bornova Erzene", { ...TAM_P, fiyat: 5_500_000 }));
   assert.equal(s.lokasyonOrani, MODEL.lok.ilceVerisiz);
   assert.equal(s.uygunluk, "SUNULABILIR");
 });
@@ -112,8 +115,8 @@ test("oda: istenen oda tam puan, bir oda fazla kısmi (sunulabilir), iki oda faz
 });
 
 test("bütçe altı: fiyat bütçenin çok altındaysa puan düşer ama elenmez; alt sınır verilmişse o kullanılır", () => {
-  const t = T("Muratpaşa / Fener", { maxFiyat: 10_000_000 });
-  const f = (fiyat: number, tt = t) => { const s = es(tt, P("Muratpaşa / Fener", { fiyat })); return { u: s.uygunluk, puan: s.kriterler.find((k) => k.anahtar === "fiyat")!.puan }; };
+  const t = T("Muratpaşa / Fener", { ...TAM_T, maxFiyat: 10_000_000 });
+  const f = (fiyat: number, tt = t) => { const s = es(tt, P("Muratpaşa / Fener", { ...TAM_P, fiyat })); return { u: s.uygunluk, puan: s.kriterler.find((k) => k.anahtar === "fiyat")!.puan }; };
   assert.deepEqual([f(8_000_000).puan, f(5_500_000).puan, f(3_500_000).puan], [1, 0.8, 0.6]);
   assert.equal(f(3_500_000).u, "SUNULABILIR");
   const aralik = { ...t, minFiyat: 7_000_000 };

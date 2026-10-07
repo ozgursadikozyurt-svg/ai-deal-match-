@@ -42,3 +42,38 @@ export function KoparDugmesi({ tid, pid, kucuk = false }: { tid: string; pid: st
     </div>}
   </>;
 }
+/**
+ * v3.19 — Toplu işlem: seçilen (ya da listedeki tüm) eşleşmeleri tek seferde kopar ya da geri al.
+ * Tek bir `guncelle` ile yazılır; her eşleşmeye aynı neden ve tarih işlenir.
+ */
+export function TopluKoparPenceresi({ ciftler, geriAl = false, onKapat, onBitti }: { ciftler: { tid: string; pid: string }[]; geriAl?: boolean; onKapat: () => void; onBitti: () => void }) {
+  const { guncelle, bildir } = useDepo();
+  const [neden, setNeden] = useState<KopmaNedeni>("YANLIS");
+  const [not, setNot] = useState("");
+  const uygula = () => {
+    const simdi = new Date().toISOString();
+    guncelle((dd) => {
+      const notlar = { ...dd.eslesmeNotlari };
+      for (const { tid, pid } of ciftler) {
+        const a = eKey(tid, pid), onceki = notlar[a];
+        notlar[a] = geriAl
+          ? { ...({ durum: "YENI", not: "" } as const), ...(onceki ?? {}), durum: "YENI", neden: undefined, tarih: undefined }
+          : { ...({ durum: "YENI", not: "" } as const), ...(onceki ?? {}), durum: "REDDEDILDI", neden, tarih: simdi, ...(not.trim() ? { not: [onceki?.not, not.trim()].filter(Boolean).join("\n") } : {}) };
+      }
+      return { ...dd, eslesmeNotlari: notlar };
+    });
+    bildir(geriAl ? `${ciftler.length} eşleşme geri alındı` : `${ciftler.length} eşleşme koparıldı`);
+    onBitti();
+  };
+  return <div className="perde" onClick={onKapat}>
+    <div className="panel kopar-panel" role="dialog" aria-label={geriAl ? "Eşleşmeleri geri al" : "Eşleşmeleri kopar"} onClick={(e) => e.stopPropagation()}>
+      <h3>{geriAl ? `${ciftler.length} eşleşmeyi geri al` : `${ciftler.length} eşleşmeyi kopar`}</h3>
+      <p className="ipucu">{geriAl ? "Seçilen eşleşmeler yeniden listelere döner." : "Bu çiftler bir daha ana ekranda, eşleşme listesinde ve çekmecede çıkmaz. Eşleşmeler → Koparılan'dan geri alabilirsiniz."}</p>
+      {!geriAl && <>
+        <div className="yigin kucuk-bosluk" role="radiogroup">{KOPMA_NEDENLERI.map(([k, l]) => <label key={k} className="onay-satir"><input type="radio" name="toplu-neden" checked={neden === k} onChange={() => setNeden(k)} /> {l}</label>)}</div>
+        <textarea rows={2} placeholder="Not (isteğe bağlı) — her eşleşmenin notuna eklenir" value={not} onChange={(e) => setNot(e.target.value)} />
+      </>}
+      <div className="satir"><button type="button" className={cx("btn", geriAl ? "birincil" : "tehlike")} onClick={uygula} disabled={!ciftler.length}>{geriAl ? "Geri al" : "Koparmayı onayla"}</button><button type="button" className="btn" onClick={onKapat}>Vazgeç</button></div>
+    </div>
+  </div>;
+}
