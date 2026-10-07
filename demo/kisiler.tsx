@@ -106,6 +106,7 @@ export function Kisiler() {
   const [yeni, setYeni] = useState({ adSoyad: "", telefon: "", rol: "" });
   const [secili, setSecili] = useState<Set<string>>(new Set());            // v3.15: toplu işlem seçimi
   const [silOnay, setSilOnay] = useState(false);
+  const [secimModu, setSecimModu] = useState(false);                         // v3.19: onay kutuları yalnızca "Seç" modunda görünür (kartlarda yer açar)
   const [duzenId, setDuzenId] = useState<string | null>(null);
   const [filtreAcik, setFiltreAcik] = useState(false);              // v3.15: listede hızlı düzenleme
   const ql = q.toLocaleLowerCase("tr");
@@ -142,6 +143,7 @@ export function Kisiler() {
   };
   const toplamBag = gorunenSecili.reduce((a, k) => a + kayitSay(k.id), 0);
   const harici = gorunenSecili.filter((k) => k.googleResourceName || k.notionId).length;
+  const degisSec = (id: string) => setSecili((x) => { const y = new Set(x); if (y.has(id)) y.delete(id); else y.add(id); return y; });
   const hepsiSecili = sirali.length > 0 && sirali.every((k) => secili.has(k.id));
   return <div className="yigin">
     <div className="satir-ara"><h2>Kişiler</h2><div className="satir"><button className="btn" onClick={() => { if (d.baglantilar?.google.durum !== "BAGLI") return git({ ad: "baglantilar" }); let o: any; guncelle((x) => { const r = demoGoogleSenkron(x, "kullanici"); o = r.calisma.ozet; return r.d; }); bildir(o ? `Google: ${o.yeni} yeni, ${o.guncellenen + o.baglanan} güncellenen` : "Google eşitlendi"); }}>{d.baglantilar?.google.durum === "BAGLI" ? `Google'dan çek${(d.googleBekleyen ?? []).length ? ` (${d.googleBekleyen!.length} yeni)` : ""}` : "Google Kişiler'i bağla"}</button><button className="btn birincil" onClick={() => setYeniAcik(!yeniAcik)}>+ Yeni kişi</button></div></div>
@@ -175,20 +177,24 @@ export function Kisiler() {
         </div>
       </details>
     </div>}
-    <div className="satir sar secim-bar">
-      <label className="cip secilir"><input type="checkbox" aria-label="Listedeki tüm kişileri seç" checked={hepsiSecili} onChange={(e) => setSecili(e.target.checked ? new Set([...secili, ...sirali.map((k) => k.id)]) : new Set([...secili].filter((id) => !sirali.some((k) => k.id === id))))} /> {filtreVar ? "Süzülenlerin" : "Tümünün"} seçimi ({sirali.length})</label>
+    {/* v3.19 — tek ince satır: sayı + "Seç". Onay kutuları ve toplu işlem düğmeleri yalnızca seçim modunda çıkar. */}
+    <div className="kisi-arac">
       <span className="ipucu">{liste.length} kişi{gorunenSecili.length > 0 && ` · ${gorunenSecili.length} seçili`}</span>
-      {gorunenSecili.length > 0 && !silOnay && <><button className="btn kucuk" onClick={() => setSecili(new Set())}>Seçimi kaldır</button><button className="btn kucuk tehlike" onClick={() => setSilOnay(true)}>Toplu sil ({gorunenSecili.length})</button></>}
+      {!secimModu ? <button className="btn kucuk" onClick={() => setSecimModu(true)} disabled={!sirali.length}>Seç</button> : <div className="kisi-arac-sec">
+        <label className="kisi-hepsi"><input type="checkbox" aria-label="Listedeki tüm kişileri seç" checked={hepsiSecili} onChange={(e) => setSecili(e.target.checked ? new Set([...secili, ...sirali.map((k) => k.id)]) : new Set([...secili].filter((id) => !sirali.some((k) => k.id === id))))} /> {filtreVar ? "Süzülenlerin" : "Tümünün"} seçimi ({sirali.length})</label>
+        {gorunenSecili.length > 0 && !silOnay && <><button className="btn kucuk" onClick={() => setSecili(new Set())}>Seçimi kaldır</button><button className="btn kucuk tehlike" onClick={() => setSilOnay(true)}>Toplu sil ({gorunenSecili.length})</button></>}
+        <button className="btn kucuk" onClick={() => { setSecimModu(false); setSecili(new Set()); setSilOnay(false); }}>Bitti</button>
+      </div>}
     </div>
     {silOnay && <div className="hata-kutu" role="alert"><b>{gorunenSecili.length} kişi silinecek.</b> Bağlı oldukları {toplamBag} kayıttan kişi bağı kalkar (kayıtların kendisi silinmez).{harici > 0 ? ` ${harici} kişi Google/Notion'dan geldi; bağlantı açıksa bir sonraki eşitlemede geri gelebilir.` : ""}
       <div className="satir"><button className="btn tehlike" onClick={topluSil}>Evet, sil</button><button className="btn" onClick={() => setSilOnay(false)}>Vazgeç</button></div></div>}
     {sirali.map((k) => { const ky = kisininKayitlari(d.kayitlar, k.id); return <React.Fragment key={k.id}>
-      <div className={cx("kart kisi-kart", secili.has(k.id) && "secili")} role="button" tabIndex={0} onClick={() => git({ ad: "kisi", id: k.id })} onKeyDown={(e) => { if (e.key === "Enter") git({ ad: "kisi", id: k.id }); }}>
-        <input type="checkbox" aria-label={`${k.adSoyad} seç`} checked={secili.has(k.id)} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} onChange={(e) => { const y = new Set(secili); if (e.target.checked) y.add(k.id); else y.delete(k.id); setSecili(y); }} />
+      <div className={cx("kart kisi-kart", secili.has(k.id) && "secili")} role="button" tabIndex={0} onClick={() => (secimModu ? degisSec(k.id) : git({ ad: "kisi", id: k.id }))} onKeyDown={(e) => { if (e.key === "Enter") (secimModu ? degisSec(k.id) : git({ ad: "kisi", id: k.id })); }}>
+        {secimModu && <input type="checkbox" aria-label={`${k.adSoyad} seç`} checked={secili.has(k.id)} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} onChange={() => degisSec(k.id)} />}
         <div className="avatar">{k.adSoyad[0]?.toLocaleUpperCase("tr")}</div>
-        <div><b>{k.adSoyad}</b>{k.sirket && <div className="kk-alt">{k.sirket}</div>}<div className="kk-alt">{telYaz(k.telefon)}</div>
+        <div className="kisi-bilgi"><b>{k.adSoyad}</b>{k.sirket && <div className="kk-alt">{k.sirket}</div>}<div className="kk-alt">{telYaz(k.telefon)}</div>
           <div className="pill-satir"><KaynakRozeti k={k} />{k.roller.map((r) => <Pill key={r}>{rolAd(r)}</Pill>)}{ky.filter((x) => x.veri.tip === "TALEP").length > 0 && <Pill ton="mavi">{ky.filter((x) => x.veri.tip === "TALEP").length} talep</Pill>}{ky.filter((x) => x.veri.tip === "PORTFOY").length > 0 && <Pill ton="yesil">{ky.filter((x) => x.veri.tip === "PORTFOY").length} portföy</Pill>}</div></div>
-        <button className="btn kucuk" aria-label={`${k.adSoyad} hızlı düzenle`} onKeyDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setDuzenId(duzenId === k.id ? null : k.id); }}>✎ Düzenle</button>
+        <button className="btn kucuk" aria-label={`${k.adSoyad} hızlı düzenle`} onKeyDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setDuzenId(duzenId === k.id ? null : k.id); }}><span aria-hidden="true">✎</span><span className="kisi-duzen-yazi"> Düzenle</span></button>
         <IletisimDugmeleri tel={k.telefon} ad={k.adSoyad} kucuk />
       </div>
       {duzenId === k.id && <HizliDuzen k={k} kapat={() => setDuzenId(null)} />}

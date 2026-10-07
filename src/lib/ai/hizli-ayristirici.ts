@@ -183,6 +183,9 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   let mulkTipi = TIP_SOZLUK.find(([re]) => re.test(m))?.[1] ?? null;
   const oda = m.match(/\b(\d{1,2})\s*\+\s*(\d)\b/);
   let odaSayisi = oda ? `${oda[1]}+${oda[2]}` : /st[üu]dyo|1\s*\+\s*0/.test(m) ? "1+0" : null;
+  // v3.19 — "2+1 veya 3+1", "2+1 / 3+1", "2+1, 3+1" → çoklu oda seçimi (virgülle ayrılmış)
+  const odaZinciri = m.match(/\b\d{1,2}\s*\+\s*\d(?:\s*(?:veya|ya da|\/|,|-)\s*\d{1,2}\s*\+\s*\d)+\b/);
+  if (odaZinciri) { const l = [...new Set([...odaZinciri[0].matchAll(/(\d{1,2})\s*\+\s*(\d)/g)].map((x) => `${x[1]}+${x[2]}`))]; if (l.length > 1) odaSayisi = l.slice(0, 4).join(", "); }
   if (!mulkTipi && odaSayisi) mulkTipi = "DAIRE";
   let aileKodu = AILE_SOZLUK.find(([re]) => re.test(m))?.[1] ?? null;
   if (mulkTipi) bul("mülk tipi");

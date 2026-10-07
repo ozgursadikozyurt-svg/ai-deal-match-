@@ -151,7 +151,7 @@ export const KayitTemel = z.object({
 
   m2, netM2: m2, minM2: m2, maxM2: m2,
   m2ToleransYuzde: pozitif(100).nullish(),
-  odaSayisi: kisaMetin(20),
+  odaSayisi: kisaMetin(60), // v3.19: talepte çoklu seçim → "2+1, 3+1"
 
   lokasyonlar: z.array(KayitLokasyonSchema).max(15).default([]),
   lokasyonHam: kisaMetin(200),

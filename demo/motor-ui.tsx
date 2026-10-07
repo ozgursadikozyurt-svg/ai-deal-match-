@@ -40,7 +40,7 @@ export function MatrisDokumu({ s }: { s: OnizlemeSonucu }) {
 
 export function HavuzRozeti({ v }: { v: Partial<Veri> }) {
   const k = havuzKatmani(v as any), m = katmanOf(k);
-  return <span className={"pill havuz-" + k.toLowerCase()} title={m.aciklama}>{m.sira}· {m.etiket}</span>;
+  return <span className={"pill havuz-" + k.toLowerCase()} title={m.aciklama}>{m.etiket}</span>;
 }
 export const katmanSirasi = (v: Partial<Veri>) => katmanOf(havuzKatmani(v as any)).sira;
 export type { HavuzKatmani };

@@ -4,10 +4,10 @@
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.18";
-export const TARIH = "6 Ekim 2026";
+export const SURUM = "3.19";
+export const TARIH = "7 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.18_6Ekim2026";
+export const DOSYA_EKI = "v3.19_7Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,29 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.19",
+    tarih: "7 Ekim 2026",
+    baslik: "Eşleşme puanı eksik veriyi cezalandırıyor, fırsat önceliği (sahibinden ↔ müşteri), anahtar / İzleme, toplu kopar, çoklu oda, Veri Girişi'nde yapay zekâ",
+    degisenler: [
+      "Puanlama düzeltildi: m², oda sayısı ya da fiyat/bütçe karşılaştırılamıyorsa o bileşen artık \"yok sayılıp\" ağırlığı diğerlerine dağıtılmıyor; kararsız (0,4) puan alıyor. Eskiden yalnızca konum + tip eşleşince 86–91 puan \"Sunulabilir\" çıkıyordu. Fiyat karşılaştırılamıyorsa ya da iki çekirdek bilgi eksikse en fazla \"Koşullu\". Kartta \"Eksik: …\" olarak görünür; oda uyarısı yalnızca konutta çıkar.",
+      "Fırsat önceliği: mülk sahibi / sahibinden portföy ↔ doğrudan müşteri talebi \"Öncelikli\"; bir taraf emlakçı \"Normal\"; emlakçı ↔ emlakçı \"Düşük\" (ikinci plan). Her kartta rozet + tahmini komisyon, Eşleşmeler ekranında fırsat kartı, kademe filtresi ve varsayılan sıralama (uygunluk → fırsat → skor). Komisyon varsayımı: satılıkta her taraftan %2, kiralıkta 1 aylık kira; emlakçı payı yarıya sayılır.",
+      "Eşleşme kartı sadeleşti: Satılık/Kiralık ve mülk tipi bir kez, \"4· Web ilanı\" gibi numaralı katman etiketi kaldırıldı (kimin ilanı olduğu zaten rolde yazıyor).",
+      "Anahtar (favori) ve İzleme ekranı: talep, portföy ve eşleşme kartlarında anahtar simgesi; işaretlenenler yeni İzleme ekranında toplanır. Veritabanı değişikliği gerekmez (arayüz ayarında saklanır).",
+      "Toplu kopar: Eşleşmeler ekranında \"Listedekilerin tümünü kopar\", \"Seç\" modu ile seçilenleri kopar, Koparılan görünümünde \"Tümünü geri al\". Tek nedenle, tek kayıtta yazılır.",
+      "Ara kat: portföy \"ara kat\" yazmasa da bulunduğu kat ve bina kat sayısından hesaplanır (1 ≤ kat < kat sayısı); karşılıyorsa kartta \"4/9 · ara kat\" görünür, karşılamıyorsa puan düşer.",
+      "Taleplerde oda sayısı çoklu seçim (\"2+1, 3+1\"): form, filtre, puanlama (en iyi seçenek) ve metinden okuma (\"2+1 veya 3+1\"). Şema değişmedi.",
+      "Mükerrer kontrolü sağlamlaştı: fiyat ±%3, m² ±%5 bandında aynı sayılır (eskiden bin TL yuvarlaması), aynı telefon farklı yazılmış adla da yakalanır, \"Zaten var\" nedeni okunur (tekrarNedeni).",
+      "Veri Girişi: dosya yüklenince en üstte tek \"✦ Yapay zekâ ile yorumla\" düğmesi. Tablolarda eksik satırları hücrelerinden tamamlayıp listeyi günceller, kişi listesi / vCard'da rol önerir. Satır düğmesindeki \"yorumlanacak metin yok\" hatası giderildi (satırın hücreleri başlıklarıyla okunuyor). Yapay zekâ kapalıysa bedava kurallar çalışır.",
+      "Kişiler: onay kutuları yalnızca \"Seç\" modunda; üstte tek ince araç satırı; ad ve telefona tam genişlik.",
+    ],
+    testEt: [
+      "Eşleşmeler → Fırsat önceliği kartından \"Öncelikli\"yi seçin; sahibinden portföy + müşteri talebi eşleşmeleri öne gelir.",
+      "Bir kartta anahtar simgesine basın → İzleme ekranında görünür.",
+      "Eşleşmeler → Seç → birkaç kart → Seçilenleri kopar; Koparılan görünümünden geri alın.",
+      "Veri Girişi → Dosya yükle → örnek dosya → en üstteki \"Yapay zekâ ile yorumla\".",
+    ],
+  },
   {
     surum: "3.18",
     tarih: "6 Ekim 2026",

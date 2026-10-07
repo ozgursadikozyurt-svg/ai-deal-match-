@@ -29,6 +29,7 @@ export function Logo({ alt = true }: { alt?: boolean }) {
 }
 
 const YOL: Record<string, string> = {
+  anahtar: "M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3M7.5 10a5.5 5.5 0 1 0 0 11a5.5 5.5 0 0 0 0-11z",
   ana: "M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z",
   talep: "M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13zm4.8 11.3L20 20",
   portfoy: "M4 20V8l6-3v15M10 20V5l10 4v11M4 20h16M13 12h4M13 15.5h4",

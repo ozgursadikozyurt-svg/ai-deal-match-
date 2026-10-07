@@ -9,7 +9,7 @@ import { talepDnasi } from "../src/lib/eslestirme/talep-dna";
 import { EksikUyarisi } from "./motor-ui";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { KayitCreateSchema, MulkOzellikSchema } from "../src/lib/validation/kayit";
-import { MULK_OZELLIK_META, alanGruptaMi, KAT_SECENEKLERI, type MulkOzellikAlani } from "../src/lib/domain/teknik-alanlar";
+import { MULK_OZELLIK_META, alanGruptaMi, KAT_SECENEKLERI, odaListesi, odaYaz, type MulkOzellikAlani } from "../src/lib/domain/teknik-alanlar";
 import { anaKategoriOf, islemKategoriUyumlu, MULK_AILELERI, aileOf, benzerAileler } from "../src/lib/domain/kategori";
 import { ONEMLI_ALANLAR, TEMEL_EKSTRA } from "../src/lib/domain/form-alanlari";
 import { adaylariGuncelle } from "../src/lib/lokasyon/ogrenme";
@@ -235,7 +235,14 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
       <div className="alanlar">
         <div className="alan"><label htmlFor="f-islem">İşlem</label><select id="f-islem" value={f.islemTipi} onChange={(e) => set("islemTipi", e.target.value)}>{islemler.map((i) => <option key={i} value={i}>{(ISLEM_TIPI_ETIKET as any)[i]}</option>)}</select></div>
         {talep && <div className="alan"><label htmlFor="f-acil">Aciliyet</label><select id="f-acil" value={f.aciliyet} onChange={(e) => set("aciliyet", e.target.value)}>{["DUSUK", "NORMAL", "YUKSEK", "ACIL"].map((x) => <option key={x} value={x}>{etiket(x)}</option>)}</select></div>}
-        {ekstra.includes("odaSayisi") && <div className="alan genis"><label>Oda sayısı{talep ? " · en az" : ""}</label><div className="cip-satir">{ODA_SECENEK.map((o) => <button type="button" key={o} className={cx("cip secilir", f.odaSayisi === o && "on")} onClick={() => set("odaSayisi", f.odaSayisi === o ? null : o)}>{o}</button>)}<input id="f-oda" aria-label="Diğer oda sayısı" className="kisa-girdi" placeholder="diğer: 2+2, 7+1…" value={f.odaSayisi && !ODA_SECENEK.includes(f.odaSayisi) ? f.odaSayisi : ""} onChange={(e) => set("odaSayisi", e.target.value || null)} /></div></div>}
+        {ekstra.includes("odaSayisi") && (() => {
+          // v3.19 — talepte çoklu seçim ("2+1, 3+1"); portföyde tek seçim
+          const secili = odaListesi(f.odaSayisi).map((x) => x.etiket);
+          const digerler = secili.filter((x) => !ODA_SECENEK.includes(x));
+          const yaz = (l: string[]) => set("odaSayisi", l.length ? odaYaz(l) : null);
+          const tikla = (o: string) => talep ? yaz(secili.includes(o) ? secili.filter((x) => x !== o) : [...secili, o]) : set("odaSayisi", f.odaSayisi === o ? null : o);
+          return <div className="alan genis"><label>Oda sayısı{talep ? " · birden çok seçebilirsiniz" : ""}</label><div className="cip-satir">{ODA_SECENEK.map((o) => <button type="button" key={o} aria-pressed={secili.includes(o)} className={cx("cip secilir", secili.includes(o) && "on")} onClick={() => tikla(o)}>{o}</button>)}<input id="f-oda" aria-label="Diğer oda sayısı" className="kisa-girdi" placeholder="diğer: 2+2, 7+1…" key={digerler.join()} defaultValue={digerler.join(", ")} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); (e.target as HTMLInputElement).blur(); } }} onBlur={(e) => { const dig = odaListesi(e.target.value).map((x) => x.etiket); yaz(talep ? [...secili.filter((x) => ODA_SECENEK.includes(x)), ...dig] : dig.slice(0, 1)); }} /></div></div>;
+        })()}
         {talep ? <>
           <div className="alan"><label htmlFor="f-maxf">Bütçe (en fazla)</label><SayiGir binlik id="f-maxf" deger={f.maxFiyat} onChange={(x) => set("maxFiyat", x)} /></div>
           <div className="alan"><label htmlFor="f-minm2">En az alan (m²)</label><SayiGir binlik id="f-minm2" deger={f.minM2} onChange={(x) => set("minM2", x)} /></div>

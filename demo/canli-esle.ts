@@ -32,7 +32,7 @@ export function sunucudanDurum(s: SunucuDurumu): DepoDurumu {
     ogrenilen: a.ogrenilen ?? [], adaylar: a.adaylar ?? [], aktifIceAktarma: null, iceAktarmaGecmisi: a.iceAktarmaGecmisi ?? [],
     roller: rolNormalize(s.ayarlar?.roller),
     kisiler: s.kisiler.map((k) => nullAt(k)) as unknown as Kisi[],
-    islenmisMesajlar: a.islenmisMesajlar ?? [], dosyaIzleri: a.dosyaIzleri ?? {},
+    islenmisMesajlar: a.islenmisMesajlar ?? [], dosyaIzleri: a.dosyaIzleri ?? {}, favoriler: a.favoriler ?? [],
     baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleBekleyen: [],
   };
 }
@@ -42,7 +42,7 @@ export interface Imza { kayit: Map<string, string>; kisi: Map<string, string>; e
 const KISI_ALANLARI = ["id", "adSoyad", "telefon", "ikincilTelefon", "email", "sirket", "roller", "uzmanlikAileleri", "referans", "notlar", "whatsappGruplari", "olusturma", "sonIletisim", "kaynak", "ilanSahibiTipi"] as const;
 const kisiYuku = (k: Kisi) => Object.fromEntries(KISI_ALANLARI.map((a) => [a, (k as any)[a]]).filter(([, v]) => v !== undefined));
 const kayitYuku = (k: Kayit) => ({ id: k.id, olusturma: k.olusturma, veri: k.veri, notlar: k.notlar ?? [] });
-const arayuzYuku = (d: DepoDurumu) => ({ testler: d.testler, geriBildirim: d.geriBildirim, ogrenilen: d.ogrenilen, adaylar: d.adaylar, iceAktarmaGecmisi: d.iceAktarmaGecmisi, islenmisMesajlar: d.islenmisMesajlar, dosyaIzleri: d.dosyaIzleri });
+const arayuzYuku = (d: DepoDurumu) => ({ testler: d.testler, geriBildirim: d.geriBildirim, ogrenilen: d.ogrenilen, adaylar: d.adaylar, iceAktarmaGecmisi: d.iceAktarmaGecmisi, islenmisMesajlar: d.islenmisMesajlar, dosyaIzleri: d.dosyaIzleri, favoriler: d.favoriler ?? [] });
 const ayarYuku = (d: DepoDurumu) => ({ ttl: d.ayarlar.ttl, ai: aiAyari(d), paylasim: paylasimAyari(d), calismaIli: calismaIli(d), roller: d.roller ?? [] });
 
 export function imzaAl(d: DepoDurumu): Imza {

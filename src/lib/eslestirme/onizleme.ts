@@ -21,7 +21,7 @@
  */
 import { MULK_OZELLIK_META, SIRALAMA, type MulkOzellikAlani } from "../domain/teknik-alanlar";
 import { enIyiTipBenzerligi, MULK_TIPI_META } from "../domain/kategori";
-import { odaSayisiAyristir, istenenKatlarOf, katUyumu, katYaz } from "../domain/teknik-alanlar";
+import { odaSayisiAyristir, odaListesi, odaFarkPuani, istenenKatlarOf, katUyumu, katYaz } from "../domain/teknik-alanlar";
 
 /** v3.15 — iki taraf da takasa açıksa eşleşme puanına eklenen küçük bonus (ayrı kriter satırı; uygunluk kararını değiştirmez). */
 export const TAKAS_BONUS = 3;
@@ -30,13 +30,16 @@ export const TAKAS_BONUS = 3;
 export const VERI_YETERLI = 6;
 /** v3.17 — eksik her alan için skor tavanından düşülen puan */
 export const EKSIK_VERI_CEZASI = 7;
+/** v3.19 — ölçülemeyen çekirdek bileşenin (alan/oda/fiyat) puanı: 1'e değil, kararsız 0,4'e sayılır */
+export const BILINMEYEN_PUAN = 0.4;
 
 /** v3.17 — iki kayıtta da boş olan ve skoru şüpheli kılan temel alanlar (kullanıcıya "tamamlayın" denir) */
 export function eksikVeriUyarilari(t: OnizlemeKayit, p: OnizlemeKayit): string[] {
   const u: string[] = [];
   const talepAlan = t.minM2 == null && t.maxM2 == null, portfoyAlan = p.m2 == null;
   if (talepAlan || portfoyAlan) u.push(`m² bilgisi yok (${talepAlan && portfoyAlan ? "talep ve portföy" : talepAlan ? "talep" : "portföy"})`);
-  if (!t.odaSayisi && !p.odaSayisi) u.push("oda sayısı yok");
+  // oda yalnızca konut grubunda aranır (depo, arsa, dükkan için anlamsız uyarı verilmez)
+  if (matrisOf(t.mulkTipi) === "KONUT" && !t.odaSayisi && !p.odaSayisi) u.push("oda sayısı yok");
   if (t.maxFiyat == null && t.minFiyat == null) u.push("talepte bütçe yok");
   if (p.fiyat == null) u.push("portföyde fiyat yok");
   const mahalle = (x: OnizlemeKayit) => x.lokasyonlar.some((l) => l.mahalleId != null || l.altBolgeId != null);
@@ -305,13 +308,16 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   if (tu.oran < 1) satirlar.push({ anahtar: "mulkTipi", etiket: "Mülk tipi", talep: String(MULK_TIPI_META[tu.tip as keyof typeof MULK_TIPI_META]?.etiket ?? tu.tip), portfoy: String(MULK_TIPI_META[p.mulkTipi as keyof typeof MULK_TIPI_META]?.etiket ?? p.mulkTipi), sonuc: tu.oran >= 0.9 ? "SAGLANDI" : "BILINMIYOR", kritik: kritik.has("MULK_TIPI"), bilesen: "TIP_SATIR" });
   // Oda sayısı (konut / ofis). v3.11: "2+1" isteyen müşteriye 3+1 tam uyum değildir —
   // istenen oda 1,0 · bir oda fazla kısmi puan (sunulabilir) · iki+ oda fazla ya da eksik = sağlanmadı.
-  const to = odaSayisiAyristir(t.odaSayisi), po = odaSayisiAyristir(p.odaSayisi);
-  if (to) {
-    const fark = po ? po.oda - to.oda : null;
+  // v3.19 — çoklu oda: talep "2+1, 3+1" isteyebilir; portföy en yakın seçeneğe göre değerlendirilir (en iyi puan).
+  const toL = odaListesi(t.odaSayisi), po = odaSayisiAyristir(p.odaSayisi);
+  if (toL.length) {
+    let en: { fark: number; puan: number } | null = null;
+    if (po) for (const to of toL) { const fark = po.oda - to.oda; const puan = odaFarkPuani(fark, A.oda.fazla1, A.oda.fazla2); if (!en || puan > en.puan) en = { fark, puan }; }
+    const fark = en?.fark ?? null;
     const sonuc: KriterSonuc = fark == null ? "BILINMIYOR" : fark === 0 || fark === 1 ? "SAGLANDI" : "SAGLANMADI";
-    const puan = fark == null ? 0.5 : fark === 0 ? 1 : fark === 1 ? A.oda.fazla1 : fark >= 2 ? A.oda.fazla2 : 0;
+    const puan = en ? en.puan : 0.5;
     const not = fark == null || fark === 0 ? "" : fark > 0 ? ` (${fark} oda fazla)` : ` (${-fark} oda eksik)`;
-    satirlar.push({ anahtar: "odaSayisi", etiket: "Oda sayısı", talep: String(t.odaSayisi), portfoy: (p.odaSayisi ?? "—") + not, sonuc, kritik: kritik.has("ODA_SAYISI"), puan, bilesen: "ODA" });
+    satirlar.push({ anahtar: "odaSayisi", etiket: "Oda sayısı", talep: toL.map((x) => x.etiket).join(" / "), portfoy: (p.odaSayisi ?? "—") + not, sonuc, kritik: kritik.has("ODA_SAYISI"), puan, bilesen: "ODA" });
   }
   if (t.krediyeUygun) satirlar.push({ anahtar: "krediyeUygun", etiket: "Krediye uygun", talep: "İstiyor", portfoy: p.krediyeUygun == null ? "—" : p.krediyeUygun ? "Var" : "Yok", sonuc: p.krediyeUygun == null ? "BILINMIYOR" : p.krediyeUygun ? "SAGLANDI" : "SAGLANMADI", kritik: kritik.has("KREDI"), bilesen: "KONUT" });
   // v3.15 — çoklu kat: talep birden çok kata uygun olabilir ("Giriş", "3. kat", "Ara kat"…); biri tutarsa karşılanmış sayılır.
@@ -319,7 +325,12 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   const istenenKat = istenenKatlarOf(t.ozellik);
   if (istenenKat.length) {
     const pk = typeof p.ozellik?.bulunduguKat === "number" ? p.ozellik.bulunduguKat : null;
-    satirlar.push({ anahtar: "istenenKatlar", etiket: "Kat", talep: katYaz(istenenKat), portfoy: pk == null ? "—" : katYaz([String(pk)]), sonuc: katUyumu(istenenKat, pk, p.ozellik?.katSayisi as number | null | undefined), kritik: kritik.has("KAT"), bilesen: BILESEN.KAT ?? "DIGER" });
+    const ks = typeof p.ozellik?.katSayisi === "number" ? p.ozellik.katSayisi : null;
+    const katSonuc = katUyumu(istenenKat, pk, ks);
+    // v3.19 — portföy "ara kat" yazmasa da bulunduğu kat ve bina kat sayısından hesaplanır; sonuç kartta açıklanır
+    const goreli = istenenKat.includes("ARA") || istenenKat.includes("SON");
+    const hesap = pk == null ? "" : ks != null ? ` (${pk}/${ks}${goreli ? pk >= 1 && pk < ks ? " · ara kat" : pk === ks ? " · son kat" : pk <= 0 ? " · giriş/zemin" : "" : ""})` : goreli ? " (bina kat sayısı yok)" : "";
+    satirlar.push({ anahtar: "istenenKatlar", etiket: "Kat", talep: katYaz(istenenKat), portfoy: pk == null ? "—" : katYaz([String(pk)]) + hesap, sonuc: katSonuc, kritik: kritik.has("KAT"), puan: katSonuc === "SAGLANDI" ? 1 : katSonuc === "SAGLANMADI" ? 0.2 : 0.5, bilesen: BILESEN.KAT ?? "DIGER" });
   }
   // v3.15 — takas: iki taraf da açıksa küçük bonus (aşağıda skora eklenir); matris bileşenlerine girmez
   const takasUyumu = t.takasaAcik === true && p.takasaAcik === true;
@@ -385,23 +396,28 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
     const ss = satirlar.filter((s) => s.bilesen && s.bilesen !== "TIP_SATIR" && (kodlar.has(s.bilesen) ? s.bilesen : "DIGER") === kod);
     return { kod, etiket, agirlik, puan: ss.length ? ss.reduce((a, s) => a + puanOf(s), 0) / ss.length : null };
   });
+  // v3.19 — ölçülemeyen ÇEKİRDEK bileşen (alan, oda, fiyat) artık "yok sayılıp ağırlığı dağıtılmaz":
+  // bilinmeyen bilgi lehe sayılmaz. Ağırlığı korunur, puanı BILINMEYEN_PUAN alınır → skor doğal olarak düşer.
+  const CEKIRDEK = new Set(["ALAN", "ODA", "FIYAT"]);
+  const eksikCekirdek = bilesenler.filter((x) => x.puan == null && CEKIRDEK.has(x.kod));
+  for (const x of eksikCekirdek) (x as { puan: number | null }).puan = BILINMEYEN_PUAN;
   const sayilan = bilesenler.filter((x) => x.puan != null);
   const toplamW = sayilan.reduce((a, x) => a + x.agirlik, 0);
   let skor = Math.round((100 * sayilan.reduce((a, x) => a + x.agirlik * (x.puan as number), 0)) / Math.max(1, toplamW));
   if (takasUyumu) skor += TAKAS_BONUS; // v3.15
 
-  // ───── v3.17 — eksik veri cezası: iki kayıt da yalnızca ilçe + fiyat taşıyorsa skor "kesin" görünmemeli.
-  // Yüksek skor, çok sayıda alanın karşılaştırılabilmiş olmasını gerektirir; karşılaştırılan alan azsa tavan düşer.
   const veriEksikleri = eksikVeriUyarilari(t, p);
-  const olculen = sayilan.length + satirlar.filter((x) => x.sonuc !== "BILINMIYOR" && x.anahtar !== "takasaAcik").length; // takas bonus satırı "ölçülen alan" sayılmaz
-  const tavan = olculen >= VERI_YETERLI ? 100 : 100 - EKSIK_VERI_CEZASI * (VERI_YETERLI - olculen);
-  if (veriEksikleri.length) skor = Math.min(skor, tavan);
+  // Yalnızca ilçe + fiyat gibi çok az alan karşılaştırıldıysa skor yine de kesin görünmesin (eski v3.17 tavanı, çifte sayım olmadan)
+  const olculen = bilesenler.filter((x) => x.puan != null && !eksikCekirdek.includes(x)).length;
+  if (veriEksikleri.length && olculen < 3) skor = Math.min(skor, 100 - EKSIK_VERI_CEZASI * (3 - olculen) * 2);
+  const fiyatKarsilastirilamadi = eksikCekirdek.some((x) => x.kod === "FIYAT");
+  const cekirdekKosullu = fiyatKarsilastirilamadi || eksikCekirdek.length >= 2;
 
   skor -= 5 * talepEksikleri.length; // talepte öldürücü bilgi eksikse skor "kesin" görünmesin
   skor = Math.max(0, Math.min(100, skor));
 
   const uygunluk: Uygunluk = kritikEngeller.length ? "UYGUN_DEGIL"
-    : bilinmeyenKritikler.length || talepEksikleri.length || tipUyumu.oran < 0.9 || satirlar.some((s) => s.sonuc === "SAGLANMADI")
+    : bilinmeyenKritikler.length || talepEksikleri.length || cekirdekKosullu || tipUyumu.oran < 0.9 || satirlar.some((s) => s.sonuc === "SAGLANMADI")
       // v3.11 — zayıf bileşen: konum "biraz uzak / bilinmiyor" ya da bir satırın puanı eşiğin altında → sunmadan önce sor
       || lok.belirsiz || (lok.kademe !== "IL_GENELI" && lok.kademe !== "BILINMIYOR" && lok.oran < A.kosulluAlti) || satirlar.some((s) => s.sonuc === "SAGLANDI" && s.puan != null && s.puan < A.kosulluAlti) ? "KOSULLU" : "SUNULABILIR";
   return {

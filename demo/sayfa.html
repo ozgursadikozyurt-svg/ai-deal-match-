@@ -519,7 +519,7 @@ main.sarici{padding-block:18px 32px}
 .ilt.ara{background:var(--panel2,#eef1f5);color:var(--fg)}.ilt.wa{background:#1fa855;color:#fff}
 .ilt:hover{filter:brightness(.95)}.ilt:focus-visible{outline:2px solid var(--pirinc,#c08a2e);outline-offset:2px}
 .iletisim.kucuk .ilt{padding:0;width:40px;height:40px;justify-content:center}
-.kisi-kart{display:flex;align-items:center;gap:12px;cursor:pointer}.kisi-kart>div:nth-child(2){flex:1;min-width:0}
+.kisi-kart{display:flex;align-items:center;gap:12px;cursor:pointer}.kisi-kart>.kisi-bilgi{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}.kisi-kart>.avatar{flex:none}.kisi-kart>input[type=checkbox]{flex:none;width:20px;height:20px;accent-color:var(--acc)}.kisi-kart>.btn{flex:none}.kisi-kart>.iletisim:last-child{flex-direction:row;gap:6px}
 .kisi-satir-sar{display:flex;align-items:center;gap:8px}.kisi-satir-sar>.kisi-satir{flex:1;min-width:0}
 .not-akisi{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
 .not-akisi li{display:flex;gap:10px;align-items:flex-start;padding-top:10px;border-top:1px solid var(--line,#e5e7eb)}
@@ -795,6 +795,46 @@ input[type=range]{padding:0;accent-color:var(--acc)}
   .ai-git{height:36px}
   .ai-giris textarea{max-height:38vh}
 }
+
+/* Kişiler: ince araç satırı, seçim modu */
+.kisi-arac{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;min-height:34px}
+.kisi-arac-sec{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.kisi-hepsi{display:inline-flex;align-items:center;gap:6px;font-size:.88rem}
+.kisi-kart.secili{box-shadow:inset 3px 0 0 var(--acc)}
+@media(max-width:640px){.kisi-duzen-yazi{display:none}.kisi-kart{gap:10px}}
+/* Veri girişi: yapay zekâ çubuğu */
+.ai-bar{display:flex;flex-direction:column;gap:8px;padding-top:10px;border-top:1px dashed var(--line)}
+.ai-btn{background:linear-gradient(135deg,#7c5cff,#4f8cff);border-color:transparent;color:#fff;font-weight:650}
+.ai-btn:disabled{opacity:.55}
+.ilerleme{height:6px;border-radius:99px;background:var(--panel2);overflow:hidden}.ilerleme span{display:block;height:100%;background:var(--acc);transition:width .2s}
+/* ───── v3.19 — fırsat rozeti, anahtar (favori), toplu işlem, Kişiler düzeni ───── */
+.pill.firsat{display:inline-flex;align-items:center;gap:6px;font-weight:650;border:1px solid transparent}
+.pill.firsat i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.pill.firsat small{font-weight:500;opacity:.85}
+.pill.firsat-onceliki,.pill.firsat-oncelikli{background:var(--iyi-bg);color:var(--iyi)}
+.pill.firsat-normal{background:var(--mavi-bg,var(--panel2));color:var(--mavi)}
+.pill.firsat-dusuk{background:var(--panel2);color:var(--mut);border-color:var(--line)}
+.es2-satir1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.es2.secili{outline:2px solid var(--acc);outline-offset:1px}
+.es2-sec{width:20px;height:20px;flex:none;accent-color:var(--acc)}
+.es2 .es-aksiyon{display:flex;align-items:center;gap:4px}
+.firsat-kart{display:flex;flex-direction:column;gap:8px;padding:12px 14px}
+.firsat-ust{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;justify-content:space-between}
+.firsat-fb{display:inline-flex;align-items:center;gap:6px}
+.firsat-fb i{width:8px;height:8px;border-radius:50%;background:var(--mut)}
+.firsat-fb.f-oncelikli i{background:var(--iyi)}.firsat-fb.f-normal i{background:var(--mavi)}
+.toplu-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.anahtar-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel);color:var(--mut);border-radius:10px;padding:6px 8px;cursor:pointer;line-height:1}
+.anahtar-btn:hover{color:var(--acc);border-color:color-mix(in srgb,var(--acc) 40%,var(--line))}
+.anahtar-btn.on{color:#b7791f;background:color-mix(in srgb,#f6c453 22%,var(--panel));border-color:color-mix(in srgb,#f6c453 60%,var(--line))}
+.anahtar-btn.kucuk{padding:5px;border-radius:9px}
+.anahtar-btn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.kart-sar{position:relative}
+.kart-sar>.kayit-kart{width:100%}
+.kart-anahtar{position:absolute;top:8px;right:8px}
+.kart-sar .pill-satir:first-child{padding-right:44px}
+.izleme-baslik{margin:12px 0 2px;font-size:.95rem;color:var(--mut)}
+.bos-izleme{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:28px 16px;color:var(--mut)}
 </style>
 <div id="kok"></div>
 <noscript>Bu demo için JavaScript gereklidir.</noscript>

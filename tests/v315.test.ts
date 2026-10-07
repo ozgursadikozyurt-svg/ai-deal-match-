@@ -91,9 +91,10 @@ const ciz = (el: React.ReactElement, d: DepoDurumu) => renderToStaticMarkup(Reac
 test("kişiler ekranı: onay kutusu, hızlı düzenleme, toplu sil; filtreler tek 'Filtrele' menüsünde (v3.16)", () => {
   rolleriUygula([{ kod: "BANKA_PERSONELI", etiket: "Banka personeli" }]);
   const h = ciz(React.createElement(Kisiler), dur({ roller: [{ kod: "BANKA_PERSONELI", etiket: "Banka personeli" }] }));
-  assert.match(h, /type="checkbox"/); assert.match(h, /hızlı düzenle/);
+  // v3.19: onay kutuları yalnızca "Seç" modunda çıkar; açılışta tek ince araç satırı vardır
+  assert.ok(!/type="checkbox"/.test(h), "seçim modu kapalıyken onay kutusu yok"); assert.match(h, /hızlı düzenle/);
   assert.match(h, /Filtrele/, "tek filtre düğmesi");
-  assert.match(h, /Listedeki tüm kişileri seç/);
+  assert.match(h, /class="kisi-arac"/); assert.match(h, />Seç</);
   // v3.16: çip satırları artık kapalı menünün içinde — ekran açılışta sade
   assert.ok(!h.includes("Telefonu olmayanlar"), "filtre seçenekleri kapalı menüde durmalı");
   assert.equal(KISI_ROLLERI.length, 12);
@@ -121,13 +122,15 @@ test("ayarlar: rol yönetimi bileşeni çizilir", () => {
   assert.match(h, /Yeni rol ekle/); assert.match(h, /sistem rolü/);
 });
 
-test("eşleşme kartı: mülk tipi yanında işlem tipi rozeti (Satılık/Kiralık/Devren)", () => {
+test("eşleşme kartı (v3.19): işlem tipi ve mülk tipi kartta bir kez; numaralı katman etiketi yok; fırsat rozeti var", () => {
   const t = kayitlar.find((k) => k.veri.tip === "TALEP")!, p = kayitlar.find((k) => k.veri.tip === "PORTFOY")!;
-  const e: any = { t, p, s: eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM) };
+  const e: any = { t, p, s: eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM), f: { kademe: "NORMAL", etiket: "Normal", aciklama: "x", sira: 2, tahminiKomisyon: 100000, dogrudanTaraf: 1 } };
   const h = ciz(React.createElement(EslesmeKarti, { e }), dur());
   const et = [...h.matchAll(/class="es2-et">(.*?)<\/div>/gs)].map((m) => m[1]);
   assert.equal(et.length, 2, "talep ve portföy tarafı");
-  for (const x of et) assert.match(x, /<span class="pill[^"]*">[^<]+<\/span><span class="pill p-[^"]*">(Satılık|Kiralık|Devren[^<]*|[^<]+)<\/span>/, "mülk tipi rozetinin hemen yanında işlem rozeti");
+  assert.equal([...h.matchAll(/class="pill p-[^"]*">(Satılık|Kiralık|Devren[^<]*)<\/span>/g)].length, 1, "Satılık/Kiralık yalnızca bir kez");
+  assert.ok(!/\d· (Web ilanı|Yetkili|CRM|Partner)/.test(h), "numaralı katman etiketi kaldırıldı");
+  assert.match(h, /firsat-normal/); assert.match(h, /anahtar-btn/);
 });
 
 test("liste filtresi: takasa açık ve çoklu kat", () => {

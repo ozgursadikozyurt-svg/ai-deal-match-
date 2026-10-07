@@ -8,7 +8,7 @@
 import { SayiGir } from "./girdi";
 import React, { useMemo, useState } from "react";
 import { MULK_AILELERI, aileOf, MULK_TIPI_META } from "../src/lib/domain/kategori";
-import { MULK_OZELLIK_META, SIRALAMA, odaSayisiAyristir, KAT_SECENEKLERI, katUyumu, katYaz, istenenKatlarOf, type MulkOzellikAlani } from "../src/lib/domain/teknik-alanlar";
+import { MULK_OZELLIK_META, SIRALAMA, odaSayisiAyristir, odaListesi, KAT_SECENEKLERI, katUyumu, katYaz, istenenKatlarOf, type MulkOzellikAlani } from "../src/lib/domain/teknik-alanlar";
 import { ONEMLI_ALANLAR } from "../src/lib/domain/form-alanlari";
 import { etiket, ISLEM_TIPI_ETIKET, VERI_KANALI_ETIKET } from "./etiketler";
 import { BAGLAM, lokEtiket, type KonumOnerisi } from "./lokasyon";
@@ -74,8 +74,8 @@ export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string
     if (f.m2Max != null && lo > f.m2Max) return false;
   }
   if (f.odalar.length) {
-    const r = odaSayisiAyristir(v.odaSayisi); if (!r) return false;
-    if (!f.odalar.some((x) => (x === "5+" ? r.oda >= 5 : odaSayisiAyristir(x)!.oda === r.oda))) return false;
+    const rl = odaListesi(v.odaSayisi); if (!rl.length) return false; // v3.19: talep birden çok oda isteyebilir
+    if (!f.odalar.some((x) => rl.some((r) => (x === "5+" ? r.oda >= 5 : odaSayisiAyristir(x)!.oda === r.oda)))) return false;
   }
   for (const [a, fv] of Object.entries(f.ozellik)) {
     if (fv == null || fv === "" || (Array.isArray(fv) && !fv.length)) continue;

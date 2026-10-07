@@ -20,7 +20,10 @@ import { VeriGirisi } from "./ice-aktarma";
 import { Konumlar } from "./konumlar";
 import { GorusmeNotlari } from "./notlar";
 import { DisaAktar } from "./disa-aktar";
-import { KimPill, KoparDugmesi } from "./kopar";
+import { FirsatRozeti } from "./kartlar";
+import { KimPill, KoparDugmesi, TopluKoparPenceresi } from "./kopar";
+import { FIRSAT_KADEME_ETIKET, type FirsatKademe } from "../src/lib/eslestirme/firsat";
+import { AnahtarDugmesi, Izleme, favTalep, favPortfoy, favEslesme } from "./favori";
 import { kopmaEtiket } from "../src/lib/eslestirme/kopar";
 import { IletisimDugmeleri } from "./kisiler";
 import { selamMetni } from "../src/lib/iletisim";
@@ -89,7 +92,7 @@ function AnaSayfa({ donus }: { donus?: boolean } = {}) {
 function KayitKart({ k }: { k: Kayit }) {
   const { git, d } = useDepo();
   const v = k.veri;
-  return <button className={cx("kart kayit-kart", v.durum !== "ACTIVE" && "soluk")} onClick={() => git({ ad: "detay", id: k.id })}>
+  return <div className="kart-sar"><button className={cx("kart kayit-kart", v.durum !== "ACTIVE" && "soluk")} onClick={() => git({ ad: "detay", id: k.id })}>
     <div className="pill-satir">
       <Pill ton={v.tip === "TALEP" ? "mavi" : "yesil"}>{tipYaz(v)}</Pill>
       <IslemPill islem={v.islemTipi} />
@@ -108,7 +111,7 @@ function KayitKart({ k }: { k: Kayit }) {
       </div>
       <div className="kk-sag"><b>{fiyatOf(v)}</b><span>{m2Of(v)}</span></div>
     </div>
-  </button>;
+  </button><div className="kart-anahtar"><AnahtarDugmesi anahtar={v.tip === "TALEP" ? favTalep(k.id) : favPortfoy(k.id)} /></div></div>;
 }
 
 /** v3.16 — Talep / portföy listesini metin olarak paylaşma: istenenler seçilir, hazır metin kopyalanır ya da WhatsApp'a verilir.
@@ -191,6 +194,7 @@ function Detay({ id }: { id: string }) {
     {/* v3.13 — üst satır: solda geri, sağda Düzenle + (portföyde) Portföy paylaş. Önceden paylaş düğmesi başlığın altındaydı, üst sağ boştu. */}
     <div className="detay-ust">
       <div className="satir">
+        <AnahtarDugmesi anahtar={talep ? favTalep(k.id) : favPortfoy(k.id)} kucuk={false} etiket />
         <button className="btn kucuk" onClick={() => git({ ad: "form", tip: v.tip, id: k.id })}>Düzenle</button>
         {!talep && <button className="btn kucuk birincil" id="portfoy-paylas" onClick={() => setPaylasAcik(true)}>Portföy paylaş</button>}
       </div>
@@ -298,6 +302,10 @@ function Eslesmeler() {
   const [f, setF] = useState<Filtre>(() => bosFiltre());
   const [minSkor, setMinSkor] = useState(0);
   const [takip, setTakip] = useState<string[]>([]);
+  const [fk, setFk] = useState<FirsatKademe | "">("");          // v3.19 — fırsat kademesi filtresi
+  const [secimModu, setSecimModu] = useState(false);            // v3.19 — toplu işlem için seçim
+  const [secili, setSecili] = useState<Set<string>>(() => new Set());
+  const [topluAcik, setTopluAcik] = useState<null | "KOPAR" | "GERI">(null);
   const kisiAd = (id: string) => d.kisiler.find((k) => k.id === id)?.adSoyad ?? "";
   const kisiRol = (id: string) => d.kisiler.find((k) => k.id === id)?.roller ?? [];
   const es = hepsi.filter((e) => {
@@ -310,10 +318,15 @@ function Eslesmeler() {
     return true;
   });
   const say = (x: Uygunluk) => es.filter((e) => !kopukMu(e) && e.s.uygunluk === x).length;
+  const firsatSay = (k: FirsatKademe) => es.filter((e) => !kopukMu(e) && e.s.uygunluk !== "UYGUN_DEGIL" && e.f.kademe === k).length;
+  const oncelikliKomisyon = es.filter((e) => !kopukMu(e) && e.s.uygunluk !== "UYGUN_DEGIL" && e.f.kademe === "ONCELIKLI").reduce((a, e) => a + (e.f.tahminiKomisyon ?? 0), 0);
   const kopukSay = es.filter(kopukMu).length;
-  const [sr, setSr] = useState<Siralama>({ alan: "skor", yon: "azalan" });
+  const [sr, setSr] = useState<Siralama>({ alan: "firsat", yon: "azalan" });
   const tn = (x?: unknown) => (x ? new Date(x as any).getTime() || null : null);
   const esSecenek: import("../src/lib/siralama").SiralamaSecenegi<Eslesme>[] = [
+    // v3.19 — varsayılan: uygunluk → fırsat kademesi (sahibinden ↔ müşteri önde) → skor
+    { alan: "firsat", etiket: "Fırsat önceliği", deger: (e) => (e.s.uygunluk === "SUNULABILIR" ? 2 : e.s.uygunluk === "KOSULLU" ? 1 : 0) * 1e6 + e.f.sira * 1e3 + e.s.skor, varsayilanYon: "azalan" },
+    { alan: "komisyon", etiket: "Tahmini komisyon", deger: (e) => e.f.tahminiKomisyon ?? null, varsayilanYon: "azalan" },
     { alan: "skor", etiket: "Skor", deger: (e) => e.s.skor, varsayilanYon: "azalan" },
     { alan: "fiyat", etiket: "Portföy fiyatı", deger: (e) => e.p.veri.fiyat ?? null, varsayilanYon: "azalan" },
     { alan: "butce", etiket: "Talep bütçesi", deger: (e) => e.t.veri.maxFiyat ?? null, varsayilanYon: "azalan" },
@@ -321,7 +334,7 @@ function Eslesmeler() {
     { alan: "giris", etiket: "Kayda giriş", deger: (e) => Math.max(tn(e.t.olusturma) ?? 0, tn(e.p.olusturma) ?? 0), varsayilanYon: "azalan" },
     { alan: "sure", etiket: "Talebin kalan süresi", deger: (e) => tn(e.t.veri.validUntil), varsayilanYon: "artan" },
   ];
-  const liste = siralaUygula(es.filter((e) => (u === "KOPUK" ? kopukMu(e) : !kopukMu(e) && (u === "TUMU" || (u === "UYGUN" ? e.s.uygunluk !== "UYGUN_DEGIL" : e.s.uygunluk === u)))), sr, esSecenek);
+  const liste = siralaUygula(es.filter((e) => (!fk || e.f.kademe === fk) && (u === "KOPUK" ? kopukMu(e) : !kopukMu(e) && (u === "TUMU" || (u === "UYGUN" ? e.s.uygunluk !== "UYGUN_DEGIL" : e.s.uygunluk === u)))), sr, esSecenek);
   return <div className="yigin">
     <h2>Eşleşmeler</h2>
     <FiltrePaneli f={f} set={setF} ogeler={[...new Map(hepsi.flatMap((e) => [[e.p.id, e.p.veri], [e.t.id, e.t.veri]] as [string, typeof e.p.veri][])).values()]} gizle={["durum", "kisi"]} yerTutucu="Ara: talep, portföy, kişi, bölge…" sonucEtiketi={`${liste.length} eşleşmeyi göster`} sirala={<SiralaDugmesi secenekler={esSecenek} s={sr} set={setSr} />}
@@ -344,8 +357,30 @@ function Eslesmeler() {
       <button className={cx("fb", u === "UYGUN_DEGIL" && "on")} onClick={() => setU("UYGUN_DEGIL")}>Uygun değil ({say("UYGUN_DEGIL")})</button>
       {kopukSay > 0 && <button className={cx("fb", u === "KOPUK" && "on")} onClick={() => setU("KOPUK")}>Koparılan ({kopukSay})</button>}
     </div>
-    {liste.map((e) => <EslesmeKarti key={eKey(e.t.id, e.p.id)} e={e} />)}
+    {/* v3.19 — fırsat önceliği: mülk sahibi ↔ doğrudan müşteri en kazançlı; emlakçı ↔ emlakçı ikinci planda */}
+    <section className="kart firsat-kart" aria-label="Fırsat önceliği">
+      <div className="firsat-ust"><b>Fırsat önceliği</b><span className="ipucu">{firsatSay("ONCELIKLI") ? `${firsatSay("ONCELIKLI")} öncelikli eşleşme${oncelikliKomisyon ? ` · tahmini komisyon ≈ ${oncelikliKomisyon.toLocaleString("tr-TR")} ₺` : ""}` : "Öncelikli (sahibinden ↔ müşteri) eşleşme yok"}</span></div>
+      <div className="filtre">
+        <button className={cx("fb", !fk && "on")} onClick={() => setFk("")}>Tümü</button>
+        {(["ONCELIKLI", "NORMAL", "DUSUK"] as const).map((k) => <button key={k} className={cx("fb firsat-fb", "f-" + k.toLowerCase(), fk === k && "on")} onClick={() => setFk(fk === k ? "" : k)} title={{ ONCELIKLI: "Mülk sahibi ↔ doğrudan müşteri", NORMAL: "Bir taraf emlakçı — komisyon paylaşılır", DUSUK: "Emlakçı ↔ emlakçı — ikinci plan" }[k]}><i aria-hidden="true" />{FIRSAT_KADEME_ETIKET[k]} ({firsatSay(k)})</button>)}
+      </div>
+    </section>
+    {/* v3.19 — toplu işlem çubuğu */}
+    <div className="toplu-bar">
+      {!secimModu ? <>
+        <button className="btn kucuk" onClick={() => setSecimModu(true)} disabled={!liste.length}>Seç</button>
+        {u !== "KOPUK" && <button className="btn kucuk" onClick={() => setTopluAcik("KOPAR")} disabled={!liste.length}>Listedekilerin tümünü kopar ({liste.length})</button>}
+        {u === "KOPUK" && <button className="btn kucuk" onClick={() => setTopluAcik("GERI")} disabled={!liste.length}>Tümünü geri al ({liste.length})</button>}
+      </> : <>
+        <button className="btn kucuk" onClick={() => setSecili(new Set(liste.map((e) => eKey(e.t.id, e.p.id))))}>Tümünü seç ({liste.length})</button>
+        <button className="btn kucuk" onClick={() => setSecili(new Set())} disabled={!secili.size}>Seçimi temizle</button>
+        <button className={cx("btn kucuk", u === "KOPUK" ? "birincil" : "tehlike")} onClick={() => setTopluAcik(u === "KOPUK" ? "GERI" : "KOPAR")} disabled={!secili.size}>{u === "KOPUK" ? "Seçilenleri geri al" : "Seçilenleri kopar"} ({secili.size})</button>
+        <button className="btn kucuk" onClick={() => { setSecimModu(false); setSecili(new Set()); }}>Bitti</button>
+      </>}
+    </div>
+    {liste.map((e) => { const a = eKey(e.t.id, e.p.id); return <EslesmeKarti key={a} e={e} sec={secimModu ? { acik: secili.has(a), degis: () => setSecili((x) => { const y = new Set(x); if (y.has(a)) y.delete(a); else y.add(a); return y; }) } : undefined} />; })}
     {!liste.length && <p className="bos">Bu filtrede eşleşme yok.</p>}
+    {topluAcik && <TopluKoparPenceresi geriAl={topluAcik === "GERI"} ciftler={(secimModu ? liste.filter((e) => secili.has(eKey(e.t.id, e.p.id))) : liste).map((e) => ({ tid: e.t.id, pid: e.p.id }))} onKapat={() => setTopluAcik(null)} onBitti={() => { setTopluAcik(null); setSecimModu(false); setSecili(new Set()); }} />}
   </div>;
 }
 function Taraf({ k, rol }: { k: Kayit; rol: string }) {
@@ -369,7 +404,7 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
   const sorulacak = [...new Set([...e.s.kriterler.filter((k) => k.sonuc === "BILINMIYOR").map((k) => k.etiket + " (portföy sahibine)"), ...e.s.dna.eksik.map((x) => x.etiket + " (müşteriye)")])];
   const u = UYGUNLUK[e.s.uygunluk];
   return <div className="yigin">
-    <section className="kart es-bas"><Skor s={e.s.skor} u={e.s.uygunluk} /><div><Pill ton={u.ton}>{u.e}</Pill><div className="ipucu">{e.s.lokasyonAciklama}</div>
+    <section className="kart es-bas"><Skor s={e.s.skor} u={e.s.uygunluk} /><div><Pill ton={u.ton}>{u.e}</Pill> <FirsatRozeti f={e.f} komisyon /> <AnahtarDugmesi anahtar={favEslesme(tid, pid)} kucuk={false} etiket /><div className="ipucu">{e.s.lokasyonAciklama}</div>
       {e.s.tipUyumu.oran < 1 && <div className="ipucu">Mülk tipi: {e.s.tipUyumu.aciklama}</div>}
       {e.s.kritikEngeller.length > 0 && <div className="hata-satir">Olmazsa olmaz karşılanmıyor: {e.s.kritikEngeller.join(", ")}</div>}</div></section>
     <section className={cx("kart kopar-kart", n.durum === "REDDEDILDI" && "kopuk")}><div className="satir-ara"><div><b>{n.durum === "REDDEDILDI" ? "Bu eşleşme koparıldı" : "Uygun değil mi, sunuldu ve beğenilmedi mi?"}</b><div className="ipucu">{n.durum === "REDDEDILDI" ? "Ana ekranda ve listelerde gösterilmiyor." : "Koparırsanız bir daha önerilmez."}</div></div><KoparDugmesi tid={tid} pid={pid} /></div></section>
@@ -493,6 +528,7 @@ export function Uygulama() {
     { k: "liste-T", etiket: "Talepler", ikon: "talep", git: () => git({ ad: "liste", tip: "TALEP" }) },
     { k: "liste-P", etiket: "Portföyler", ikon: "portfoy", git: () => git({ ad: "liste", tip: "PORTFOY" }) },
     { k: "eslesmeler", etiket: "Eşleşmeler", ikon: "eslesme", git: () => git({ ad: "eslesmeler" }) },
+    { k: "izleme", etiket: "İzleme", ikon: "anahtar", git: () => git({ ad: "izleme" }), rozet: (d.favoriler ?? []).length || undefined },
     { k: "kisiler", etiket: "Kişiler", ikon: "kisi", git: () => git({ ad: "kisiler" }) },
     ...(CANLI.acik ? [] : [{ k: "baglantilar", etiket: "Bağlantılar", ikon: "baglanti", git: () => git({ ad: "baglantilar" }), rozet: cakisma, alt: true } as NavOge]), // canlıda Notion/Google bağlantıları sonraki aşama
     { k: "veri", etiket: "Veri Girişi", ikon: "veri", git: () => git({ ad: "veri" }), alt: true },
@@ -516,6 +552,7 @@ export function Uygulama() {
       {ekran.ad === "detay" && <Detay id={ekran.id} />}
       {ekran.ad === "form" && <KayitFormu key={(ekran.id ?? ekran.adayId ?? "yeni") + ekran.tip} tip={ekran.tip} id={ekran.id} taslak={ekran.taslak} adayId={ekran.adayId} geri={ekran.geri} />}
       {ekran.ad === "eslesmeler" && <Eslesmeler />}
+      {ekran.ad === "izleme" && <Izleme />}
       {ekran.ad === "eslesme" && <EslesmeDetay tid={ekran.tid} pid={ekran.pid} />}
       {ekran.ad === "veri" && <VeriGirisi key={(ekran.alt ?? "") + (ekran.metin?.length ?? "")} alt={ekran.alt} metin={ekran.metin} donus={ekran.donus} />}
       {ekran.ad === "kisiler" && <Kisiler />}
