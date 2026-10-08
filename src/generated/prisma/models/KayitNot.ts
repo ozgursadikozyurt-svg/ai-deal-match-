@@ -26,6 +26,7 @@ export type AggregateKayitNot = {
 
 export type KayitNotMinAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   kayitId: string | null
   tur: $Enums.NotTuru | null
   metin: string | null
@@ -36,6 +37,7 @@ export type KayitNotMinAggregateOutputType = {
 
 export type KayitNotMaxAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   kayitId: string | null
   tur: $Enums.NotTuru | null
   metin: string | null
@@ -46,6 +48,7 @@ export type KayitNotMaxAggregateOutputType = {
 
 export type KayitNotCountAggregateOutputType = {
   id: number
+  ofisId: number
   kayitId: number
   tur: number
   metin: number
@@ -58,6 +61,7 @@ export type KayitNotCountAggregateOutputType = {
 
 export type KayitNotMinAggregateInputType = {
   id?: true
+  ofisId?: true
   kayitId?: true
   tur?: true
   metin?: true
@@ -68,6 +72,7 @@ export type KayitNotMinAggregateInputType = {
 
 export type KayitNotMaxAggregateInputType = {
   id?: true
+  ofisId?: true
   kayitId?: true
   tur?: true
   metin?: true
@@ -78,6 +83,7 @@ export type KayitNotMaxAggregateInputType = {
 
 export type KayitNotCountAggregateInputType = {
   id?: true
+  ofisId?: true
   kayitId?: true
   tur?: true
   metin?: true
@@ -161,6 +167,7 @@ export type KayitNotGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type KayitNotGroupByOutputType = {
   id: string
+  ofisId: string
   kayitId: string
   tur: $Enums.NotTuru
   metin: string
@@ -192,24 +199,28 @@ export type KayitNotWhereInput = {
   OR?: Prisma.KayitNotWhereInput[]
   NOT?: Prisma.KayitNotWhereInput | Prisma.KayitNotWhereInput[]
   id?: Prisma.StringFilter<"KayitNot"> | string
+  ofisId?: Prisma.StringFilter<"KayitNot"> | string
   kayitId?: Prisma.StringFilter<"KayitNot"> | string
   tur?: Prisma.EnumNotTuruFilter<"KayitNot"> | $Enums.NotTuru
   metin?: Prisma.StringFilter<"KayitNot"> | string
   kisiId?: Prisma.StringNullableFilter<"KayitNot"> | string | null
   tarih?: Prisma.DateTimeFilter<"KayitNot"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"KayitNot"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
   kayit?: Prisma.XOR<Prisma.KayitScalarRelationFilter, Prisma.KayitWhereInput>
   kisi?: Prisma.XOR<Prisma.KisiNullableScalarRelationFilter, Prisma.KisiWhereInput> | null
 }
 
 export type KayitNotOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   tur?: Prisma.SortOrder
   metin?: Prisma.SortOrder
   kisiId?: Prisma.SortOrderInput | Prisma.SortOrder
   tarih?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
   kayit?: Prisma.KayitOrderByWithRelationInput
   kisi?: Prisma.KisiOrderByWithRelationInput
 }
@@ -219,18 +230,21 @@ export type KayitNotWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.KayitNotWhereInput | Prisma.KayitNotWhereInput[]
   OR?: Prisma.KayitNotWhereInput[]
   NOT?: Prisma.KayitNotWhereInput | Prisma.KayitNotWhereInput[]
+  ofisId?: Prisma.StringFilter<"KayitNot"> | string
   kayitId?: Prisma.StringFilter<"KayitNot"> | string
   tur?: Prisma.EnumNotTuruFilter<"KayitNot"> | $Enums.NotTuru
   metin?: Prisma.StringFilter<"KayitNot"> | string
   kisiId?: Prisma.StringNullableFilter<"KayitNot"> | string | null
   tarih?: Prisma.DateTimeFilter<"KayitNot"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"KayitNot"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
   kayit?: Prisma.XOR<Prisma.KayitScalarRelationFilter, Prisma.KayitWhereInput>
   kisi?: Prisma.XOR<Prisma.KisiNullableScalarRelationFilter, Prisma.KisiWhereInput> | null
 }, "id">
 
 export type KayitNotOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   tur?: Prisma.SortOrder
   metin?: Prisma.SortOrder
@@ -247,6 +261,7 @@ export type KayitNotScalarWhereWithAggregatesInput = {
   OR?: Prisma.KayitNotScalarWhereWithAggregatesInput[]
   NOT?: Prisma.KayitNotScalarWhereWithAggregatesInput | Prisma.KayitNotScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"KayitNot"> | string
+  ofisId?: Prisma.StringWithAggregatesFilter<"KayitNot"> | string
   kayitId?: Prisma.StringWithAggregatesFilter<"KayitNot"> | string
   tur?: Prisma.EnumNotTuruWithAggregatesFilter<"KayitNot"> | $Enums.NotTuru
   metin?: Prisma.StringWithAggregatesFilter<"KayitNot"> | string
@@ -261,12 +276,14 @@ export type KayitNotCreateInput = {
   metin: string
   tarih?: Date | string
   createdAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitNotlariInput
   kayit: Prisma.KayitCreateNestedOneWithoutGorusmeNotlariInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitNotlariInput
 }
 
 export type KayitNotUncheckedCreateInput = {
   id?: string
+  ofisId?: string
   kayitId: string
   tur?: $Enums.NotTuru
   metin: string
@@ -281,12 +298,14 @@ export type KayitNotUpdateInput = {
   metin?: Prisma.StringFieldUpdateOperationsInput | string
   tarih?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitNotlariNestedInput
   kayit?: Prisma.KayitUpdateOneRequiredWithoutGorusmeNotlariNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitNotlariNestedInput
 }
 
 export type KayitNotUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kayitId?: Prisma.StringFieldUpdateOperationsInput | string
   tur?: Prisma.EnumNotTuruFieldUpdateOperationsInput | $Enums.NotTuru
   metin?: Prisma.StringFieldUpdateOperationsInput | string
@@ -297,6 +316,7 @@ export type KayitNotUncheckedUpdateInput = {
 
 export type KayitNotCreateManyInput = {
   id?: string
+  ofisId?: string
   kayitId: string
   tur?: $Enums.NotTuru
   metin: string
@@ -315,6 +335,7 @@ export type KayitNotUpdateManyMutationInput = {
 
 export type KayitNotUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kayitId?: Prisma.StringFieldUpdateOperationsInput | string
   tur?: Prisma.EnumNotTuruFieldUpdateOperationsInput | $Enums.NotTuru
   metin?: Prisma.StringFieldUpdateOperationsInput | string
@@ -335,6 +356,7 @@ export type KayitNotOrderByRelationAggregateInput = {
 
 export type KayitNotCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   tur?: Prisma.SortOrder
   metin?: Prisma.SortOrder
@@ -345,6 +367,7 @@ export type KayitNotCountOrderByAggregateInput = {
 
 export type KayitNotMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   tur?: Prisma.SortOrder
   metin?: Prisma.SortOrder
@@ -355,12 +378,55 @@ export type KayitNotMaxOrderByAggregateInput = {
 
 export type KayitNotMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   tur?: Prisma.SortOrder
   metin?: Prisma.SortOrder
   kisiId?: Prisma.SortOrder
   tarih?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type KayitNotCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.KayitNotCreateWithoutOfisInput, Prisma.KayitNotUncheckedCreateWithoutOfisInput> | Prisma.KayitNotCreateWithoutOfisInput[] | Prisma.KayitNotUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitNotCreateOrConnectWithoutOfisInput | Prisma.KayitNotCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.KayitNotCreateManyOfisInputEnvelope
+  connect?: Prisma.KayitNotWhereUniqueInput | Prisma.KayitNotWhereUniqueInput[]
+}
+
+export type KayitNotUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.KayitNotCreateWithoutOfisInput, Prisma.KayitNotUncheckedCreateWithoutOfisInput> | Prisma.KayitNotCreateWithoutOfisInput[] | Prisma.KayitNotUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitNotCreateOrConnectWithoutOfisInput | Prisma.KayitNotCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.KayitNotCreateManyOfisInputEnvelope
+  connect?: Prisma.KayitNotWhereUniqueInput | Prisma.KayitNotWhereUniqueInput[]
+}
+
+export type KayitNotUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.KayitNotCreateWithoutOfisInput, Prisma.KayitNotUncheckedCreateWithoutOfisInput> | Prisma.KayitNotCreateWithoutOfisInput[] | Prisma.KayitNotUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitNotCreateOrConnectWithoutOfisInput | Prisma.KayitNotCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.KayitNotUpsertWithWhereUniqueWithoutOfisInput | Prisma.KayitNotUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.KayitNotCreateManyOfisInputEnvelope
+  set?: Prisma.KayitNotWhereUniqueInput | Prisma.KayitNotWhereUniqueInput[]
+  disconnect?: Prisma.KayitNotWhereUniqueInput | Prisma.KayitNotWhereUniqueInput[]
+  delete?: Prisma.KayitNotWhereUniqueInput | Prisma.KayitNotWhereUniqueInput[]
+  connect?: Prisma.KayitNotWhereUniqueInput | Prisma.KayitNotWhereUniqueInput[]
+  update?: Prisma.KayitNotUpdateWithWhereUniqueWithoutOfisInput | Prisma.KayitNotUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.KayitNotUpdateManyWithWhereWithoutOfisInput | Prisma.KayitNotUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.KayitNotScalarWhereInput | Prisma.KayitNotScalarWhereInput[]
+}
+
+export type KayitNotUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.KayitNotCreateWithoutOfisInput, Prisma.KayitNotUncheckedCreateWithoutOfisInput> | Prisma.KayitNotCreateWithoutOfisInput[] | Prisma.KayitNotUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitNotCreateOrConnectWithoutOfisInput | Prisma.KayitNotCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.KayitNotUpsertWithWhereUniqueWithoutOfisInput | Prisma.KayitNotUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.KayitNotCreateManyOfisInputEnvelope
+  set?: Prisma.KayitNotWhereUniqueInput | Prisma.KayitNotWhereUniqueInput[]
+  disconnect?: Prisma.KayitNotWhereUniqueInput | Prisma.KayitNotWhereUniqueInput[]
+  delete?: Prisma.KayitNotWhereUniqueInput | Prisma.KayitNotWhereUniqueInput[]
+  connect?: Prisma.KayitNotWhereUniqueInput | Prisma.KayitNotWhereUniqueInput[]
+  update?: Prisma.KayitNotUpdateWithWhereUniqueWithoutOfisInput | Prisma.KayitNotUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.KayitNotUpdateManyWithWhereWithoutOfisInput | Prisma.KayitNotUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.KayitNotScalarWhereInput | Prisma.KayitNotScalarWhereInput[]
 }
 
 export type KayitNotCreateNestedManyWithoutKayitInput = {
@@ -451,17 +517,79 @@ export type EnumNotTuruFieldUpdateOperationsInput = {
   set?: $Enums.NotTuru
 }
 
+export type KayitNotCreateWithoutOfisInput = {
+  id?: string
+  tur?: $Enums.NotTuru
+  metin: string
+  tarih?: Date | string
+  createdAt?: Date | string
+  kayit: Prisma.KayitCreateNestedOneWithoutGorusmeNotlariInput
+  kisi?: Prisma.KisiCreateNestedOneWithoutKayitNotlariInput
+}
+
+export type KayitNotUncheckedCreateWithoutOfisInput = {
+  id?: string
+  kayitId: string
+  tur?: $Enums.NotTuru
+  metin: string
+  kisiId?: string | null
+  tarih?: Date | string
+  createdAt?: Date | string
+}
+
+export type KayitNotCreateOrConnectWithoutOfisInput = {
+  where: Prisma.KayitNotWhereUniqueInput
+  create: Prisma.XOR<Prisma.KayitNotCreateWithoutOfisInput, Prisma.KayitNotUncheckedCreateWithoutOfisInput>
+}
+
+export type KayitNotCreateManyOfisInputEnvelope = {
+  data: Prisma.KayitNotCreateManyOfisInput | Prisma.KayitNotCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type KayitNotUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.KayitNotWhereUniqueInput
+  update: Prisma.XOR<Prisma.KayitNotUpdateWithoutOfisInput, Prisma.KayitNotUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.KayitNotCreateWithoutOfisInput, Prisma.KayitNotUncheckedCreateWithoutOfisInput>
+}
+
+export type KayitNotUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.KayitNotWhereUniqueInput
+  data: Prisma.XOR<Prisma.KayitNotUpdateWithoutOfisInput, Prisma.KayitNotUncheckedUpdateWithoutOfisInput>
+}
+
+export type KayitNotUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.KayitNotScalarWhereInput
+  data: Prisma.XOR<Prisma.KayitNotUpdateManyMutationInput, Prisma.KayitNotUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type KayitNotScalarWhereInput = {
+  AND?: Prisma.KayitNotScalarWhereInput | Prisma.KayitNotScalarWhereInput[]
+  OR?: Prisma.KayitNotScalarWhereInput[]
+  NOT?: Prisma.KayitNotScalarWhereInput | Prisma.KayitNotScalarWhereInput[]
+  id?: Prisma.StringFilter<"KayitNot"> | string
+  ofisId?: Prisma.StringFilter<"KayitNot"> | string
+  kayitId?: Prisma.StringFilter<"KayitNot"> | string
+  tur?: Prisma.EnumNotTuruFilter<"KayitNot"> | $Enums.NotTuru
+  metin?: Prisma.StringFilter<"KayitNot"> | string
+  kisiId?: Prisma.StringNullableFilter<"KayitNot"> | string | null
+  tarih?: Prisma.DateTimeFilter<"KayitNot"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"KayitNot"> | Date | string
+}
+
 export type KayitNotCreateWithoutKayitInput = {
   id?: string
   tur?: $Enums.NotTuru
   metin: string
   tarih?: Date | string
   createdAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitNotlariInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitNotlariInput
 }
 
 export type KayitNotUncheckedCreateWithoutKayitInput = {
   id?: string
+  ofisId?: string
   tur?: $Enums.NotTuru
   metin: string
   kisiId?: string | null
@@ -495,30 +623,19 @@ export type KayitNotUpdateManyWithWhereWithoutKayitInput = {
   data: Prisma.XOR<Prisma.KayitNotUpdateManyMutationInput, Prisma.KayitNotUncheckedUpdateManyWithoutKayitInput>
 }
 
-export type KayitNotScalarWhereInput = {
-  AND?: Prisma.KayitNotScalarWhereInput | Prisma.KayitNotScalarWhereInput[]
-  OR?: Prisma.KayitNotScalarWhereInput[]
-  NOT?: Prisma.KayitNotScalarWhereInput | Prisma.KayitNotScalarWhereInput[]
-  id?: Prisma.StringFilter<"KayitNot"> | string
-  kayitId?: Prisma.StringFilter<"KayitNot"> | string
-  tur?: Prisma.EnumNotTuruFilter<"KayitNot"> | $Enums.NotTuru
-  metin?: Prisma.StringFilter<"KayitNot"> | string
-  kisiId?: Prisma.StringNullableFilter<"KayitNot"> | string | null
-  tarih?: Prisma.DateTimeFilter<"KayitNot"> | Date | string
-  createdAt?: Prisma.DateTimeFilter<"KayitNot"> | Date | string
-}
-
 export type KayitNotCreateWithoutKisiInput = {
   id?: string
   tur?: $Enums.NotTuru
   metin: string
   tarih?: Date | string
   createdAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitNotlariInput
   kayit: Prisma.KayitCreateNestedOneWithoutGorusmeNotlariInput
 }
 
 export type KayitNotUncheckedCreateWithoutKisiInput = {
   id?: string
+  ofisId?: string
   kayitId: string
   tur?: $Enums.NotTuru
   metin: string
@@ -552,8 +669,49 @@ export type KayitNotUpdateManyWithWhereWithoutKisiInput = {
   data: Prisma.XOR<Prisma.KayitNotUpdateManyMutationInput, Prisma.KayitNotUncheckedUpdateManyWithoutKisiInput>
 }
 
+export type KayitNotCreateManyOfisInput = {
+  id?: string
+  kayitId: string
+  tur?: $Enums.NotTuru
+  metin: string
+  kisiId?: string | null
+  tarih?: Date | string
+  createdAt?: Date | string
+}
+
+export type KayitNotUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tur?: Prisma.EnumNotTuruFieldUpdateOperationsInput | $Enums.NotTuru
+  metin?: Prisma.StringFieldUpdateOperationsInput | string
+  tarih?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  kayit?: Prisma.KayitUpdateOneRequiredWithoutGorusmeNotlariNestedInput
+  kisi?: Prisma.KisiUpdateOneWithoutKayitNotlariNestedInput
+}
+
+export type KayitNotUncheckedUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kayitId?: Prisma.StringFieldUpdateOperationsInput | string
+  tur?: Prisma.EnumNotTuruFieldUpdateOperationsInput | $Enums.NotTuru
+  metin?: Prisma.StringFieldUpdateOperationsInput | string
+  kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tarih?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type KayitNotUncheckedUpdateManyWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kayitId?: Prisma.StringFieldUpdateOperationsInput | string
+  tur?: Prisma.EnumNotTuruFieldUpdateOperationsInput | $Enums.NotTuru
+  metin?: Prisma.StringFieldUpdateOperationsInput | string
+  kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tarih?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type KayitNotCreateManyKayitInput = {
   id?: string
+  ofisId?: string
   tur?: $Enums.NotTuru
   metin: string
   kisiId?: string | null
@@ -567,11 +725,13 @@ export type KayitNotUpdateWithoutKayitInput = {
   metin?: Prisma.StringFieldUpdateOperationsInput | string
   tarih?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitNotlariNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitNotlariNestedInput
 }
 
 export type KayitNotUncheckedUpdateWithoutKayitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   tur?: Prisma.EnumNotTuruFieldUpdateOperationsInput | $Enums.NotTuru
   metin?: Prisma.StringFieldUpdateOperationsInput | string
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -581,6 +741,7 @@ export type KayitNotUncheckedUpdateWithoutKayitInput = {
 
 export type KayitNotUncheckedUpdateManyWithoutKayitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   tur?: Prisma.EnumNotTuruFieldUpdateOperationsInput | $Enums.NotTuru
   metin?: Prisma.StringFieldUpdateOperationsInput | string
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -590,6 +751,7 @@ export type KayitNotUncheckedUpdateManyWithoutKayitInput = {
 
 export type KayitNotCreateManyKisiInput = {
   id?: string
+  ofisId?: string
   kayitId: string
   tur?: $Enums.NotTuru
   metin: string
@@ -603,11 +765,13 @@ export type KayitNotUpdateWithoutKisiInput = {
   metin?: Prisma.StringFieldUpdateOperationsInput | string
   tarih?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitNotlariNestedInput
   kayit?: Prisma.KayitUpdateOneRequiredWithoutGorusmeNotlariNestedInput
 }
 
 export type KayitNotUncheckedUpdateWithoutKisiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kayitId?: Prisma.StringFieldUpdateOperationsInput | string
   tur?: Prisma.EnumNotTuruFieldUpdateOperationsInput | $Enums.NotTuru
   metin?: Prisma.StringFieldUpdateOperationsInput | string
@@ -617,6 +781,7 @@ export type KayitNotUncheckedUpdateWithoutKisiInput = {
 
 export type KayitNotUncheckedUpdateManyWithoutKisiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kayitId?: Prisma.StringFieldUpdateOperationsInput | string
   tur?: Prisma.EnumNotTuruFieldUpdateOperationsInput | $Enums.NotTuru
   metin?: Prisma.StringFieldUpdateOperationsInput | string
@@ -628,42 +793,49 @@ export type KayitNotUncheckedUpdateManyWithoutKisiInput = {
 
 export type KayitNotSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   tur?: boolean
   metin?: boolean
   kisiId?: boolean
   tarih?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   kisi?: boolean | Prisma.KayitNot$kisiArgs<ExtArgs>
 }, ExtArgs["result"]["kayitNot"]>
 
 export type KayitNotSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   tur?: boolean
   metin?: boolean
   kisiId?: boolean
   tarih?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   kisi?: boolean | Prisma.KayitNot$kisiArgs<ExtArgs>
 }, ExtArgs["result"]["kayitNot"]>
 
 export type KayitNotSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   tur?: boolean
   metin?: boolean
   kisiId?: boolean
   tarih?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   kisi?: boolean | Prisma.KayitNot$kisiArgs<ExtArgs>
 }, ExtArgs["result"]["kayitNot"]>
 
 export type KayitNotSelectScalar = {
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   tur?: boolean
   metin?: boolean
@@ -672,16 +844,19 @@ export type KayitNotSelectScalar = {
   createdAt?: boolean
 }
 
-export type KayitNotOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kayitId" | "tur" | "metin" | "kisiId" | "tarih" | "createdAt", ExtArgs["result"]["kayitNot"]>
+export type KayitNotOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "kayitId" | "tur" | "metin" | "kisiId" | "tarih" | "createdAt", ExtArgs["result"]["kayitNot"]>
 export type KayitNotInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   kisi?: boolean | Prisma.KayitNot$kisiArgs<ExtArgs>
 }
 export type KayitNotIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   kisi?: boolean | Prisma.KayitNot$kisiArgs<ExtArgs>
 }
 export type KayitNotIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   kisi?: boolean | Prisma.KayitNot$kisiArgs<ExtArgs>
 }
@@ -689,11 +864,13 @@ export type KayitNotIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
 export type $KayitNotPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "KayitNot"
   objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
     kayit: Prisma.$KayitPayload<ExtArgs>
     kisi: Prisma.$KisiPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ofisId: string
     kayitId: string
     tur: $Enums.NotTuru
     metin: string
@@ -1094,6 +1271,7 @@ readonly fields: KayitNotFieldRefs;
  */
 export interface Prisma__KayitNotClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   kayit<T extends Prisma.KayitDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KayitDefaultArgs<ExtArgs>>): Prisma.Prisma__KayitClient<runtime.Types.Result.GetResult<Prisma.$KayitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   kisi<T extends Prisma.KayitNot$kisiArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KayitNot$kisiArgs<ExtArgs>>): Prisma.Prisma__KisiClient<runtime.Types.Result.GetResult<Prisma.$KisiPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1126,6 +1304,7 @@ export interface Prisma__KayitNotClient<T, Null = never, ExtArgs extends runtime
  */
 export interface KayitNotFieldRefs {
   readonly id: Prisma.FieldRef<"KayitNot", 'String'>
+  readonly ofisId: Prisma.FieldRef<"KayitNot", 'String'>
   readonly kayitId: Prisma.FieldRef<"KayitNot", 'String'>
   readonly tur: Prisma.FieldRef<"KayitNot", 'NotTuru'>
   readonly metin: Prisma.FieldRef<"KayitNot", 'String'>

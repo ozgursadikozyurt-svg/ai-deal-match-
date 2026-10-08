@@ -8,6 +8,10 @@ import assert from "node:assert/strict";
 import { coz, BAGLAM } from "../demo/lokasyon";
 import { ornekVeriyiKur } from "../demo/depo";
 import { eslesmeOnizle, temelUyum } from "../src/lib/eslestirme/onizleme";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 const etiketler = (s: string) => coz(s).lokasyonlar.map((l) => l.etiket);
 

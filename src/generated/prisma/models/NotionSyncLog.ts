@@ -26,6 +26,7 @@ export type AggregateNotionSyncLog = {
 
 export type NotionSyncLogMinAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   kayitId: string | null
   notionId: string | null
   yon: string | null
@@ -36,6 +37,7 @@ export type NotionSyncLogMinAggregateOutputType = {
 
 export type NotionSyncLogMaxAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   kayitId: string | null
   notionId: string | null
   yon: string | null
@@ -46,6 +48,7 @@ export type NotionSyncLogMaxAggregateOutputType = {
 
 export type NotionSyncLogCountAggregateOutputType = {
   id: number
+  ofisId: number
   kayitId: number
   notionId: number
   yon: number
@@ -58,6 +61,7 @@ export type NotionSyncLogCountAggregateOutputType = {
 
 export type NotionSyncLogMinAggregateInputType = {
   id?: true
+  ofisId?: true
   kayitId?: true
   notionId?: true
   yon?: true
@@ -68,6 +72,7 @@ export type NotionSyncLogMinAggregateInputType = {
 
 export type NotionSyncLogMaxAggregateInputType = {
   id?: true
+  ofisId?: true
   kayitId?: true
   notionId?: true
   yon?: true
@@ -78,6 +83,7 @@ export type NotionSyncLogMaxAggregateInputType = {
 
 export type NotionSyncLogCountAggregateInputType = {
   id?: true
+  ofisId?: true
   kayitId?: true
   notionId?: true
   yon?: true
@@ -161,6 +167,7 @@ export type NotionSyncLogGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 
 export type NotionSyncLogGroupByOutputType = {
   id: string
+  ofisId: string
   kayitId: string | null
   notionId: string | null
   yon: string
@@ -192,22 +199,26 @@ export type NotionSyncLogWhereInput = {
   OR?: Prisma.NotionSyncLogWhereInput[]
   NOT?: Prisma.NotionSyncLogWhereInput | Prisma.NotionSyncLogWhereInput[]
   id?: Prisma.StringFilter<"NotionSyncLog"> | string
+  ofisId?: Prisma.StringFilter<"NotionSyncLog"> | string
   kayitId?: Prisma.StringNullableFilter<"NotionSyncLog"> | string | null
   notionId?: Prisma.StringNullableFilter<"NotionSyncLog"> | string | null
   yon?: Prisma.StringFilter<"NotionSyncLog"> | string
   durum?: Prisma.EnumSyncDurumFilter<"NotionSyncLog"> | $Enums.SyncDurum
   hata?: Prisma.StringNullableFilter<"NotionSyncLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"NotionSyncLog"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
 }
 
 export type NotionSyncLogOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrderInput | Prisma.SortOrder
   notionId?: Prisma.SortOrderInput | Prisma.SortOrder
   yon?: Prisma.SortOrder
   durum?: Prisma.SortOrder
   hata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
 }
 
 export type NotionSyncLogWhereUniqueInput = Prisma.AtLeast<{
@@ -215,16 +226,19 @@ export type NotionSyncLogWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.NotionSyncLogWhereInput | Prisma.NotionSyncLogWhereInput[]
   OR?: Prisma.NotionSyncLogWhereInput[]
   NOT?: Prisma.NotionSyncLogWhereInput | Prisma.NotionSyncLogWhereInput[]
+  ofisId?: Prisma.StringFilter<"NotionSyncLog"> | string
   kayitId?: Prisma.StringNullableFilter<"NotionSyncLog"> | string | null
   notionId?: Prisma.StringNullableFilter<"NotionSyncLog"> | string | null
   yon?: Prisma.StringFilter<"NotionSyncLog"> | string
   durum?: Prisma.EnumSyncDurumFilter<"NotionSyncLog"> | $Enums.SyncDurum
   hata?: Prisma.StringNullableFilter<"NotionSyncLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"NotionSyncLog"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
 }, "id">
 
 export type NotionSyncLogOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrderInput | Prisma.SortOrder
   notionId?: Prisma.SortOrderInput | Prisma.SortOrder
   yon?: Prisma.SortOrder
@@ -241,6 +255,7 @@ export type NotionSyncLogScalarWhereWithAggregatesInput = {
   OR?: Prisma.NotionSyncLogScalarWhereWithAggregatesInput[]
   NOT?: Prisma.NotionSyncLogScalarWhereWithAggregatesInput | Prisma.NotionSyncLogScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"NotionSyncLog"> | string
+  ofisId?: Prisma.StringWithAggregatesFilter<"NotionSyncLog"> | string
   kayitId?: Prisma.StringNullableWithAggregatesFilter<"NotionSyncLog"> | string | null
   notionId?: Prisma.StringNullableWithAggregatesFilter<"NotionSyncLog"> | string | null
   yon?: Prisma.StringWithAggregatesFilter<"NotionSyncLog"> | string
@@ -257,10 +272,12 @@ export type NotionSyncLogCreateInput = {
   durum: $Enums.SyncDurum
   hata?: string | null
   createdAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutNotionSyncLoglariInput
 }
 
 export type NotionSyncLogUncheckedCreateInput = {
   id?: string
+  ofisId?: string
   kayitId?: string | null
   notionId?: string | null
   yon?: string
@@ -277,10 +294,12 @@ export type NotionSyncLogUpdateInput = {
   durum?: Prisma.EnumSyncDurumFieldUpdateOperationsInput | $Enums.SyncDurum
   hata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutNotionSyncLoglariNestedInput
 }
 
 export type NotionSyncLogUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kayitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   yon?: Prisma.StringFieldUpdateOperationsInput | string
@@ -291,6 +310,7 @@ export type NotionSyncLogUncheckedUpdateInput = {
 
 export type NotionSyncLogCreateManyInput = {
   id?: string
+  ofisId?: string
   kayitId?: string | null
   notionId?: string | null
   yon?: string
@@ -311,6 +331,7 @@ export type NotionSyncLogUpdateManyMutationInput = {
 
 export type NotionSyncLogUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kayitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   yon?: Prisma.StringFieldUpdateOperationsInput | string
@@ -319,8 +340,19 @@ export type NotionSyncLogUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type NotionSyncLogListRelationFilter = {
+  every?: Prisma.NotionSyncLogWhereInput
+  some?: Prisma.NotionSyncLogWhereInput
+  none?: Prisma.NotionSyncLogWhereInput
+}
+
+export type NotionSyncLogOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type NotionSyncLogCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   notionId?: Prisma.SortOrder
   yon?: Prisma.SortOrder
@@ -331,6 +363,7 @@ export type NotionSyncLogCountOrderByAggregateInput = {
 
 export type NotionSyncLogMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   notionId?: Prisma.SortOrder
   yon?: Prisma.SortOrder
@@ -341,6 +374,7 @@ export type NotionSyncLogMaxOrderByAggregateInput = {
 
 export type NotionSyncLogMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   notionId?: Prisma.SortOrder
   yon?: Prisma.SortOrder
@@ -349,40 +383,189 @@ export type NotionSyncLogMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
 }
 
+export type NotionSyncLogCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.NotionSyncLogCreateWithoutOfisInput, Prisma.NotionSyncLogUncheckedCreateWithoutOfisInput> | Prisma.NotionSyncLogCreateWithoutOfisInput[] | Prisma.NotionSyncLogUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.NotionSyncLogCreateOrConnectWithoutOfisInput | Prisma.NotionSyncLogCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.NotionSyncLogCreateManyOfisInputEnvelope
+  connect?: Prisma.NotionSyncLogWhereUniqueInput | Prisma.NotionSyncLogWhereUniqueInput[]
+}
+
+export type NotionSyncLogUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.NotionSyncLogCreateWithoutOfisInput, Prisma.NotionSyncLogUncheckedCreateWithoutOfisInput> | Prisma.NotionSyncLogCreateWithoutOfisInput[] | Prisma.NotionSyncLogUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.NotionSyncLogCreateOrConnectWithoutOfisInput | Prisma.NotionSyncLogCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.NotionSyncLogCreateManyOfisInputEnvelope
+  connect?: Prisma.NotionSyncLogWhereUniqueInput | Prisma.NotionSyncLogWhereUniqueInput[]
+}
+
+export type NotionSyncLogUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.NotionSyncLogCreateWithoutOfisInput, Prisma.NotionSyncLogUncheckedCreateWithoutOfisInput> | Prisma.NotionSyncLogCreateWithoutOfisInput[] | Prisma.NotionSyncLogUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.NotionSyncLogCreateOrConnectWithoutOfisInput | Prisma.NotionSyncLogCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.NotionSyncLogUpsertWithWhereUniqueWithoutOfisInput | Prisma.NotionSyncLogUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.NotionSyncLogCreateManyOfisInputEnvelope
+  set?: Prisma.NotionSyncLogWhereUniqueInput | Prisma.NotionSyncLogWhereUniqueInput[]
+  disconnect?: Prisma.NotionSyncLogWhereUniqueInput | Prisma.NotionSyncLogWhereUniqueInput[]
+  delete?: Prisma.NotionSyncLogWhereUniqueInput | Prisma.NotionSyncLogWhereUniqueInput[]
+  connect?: Prisma.NotionSyncLogWhereUniqueInput | Prisma.NotionSyncLogWhereUniqueInput[]
+  update?: Prisma.NotionSyncLogUpdateWithWhereUniqueWithoutOfisInput | Prisma.NotionSyncLogUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.NotionSyncLogUpdateManyWithWhereWithoutOfisInput | Prisma.NotionSyncLogUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.NotionSyncLogScalarWhereInput | Prisma.NotionSyncLogScalarWhereInput[]
+}
+
+export type NotionSyncLogUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.NotionSyncLogCreateWithoutOfisInput, Prisma.NotionSyncLogUncheckedCreateWithoutOfisInput> | Prisma.NotionSyncLogCreateWithoutOfisInput[] | Prisma.NotionSyncLogUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.NotionSyncLogCreateOrConnectWithoutOfisInput | Prisma.NotionSyncLogCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.NotionSyncLogUpsertWithWhereUniqueWithoutOfisInput | Prisma.NotionSyncLogUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.NotionSyncLogCreateManyOfisInputEnvelope
+  set?: Prisma.NotionSyncLogWhereUniqueInput | Prisma.NotionSyncLogWhereUniqueInput[]
+  disconnect?: Prisma.NotionSyncLogWhereUniqueInput | Prisma.NotionSyncLogWhereUniqueInput[]
+  delete?: Prisma.NotionSyncLogWhereUniqueInput | Prisma.NotionSyncLogWhereUniqueInput[]
+  connect?: Prisma.NotionSyncLogWhereUniqueInput | Prisma.NotionSyncLogWhereUniqueInput[]
+  update?: Prisma.NotionSyncLogUpdateWithWhereUniqueWithoutOfisInput | Prisma.NotionSyncLogUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.NotionSyncLogUpdateManyWithWhereWithoutOfisInput | Prisma.NotionSyncLogUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.NotionSyncLogScalarWhereInput | Prisma.NotionSyncLogScalarWhereInput[]
+}
+
+export type NotionSyncLogCreateWithoutOfisInput = {
+  id?: string
+  kayitId?: string | null
+  notionId?: string | null
+  yon?: string
+  durum: $Enums.SyncDurum
+  hata?: string | null
+  createdAt?: Date | string
+}
+
+export type NotionSyncLogUncheckedCreateWithoutOfisInput = {
+  id?: string
+  kayitId?: string | null
+  notionId?: string | null
+  yon?: string
+  durum: $Enums.SyncDurum
+  hata?: string | null
+  createdAt?: Date | string
+}
+
+export type NotionSyncLogCreateOrConnectWithoutOfisInput = {
+  where: Prisma.NotionSyncLogWhereUniqueInput
+  create: Prisma.XOR<Prisma.NotionSyncLogCreateWithoutOfisInput, Prisma.NotionSyncLogUncheckedCreateWithoutOfisInput>
+}
+
+export type NotionSyncLogCreateManyOfisInputEnvelope = {
+  data: Prisma.NotionSyncLogCreateManyOfisInput | Prisma.NotionSyncLogCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type NotionSyncLogUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.NotionSyncLogWhereUniqueInput
+  update: Prisma.XOR<Prisma.NotionSyncLogUpdateWithoutOfisInput, Prisma.NotionSyncLogUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.NotionSyncLogCreateWithoutOfisInput, Prisma.NotionSyncLogUncheckedCreateWithoutOfisInput>
+}
+
+export type NotionSyncLogUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.NotionSyncLogWhereUniqueInput
+  data: Prisma.XOR<Prisma.NotionSyncLogUpdateWithoutOfisInput, Prisma.NotionSyncLogUncheckedUpdateWithoutOfisInput>
+}
+
+export type NotionSyncLogUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.NotionSyncLogScalarWhereInput
+  data: Prisma.XOR<Prisma.NotionSyncLogUpdateManyMutationInput, Prisma.NotionSyncLogUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type NotionSyncLogScalarWhereInput = {
+  AND?: Prisma.NotionSyncLogScalarWhereInput | Prisma.NotionSyncLogScalarWhereInput[]
+  OR?: Prisma.NotionSyncLogScalarWhereInput[]
+  NOT?: Prisma.NotionSyncLogScalarWhereInput | Prisma.NotionSyncLogScalarWhereInput[]
+  id?: Prisma.StringFilter<"NotionSyncLog"> | string
+  ofisId?: Prisma.StringFilter<"NotionSyncLog"> | string
+  kayitId?: Prisma.StringNullableFilter<"NotionSyncLog"> | string | null
+  notionId?: Prisma.StringNullableFilter<"NotionSyncLog"> | string | null
+  yon?: Prisma.StringFilter<"NotionSyncLog"> | string
+  durum?: Prisma.EnumSyncDurumFilter<"NotionSyncLog"> | $Enums.SyncDurum
+  hata?: Prisma.StringNullableFilter<"NotionSyncLog"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"NotionSyncLog"> | Date | string
+}
+
+export type NotionSyncLogCreateManyOfisInput = {
+  id?: string
+  kayitId?: string | null
+  notionId?: string | null
+  yon?: string
+  durum: $Enums.SyncDurum
+  hata?: string | null
+  createdAt?: Date | string
+}
+
+export type NotionSyncLogUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kayitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yon?: Prisma.StringFieldUpdateOperationsInput | string
+  durum?: Prisma.EnumSyncDurumFieldUpdateOperationsInput | $Enums.SyncDurum
+  hata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type NotionSyncLogUncheckedUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kayitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yon?: Prisma.StringFieldUpdateOperationsInput | string
+  durum?: Prisma.EnumSyncDurumFieldUpdateOperationsInput | $Enums.SyncDurum
+  hata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type NotionSyncLogUncheckedUpdateManyWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kayitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yon?: Prisma.StringFieldUpdateOperationsInput | string
+  durum?: Prisma.EnumSyncDurumFieldUpdateOperationsInput | $Enums.SyncDurum
+  hata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type NotionSyncLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   notionId?: boolean
   yon?: boolean
   durum?: boolean
   hata?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["notionSyncLog"]>
 
 export type NotionSyncLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   notionId?: boolean
   yon?: boolean
   durum?: boolean
   hata?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["notionSyncLog"]>
 
 export type NotionSyncLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   notionId?: boolean
   yon?: boolean
   durum?: boolean
   hata?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["notionSyncLog"]>
 
 export type NotionSyncLogSelectScalar = {
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   notionId?: boolean
   yon?: boolean
@@ -391,13 +574,25 @@ export type NotionSyncLogSelectScalar = {
   createdAt?: boolean
 }
 
-export type NotionSyncLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kayitId" | "notionId" | "yon" | "durum" | "hata" | "createdAt", ExtArgs["result"]["notionSyncLog"]>
+export type NotionSyncLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "kayitId" | "notionId" | "yon" | "durum" | "hata" | "createdAt", ExtArgs["result"]["notionSyncLog"]>
+export type NotionSyncLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type NotionSyncLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type NotionSyncLogIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
 
 export type $NotionSyncLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "NotionSyncLog"
-  objects: {}
+  objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ofisId: string
     kayitId: string | null
     notionId: string | null
     yon: string
@@ -798,6 +993,7 @@ readonly fields: NotionSyncLogFieldRefs;
  */
 export interface Prisma__NotionSyncLogClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -828,6 +1024,7 @@ export interface Prisma__NotionSyncLogClient<T, Null = never, ExtArgs extends ru
  */
 export interface NotionSyncLogFieldRefs {
   readonly id: Prisma.FieldRef<"NotionSyncLog", 'String'>
+  readonly ofisId: Prisma.FieldRef<"NotionSyncLog", 'String'>
   readonly kayitId: Prisma.FieldRef<"NotionSyncLog", 'String'>
   readonly notionId: Prisma.FieldRef<"NotionSyncLog", 'String'>
   readonly yon: Prisma.FieldRef<"NotionSyncLog", 'String'>
@@ -851,6 +1048,10 @@ export type NotionSyncLogFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.NotionSyncLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogInclude<ExtArgs> | null
+  /**
    * Filter, which NotionSyncLog to fetch.
    */
   where: Prisma.NotionSyncLogWhereUniqueInput
@@ -869,6 +1070,10 @@ export type NotionSyncLogFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.NotionSyncLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogInclude<ExtArgs> | null
+  /**
    * Filter, which NotionSyncLog to fetch.
    */
   where: Prisma.NotionSyncLogWhereUniqueInput
@@ -886,6 +1091,10 @@ export type NotionSyncLogFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the NotionSyncLog
    */
   omit?: Prisma.NotionSyncLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogInclude<ExtArgs> | null
   /**
    * Filter, which NotionSyncLog to fetch.
    */
@@ -935,6 +1144,10 @@ export type NotionSyncLogFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
    */
   omit?: Prisma.NotionSyncLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogInclude<ExtArgs> | null
+  /**
    * Filter, which NotionSyncLog to fetch.
    */
   where?: Prisma.NotionSyncLogWhereInput
@@ -982,6 +1195,10 @@ export type NotionSyncLogFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the NotionSyncLog
    */
   omit?: Prisma.NotionSyncLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogInclude<ExtArgs> | null
   /**
    * Filter, which NotionSyncLogs to fetch.
    */
@@ -1031,6 +1248,10 @@ export type NotionSyncLogCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   omit?: Prisma.NotionSyncLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogInclude<ExtArgs> | null
+  /**
    * The data needed to create a NotionSyncLog.
    */
   data: Prisma.XOR<Prisma.NotionSyncLogCreateInput, Prisma.NotionSyncLogUncheckedCreateInput>
@@ -1064,6 +1285,10 @@ export type NotionSyncLogCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    */
   data: Prisma.NotionSyncLogCreateManyInput | Prisma.NotionSyncLogCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1078,6 +1303,10 @@ export type NotionSyncLogUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the NotionSyncLog
    */
   omit?: Prisma.NotionSyncLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogInclude<ExtArgs> | null
   /**
    * The data needed to update a NotionSyncLog.
    */
@@ -1130,6 +1359,10 @@ export type NotionSyncLogUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * Limit how many NotionSyncLogs to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1144,6 +1377,10 @@ export type NotionSyncLogUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the NotionSyncLog
    */
   omit?: Prisma.NotionSyncLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogInclude<ExtArgs> | null
   /**
    * The filter to search for the NotionSyncLog to update in case it exists.
    */
@@ -1170,6 +1407,10 @@ export type NotionSyncLogDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the NotionSyncLog
    */
   omit?: Prisma.NotionSyncLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogInclude<ExtArgs> | null
   /**
    * Filter which NotionSyncLog to delete.
    */
@@ -1202,4 +1443,8 @@ export type NotionSyncLogDefaultArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the NotionSyncLog
    */
   omit?: Prisma.NotionSyncLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotionSyncLogInclude<ExtArgs> | null
 }

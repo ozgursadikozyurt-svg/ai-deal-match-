@@ -12,6 +12,10 @@ import { hizliAyristir, soruFiltresi, metinTuru, metindenKonumlar } from "../src
 import { KayitCreateSchema } from "../src/lib/validation/kayit";
 import { ornekVeriyiKur } from "../demo/depo";
 import { BAGLAM, INDEKS, coz, cozulenToKayitLok } from "../demo/lokasyon";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 const talep = (x: any) => ({ tip: "TALEP", lokasyonlar: [{ ilId: 7, ilceId: 1 }], ...x });
 

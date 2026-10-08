@@ -580,6 +580,124 @@ enum CakismaDurum {
 }
 
 // ============================================================================
+//  OFİS / KULLANICI / DAVET  (v3.20 — çok ofisli altyapı)
+//  Her emlak ofisi bir Ofis satırıdır; tek başına çalışan danışman da tek kişilik ofistir.
+//  Ofise ait her tabloda ofisId vardır ve süzgeç src/lib/kiracilik.ts'ten zorlanır.
+// ============================================================================
+
+enum Rol {
+  PLATFORM_YONETICISI
+  OFIS_YONETICISI
+  DANISMAN
+}
+
+enum Plan {
+  UCRETSIZ
+  PRO
+}
+
+enum OfisDurumu {
+  AKTIF
+  ASKIDA
+}
+
+/// Kaydı yalnızca sahibi mi görür (OZEL) yoksa ofisin tamamı mı (OFIS)
+enum Gorunurluk {
+  OFIS
+  OZEL
+}
+
+enum DavetDurumu {
+  BEKLIYOR
+  KULLANILDI
+  IPTAL
+}
+
+model Ofis {
+  id        String     @id @default(cuid())
+  ad        String
+  slug      String     @unique
+  durum     OfisDurumu @default(AKTIF)
+  plan      Plan       @default(UCRETSIZ)
+  /// Plan sınırları uygulanmaz (Özyurtlar Gayrimenkul)
+  sinirsiz  Boolean    @default(false)
+  /// Pro deneme bitişi; null = deneme yok
+  denemeBitis DateTime?
+  /// İletişim ve künye
+  telefon   String?
+  sehir     String?
+  /// Paylaşım föyündeki imza, çalışma ili gibi ofis künyesi (ayar tablosu ofis başına ayrıca tutulur)
+  notlar    String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  kullanicilar Kullanici[]
+  davetler     Davet[]
+  kayitlar     Kayit[]
+  kisiler      Kisi[]
+  matchler     Match[]
+  ayarlar      Ayar[]
+  lokasyonAdaylari LokasyonAday[]
+  islenmisMesajlar IslenmisMesaj[]
+  portalIlanlari   PortalIlan[]
+  entegrasyonlar   Entegrasyon[]
+  senkronCalismalari SenkronCalisma[]
+  senkronCakismalari SenkronCakisma[]
+  notionSyncLoglari  NotionSyncLog[]
+  ingestionLoglari   IngestionLog[]
+  auditLoglari       AuditLog[]
+  kayitNotlari       KayitNot[]
+  kayitFotolari      KayitFoto[]
+
+  @@index([durum])
+  @@map("ofis")
+}
+
+model Kullanici {
+  id      String  @id @default(cuid())
+  ofisId  String @default("")
+  ofis    Ofis    @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  /// Supabase Auth ile aynı e-posta (giriş bu e-postaya gelen bağlantıyla yapılır)
+  eposta  String  @unique
+  adSoyad String?
+  telefon String?
+  rol     Rol     @default(DANISMAN)
+  aktif   Boolean @default(true)
+  sonGiris DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sahipKayitlar Kayit[] @relation("KayitSahibi")
+  sahipKisiler  Kisi[]  @relation("KisiSahibi")
+  olusturduguDavetler Davet[] @relation("DavetOlusturan")
+
+  @@index([ofisId, aktif])
+  @@map("kullanici")
+}
+
+/// Davetle hesap açma: yönetici bir bağlantı üretir, kişi e-postasını doğrulayıp o ofise girer.
+model Davet {
+  id         String      @id @default(cuid())
+  ofisId     String @default("")
+  ofis       Ofis        @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  /// Bağlantıdaki gizli kod (SHA-256 özeti saklanır, düz kod yalnızca bir kez gösterilir)
+  kodOzeti   String      @unique
+  /// Boş bırakılırsa bağlantıyı açan herkes kullanabilir (tek kullanımlık)
+  eposta     String?
+  rol        Rol         @default(DANISMAN)
+  durum      DavetDurumu @default(BEKLIYOR)
+  sonKullanma DateTime
+  olusturanId String?
+  olusturan   Kullanici? @relation("DavetOlusturan", fields: [olusturanId], references: [id], onDelete: SetNull)
+  kullanilan  DateTime?
+  kullananEposta String?
+  createdAt   DateTime   @default(now())
+
+  @@index([ofisId, durum])
+  @@map("davet")
+}
+
+// ============================================================================
 //  LOKASYON MODELLERİ  (Madde 4)
 //  Kaynak: PTT posta kodu listesi → prisma/seed/data/*.json (81 il / 973 ilçe / 73.305 yerleşim)
 // ============================================================================
@@ -722,6 +840,8 @@ model LokasyonAlias {
 /// çözülmüş konumlar sayılır ("cender otel" 5 mesajda "Gençlik" ile geçti). Kullanıcı onaylayınca LokasyonAlias olur.
 model LokasyonAday {
   id           String      @id @default(cuid())
+  ofisId       String @default("")
+  ofis         Ofis        @relation(fields: [ofisId], references: [id], onDelete: Cascade)
   ilId         Int         @default(7)
   ifade        String      // normalize edilmiş
   ornekMetin   String?     // ilk görüldüğü mesajdan kısa alıntı
@@ -732,17 +852,22 @@ model LokasyonAday {
   sonGorulme   DateTime    @default(now())
   createdAt    DateTime    @default(now())
 
-  @@unique([ilId, ifade])
+  @@unique([ofisId, ilId, ifade])
   @@index([durum, gorulme])
+  @@index([ofisId])
   @@map("lokasyon_aday")
 }
 
 /// v3.3 — Kullanıcının ekrandan değiştirebildiği ayarlar (TTL gün sayıları vb.)
+/// v3.20 — ayarlar ofis başına tutulur (birincil anahtar: ofisId + anahtar)
 model Ayar {
-  anahtar   String   @id   // "ttl"
+  ofisId    String @default("")
+  ofis      Ofis     @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  anahtar   String         // "ttl"
   deger     Json           // { "PORTFOY": 90, "TALEP": 60, "TALEP_ACIL": 30 }
   updatedAt DateTime @updatedAt
 
+  @@id([ofisId, anahtar])
   @@map("ayar")
 }
 
@@ -777,6 +902,14 @@ model KayitLokasyon {
 
 model Kayit {
   id            String       @id @default(cuid())
+  /// v3.20 — kaydın ait olduğu ofis
+  ofisId        String @default("")
+  ofis          Ofis         @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  /// v3.20 — kaydı giren danışman (null = ofis ortak / içe aktarma)
+  sahipKullaniciId String?
+  sahipKullanici   Kullanici? @relation("KayitSahibi", fields: [sahipKullaniciId], references: [id], onDelete: SetNull)
+  /// v3.20 — OFIS: ofisin tamamı görür · OZEL: yalnızca sahibi ve ofis yöneticisi görür
+  gorunurluk    Gorunurluk   @default(OFIS)
   tip           KayitTipi
   durum         Durum        @default(ACTIVE)
   aciliyet      Aciliyet     @default(NORMAL)
@@ -854,10 +987,11 @@ model Kayit {
   // ---- Yaşam döngüsü ----
   validUntil          DateTime
   ttlUyariGonderildi  Boolean  @default(false)
-  fingerprint         String   @unique
+  /// v3.20 — mükerrer kontrolü ofis içinde: iki ofis aynı ilanı ayrı ayrı tutabilir
+  fingerprint         String
 
   // ---- Notion ----
-  notionId       String?  @unique
+  notionId       String?
   notionSonSync  DateTime?
   /// v3.6 — son içe aktarılan Notion alanları (+ __tablo, __duzenleme) ve son geri yazılan değerler
   notionSnapshot Json?
@@ -881,6 +1015,10 @@ model Kayit {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([ofisId, fingerprint])
+  @@unique([ofisId, notionId])
+  @@index([ofisId, tip, durum])
+  @@index([ofisId, sahipKullaniciId])
   @@index([tip, durum])
   @@index([anaKategori, mulkTipi])
   @@index([islemTipi])
@@ -1077,8 +1215,15 @@ model MulkOzellik {
 
 model Kisi {
   id             String         @id @default(cuid())
+  /// v3.20 — kişinin ait olduğu ofis
+  ofisId         String @default("")
+  ofis           Ofis           @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  /// v3.20 — kişiyi ekleyen danışman; müşteri listesi varsayılan olarak danışmana özeldir
+  sahipKullaniciId String?
+  sahipKullanici   Kullanici?   @relation("KisiSahibi", fields: [sahipKullaniciId], references: [id], onDelete: SetNull)
+  gorunurluk     Gorunurluk     @default(OZEL)
   adSoyad        String
-  telefon        String?        @unique // normalize +905…
+  telefon        String?        // normalize +905… (benzersizlik ofis içinde)
   ikincilTelefon String?
   email          String?
   sirket         String?
@@ -1087,8 +1232,8 @@ model Kisi {
   ilanSahibiTipi IlanSahibiTipi @default(BILINMIYOR)
   kaynak         KisiKaynagi    @default(MANUEL)
   notlar         String?
-  googleResourceName String?    @unique
-  notionId       String?        @unique
+  googleResourceName String?
+  notionId       String?
   // v3.6 — senkron: son senkronda dış kaynaktan alınan alanların fotoğrafı (üç yönlü birleştirme için)
   googleEtag     String?
   googleSnapshot Json?
@@ -1108,7 +1253,11 @@ model Kisi {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([ofisId, telefon])
+  @@unique([ofisId, googleResourceName])
+  @@unique([ofisId, notionId])
   @@index([adSoyad])
+  @@index([ofisId, sahipKullaniciId])
   @@map("kisi")
 }
 
@@ -1131,13 +1280,16 @@ model KayitKisi {
 /// v3.4 — Yapay zekâya bir kez gönderilmiş mesajlar. Aynı dosya / aynı mesaj tekrar yüklendiğinde
 /// yeniden ayrıştırılmaz (AI kredisi boşa harcanmaz).
 model IslenmisMesaj {
-  parmakIzi   String   @id      // normalize edilmiş metin özeti
+  parmakIzi   String            // normalize edilmiş metin özeti
+  ofisId      String @default("")
+  ofis        Ofis     @relation(fields: [ofisId], references: [id], onDelete: Cascade)
   grup        String?
   mesajTarihi DateTime?
   ingestionId String?
   kayitSayisi Int      @default(0)
   createdAt   DateTime @default(now())
 
+  @@id([ofisId, parmakIzi])
   @@index([grup, mesajTarihi])
   @@map("islenmis_mesaj")
 }
@@ -1148,6 +1300,8 @@ model IslenmisMesaj {
 
 model Match {
   id          String     @id @default(cuid())
+  ofisId      String @default("")
+  ofis        Ofis       @relation(fields: [ofisId], references: [id], onDelete: Cascade)
   talepId     String
   portfoyId   String?
   portalIlanId String?   // dış havuz eşleşmesi
@@ -1189,6 +1343,7 @@ model Match {
   @@unique([talepId, portalIlanId])
   @@index([finalSkor])
   @@index([durum])
+  @@index([ofisId])
   @@map("match")
 }
 
@@ -1198,8 +1353,10 @@ model Match {
 
 model PortalIlan {
   id             String          @id @default(cuid())
+  ofisId         String @default("")
+  ofis           Ofis            @relation(fields: [ofisId], references: [id], onDelete: Cascade)
   kanal          VeriKanali
-  url            String          @unique
+  url            String
   ilanNo         String?
   baslik         String?
   hamIcerik      String?
@@ -1235,8 +1392,10 @@ model PortalIlan {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([ofisId, url])
   @@index([kanal, durum])
   @@index([ilceId])
+  @@index([ofisId])
   @@map("portal_ilan")
 }
 
@@ -1246,6 +1405,8 @@ model PortalIlan {
 
 model AuditLog {
   id        String   @id @default(cuid())
+  ofisId    String @default("")
+  ofis      Ofis     @relation(fields: [ofisId], references: [id], onDelete: Cascade)
   kayitId   String
   alan      String
   eskiDeger Json?
@@ -1255,11 +1416,14 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([kayitId])
+  @@index([ofisId])
   @@map("audit_log")
 }
 
 model IngestionLog {
   id            String     @id @default(cuid())
+  ofisId        String @default("")
+  ofis          Ofis       @relation(fields: [ofisId], references: [id], onDelete: Cascade)
   kanal         VeriKanali
   dosyaAdi      String?
   grupAdi       String?
@@ -1274,13 +1438,16 @@ model IngestionLog {
   detay         Json?
   createdAt     DateTime   @default(now())
 
+  @@index([ofisId])
   @@map("ingestion_log")
 }
 
 /// v3.6 — Google Kişiler / Notion bağlantısı (sağlayıcı başına tek satır)
 model Entegrasyon {
   id          String               @id @default(cuid())
-  saglayici   EntegrasyonSaglayici @unique
+  ofisId      String @default("")
+  ofis        Ofis                 @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  saglayici   EntegrasyonSaglayici
   durum       EntegrasyonDurum     @default(BAGLI_DEGIL)
   hesap       String?              // bağlanan Google e-postası / Notion çalışma alanı
   tokenSifreli String?             // AES-256-GCM (src/lib/guvenlik/sifre.ts) — Google yenileme anahtarı
@@ -1295,12 +1462,15 @@ model Entegrasyon {
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt
 
+  @@unique([ofisId, saglayici])
   @@map("entegrasyon")
 }
 
 /// v3.6 — her senkron çalışmasının özeti (Bağlantılar ekranındaki geçmiş)
 model SenkronCalisma {
   id          String               @id @default(cuid())
+  ofisId      String @default("")
+  ofis        Ofis                 @relation(fields: [ofisId], references: [id], onDelete: Cascade)
   saglayici   EntegrasyonSaglayici
   tetik       String               @default("zamanlayici") // zamanlayici | kullanici | ilk
   baslangic   DateTime             @default(now())
@@ -1319,12 +1489,15 @@ model SenkronCalisma {
   hata        String?
 
   @@index([saglayici, baslangic])
+  @@index([ofisId])
   @@map("senkron_calisma")
 }
 
 /// v3.6 — iki tarafta da değişmiş alan: kullanıcı hangisinin kalacağını seçer
 model SenkronCakisma {
   id         String               @id @default(cuid())
+  ofisId     String @default("")
+  ofis       Ofis                 @relation(fields: [ofisId], references: [id], onDelete: Cascade)
   saglayici  EntegrasyonSaglayici
   hedefTip   String               // KISI | KAYIT
   hedefId    String
@@ -1338,11 +1511,14 @@ model SenkronCakisma {
 
   @@index([hedefId])
   @@index([durum])
+  @@index([ofisId])
   @@map("senkron_cakisma")
 }
 
 model NotionSyncLog {
   id        String     @id @default(cuid())
+  ofisId    String @default("")
+  ofis      Ofis       @relation(fields: [ofisId], references: [id], onDelete: Cascade)
   kayitId   String?
   notionId  String?
   yon       String     @default("supabase_to_notion")
@@ -1351,6 +1527,7 @@ model NotionSyncLog {
   createdAt DateTime   @default(now())
 
   @@index([durum])
+  @@index([ofisId])
   @@map("notion_sync_log")
 }
 
@@ -1367,6 +1544,8 @@ enum NotTuru {
 
 model KayitNot {
   id        String   @id @default(cuid())
+  ofisId      String @default("")
+  ofis        Ofis     @relation(fields: [ofisId], references: [id], onDelete: Cascade)
   kayitId   String
   kayit     Kayit    @relation(fields: [kayitId], references: [id], onDelete: Cascade)
   tur       NotTuru  @default(NOT)
@@ -1378,6 +1557,7 @@ model KayitNot {
 
   @@index([kayitId, tarih])
   @@index([kisiId])
+  @@index([ofisId])
   @@map("kayit_not")
 }
 
@@ -1385,6 +1565,8 @@ model KayitNot {
 /// Fotoğraf tarayıcıda küçültülerek yüklenir (uzun kenar 1600 px); kayıt başına en fazla 8 (bkz. src/lib/domain/foto.ts).
 model KayitFoto {
   id         String   @id @default(cuid())
+  ofisId     String @default("")
+  ofis       Ofis     @relation(fields: [ofisId], references: [id], onDelete: Cascade)
   kayitId    String
   kayit      Kayit    @relation(fields: [kayitId], references: [id], onDelete: Cascade)
   /// 0 = kapak
@@ -1399,5 +1581,6 @@ model KayitFoto {
   createdAt  DateTime @default(now())
 
   @@index([kayitId, sira])
+  @@index([ofisId])
   @@map("kayit_foto")
 }

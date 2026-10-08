@@ -31,8 +31,8 @@ export * from "./enums"
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Ils
- * const ils = await prisma.il.findMany()
+ * // Fetch zero or more Ofis
+ * const ofis = await prisma.ofis.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -41,6 +41,21 @@ export const PrismaClient = $Class.getPrismaClientClass()
 export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts extends Prisma.PrismaClientOptions["omit"] = Prisma.PrismaClientOptions["omit"], ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = $Class.PrismaClient<LogOpts, OmitOpts, ExtArgs>
 export { Prisma }
 
+/**
+ * Model Ofis
+ * 
+ */
+export type Ofis = Prisma.OfisModel
+/**
+ * Model Kullanici
+ * 
+ */
+export type Kullanici = Prisma.KullaniciModel
+/**
+ * Model Davet
+ * Davetle hesap açma: yönetici bir bağlantı üretir, kişi e-postasını doğrulayıp o ofise girer.
+ */
+export type Davet = Prisma.DavetModel
 /**
  * Model Il
  * 
@@ -87,6 +102,7 @@ export type LokasyonAday = Prisma.LokasyonAdayModel
 /**
  * Model Ayar
  * v3.3 — Kullanıcının ekrandan değiştirebildiği ayarlar (TTL gün sayıları vb.)
+ * v3.20 — ayarlar ofis başına tutulur (birincil anahtar: ofisId + anahtar)
  */
 export type Ayar = Prisma.AyarModel
 /**

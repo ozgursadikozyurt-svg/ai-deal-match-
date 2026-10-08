@@ -22,6 +22,10 @@ import { Logo } from "../demo/kabuk";
 import { Eslesmeler, AnaSayfa } from "../demo/app";
 import { ORNEK_PORTAL_SAYFASI, ORNEK_SOHBET } from "../demo/ornek-metinler";
 import { ORNEK_TOPLANTI_NOTU } from "../demo/ornek-dosyalar";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 const { kayitlar, kisiler } = ornekVeriyiKur();
 const durum: DepoDurumu = { veriSurumu: "t", kayitlar, eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN }, ogrenilen: [], adaylar: [], aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [] } as any;

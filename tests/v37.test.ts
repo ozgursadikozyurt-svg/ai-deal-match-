@@ -15,6 +15,10 @@ import { whatsappLinki, aramaLinki, selamMetni } from "../src/lib/iletisim";
 import { ttlNormalize, TTL_VARSAYILAN } from "../src/lib/domain/gecerlilik";
 import { INDEKS } from "../demo/lokasyon";
 import { ORNEK_PORTAL_CSV, ORNEK_TALEP_SAYFALARI, ORNEK_TOPLANTI_NOTU, ORNEK_VCF } from "../demo/ornek-dosyalar";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 const BUGUN = new Date(2026, 9, 1, 12);
 const sec = (o: Partial<AktarimSecenek> = {}): AktarimSecenek => ({ tip: "PORTFOY", dosyaTuru: "PORTAL", varsayilanSahip: "EMLAKCI", ilanGun: 90, varsayilanIslem: "SATILIK", bugun: BUGUN, ...o });

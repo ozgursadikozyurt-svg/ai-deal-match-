@@ -17,6 +17,10 @@ import { Eslesmeler, AnaSayfa, Liste } from "../demo/app";
 import { eslesmeOnizle, temelUyum } from "../src/lib/eslestirme/onizleme";
 import { BAGLAM } from "../demo/lokasyon";
 import { TopluMesaj } from "../demo/toplu-giris";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 const talep = { tip: "TALEP", mulkTipi: "DAIRE", islemTipi: "SATILIK", odaSayisi: "2+1", maxFiyat: 3_500_000, lokasyonlar: [{ ilceId: 12, mahalleId: 345 }] };
 

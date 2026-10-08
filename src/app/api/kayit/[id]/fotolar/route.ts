@@ -8,6 +8,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { hata, ok } from "@/lib/http/yanit";
 import { fotoDenetle, fotoYolu, FOTO_SINIR } from "@/lib/domain/foto";
+import { ofisBaglami } from "@/lib/kiracilik";
 import { dosyaYukle, dosyalariSil, imzaliBaglantilar, DepoHatasi } from "@/lib/depolama/supabase";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -33,7 +34,7 @@ export async function POST(req: Request, { params }: Ctx) {
     if (sorun) return ok({ hata: "DOGRULAMA", mesaj: sorun }, 422);
     const olcu = z.object({ en: z.coerce.number().int().min(1).max(8000), boy: z.coerce.number().int().min(1).max(8000) }).parse({ en: form.get("en"), boy: form.get("boy") });
     const foto = await prisma.kayitFoto.create({ data: { kayitId, sira: kayit._count.fotolar, ad: dosya.name.replace(/\.[^.]+$/, "").slice(0, 60) || "fotograf", ...olcu, boyut: dosya.size, icerikTuru: dosya.type, depoYolu: "" } });
-    const depoYolu = fotoYolu(kayitId, foto.id, dosya.type);
+    const depoYolu = fotoYolu(ofisBaglami().ofisId, kayitId, foto.id, dosya.type);
     try { await dosyaYukle(depoYolu, await dosya.arrayBuffer(), dosya.type); }
     catch (e) { await prisma.kayitFoto.delete({ where: { id: foto.id } }); throw e; }
     await prisma.kayitFoto.update({ where: { id: foto.id }, data: { depoYolu } });

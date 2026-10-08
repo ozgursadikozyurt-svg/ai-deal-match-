@@ -48,6 +48,7 @@ export type PortalIlanSumAggregateOutputType = {
 
 export type PortalIlanMinAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   kanal: $Enums.VeriKanali | null
   url: string | null
   ilanNo: string | null
@@ -78,6 +79,7 @@ export type PortalIlanMinAggregateOutputType = {
 
 export type PortalIlanMaxAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   kanal: $Enums.VeriKanali | null
   url: string | null
   ilanNo: string | null
@@ -108,6 +110,7 @@ export type PortalIlanMaxAggregateOutputType = {
 
 export type PortalIlanCountAggregateOutputType = {
   id: number
+  ofisId: number
   kanal: number
   url: number
   ilanNo: number
@@ -161,6 +164,7 @@ export type PortalIlanSumAggregateInputType = {
 
 export type PortalIlanMinAggregateInputType = {
   id?: true
+  ofisId?: true
   kanal?: true
   url?: true
   ilanNo?: true
@@ -191,6 +195,7 @@ export type PortalIlanMinAggregateInputType = {
 
 export type PortalIlanMaxAggregateInputType = {
   id?: true
+  ofisId?: true
   kanal?: true
   url?: true
   ilanNo?: true
@@ -221,6 +226,7 @@ export type PortalIlanMaxAggregateInputType = {
 
 export type PortalIlanCountAggregateInputType = {
   id?: true
+  ofisId?: true
   kanal?: true
   url?: true
   ilanNo?: true
@@ -339,6 +345,7 @@ export type PortalIlanGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
 
 export type PortalIlanGroupByOutputType = {
   id: string
+  ofisId: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo: string | null
@@ -393,6 +400,7 @@ export type PortalIlanWhereInput = {
   OR?: Prisma.PortalIlanWhereInput[]
   NOT?: Prisma.PortalIlanWhereInput | Prisma.PortalIlanWhereInput[]
   id?: Prisma.StringFilter<"PortalIlan"> | string
+  ofisId?: Prisma.StringFilter<"PortalIlan"> | string
   kanal?: Prisma.EnumVeriKanaliFilter<"PortalIlan"> | $Enums.VeriKanali
   url?: Prisma.StringFilter<"PortalIlan"> | string
   ilanNo?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
@@ -420,6 +428,7 @@ export type PortalIlanWhereInput = {
   kayitId?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
   il?: Prisma.XOR<Prisma.IlNullableScalarRelationFilter, Prisma.IlWhereInput> | null
   ilce?: Prisma.XOR<Prisma.IlceNullableScalarRelationFilter, Prisma.IlceWhereInput> | null
   mahalle?: Prisma.XOR<Prisma.MahalleNullableScalarRelationFilter, Prisma.MahalleWhereInput> | null
@@ -431,6 +440,7 @@ export type PortalIlanWhereInput = {
 
 export type PortalIlanOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kanal?: Prisma.SortOrder
   url?: Prisma.SortOrder
   ilanNo?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -458,6 +468,7 @@ export type PortalIlanOrderByWithRelationInput = {
   kayitId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
   il?: Prisma.IlOrderByWithRelationInput
   ilce?: Prisma.IlceOrderByWithRelationInput
   mahalle?: Prisma.MahalleOrderByWithRelationInput
@@ -469,12 +480,14 @@ export type PortalIlanOrderByWithRelationInput = {
 
 export type PortalIlanWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  url?: string
   kayitId?: string
+  ofisId_url?: Prisma.PortalIlanOfisIdUrlCompoundUniqueInput
   AND?: Prisma.PortalIlanWhereInput | Prisma.PortalIlanWhereInput[]
   OR?: Prisma.PortalIlanWhereInput[]
   NOT?: Prisma.PortalIlanWhereInput | Prisma.PortalIlanWhereInput[]
+  ofisId?: Prisma.StringFilter<"PortalIlan"> | string
   kanal?: Prisma.EnumVeriKanaliFilter<"PortalIlan"> | $Enums.VeriKanali
+  url?: Prisma.StringFilter<"PortalIlan"> | string
   ilanNo?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
   baslik?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
   hamIcerik?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
@@ -499,6 +512,7 @@ export type PortalIlanWhereUniqueInput = Prisma.AtLeast<{
   durum?: Prisma.EnumPortalIlanDurumFilter<"PortalIlan"> | $Enums.PortalIlanDurum
   createdAt?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
   il?: Prisma.XOR<Prisma.IlNullableScalarRelationFilter, Prisma.IlWhereInput> | null
   ilce?: Prisma.XOR<Prisma.IlceNullableScalarRelationFilter, Prisma.IlceWhereInput> | null
   mahalle?: Prisma.XOR<Prisma.MahalleNullableScalarRelationFilter, Prisma.MahalleWhereInput> | null
@@ -506,10 +520,11 @@ export type PortalIlanWhereUniqueInput = Prisma.AtLeast<{
   ozellik?: Prisma.XOR<Prisma.MulkOzellikNullableScalarRelationFilter, Prisma.MulkOzellikWhereInput> | null
   matchler?: Prisma.MatchListRelationFilter
   kayit?: Prisma.XOR<Prisma.KayitNullableScalarRelationFilter, Prisma.KayitWhereInput> | null
-}, "id" | "url" | "kayitId">
+}, "id" | "kayitId" | "ofisId_url">
 
 export type PortalIlanOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kanal?: Prisma.SortOrder
   url?: Prisma.SortOrder
   ilanNo?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -549,6 +564,7 @@ export type PortalIlanScalarWhereWithAggregatesInput = {
   OR?: Prisma.PortalIlanScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PortalIlanScalarWhereWithAggregatesInput | Prisma.PortalIlanScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"PortalIlan"> | string
+  ofisId?: Prisma.StringWithAggregatesFilter<"PortalIlan"> | string
   kanal?: Prisma.EnumVeriKanaliWithAggregatesFilter<"PortalIlan"> | $Enums.VeriKanali
   url?: Prisma.StringWithAggregatesFilter<"PortalIlan"> | string
   ilanNo?: Prisma.StringNullableWithAggregatesFilter<"PortalIlan"> | string | null
@@ -602,6 +618,7 @@ export type PortalIlanCreateInput = {
   durum?: $Enums.PortalIlanDurum
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutPortalIlanlariInput
   il?: Prisma.IlCreateNestedOneWithoutPortalIlanlariInput
   ilce?: Prisma.IlceCreateNestedOneWithoutPortalIlanlariInput
   mahalle?: Prisma.MahalleCreateNestedOneWithoutPortalIlanlariInput
@@ -613,6 +630,7 @@ export type PortalIlanCreateInput = {
 
 export type PortalIlanUncheckedCreateInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -668,6 +686,7 @@ export type PortalIlanUpdateInput = {
   durum?: Prisma.EnumPortalIlanDurumFieldUpdateOperationsInput | $Enums.PortalIlanDurum
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutPortalIlanlariNestedInput
   il?: Prisma.IlUpdateOneWithoutPortalIlanlariNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutPortalIlanlariNestedInput
   mahalle?: Prisma.MahalleUpdateOneWithoutPortalIlanlariNestedInput
@@ -679,6 +698,7 @@ export type PortalIlanUpdateInput = {
 
 export type PortalIlanUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -712,6 +732,7 @@ export type PortalIlanUncheckedUpdateInput = {
 
 export type PortalIlanCreateManyInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -769,6 +790,7 @@ export type PortalIlanUpdateManyMutationInput = {
 
 export type PortalIlanUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -813,8 +835,14 @@ export type PortalIlanNullableScalarRelationFilter = {
   isNot?: Prisma.PortalIlanWhereInput | null
 }
 
+export type PortalIlanOfisIdUrlCompoundUniqueInput = {
+  ofisId: string
+  url: string
+}
+
 export type PortalIlanCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kanal?: Prisma.SortOrder
   url?: Prisma.SortOrder
   ilanNo?: Prisma.SortOrder
@@ -856,6 +884,7 @@ export type PortalIlanAvgOrderByAggregateInput = {
 
 export type PortalIlanMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kanal?: Prisma.SortOrder
   url?: Prisma.SortOrder
   ilanNo?: Prisma.SortOrder
@@ -886,6 +915,7 @@ export type PortalIlanMaxOrderByAggregateInput = {
 
 export type PortalIlanMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kanal?: Prisma.SortOrder
   url?: Prisma.SortOrder
   ilanNo?: Prisma.SortOrder
@@ -922,6 +952,48 @@ export type PortalIlanSumOrderByAggregateInput = {
   mahalleId?: Prisma.SortOrder
   altBolgeId?: Prisma.SortOrder
   portfoyEdinmeSkoru?: Prisma.SortOrder
+}
+
+export type PortalIlanCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.PortalIlanCreateWithoutOfisInput, Prisma.PortalIlanUncheckedCreateWithoutOfisInput> | Prisma.PortalIlanCreateWithoutOfisInput[] | Prisma.PortalIlanUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.PortalIlanCreateOrConnectWithoutOfisInput | Prisma.PortalIlanCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.PortalIlanCreateManyOfisInputEnvelope
+  connect?: Prisma.PortalIlanWhereUniqueInput | Prisma.PortalIlanWhereUniqueInput[]
+}
+
+export type PortalIlanUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.PortalIlanCreateWithoutOfisInput, Prisma.PortalIlanUncheckedCreateWithoutOfisInput> | Prisma.PortalIlanCreateWithoutOfisInput[] | Prisma.PortalIlanUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.PortalIlanCreateOrConnectWithoutOfisInput | Prisma.PortalIlanCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.PortalIlanCreateManyOfisInputEnvelope
+  connect?: Prisma.PortalIlanWhereUniqueInput | Prisma.PortalIlanWhereUniqueInput[]
+}
+
+export type PortalIlanUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.PortalIlanCreateWithoutOfisInput, Prisma.PortalIlanUncheckedCreateWithoutOfisInput> | Prisma.PortalIlanCreateWithoutOfisInput[] | Prisma.PortalIlanUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.PortalIlanCreateOrConnectWithoutOfisInput | Prisma.PortalIlanCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.PortalIlanUpsertWithWhereUniqueWithoutOfisInput | Prisma.PortalIlanUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.PortalIlanCreateManyOfisInputEnvelope
+  set?: Prisma.PortalIlanWhereUniqueInput | Prisma.PortalIlanWhereUniqueInput[]
+  disconnect?: Prisma.PortalIlanWhereUniqueInput | Prisma.PortalIlanWhereUniqueInput[]
+  delete?: Prisma.PortalIlanWhereUniqueInput | Prisma.PortalIlanWhereUniqueInput[]
+  connect?: Prisma.PortalIlanWhereUniqueInput | Prisma.PortalIlanWhereUniqueInput[]
+  update?: Prisma.PortalIlanUpdateWithWhereUniqueWithoutOfisInput | Prisma.PortalIlanUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.PortalIlanUpdateManyWithWhereWithoutOfisInput | Prisma.PortalIlanUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.PortalIlanScalarWhereInput | Prisma.PortalIlanScalarWhereInput[]
+}
+
+export type PortalIlanUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.PortalIlanCreateWithoutOfisInput, Prisma.PortalIlanUncheckedCreateWithoutOfisInput> | Prisma.PortalIlanCreateWithoutOfisInput[] | Prisma.PortalIlanUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.PortalIlanCreateOrConnectWithoutOfisInput | Prisma.PortalIlanCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.PortalIlanUpsertWithWhereUniqueWithoutOfisInput | Prisma.PortalIlanUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.PortalIlanCreateManyOfisInputEnvelope
+  set?: Prisma.PortalIlanWhereUniqueInput | Prisma.PortalIlanWhereUniqueInput[]
+  disconnect?: Prisma.PortalIlanWhereUniqueInput | Prisma.PortalIlanWhereUniqueInput[]
+  delete?: Prisma.PortalIlanWhereUniqueInput | Prisma.PortalIlanWhereUniqueInput[]
+  connect?: Prisma.PortalIlanWhereUniqueInput | Prisma.PortalIlanWhereUniqueInput[]
+  update?: Prisma.PortalIlanUpdateWithWhereUniqueWithoutOfisInput | Prisma.PortalIlanUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.PortalIlanUpdateManyWithWhereWithoutOfisInput | Prisma.PortalIlanUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.PortalIlanScalarWhereInput | Prisma.PortalIlanScalarWhereInput[]
 }
 
 export type PortalIlanCreateNestedManyWithoutIlInput = {
@@ -1172,6 +1244,133 @@ export type EnumPortalIlanDurumFieldUpdateOperationsInput = {
   set?: $Enums.PortalIlanDurum
 }
 
+export type PortalIlanCreateWithoutOfisInput = {
+  id?: string
+  kanal: $Enums.VeriKanali
+  url: string
+  ilanNo?: string | null
+  baslik?: string | null
+  hamIcerik?: string | null
+  ilanSahibiAdi?: string | null
+  ilanSahibiTel?: string | null
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  anaKategori?: $Enums.AnaKategori | null
+  mulkTipi?: $Enums.MulkTipi | null
+  islemTipi?: $Enums.IslemTipi | null
+  fiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: $Enums.ParaBirimi
+  fiyatPeriyodu?: $Enums.FiyatPeriyodu
+  m2?: number | null
+  ilkGorulme?: Date | string
+  sonGorulme?: Date | string
+  fiyatGecmisi?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  portfoyEdinmeSkoru?: number | null
+  durum?: $Enums.PortalIlanDurum
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  il?: Prisma.IlCreateNestedOneWithoutPortalIlanlariInput
+  ilce?: Prisma.IlceCreateNestedOneWithoutPortalIlanlariInput
+  mahalle?: Prisma.MahalleCreateNestedOneWithoutPortalIlanlariInput
+  altBolge?: Prisma.AltBolgeCreateNestedOneWithoutPortalIlanlariInput
+  ozellik?: Prisma.MulkOzellikCreateNestedOneWithoutPortalIlanInput
+  matchler?: Prisma.MatchCreateNestedManyWithoutPortalIlanInput
+  kayit?: Prisma.KayitCreateNestedOneWithoutPortalKaynagiInput
+}
+
+export type PortalIlanUncheckedCreateWithoutOfisInput = {
+  id?: string
+  kanal: $Enums.VeriKanali
+  url: string
+  ilanNo?: string | null
+  baslik?: string | null
+  hamIcerik?: string | null
+  ilanSahibiAdi?: string | null
+  ilanSahibiTel?: string | null
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  anaKategori?: $Enums.AnaKategori | null
+  mulkTipi?: $Enums.MulkTipi | null
+  islemTipi?: $Enums.IslemTipi | null
+  fiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: $Enums.ParaBirimi
+  fiyatPeriyodu?: $Enums.FiyatPeriyodu
+  m2?: number | null
+  ilId?: number | null
+  ilceId?: number | null
+  mahalleId?: number | null
+  altBolgeId?: number | null
+  ilkGorulme?: Date | string
+  sonGorulme?: Date | string
+  fiyatGecmisi?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  portfoyEdinmeSkoru?: number | null
+  durum?: $Enums.PortalIlanDurum
+  kayitId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ozellik?: Prisma.MulkOzellikUncheckedCreateNestedOneWithoutPortalIlanInput
+  matchler?: Prisma.MatchUncheckedCreateNestedManyWithoutPortalIlanInput
+}
+
+export type PortalIlanCreateOrConnectWithoutOfisInput = {
+  where: Prisma.PortalIlanWhereUniqueInput
+  create: Prisma.XOR<Prisma.PortalIlanCreateWithoutOfisInput, Prisma.PortalIlanUncheckedCreateWithoutOfisInput>
+}
+
+export type PortalIlanCreateManyOfisInputEnvelope = {
+  data: Prisma.PortalIlanCreateManyOfisInput | Prisma.PortalIlanCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type PortalIlanUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.PortalIlanWhereUniqueInput
+  update: Prisma.XOR<Prisma.PortalIlanUpdateWithoutOfisInput, Prisma.PortalIlanUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.PortalIlanCreateWithoutOfisInput, Prisma.PortalIlanUncheckedCreateWithoutOfisInput>
+}
+
+export type PortalIlanUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.PortalIlanWhereUniqueInput
+  data: Prisma.XOR<Prisma.PortalIlanUpdateWithoutOfisInput, Prisma.PortalIlanUncheckedUpdateWithoutOfisInput>
+}
+
+export type PortalIlanUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.PortalIlanScalarWhereInput
+  data: Prisma.XOR<Prisma.PortalIlanUpdateManyMutationInput, Prisma.PortalIlanUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type PortalIlanScalarWhereInput = {
+  AND?: Prisma.PortalIlanScalarWhereInput | Prisma.PortalIlanScalarWhereInput[]
+  OR?: Prisma.PortalIlanScalarWhereInput[]
+  NOT?: Prisma.PortalIlanScalarWhereInput | Prisma.PortalIlanScalarWhereInput[]
+  id?: Prisma.StringFilter<"PortalIlan"> | string
+  ofisId?: Prisma.StringFilter<"PortalIlan"> | string
+  kanal?: Prisma.EnumVeriKanaliFilter<"PortalIlan"> | $Enums.VeriKanali
+  url?: Prisma.StringFilter<"PortalIlan"> | string
+  ilanNo?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
+  baslik?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
+  hamIcerik?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
+  ilanSahibiAdi?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
+  ilanSahibiTel?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFilter<"PortalIlan"> | $Enums.IlanSahibiTipi
+  anaKategori?: Prisma.EnumAnaKategoriNullableFilter<"PortalIlan"> | $Enums.AnaKategori | null
+  mulkTipi?: Prisma.EnumMulkTipiNullableFilter<"PortalIlan"> | $Enums.MulkTipi | null
+  islemTipi?: Prisma.EnumIslemTipiNullableFilter<"PortalIlan"> | $Enums.IslemTipi | null
+  fiyat?: Prisma.DecimalNullableFilter<"PortalIlan"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: Prisma.EnumParaBirimiFilter<"PortalIlan"> | $Enums.ParaBirimi
+  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFilter<"PortalIlan"> | $Enums.FiyatPeriyodu
+  m2?: Prisma.FloatNullableFilter<"PortalIlan"> | number | null
+  ilId?: Prisma.IntNullableFilter<"PortalIlan"> | number | null
+  ilceId?: Prisma.IntNullableFilter<"PortalIlan"> | number | null
+  mahalleId?: Prisma.IntNullableFilter<"PortalIlan"> | number | null
+  altBolgeId?: Prisma.IntNullableFilter<"PortalIlan"> | number | null
+  ilkGorulme?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
+  sonGorulme?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
+  fiyatGecmisi?: Prisma.JsonNullableFilter<"PortalIlan">
+  portfoyEdinmeSkoru?: Prisma.FloatNullableFilter<"PortalIlan"> | number | null
+  durum?: Prisma.EnumPortalIlanDurumFilter<"PortalIlan"> | $Enums.PortalIlanDurum
+  kayitId?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
+}
+
 export type PortalIlanCreateWithoutIlInput = {
   id?: string
   kanal: $Enums.VeriKanali
@@ -1196,6 +1395,7 @@ export type PortalIlanCreateWithoutIlInput = {
   durum?: $Enums.PortalIlanDurum
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutPortalIlanlariInput
   ilce?: Prisma.IlceCreateNestedOneWithoutPortalIlanlariInput
   mahalle?: Prisma.MahalleCreateNestedOneWithoutPortalIlanlariInput
   altBolge?: Prisma.AltBolgeCreateNestedOneWithoutPortalIlanlariInput
@@ -1206,6 +1406,7 @@ export type PortalIlanCreateWithoutIlInput = {
 
 export type PortalIlanUncheckedCreateWithoutIlInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -1262,40 +1463,6 @@ export type PortalIlanUpdateManyWithWhereWithoutIlInput = {
   data: Prisma.XOR<Prisma.PortalIlanUpdateManyMutationInput, Prisma.PortalIlanUncheckedUpdateManyWithoutIlInput>
 }
 
-export type PortalIlanScalarWhereInput = {
-  AND?: Prisma.PortalIlanScalarWhereInput | Prisma.PortalIlanScalarWhereInput[]
-  OR?: Prisma.PortalIlanScalarWhereInput[]
-  NOT?: Prisma.PortalIlanScalarWhereInput | Prisma.PortalIlanScalarWhereInput[]
-  id?: Prisma.StringFilter<"PortalIlan"> | string
-  kanal?: Prisma.EnumVeriKanaliFilter<"PortalIlan"> | $Enums.VeriKanali
-  url?: Prisma.StringFilter<"PortalIlan"> | string
-  ilanNo?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
-  baslik?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
-  hamIcerik?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
-  ilanSahibiAdi?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
-  ilanSahibiTel?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
-  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFilter<"PortalIlan"> | $Enums.IlanSahibiTipi
-  anaKategori?: Prisma.EnumAnaKategoriNullableFilter<"PortalIlan"> | $Enums.AnaKategori | null
-  mulkTipi?: Prisma.EnumMulkTipiNullableFilter<"PortalIlan"> | $Enums.MulkTipi | null
-  islemTipi?: Prisma.EnumIslemTipiNullableFilter<"PortalIlan"> | $Enums.IslemTipi | null
-  fiyat?: Prisma.DecimalNullableFilter<"PortalIlan"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  paraBirimi?: Prisma.EnumParaBirimiFilter<"PortalIlan"> | $Enums.ParaBirimi
-  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFilter<"PortalIlan"> | $Enums.FiyatPeriyodu
-  m2?: Prisma.FloatNullableFilter<"PortalIlan"> | number | null
-  ilId?: Prisma.IntNullableFilter<"PortalIlan"> | number | null
-  ilceId?: Prisma.IntNullableFilter<"PortalIlan"> | number | null
-  mahalleId?: Prisma.IntNullableFilter<"PortalIlan"> | number | null
-  altBolgeId?: Prisma.IntNullableFilter<"PortalIlan"> | number | null
-  ilkGorulme?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
-  sonGorulme?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
-  fiyatGecmisi?: Prisma.JsonNullableFilter<"PortalIlan">
-  portfoyEdinmeSkoru?: Prisma.FloatNullableFilter<"PortalIlan"> | number | null
-  durum?: Prisma.EnumPortalIlanDurumFilter<"PortalIlan"> | $Enums.PortalIlanDurum
-  kayitId?: Prisma.StringNullableFilter<"PortalIlan"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"PortalIlan"> | Date | string
-}
-
 export type PortalIlanCreateWithoutIlceInput = {
   id?: string
   kanal: $Enums.VeriKanali
@@ -1320,6 +1487,7 @@ export type PortalIlanCreateWithoutIlceInput = {
   durum?: $Enums.PortalIlanDurum
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutPortalIlanlariInput
   il?: Prisma.IlCreateNestedOneWithoutPortalIlanlariInput
   mahalle?: Prisma.MahalleCreateNestedOneWithoutPortalIlanlariInput
   altBolge?: Prisma.AltBolgeCreateNestedOneWithoutPortalIlanlariInput
@@ -1330,6 +1498,7 @@ export type PortalIlanCreateWithoutIlceInput = {
 
 export type PortalIlanUncheckedCreateWithoutIlceInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -1410,6 +1579,7 @@ export type PortalIlanCreateWithoutMahalleInput = {
   durum?: $Enums.PortalIlanDurum
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutPortalIlanlariInput
   il?: Prisma.IlCreateNestedOneWithoutPortalIlanlariInput
   ilce?: Prisma.IlceCreateNestedOneWithoutPortalIlanlariInput
   altBolge?: Prisma.AltBolgeCreateNestedOneWithoutPortalIlanlariInput
@@ -1420,6 +1590,7 @@ export type PortalIlanCreateWithoutMahalleInput = {
 
 export type PortalIlanUncheckedCreateWithoutMahalleInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -1500,6 +1671,7 @@ export type PortalIlanCreateWithoutAltBolgeInput = {
   durum?: $Enums.PortalIlanDurum
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutPortalIlanlariInput
   il?: Prisma.IlCreateNestedOneWithoutPortalIlanlariInput
   ilce?: Prisma.IlceCreateNestedOneWithoutPortalIlanlariInput
   mahalle?: Prisma.MahalleCreateNestedOneWithoutPortalIlanlariInput
@@ -1510,6 +1682,7 @@ export type PortalIlanCreateWithoutAltBolgeInput = {
 
 export type PortalIlanUncheckedCreateWithoutAltBolgeInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -1590,6 +1763,7 @@ export type PortalIlanCreateWithoutKayitInput = {
   durum?: $Enums.PortalIlanDurum
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutPortalIlanlariInput
   il?: Prisma.IlCreateNestedOneWithoutPortalIlanlariInput
   ilce?: Prisma.IlceCreateNestedOneWithoutPortalIlanlariInput
   mahalle?: Prisma.MahalleCreateNestedOneWithoutPortalIlanlariInput
@@ -1600,6 +1774,7 @@ export type PortalIlanCreateWithoutKayitInput = {
 
 export type PortalIlanUncheckedCreateWithoutKayitInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -1670,6 +1845,7 @@ export type PortalIlanUpdateWithoutKayitInput = {
   durum?: Prisma.EnumPortalIlanDurumFieldUpdateOperationsInput | $Enums.PortalIlanDurum
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutPortalIlanlariNestedInput
   il?: Prisma.IlUpdateOneWithoutPortalIlanlariNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutPortalIlanlariNestedInput
   mahalle?: Prisma.MahalleUpdateOneWithoutPortalIlanlariNestedInput
@@ -1680,6 +1856,7 @@ export type PortalIlanUpdateWithoutKayitInput = {
 
 export type PortalIlanUncheckedUpdateWithoutKayitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1734,6 +1911,7 @@ export type PortalIlanCreateWithoutOzellikInput = {
   durum?: $Enums.PortalIlanDurum
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutPortalIlanlariInput
   il?: Prisma.IlCreateNestedOneWithoutPortalIlanlariInput
   ilce?: Prisma.IlceCreateNestedOneWithoutPortalIlanlariInput
   mahalle?: Prisma.MahalleCreateNestedOneWithoutPortalIlanlariInput
@@ -1744,6 +1922,7 @@ export type PortalIlanCreateWithoutOzellikInput = {
 
 export type PortalIlanUncheckedCreateWithoutOzellikInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -1814,6 +1993,7 @@ export type PortalIlanUpdateWithoutOzellikInput = {
   durum?: Prisma.EnumPortalIlanDurumFieldUpdateOperationsInput | $Enums.PortalIlanDurum
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutPortalIlanlariNestedInput
   il?: Prisma.IlUpdateOneWithoutPortalIlanlariNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutPortalIlanlariNestedInput
   mahalle?: Prisma.MahalleUpdateOneWithoutPortalIlanlariNestedInput
@@ -1824,6 +2004,7 @@ export type PortalIlanUpdateWithoutOzellikInput = {
 
 export type PortalIlanUncheckedUpdateWithoutOzellikInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1878,6 +2059,7 @@ export type PortalIlanCreateWithoutMatchlerInput = {
   durum?: $Enums.PortalIlanDurum
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutPortalIlanlariInput
   il?: Prisma.IlCreateNestedOneWithoutPortalIlanlariInput
   ilce?: Prisma.IlceCreateNestedOneWithoutPortalIlanlariInput
   mahalle?: Prisma.MahalleCreateNestedOneWithoutPortalIlanlariInput
@@ -1888,6 +2070,7 @@ export type PortalIlanCreateWithoutMatchlerInput = {
 
 export type PortalIlanUncheckedCreateWithoutMatchlerInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -1958,6 +2141,7 @@ export type PortalIlanUpdateWithoutMatchlerInput = {
   durum?: Prisma.EnumPortalIlanDurumFieldUpdateOperationsInput | $Enums.PortalIlanDurum
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutPortalIlanlariNestedInput
   il?: Prisma.IlUpdateOneWithoutPortalIlanlariNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutPortalIlanlariNestedInput
   mahalle?: Prisma.MahalleUpdateOneWithoutPortalIlanlariNestedInput
@@ -1968,6 +2152,7 @@ export type PortalIlanUpdateWithoutMatchlerInput = {
 
 export type PortalIlanUncheckedUpdateWithoutMatchlerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1998,8 +2183,137 @@ export type PortalIlanUncheckedUpdateWithoutMatchlerInput = {
   ozellik?: Prisma.MulkOzellikUncheckedUpdateOneWithoutPortalIlanNestedInput
 }
 
+export type PortalIlanCreateManyOfisInput = {
+  id?: string
+  kanal: $Enums.VeriKanali
+  url: string
+  ilanNo?: string | null
+  baslik?: string | null
+  hamIcerik?: string | null
+  ilanSahibiAdi?: string | null
+  ilanSahibiTel?: string | null
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  anaKategori?: $Enums.AnaKategori | null
+  mulkTipi?: $Enums.MulkTipi | null
+  islemTipi?: $Enums.IslemTipi | null
+  fiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: $Enums.ParaBirimi
+  fiyatPeriyodu?: $Enums.FiyatPeriyodu
+  m2?: number | null
+  ilId?: number | null
+  ilceId?: number | null
+  mahalleId?: number | null
+  altBolgeId?: number | null
+  ilkGorulme?: Date | string
+  sonGorulme?: Date | string
+  fiyatGecmisi?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  portfoyEdinmeSkoru?: number | null
+  durum?: $Enums.PortalIlanDurum
+  kayitId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PortalIlanUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hamIcerik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilanSahibiAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilanSahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  anaKategori?: Prisma.NullableEnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori | null
+  mulkTipi?: Prisma.NullableEnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi | null
+  islemTipi?: Prisma.NullableEnumIslemTipiFieldUpdateOperationsInput | $Enums.IslemTipi | null
+  fiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
+  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
+  m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  ilkGorulme?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sonGorulme?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fiyatGecmisi?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  portfoyEdinmeSkoru?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  durum?: Prisma.EnumPortalIlanDurumFieldUpdateOperationsInput | $Enums.PortalIlanDurum
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  il?: Prisma.IlUpdateOneWithoutPortalIlanlariNestedInput
+  ilce?: Prisma.IlceUpdateOneWithoutPortalIlanlariNestedInput
+  mahalle?: Prisma.MahalleUpdateOneWithoutPortalIlanlariNestedInput
+  altBolge?: Prisma.AltBolgeUpdateOneWithoutPortalIlanlariNestedInput
+  ozellik?: Prisma.MulkOzellikUpdateOneWithoutPortalIlanNestedInput
+  matchler?: Prisma.MatchUpdateManyWithoutPortalIlanNestedInput
+  kayit?: Prisma.KayitUpdateOneWithoutPortalKaynagiNestedInput
+}
+
+export type PortalIlanUncheckedUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hamIcerik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilanSahibiAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilanSahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  anaKategori?: Prisma.NullableEnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori | null
+  mulkTipi?: Prisma.NullableEnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi | null
+  islemTipi?: Prisma.NullableEnumIslemTipiFieldUpdateOperationsInput | $Enums.IslemTipi | null
+  fiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
+  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
+  m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  ilId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ilceId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mahalleId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ilkGorulme?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sonGorulme?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fiyatGecmisi?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  portfoyEdinmeSkoru?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  durum?: Prisma.EnumPortalIlanDurumFieldUpdateOperationsInput | $Enums.PortalIlanDurum
+  kayitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ozellik?: Prisma.MulkOzellikUncheckedUpdateOneWithoutPortalIlanNestedInput
+  matchler?: Prisma.MatchUncheckedUpdateManyWithoutPortalIlanNestedInput
+}
+
+export type PortalIlanUncheckedUpdateManyWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hamIcerik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilanSahibiAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilanSahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  anaKategori?: Prisma.NullableEnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori | null
+  mulkTipi?: Prisma.NullableEnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi | null
+  islemTipi?: Prisma.NullableEnumIslemTipiFieldUpdateOperationsInput | $Enums.IslemTipi | null
+  fiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
+  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
+  m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  ilId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ilceId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mahalleId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  ilkGorulme?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sonGorulme?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fiyatGecmisi?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  portfoyEdinmeSkoru?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  durum?: Prisma.EnumPortalIlanDurumFieldUpdateOperationsInput | $Enums.PortalIlanDurum
+  kayitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type PortalIlanCreateManyIlInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -2052,6 +2366,7 @@ export type PortalIlanUpdateWithoutIlInput = {
   durum?: Prisma.EnumPortalIlanDurumFieldUpdateOperationsInput | $Enums.PortalIlanDurum
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutPortalIlanlariNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutPortalIlanlariNestedInput
   mahalle?: Prisma.MahalleUpdateOneWithoutPortalIlanlariNestedInput
   altBolge?: Prisma.AltBolgeUpdateOneWithoutPortalIlanlariNestedInput
@@ -2062,6 +2377,7 @@ export type PortalIlanUpdateWithoutIlInput = {
 
 export type PortalIlanUncheckedUpdateWithoutIlInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2094,6 +2410,7 @@ export type PortalIlanUncheckedUpdateWithoutIlInput = {
 
 export type PortalIlanUncheckedUpdateManyWithoutIlInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2124,6 +2441,7 @@ export type PortalIlanUncheckedUpdateManyWithoutIlInput = {
 
 export type PortalIlanCreateManyIlceInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -2176,6 +2494,7 @@ export type PortalIlanUpdateWithoutIlceInput = {
   durum?: Prisma.EnumPortalIlanDurumFieldUpdateOperationsInput | $Enums.PortalIlanDurum
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutPortalIlanlariNestedInput
   il?: Prisma.IlUpdateOneWithoutPortalIlanlariNestedInput
   mahalle?: Prisma.MahalleUpdateOneWithoutPortalIlanlariNestedInput
   altBolge?: Prisma.AltBolgeUpdateOneWithoutPortalIlanlariNestedInput
@@ -2186,6 +2505,7 @@ export type PortalIlanUpdateWithoutIlceInput = {
 
 export type PortalIlanUncheckedUpdateWithoutIlceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2218,6 +2538,7 @@ export type PortalIlanUncheckedUpdateWithoutIlceInput = {
 
 export type PortalIlanUncheckedUpdateManyWithoutIlceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2248,6 +2569,7 @@ export type PortalIlanUncheckedUpdateManyWithoutIlceInput = {
 
 export type PortalIlanCreateManyMahalleInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -2300,6 +2622,7 @@ export type PortalIlanUpdateWithoutMahalleInput = {
   durum?: Prisma.EnumPortalIlanDurumFieldUpdateOperationsInput | $Enums.PortalIlanDurum
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutPortalIlanlariNestedInput
   il?: Prisma.IlUpdateOneWithoutPortalIlanlariNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutPortalIlanlariNestedInput
   altBolge?: Prisma.AltBolgeUpdateOneWithoutPortalIlanlariNestedInput
@@ -2310,6 +2633,7 @@ export type PortalIlanUpdateWithoutMahalleInput = {
 
 export type PortalIlanUncheckedUpdateWithoutMahalleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2342,6 +2666,7 @@ export type PortalIlanUncheckedUpdateWithoutMahalleInput = {
 
 export type PortalIlanUncheckedUpdateManyWithoutMahalleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2372,6 +2697,7 @@ export type PortalIlanUncheckedUpdateManyWithoutMahalleInput = {
 
 export type PortalIlanCreateManyAltBolgeInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   url: string
   ilanNo?: string | null
@@ -2424,6 +2750,7 @@ export type PortalIlanUpdateWithoutAltBolgeInput = {
   durum?: Prisma.EnumPortalIlanDurumFieldUpdateOperationsInput | $Enums.PortalIlanDurum
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutPortalIlanlariNestedInput
   il?: Prisma.IlUpdateOneWithoutPortalIlanlariNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutPortalIlanlariNestedInput
   mahalle?: Prisma.MahalleUpdateOneWithoutPortalIlanlariNestedInput
@@ -2434,6 +2761,7 @@ export type PortalIlanUpdateWithoutAltBolgeInput = {
 
 export type PortalIlanUncheckedUpdateWithoutAltBolgeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2466,6 +2794,7 @@ export type PortalIlanUncheckedUpdateWithoutAltBolgeInput = {
 
 export type PortalIlanUncheckedUpdateManyWithoutAltBolgeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   url?: Prisma.StringFieldUpdateOperationsInput | string
   ilanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2527,6 +2856,7 @@ export type PortalIlanCountOutputTypeCountMatchlerArgs<ExtArgs extends runtime.T
 
 export type PortalIlanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kanal?: boolean
   url?: boolean
   ilanNo?: boolean
@@ -2554,6 +2884,7 @@ export type PortalIlanSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   kayitId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   il?: boolean | Prisma.PortalIlan$ilArgs<ExtArgs>
   ilce?: boolean | Prisma.PortalIlan$ilceArgs<ExtArgs>
   mahalle?: boolean | Prisma.PortalIlan$mahalleArgs<ExtArgs>
@@ -2566,6 +2897,7 @@ export type PortalIlanSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
 
 export type PortalIlanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kanal?: boolean
   url?: boolean
   ilanNo?: boolean
@@ -2593,6 +2925,7 @@ export type PortalIlanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   kayitId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   il?: boolean | Prisma.PortalIlan$ilArgs<ExtArgs>
   ilce?: boolean | Prisma.PortalIlan$ilceArgs<ExtArgs>
   mahalle?: boolean | Prisma.PortalIlan$mahalleArgs<ExtArgs>
@@ -2602,6 +2935,7 @@ export type PortalIlanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
 
 export type PortalIlanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kanal?: boolean
   url?: boolean
   ilanNo?: boolean
@@ -2629,6 +2963,7 @@ export type PortalIlanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   kayitId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   il?: boolean | Prisma.PortalIlan$ilArgs<ExtArgs>
   ilce?: boolean | Prisma.PortalIlan$ilceArgs<ExtArgs>
   mahalle?: boolean | Prisma.PortalIlan$mahalleArgs<ExtArgs>
@@ -2638,6 +2973,7 @@ export type PortalIlanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
 
 export type PortalIlanSelectScalar = {
   id?: boolean
+  ofisId?: boolean
   kanal?: boolean
   url?: boolean
   ilanNo?: boolean
@@ -2667,8 +3003,9 @@ export type PortalIlanSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PortalIlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kanal" | "url" | "ilanNo" | "baslik" | "hamIcerik" | "ilanSahibiAdi" | "ilanSahibiTel" | "ilanSahibiTipi" | "anaKategori" | "mulkTipi" | "islemTipi" | "fiyat" | "paraBirimi" | "fiyatPeriyodu" | "m2" | "ilId" | "ilceId" | "mahalleId" | "altBolgeId" | "ilkGorulme" | "sonGorulme" | "fiyatGecmisi" | "portfoyEdinmeSkoru" | "durum" | "kayitId" | "createdAt" | "updatedAt", ExtArgs["result"]["portalIlan"]>
+export type PortalIlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "kanal" | "url" | "ilanNo" | "baslik" | "hamIcerik" | "ilanSahibiAdi" | "ilanSahibiTel" | "ilanSahibiTipi" | "anaKategori" | "mulkTipi" | "islemTipi" | "fiyat" | "paraBirimi" | "fiyatPeriyodu" | "m2" | "ilId" | "ilceId" | "mahalleId" | "altBolgeId" | "ilkGorulme" | "sonGorulme" | "fiyatGecmisi" | "portfoyEdinmeSkoru" | "durum" | "kayitId" | "createdAt" | "updatedAt", ExtArgs["result"]["portalIlan"]>
 export type PortalIlanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   il?: boolean | Prisma.PortalIlan$ilArgs<ExtArgs>
   ilce?: boolean | Prisma.PortalIlan$ilceArgs<ExtArgs>
   mahalle?: boolean | Prisma.PortalIlan$mahalleArgs<ExtArgs>
@@ -2679,6 +3016,7 @@ export type PortalIlanInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   _count?: boolean | Prisma.PortalIlanCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PortalIlanIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   il?: boolean | Prisma.PortalIlan$ilArgs<ExtArgs>
   ilce?: boolean | Prisma.PortalIlan$ilceArgs<ExtArgs>
   mahalle?: boolean | Prisma.PortalIlan$mahalleArgs<ExtArgs>
@@ -2686,6 +3024,7 @@ export type PortalIlanIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.E
   kayit?: boolean | Prisma.PortalIlan$kayitArgs<ExtArgs>
 }
 export type PortalIlanIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   il?: boolean | Prisma.PortalIlan$ilArgs<ExtArgs>
   ilce?: boolean | Prisma.PortalIlan$ilceArgs<ExtArgs>
   mahalle?: boolean | Prisma.PortalIlan$mahalleArgs<ExtArgs>
@@ -2696,6 +3035,7 @@ export type PortalIlanIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.E
 export type $PortalIlanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PortalIlan"
   objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
     il: Prisma.$IlPayload<ExtArgs> | null
     ilce: Prisma.$IlcePayload<ExtArgs> | null
     mahalle: Prisma.$MahallePayload<ExtArgs> | null
@@ -2706,6 +3046,7 @@ export type $PortalIlanPayload<ExtArgs extends runtime.Types.Extensions.Internal
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ofisId: string
     kanal: $Enums.VeriKanali
     url: string
     ilanNo: string | null
@@ -3127,6 +3468,7 @@ readonly fields: PortalIlanFieldRefs;
  */
 export interface Prisma__PortalIlanClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   il<T extends Prisma.PortalIlan$ilArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PortalIlan$ilArgs<ExtArgs>>): Prisma.Prisma__IlClient<runtime.Types.Result.GetResult<Prisma.$IlPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   ilce<T extends Prisma.PortalIlan$ilceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PortalIlan$ilceArgs<ExtArgs>>): Prisma.Prisma__IlceClient<runtime.Types.Result.GetResult<Prisma.$IlcePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   mahalle<T extends Prisma.PortalIlan$mahalleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PortalIlan$mahalleArgs<ExtArgs>>): Prisma.Prisma__MahalleClient<runtime.Types.Result.GetResult<Prisma.$MahallePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -3164,6 +3506,7 @@ export interface Prisma__PortalIlanClient<T, Null = never, ExtArgs extends runti
  */
 export interface PortalIlanFieldRefs {
   readonly id: Prisma.FieldRef<"PortalIlan", 'String'>
+  readonly ofisId: Prisma.FieldRef<"PortalIlan", 'String'>
   readonly kanal: Prisma.FieldRef<"PortalIlan", 'VeriKanali'>
   readonly url: Prisma.FieldRef<"PortalIlan", 'String'>
   readonly ilanNo: Prisma.FieldRef<"PortalIlan", 'String'>

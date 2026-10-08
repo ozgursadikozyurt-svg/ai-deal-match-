@@ -13,6 +13,10 @@ import { filtreUygula, bosFiltre } from "../demo/filtre";
 import { Eslesmeler, Liste } from "../demo/app";
 import { taslakYap } from "../demo/ai-kutusu";
 import { hizliAyristir } from "../src/lib/ai/hizli-ayristirici";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 const { kayitlar, kisiler } = ornekVeriyiKur();
 const d: DepoDurumu = { ...(ornekVeriyiKur() as any), veriSurumu: "t", kayitlar, kisiler, testler: {}, geriBildirim: "", ayarlar: { ttl: {} as any }, ogrenilen: [], adaylar: [], aktifIceAktarma: null, iceAktarmaGecmisi: [], islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], eslesmeNotlari: {} } as DepoDurumu;

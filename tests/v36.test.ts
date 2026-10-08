@@ -17,6 +17,10 @@ import { eslesmeOzetleri } from "../src/lib/eslestirme/ozet";
 import { NOTION_TUR1, NOTION_TUR2, GOOGLE_TUR1, GOOGLE_TUR2, GOOGLE_GRUPLAR, NK, NP, NT } from "../demo/ornek-entegrasyon";
 import { ornekVeriyiKur } from "../demo/depo";
 import { INDEKS, BAGLAM } from "../demo/lokasyon";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 test("Üç yönlü birleştirme: yerel düzeltme korunur, yalnız dışarıda değişen alınır, ikisi değişirse çakışma", () => {
   const onceki = { fiyat: 300000, baslik: "Depo", m2: 4000 };

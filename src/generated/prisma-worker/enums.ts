@@ -628,6 +628,48 @@ export const CakismaDurum = {
 export type CakismaDurum = (typeof CakismaDurum)[keyof typeof CakismaDurum]
 
 
+export const Rol = {
+  PLATFORM_YONETICISI: 'PLATFORM_YONETICISI',
+  OFIS_YONETICISI: 'OFIS_YONETICISI',
+  DANISMAN: 'DANISMAN'
+} as const
+
+export type Rol = (typeof Rol)[keyof typeof Rol]
+
+
+export const Plan = {
+  UCRETSIZ: 'UCRETSIZ',
+  PRO: 'PRO'
+} as const
+
+export type Plan = (typeof Plan)[keyof typeof Plan]
+
+
+export const OfisDurumu = {
+  AKTIF: 'AKTIF',
+  ASKIDA: 'ASKIDA'
+} as const
+
+export type OfisDurumu = (typeof OfisDurumu)[keyof typeof OfisDurumu]
+
+
+export const Gorunurluk = {
+  OFIS: 'OFIS',
+  OZEL: 'OZEL'
+} as const
+
+export type Gorunurluk = (typeof Gorunurluk)[keyof typeof Gorunurluk]
+
+
+export const DavetDurumu = {
+  BEKLIYOR: 'BEKLIYOR',
+  KULLANILDI: 'KULLANILDI',
+  IPTAL: 'IPTAL'
+} as const
+
+export type DavetDurumu = (typeof DavetDurumu)[keyof typeof DavetDurumu]
+
+
 export const NotTuru = {
   GORUSME: 'GORUSME',
   ARAMA: 'ARAMA',

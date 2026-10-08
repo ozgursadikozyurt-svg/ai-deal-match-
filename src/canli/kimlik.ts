@@ -1,14 +1,19 @@
 /**
- * Anahtar CRM v3.14 · 3 Ekim 2026
- * Canlı API'nin kapısı: her /api isteğinde Supabase oturum anahtarı (JWT) doğrulanır ve e-posta izin listesinde
- * olmalıdır (IZINLI_EPOSTALAR, virgülle). Supabase'in yeni projelerdeki asimetrik anahtarları (JWKS) ve eski
- * HS256 sırrı (SUPABASE_JWT_SECRET) desteklenir. İzin listesi boşsa kimse giremez (güvenli varsayılan).
+ * Anahtar CRM v3.20 · 7 Ekim 2026
+ * Canlı API'nin kapısı — İKİ ADIM:
+ *   1. kimlikDogrula: Supabase oturum anahtarı (JWT) doğrulanır → e-posta. Veritabanı gerekmez.
+ *      Supabase'in yeni projelerdeki asimetrik anahtarları (JWKS) ve eski HS256 sırrı desteklenir.
+ *   2. src/canli/oturum.ts → oturumCoz: e-posta `kullanici` tablosunda aranır → ofis + rol.
+ *
+ * v3.20'de değişen: e-posta izin listesi (IZINLI_EPOSTALAR) buradan kalktı, veritabanına taşındı.
+ * Ortam değişkeni yalnızca acil durum anahtarı olarak oturum.ts'te kullanılır.
  */
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
 
 const jwksOnbellek = new Map<string, ReturnType<typeof createRemoteJWKSet>>();
 export interface KimlikEnv { SUPABASE_URL?: string; SUPABASE_JWT_SECRET?: string; IZINLI_EPOSTALAR?: string }
 
+/** Geriye dönük uyumluluk: eski testler ve acil durum anahtarı için ortam listesi denetimi */
 export function izinliMi(eposta: string | undefined, liste?: string) {
   const izin = (liste ?? "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean);
   return !!eposta && izin.includes(eposta.toLowerCase());
@@ -32,6 +37,6 @@ export async function kimlikDogrula(req: Request, env: KimlikEnv): Promise<{ epo
     }
   } catch { return { hata: "Oturum geçersiz ya da süresi dolmuş", durum: 401 }; }
   const eposta = String(p.email ?? "");
-  if (!izinliMi(eposta, env.IZINLI_EPOSTALAR)) return { hata: "Bu e-postanın erişim izni yok", durum: 403 };
+  if (!eposta) return { hata: "Oturum anahtarında e-posta yok", durum: 401 };
   return { eposta };
 }

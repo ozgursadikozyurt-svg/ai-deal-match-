@@ -754,10 +754,6 @@ export type EnumAliasTipiFieldUpdateOperationsInput = {
   set?: $Enums.AliasTipi
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type LokasyonAliasCreateWithoutIlInput = {
   alias: string
   seviye: $Enums.LokasyonSeviyesi

@@ -12,8 +12,12 @@ import { kayitGuncelle, kayitListele, kayitOlustur } from "../src/lib/services/k
 import { lokasyonCozumle, lokasyonIndeksiYukle } from "../src/lib/lokasyon/cozumle";
 import { GEMINI_RESPONSE_SCHEMA, AiParseCiktiSchema } from "../src/lib/ai/gemini-cikti-semasi";
 import { NOTION_MULK_TIPI } from "../src/lib/notion/eslestirme";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID, istemciyiSarmala } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
 
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: Number(process.env.PG_POOL_MAX ?? 10) }) });
+
+const prisma = istemciyiSarmala(new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: Number(process.env.PG_POOL_MAX ?? 10) }) }));
 
 test("lokasyon veri seti: 81 il / 973 ilçe / Antalya 19 ilçe", async () => {
   assert.equal(await prisma.il.count(), 81);

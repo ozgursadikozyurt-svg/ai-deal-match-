@@ -22,8 +22,8 @@ export async function POST(req: Request) {
   try {
     const { metin, ai, istem } = Girdi.parse(await req.json());
     // v3.10 — Türkiye geneli: çalışma ili + metinde adı geçen diğer illerin indeksleri
-    const ix = await cokIlliIndeks(prisma, metin, calismaIliNormalize((await prisma.ayar.findUnique({ where: { anahtar: "calismaIli" } }))?.deger));
-    const ayar = aiAyarNormalize((await prisma.ayar.findUnique({ where: { anahtar: "ai" } }))?.deger);
+    const ix = await cokIlliIndeks(prisma, metin, calismaIliNormalize((await prisma.ayar.findFirst({ where: { anahtar: "calismaIli" } }))?.deger));
+    const ayar = aiAyarNormalize((await prisma.ayar.findFirst({ where: { anahtar: "ai" } }))?.deger);
     const y = yorumla(metin, ix);
     const parcalar = y.parcalar.map((p) => {
       const c = p.konumlar.length ? cokIlliCozumle(p.konumlar, ix) : { lokasyonlar: [], cozulemeyen: [] };

@@ -15,6 +15,7 @@ import type * as Prisma from "../internal/prismaNamespace"
 /**
  * Model Ayar
  * v3.3 — Kullanıcının ekrandan değiştirebildiği ayarlar (TTL gün sayıları vb.)
+ * v3.20 — ayarlar ofis başına tutulur (birincil anahtar: ofisId + anahtar)
  */
 export type AyarModel = runtime.Types.Result.DefaultSelection<Prisma.$AyarPayload>
 
@@ -25,16 +26,19 @@ export type AggregateAyar = {
 }
 
 export type AyarMinAggregateOutputType = {
+  ofisId: string | null
   anahtar: string | null
   updatedAt: Date | null
 }
 
 export type AyarMaxAggregateOutputType = {
+  ofisId: string | null
   anahtar: string | null
   updatedAt: Date | null
 }
 
 export type AyarCountAggregateOutputType = {
+  ofisId: number
   anahtar: number
   deger: number
   updatedAt: number
@@ -43,16 +47,19 @@ export type AyarCountAggregateOutputType = {
 
 
 export type AyarMinAggregateInputType = {
+  ofisId?: true
   anahtar?: true
   updatedAt?: true
 }
 
 export type AyarMaxAggregateInputType = {
+  ofisId?: true
   anahtar?: true
   updatedAt?: true
 }
 
 export type AyarCountAggregateInputType = {
+  ofisId?: true
   anahtar?: true
   deger?: true
   updatedAt?: true
@@ -132,6 +139,7 @@ export type AyarGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 }
 
 export type AyarGroupByOutputType = {
+  ofisId: string
   anahtar: string
   deger: runtime.JsonValue
   updatedAt: Date
@@ -159,27 +167,35 @@ export type AyarWhereInput = {
   AND?: Prisma.AyarWhereInput | Prisma.AyarWhereInput[]
   OR?: Prisma.AyarWhereInput[]
   NOT?: Prisma.AyarWhereInput | Prisma.AyarWhereInput[]
+  ofisId?: Prisma.StringFilter<"Ayar"> | string
   anahtar?: Prisma.StringFilter<"Ayar"> | string
   deger?: Prisma.JsonFilter<"Ayar">
   updatedAt?: Prisma.DateTimeFilter<"Ayar"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
 }
 
 export type AyarOrderByWithRelationInput = {
+  ofisId?: Prisma.SortOrder
   anahtar?: Prisma.SortOrder
   deger?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
 }
 
 export type AyarWhereUniqueInput = Prisma.AtLeast<{
-  anahtar?: string
+  ofisId_anahtar?: Prisma.AyarOfisIdAnahtarCompoundUniqueInput
   AND?: Prisma.AyarWhereInput | Prisma.AyarWhereInput[]
   OR?: Prisma.AyarWhereInput[]
   NOT?: Prisma.AyarWhereInput | Prisma.AyarWhereInput[]
+  ofisId?: Prisma.StringFilter<"Ayar"> | string
+  anahtar?: Prisma.StringFilter<"Ayar"> | string
   deger?: Prisma.JsonFilter<"Ayar">
   updatedAt?: Prisma.DateTimeFilter<"Ayar"> | Date | string
-}, "anahtar">
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
+}, "ofisId_anahtar">
 
 export type AyarOrderByWithAggregationInput = {
+  ofisId?: Prisma.SortOrder
   anahtar?: Prisma.SortOrder
   deger?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -192,6 +208,7 @@ export type AyarScalarWhereWithAggregatesInput = {
   AND?: Prisma.AyarScalarWhereWithAggregatesInput | Prisma.AyarScalarWhereWithAggregatesInput[]
   OR?: Prisma.AyarScalarWhereWithAggregatesInput[]
   NOT?: Prisma.AyarScalarWhereWithAggregatesInput | Prisma.AyarScalarWhereWithAggregatesInput[]
+  ofisId?: Prisma.StringWithAggregatesFilter<"Ayar"> | string
   anahtar?: Prisma.StringWithAggregatesFilter<"Ayar"> | string
   deger?: Prisma.JsonWithAggregatesFilter<"Ayar">
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Ayar"> | Date | string
@@ -201,9 +218,11 @@ export type AyarCreateInput = {
   anahtar: string
   deger: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutAyarlarInput
 }
 
 export type AyarUncheckedCreateInput = {
+  ofisId?: string
   anahtar: string
   deger: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Date | string
@@ -213,15 +232,18 @@ export type AyarUpdateInput = {
   anahtar?: Prisma.StringFieldUpdateOperationsInput | string
   deger?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutAyarlarNestedInput
 }
 
 export type AyarUncheckedUpdateInput = {
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   anahtar?: Prisma.StringFieldUpdateOperationsInput | string
   deger?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AyarCreateManyInput = {
+  ofisId?: string
   anahtar: string
   deger: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Date | string
@@ -234,59 +256,211 @@ export type AyarUpdateManyMutationInput = {
 }
 
 export type AyarUncheckedUpdateManyInput = {
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   anahtar?: Prisma.StringFieldUpdateOperationsInput | string
   deger?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type AyarListRelationFilter = {
+  every?: Prisma.AyarWhereInput
+  some?: Prisma.AyarWhereInput
+  none?: Prisma.AyarWhereInput
+}
+
+export type AyarOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type AyarOfisIdAnahtarCompoundUniqueInput = {
+  ofisId: string
+  anahtar: string
+}
+
 export type AyarCountOrderByAggregateInput = {
+  ofisId?: Prisma.SortOrder
   anahtar?: Prisma.SortOrder
   deger?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type AyarMaxOrderByAggregateInput = {
+  ofisId?: Prisma.SortOrder
   anahtar?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type AyarMinOrderByAggregateInput = {
+  ofisId?: Prisma.SortOrder
   anahtar?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type AyarCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.AyarCreateWithoutOfisInput, Prisma.AyarUncheckedCreateWithoutOfisInput> | Prisma.AyarCreateWithoutOfisInput[] | Prisma.AyarUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.AyarCreateOrConnectWithoutOfisInput | Prisma.AyarCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.AyarCreateManyOfisInputEnvelope
+  connect?: Prisma.AyarWhereUniqueInput | Prisma.AyarWhereUniqueInput[]
+}
+
+export type AyarUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.AyarCreateWithoutOfisInput, Prisma.AyarUncheckedCreateWithoutOfisInput> | Prisma.AyarCreateWithoutOfisInput[] | Prisma.AyarUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.AyarCreateOrConnectWithoutOfisInput | Prisma.AyarCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.AyarCreateManyOfisInputEnvelope
+  connect?: Prisma.AyarWhereUniqueInput | Prisma.AyarWhereUniqueInput[]
+}
+
+export type AyarUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.AyarCreateWithoutOfisInput, Prisma.AyarUncheckedCreateWithoutOfisInput> | Prisma.AyarCreateWithoutOfisInput[] | Prisma.AyarUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.AyarCreateOrConnectWithoutOfisInput | Prisma.AyarCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.AyarUpsertWithWhereUniqueWithoutOfisInput | Prisma.AyarUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.AyarCreateManyOfisInputEnvelope
+  set?: Prisma.AyarWhereUniqueInput | Prisma.AyarWhereUniqueInput[]
+  disconnect?: Prisma.AyarWhereUniqueInput | Prisma.AyarWhereUniqueInput[]
+  delete?: Prisma.AyarWhereUniqueInput | Prisma.AyarWhereUniqueInput[]
+  connect?: Prisma.AyarWhereUniqueInput | Prisma.AyarWhereUniqueInput[]
+  update?: Prisma.AyarUpdateWithWhereUniqueWithoutOfisInput | Prisma.AyarUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.AyarUpdateManyWithWhereWithoutOfisInput | Prisma.AyarUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.AyarScalarWhereInput | Prisma.AyarScalarWhereInput[]
+}
+
+export type AyarUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.AyarCreateWithoutOfisInput, Prisma.AyarUncheckedCreateWithoutOfisInput> | Prisma.AyarCreateWithoutOfisInput[] | Prisma.AyarUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.AyarCreateOrConnectWithoutOfisInput | Prisma.AyarCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.AyarUpsertWithWhereUniqueWithoutOfisInput | Prisma.AyarUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.AyarCreateManyOfisInputEnvelope
+  set?: Prisma.AyarWhereUniqueInput | Prisma.AyarWhereUniqueInput[]
+  disconnect?: Prisma.AyarWhereUniqueInput | Prisma.AyarWhereUniqueInput[]
+  delete?: Prisma.AyarWhereUniqueInput | Prisma.AyarWhereUniqueInput[]
+  connect?: Prisma.AyarWhereUniqueInput | Prisma.AyarWhereUniqueInput[]
+  update?: Prisma.AyarUpdateWithWhereUniqueWithoutOfisInput | Prisma.AyarUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.AyarUpdateManyWithWhereWithoutOfisInput | Prisma.AyarUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.AyarScalarWhereInput | Prisma.AyarScalarWhereInput[]
+}
+
+export type AyarCreateWithoutOfisInput = {
+  anahtar: string
+  deger: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  updatedAt?: Date | string
+}
+
+export type AyarUncheckedCreateWithoutOfisInput = {
+  anahtar: string
+  deger: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  updatedAt?: Date | string
+}
+
+export type AyarCreateOrConnectWithoutOfisInput = {
+  where: Prisma.AyarWhereUniqueInput
+  create: Prisma.XOR<Prisma.AyarCreateWithoutOfisInput, Prisma.AyarUncheckedCreateWithoutOfisInput>
+}
+
+export type AyarCreateManyOfisInputEnvelope = {
+  data: Prisma.AyarCreateManyOfisInput | Prisma.AyarCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type AyarUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.AyarWhereUniqueInput
+  update: Prisma.XOR<Prisma.AyarUpdateWithoutOfisInput, Prisma.AyarUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.AyarCreateWithoutOfisInput, Prisma.AyarUncheckedCreateWithoutOfisInput>
+}
+
+export type AyarUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.AyarWhereUniqueInput
+  data: Prisma.XOR<Prisma.AyarUpdateWithoutOfisInput, Prisma.AyarUncheckedUpdateWithoutOfisInput>
+}
+
+export type AyarUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.AyarScalarWhereInput
+  data: Prisma.XOR<Prisma.AyarUpdateManyMutationInput, Prisma.AyarUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type AyarScalarWhereInput = {
+  AND?: Prisma.AyarScalarWhereInput | Prisma.AyarScalarWhereInput[]
+  OR?: Prisma.AyarScalarWhereInput[]
+  NOT?: Prisma.AyarScalarWhereInput | Prisma.AyarScalarWhereInput[]
+  ofisId?: Prisma.StringFilter<"Ayar"> | string
+  anahtar?: Prisma.StringFilter<"Ayar"> | string
+  deger?: Prisma.JsonFilter<"Ayar">
+  updatedAt?: Prisma.DateTimeFilter<"Ayar"> | Date | string
+}
+
+export type AyarCreateManyOfisInput = {
+  anahtar: string
+  deger: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  updatedAt?: Date | string
+}
+
+export type AyarUpdateWithoutOfisInput = {
+  anahtar?: Prisma.StringFieldUpdateOperationsInput | string
+  deger?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AyarUncheckedUpdateWithoutOfisInput = {
+  anahtar?: Prisma.StringFieldUpdateOperationsInput | string
+  deger?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AyarUncheckedUpdateManyWithoutOfisInput = {
+  anahtar?: Prisma.StringFieldUpdateOperationsInput | string
+  deger?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
 
 export type AyarSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  ofisId?: boolean
   anahtar?: boolean
   deger?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["ayar"]>
 
 export type AyarSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  ofisId?: boolean
   anahtar?: boolean
   deger?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["ayar"]>
 
 export type AyarSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  ofisId?: boolean
   anahtar?: boolean
   deger?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["ayar"]>
 
 export type AyarSelectScalar = {
+  ofisId?: boolean
   anahtar?: boolean
   deger?: boolean
   updatedAt?: boolean
 }
 
-export type AyarOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"anahtar" | "deger" | "updatedAt", ExtArgs["result"]["ayar"]>
+export type AyarOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ofisId" | "anahtar" | "deger" | "updatedAt", ExtArgs["result"]["ayar"]>
+export type AyarInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type AyarIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type AyarIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
 
 export type $AyarPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Ayar"
-  objects: {}
+  objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    ofisId: string
     anahtar: string
     deger: runtime.JsonValue
     updatedAt: Date
@@ -373,8 +547,8 @@ export interface AyarDelegate<ExtArgs extends runtime.Types.Extensions.InternalA
    * // Get first 10 Ayars
    * const ayars = await prisma.ayar.findMany({ take: 10 })
    * 
-   * // Only select the `anahtar`
-   * const ayarWithAnahtarOnly = await prisma.ayar.findMany({ select: { anahtar: true } })
+   * // Only select the `ofisId`
+   * const ayarWithOfisIdOnly = await prisma.ayar.findMany({ select: { ofisId: true } })
    * 
    */
   findMany<T extends AyarFindManyArgs>(args?: Prisma.SelectSubset<T, AyarFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AyarPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -418,9 +592,9 @@ export interface AyarDelegate<ExtArgs extends runtime.Types.Extensions.InternalA
    *   ]
    * })
    * 
-   * // Create many Ayars and only return the `anahtar`
-   * const ayarWithAnahtarOnly = await prisma.ayar.createManyAndReturn({
-   *   select: { anahtar: true },
+   * // Create many Ayars and only return the `ofisId`
+   * const ayarWithOfisIdOnly = await prisma.ayar.createManyAndReturn({
+   *   select: { ofisId: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -509,9 +683,9 @@ export interface AyarDelegate<ExtArgs extends runtime.Types.Extensions.InternalA
    *   ]
    * })
    * 
-   * // Update zero or more Ayars and only return the `anahtar`
-   * const ayarWithAnahtarOnly = await prisma.ayar.updateManyAndReturn({
-   *   select: { anahtar: true },
+   * // Update zero or more Ayars and only return the `ofisId`
+   * const ayarWithOfisIdOnly = await prisma.ayar.updateManyAndReturn({
+   *   select: { ofisId: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -684,6 +858,7 @@ readonly fields: AyarFieldRefs;
  */
 export interface Prisma__AyarClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -713,6 +888,7 @@ export interface Prisma__AyarClient<T, Null = never, ExtArgs extends runtime.Typ
  * Fields of the Ayar model
  */
 export interface AyarFieldRefs {
+  readonly ofisId: Prisma.FieldRef<"Ayar", 'String'>
   readonly anahtar: Prisma.FieldRef<"Ayar", 'String'>
   readonly deger: Prisma.FieldRef<"Ayar", 'Json'>
   readonly updatedAt: Prisma.FieldRef<"Ayar", 'DateTime'>
@@ -733,6 +909,10 @@ export type AyarFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Internal
    */
   omit?: Prisma.AyarOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarInclude<ExtArgs> | null
+  /**
    * Filter, which Ayar to fetch.
    */
   where: Prisma.AyarWhereUniqueInput
@@ -751,6 +931,10 @@ export type AyarFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   omit?: Prisma.AyarOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarInclude<ExtArgs> | null
+  /**
    * Filter, which Ayar to fetch.
    */
   where: Prisma.AyarWhereUniqueInput
@@ -768,6 +952,10 @@ export type AyarFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Ayar
    */
   omit?: Prisma.AyarOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarInclude<ExtArgs> | null
   /**
    * Filter, which Ayar to fetch.
    */
@@ -817,6 +1005,10 @@ export type AyarFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.AyarOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarInclude<ExtArgs> | null
+  /**
    * Filter, which Ayar to fetch.
    */
   where?: Prisma.AyarWhereInput
@@ -864,6 +1056,10 @@ export type AyarFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Omit specific fields from the Ayar
    */
   omit?: Prisma.AyarOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarInclude<ExtArgs> | null
   /**
    * Filter, which Ayars to fetch.
    */
@@ -913,6 +1109,10 @@ export type AyarCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.AyarOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarInclude<ExtArgs> | null
+  /**
    * The data needed to create a Ayar.
    */
   data: Prisma.XOR<Prisma.AyarCreateInput, Prisma.AyarUncheckedCreateInput>
@@ -946,6 +1146,10 @@ export type AyarCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.AyarCreateManyInput | Prisma.AyarCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -960,6 +1164,10 @@ export type AyarUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Omit specific fields from the Ayar
    */
   omit?: Prisma.AyarOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarInclude<ExtArgs> | null
   /**
    * The data needed to update a Ayar.
    */
@@ -1012,6 +1220,10 @@ export type AyarUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Ayars to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1026,6 +1238,10 @@ export type AyarUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Omit specific fields from the Ayar
    */
   omit?: Prisma.AyarOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarInclude<ExtArgs> | null
   /**
    * The filter to search for the Ayar to update in case it exists.
    */
@@ -1052,6 +1268,10 @@ export type AyarDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Omit specific fields from the Ayar
    */
   omit?: Prisma.AyarOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarInclude<ExtArgs> | null
   /**
    * Filter which Ayar to delete.
    */
@@ -1084,4 +1304,8 @@ export type AyarDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Omit specific fields from the Ayar
    */
   omit?: Prisma.AyarOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AyarInclude<ExtArgs> | null
 }

@@ -37,6 +37,7 @@ export type IslenmisMesajSumAggregateOutputType = {
 
 export type IslenmisMesajMinAggregateOutputType = {
   parmakIzi: string | null
+  ofisId: string | null
   grup: string | null
   mesajTarihi: Date | null
   ingestionId: string | null
@@ -46,6 +47,7 @@ export type IslenmisMesajMinAggregateOutputType = {
 
 export type IslenmisMesajMaxAggregateOutputType = {
   parmakIzi: string | null
+  ofisId: string | null
   grup: string | null
   mesajTarihi: Date | null
   ingestionId: string | null
@@ -55,6 +57,7 @@ export type IslenmisMesajMaxAggregateOutputType = {
 
 export type IslenmisMesajCountAggregateOutputType = {
   parmakIzi: number
+  ofisId: number
   grup: number
   mesajTarihi: number
   ingestionId: number
@@ -74,6 +77,7 @@ export type IslenmisMesajSumAggregateInputType = {
 
 export type IslenmisMesajMinAggregateInputType = {
   parmakIzi?: true
+  ofisId?: true
   grup?: true
   mesajTarihi?: true
   ingestionId?: true
@@ -83,6 +87,7 @@ export type IslenmisMesajMinAggregateInputType = {
 
 export type IslenmisMesajMaxAggregateInputType = {
   parmakIzi?: true
+  ofisId?: true
   grup?: true
   mesajTarihi?: true
   ingestionId?: true
@@ -92,6 +97,7 @@ export type IslenmisMesajMaxAggregateInputType = {
 
 export type IslenmisMesajCountAggregateInputType = {
   parmakIzi?: true
+  ofisId?: true
   grup?: true
   mesajTarihi?: true
   ingestionId?: true
@@ -188,6 +194,7 @@ export type IslenmisMesajGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 
 export type IslenmisMesajGroupByOutputType = {
   parmakIzi: string
+  ofisId: string
   grup: string | null
   mesajTarihi: Date | null
   ingestionId: string | null
@@ -220,36 +227,44 @@ export type IslenmisMesajWhereInput = {
   OR?: Prisma.IslenmisMesajWhereInput[]
   NOT?: Prisma.IslenmisMesajWhereInput | Prisma.IslenmisMesajWhereInput[]
   parmakIzi?: Prisma.StringFilter<"IslenmisMesaj"> | string
+  ofisId?: Prisma.StringFilter<"IslenmisMesaj"> | string
   grup?: Prisma.StringNullableFilter<"IslenmisMesaj"> | string | null
   mesajTarihi?: Prisma.DateTimeNullableFilter<"IslenmisMesaj"> | Date | string | null
   ingestionId?: Prisma.StringNullableFilter<"IslenmisMesaj"> | string | null
   kayitSayisi?: Prisma.IntFilter<"IslenmisMesaj"> | number
   createdAt?: Prisma.DateTimeFilter<"IslenmisMesaj"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
 }
 
 export type IslenmisMesajOrderByWithRelationInput = {
   parmakIzi?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   grup?: Prisma.SortOrderInput | Prisma.SortOrder
   mesajTarihi?: Prisma.SortOrderInput | Prisma.SortOrder
   ingestionId?: Prisma.SortOrderInput | Prisma.SortOrder
   kayitSayisi?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
 }
 
 export type IslenmisMesajWhereUniqueInput = Prisma.AtLeast<{
-  parmakIzi?: string
+  ofisId_parmakIzi?: Prisma.IslenmisMesajOfisIdParmakIziCompoundUniqueInput
   AND?: Prisma.IslenmisMesajWhereInput | Prisma.IslenmisMesajWhereInput[]
   OR?: Prisma.IslenmisMesajWhereInput[]
   NOT?: Prisma.IslenmisMesajWhereInput | Prisma.IslenmisMesajWhereInput[]
+  parmakIzi?: Prisma.StringFilter<"IslenmisMesaj"> | string
+  ofisId?: Prisma.StringFilter<"IslenmisMesaj"> | string
   grup?: Prisma.StringNullableFilter<"IslenmisMesaj"> | string | null
   mesajTarihi?: Prisma.DateTimeNullableFilter<"IslenmisMesaj"> | Date | string | null
   ingestionId?: Prisma.StringNullableFilter<"IslenmisMesaj"> | string | null
   kayitSayisi?: Prisma.IntFilter<"IslenmisMesaj"> | number
   createdAt?: Prisma.DateTimeFilter<"IslenmisMesaj"> | Date | string
-}, "parmakIzi">
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
+}, "ofisId_parmakIzi">
 
 export type IslenmisMesajOrderByWithAggregationInput = {
   parmakIzi?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   grup?: Prisma.SortOrderInput | Prisma.SortOrder
   mesajTarihi?: Prisma.SortOrderInput | Prisma.SortOrder
   ingestionId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -267,6 +282,7 @@ export type IslenmisMesajScalarWhereWithAggregatesInput = {
   OR?: Prisma.IslenmisMesajScalarWhereWithAggregatesInput[]
   NOT?: Prisma.IslenmisMesajScalarWhereWithAggregatesInput | Prisma.IslenmisMesajScalarWhereWithAggregatesInput[]
   parmakIzi?: Prisma.StringWithAggregatesFilter<"IslenmisMesaj"> | string
+  ofisId?: Prisma.StringWithAggregatesFilter<"IslenmisMesaj"> | string
   grup?: Prisma.StringNullableWithAggregatesFilter<"IslenmisMesaj"> | string | null
   mesajTarihi?: Prisma.DateTimeNullableWithAggregatesFilter<"IslenmisMesaj"> | Date | string | null
   ingestionId?: Prisma.StringNullableWithAggregatesFilter<"IslenmisMesaj"> | string | null
@@ -281,10 +297,12 @@ export type IslenmisMesajCreateInput = {
   ingestionId?: string | null
   kayitSayisi?: number
   createdAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutIslenmisMesajlarInput
 }
 
 export type IslenmisMesajUncheckedCreateInput = {
   parmakIzi: string
+  ofisId?: string
   grup?: string | null
   mesajTarihi?: Date | string | null
   ingestionId?: string | null
@@ -299,10 +317,12 @@ export type IslenmisMesajUpdateInput = {
   ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kayitSayisi?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutIslenmisMesajlarNestedInput
 }
 
 export type IslenmisMesajUncheckedUpdateInput = {
   parmakIzi?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   grup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mesajTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -312,6 +332,7 @@ export type IslenmisMesajUncheckedUpdateInput = {
 
 export type IslenmisMesajCreateManyInput = {
   parmakIzi: string
+  ofisId?: string
   grup?: string | null
   mesajTarihi?: Date | string | null
   ingestionId?: string | null
@@ -330,6 +351,7 @@ export type IslenmisMesajUpdateManyMutationInput = {
 
 export type IslenmisMesajUncheckedUpdateManyInput = {
   parmakIzi?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   grup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mesajTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -337,8 +359,24 @@ export type IslenmisMesajUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type IslenmisMesajListRelationFilter = {
+  every?: Prisma.IslenmisMesajWhereInput
+  some?: Prisma.IslenmisMesajWhereInput
+  none?: Prisma.IslenmisMesajWhereInput
+}
+
+export type IslenmisMesajOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type IslenmisMesajOfisIdParmakIziCompoundUniqueInput = {
+  ofisId: string
+  parmakIzi: string
+}
+
 export type IslenmisMesajCountOrderByAggregateInput = {
   parmakIzi?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   grup?: Prisma.SortOrder
   mesajTarihi?: Prisma.SortOrder
   ingestionId?: Prisma.SortOrder
@@ -352,6 +390,7 @@ export type IslenmisMesajAvgOrderByAggregateInput = {
 
 export type IslenmisMesajMaxOrderByAggregateInput = {
   parmakIzi?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   grup?: Prisma.SortOrder
   mesajTarihi?: Prisma.SortOrder
   ingestionId?: Prisma.SortOrder
@@ -361,6 +400,7 @@ export type IslenmisMesajMaxOrderByAggregateInput = {
 
 export type IslenmisMesajMinOrderByAggregateInput = {
   parmakIzi?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   grup?: Prisma.SortOrder
   mesajTarihi?: Prisma.SortOrder
   ingestionId?: Prisma.SortOrder
@@ -372,37 +412,179 @@ export type IslenmisMesajSumOrderByAggregateInput = {
   kayitSayisi?: Prisma.SortOrder
 }
 
+export type IslenmisMesajCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.IslenmisMesajCreateWithoutOfisInput, Prisma.IslenmisMesajUncheckedCreateWithoutOfisInput> | Prisma.IslenmisMesajCreateWithoutOfisInput[] | Prisma.IslenmisMesajUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.IslenmisMesajCreateOrConnectWithoutOfisInput | Prisma.IslenmisMesajCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.IslenmisMesajCreateManyOfisInputEnvelope
+  connect?: Prisma.IslenmisMesajWhereUniqueInput | Prisma.IslenmisMesajWhereUniqueInput[]
+}
+
+export type IslenmisMesajUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.IslenmisMesajCreateWithoutOfisInput, Prisma.IslenmisMesajUncheckedCreateWithoutOfisInput> | Prisma.IslenmisMesajCreateWithoutOfisInput[] | Prisma.IslenmisMesajUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.IslenmisMesajCreateOrConnectWithoutOfisInput | Prisma.IslenmisMesajCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.IslenmisMesajCreateManyOfisInputEnvelope
+  connect?: Prisma.IslenmisMesajWhereUniqueInput | Prisma.IslenmisMesajWhereUniqueInput[]
+}
+
+export type IslenmisMesajUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.IslenmisMesajCreateWithoutOfisInput, Prisma.IslenmisMesajUncheckedCreateWithoutOfisInput> | Prisma.IslenmisMesajCreateWithoutOfisInput[] | Prisma.IslenmisMesajUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.IslenmisMesajCreateOrConnectWithoutOfisInput | Prisma.IslenmisMesajCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.IslenmisMesajUpsertWithWhereUniqueWithoutOfisInput | Prisma.IslenmisMesajUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.IslenmisMesajCreateManyOfisInputEnvelope
+  set?: Prisma.IslenmisMesajWhereUniqueInput | Prisma.IslenmisMesajWhereUniqueInput[]
+  disconnect?: Prisma.IslenmisMesajWhereUniqueInput | Prisma.IslenmisMesajWhereUniqueInput[]
+  delete?: Prisma.IslenmisMesajWhereUniqueInput | Prisma.IslenmisMesajWhereUniqueInput[]
+  connect?: Prisma.IslenmisMesajWhereUniqueInput | Prisma.IslenmisMesajWhereUniqueInput[]
+  update?: Prisma.IslenmisMesajUpdateWithWhereUniqueWithoutOfisInput | Prisma.IslenmisMesajUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.IslenmisMesajUpdateManyWithWhereWithoutOfisInput | Prisma.IslenmisMesajUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.IslenmisMesajScalarWhereInput | Prisma.IslenmisMesajScalarWhereInput[]
+}
+
+export type IslenmisMesajUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.IslenmisMesajCreateWithoutOfisInput, Prisma.IslenmisMesajUncheckedCreateWithoutOfisInput> | Prisma.IslenmisMesajCreateWithoutOfisInput[] | Prisma.IslenmisMesajUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.IslenmisMesajCreateOrConnectWithoutOfisInput | Prisma.IslenmisMesajCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.IslenmisMesajUpsertWithWhereUniqueWithoutOfisInput | Prisma.IslenmisMesajUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.IslenmisMesajCreateManyOfisInputEnvelope
+  set?: Prisma.IslenmisMesajWhereUniqueInput | Prisma.IslenmisMesajWhereUniqueInput[]
+  disconnect?: Prisma.IslenmisMesajWhereUniqueInput | Prisma.IslenmisMesajWhereUniqueInput[]
+  delete?: Prisma.IslenmisMesajWhereUniqueInput | Prisma.IslenmisMesajWhereUniqueInput[]
+  connect?: Prisma.IslenmisMesajWhereUniqueInput | Prisma.IslenmisMesajWhereUniqueInput[]
+  update?: Prisma.IslenmisMesajUpdateWithWhereUniqueWithoutOfisInput | Prisma.IslenmisMesajUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.IslenmisMesajUpdateManyWithWhereWithoutOfisInput | Prisma.IslenmisMesajUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.IslenmisMesajScalarWhereInput | Prisma.IslenmisMesajScalarWhereInput[]
+}
+
+export type IslenmisMesajCreateWithoutOfisInput = {
+  parmakIzi: string
+  grup?: string | null
+  mesajTarihi?: Date | string | null
+  ingestionId?: string | null
+  kayitSayisi?: number
+  createdAt?: Date | string
+}
+
+export type IslenmisMesajUncheckedCreateWithoutOfisInput = {
+  parmakIzi: string
+  grup?: string | null
+  mesajTarihi?: Date | string | null
+  ingestionId?: string | null
+  kayitSayisi?: number
+  createdAt?: Date | string
+}
+
+export type IslenmisMesajCreateOrConnectWithoutOfisInput = {
+  where: Prisma.IslenmisMesajWhereUniqueInput
+  create: Prisma.XOR<Prisma.IslenmisMesajCreateWithoutOfisInput, Prisma.IslenmisMesajUncheckedCreateWithoutOfisInput>
+}
+
+export type IslenmisMesajCreateManyOfisInputEnvelope = {
+  data: Prisma.IslenmisMesajCreateManyOfisInput | Prisma.IslenmisMesajCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type IslenmisMesajUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.IslenmisMesajWhereUniqueInput
+  update: Prisma.XOR<Prisma.IslenmisMesajUpdateWithoutOfisInput, Prisma.IslenmisMesajUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.IslenmisMesajCreateWithoutOfisInput, Prisma.IslenmisMesajUncheckedCreateWithoutOfisInput>
+}
+
+export type IslenmisMesajUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.IslenmisMesajWhereUniqueInput
+  data: Prisma.XOR<Prisma.IslenmisMesajUpdateWithoutOfisInput, Prisma.IslenmisMesajUncheckedUpdateWithoutOfisInput>
+}
+
+export type IslenmisMesajUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.IslenmisMesajScalarWhereInput
+  data: Prisma.XOR<Prisma.IslenmisMesajUpdateManyMutationInput, Prisma.IslenmisMesajUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type IslenmisMesajScalarWhereInput = {
+  AND?: Prisma.IslenmisMesajScalarWhereInput | Prisma.IslenmisMesajScalarWhereInput[]
+  OR?: Prisma.IslenmisMesajScalarWhereInput[]
+  NOT?: Prisma.IslenmisMesajScalarWhereInput | Prisma.IslenmisMesajScalarWhereInput[]
+  parmakIzi?: Prisma.StringFilter<"IslenmisMesaj"> | string
+  ofisId?: Prisma.StringFilter<"IslenmisMesaj"> | string
+  grup?: Prisma.StringNullableFilter<"IslenmisMesaj"> | string | null
+  mesajTarihi?: Prisma.DateTimeNullableFilter<"IslenmisMesaj"> | Date | string | null
+  ingestionId?: Prisma.StringNullableFilter<"IslenmisMesaj"> | string | null
+  kayitSayisi?: Prisma.IntFilter<"IslenmisMesaj"> | number
+  createdAt?: Prisma.DateTimeFilter<"IslenmisMesaj"> | Date | string
+}
+
+export type IslenmisMesajCreateManyOfisInput = {
+  parmakIzi: string
+  grup?: string | null
+  mesajTarihi?: Date | string | null
+  ingestionId?: string | null
+  kayitSayisi?: number
+  createdAt?: Date | string
+}
+
+export type IslenmisMesajUpdateWithoutOfisInput = {
+  parmakIzi?: Prisma.StringFieldUpdateOperationsInput | string
+  grup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mesajTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kayitSayisi?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type IslenmisMesajUncheckedUpdateWithoutOfisInput = {
+  parmakIzi?: Prisma.StringFieldUpdateOperationsInput | string
+  grup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mesajTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kayitSayisi?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type IslenmisMesajUncheckedUpdateManyWithoutOfisInput = {
+  parmakIzi?: Prisma.StringFieldUpdateOperationsInput | string
+  grup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mesajTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kayitSayisi?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type IslenmisMesajSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   parmakIzi?: boolean
+  ofisId?: boolean
   grup?: boolean
   mesajTarihi?: boolean
   ingestionId?: boolean
   kayitSayisi?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["islenmisMesaj"]>
 
 export type IslenmisMesajSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   parmakIzi?: boolean
+  ofisId?: boolean
   grup?: boolean
   mesajTarihi?: boolean
   ingestionId?: boolean
   kayitSayisi?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["islenmisMesaj"]>
 
 export type IslenmisMesajSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   parmakIzi?: boolean
+  ofisId?: boolean
   grup?: boolean
   mesajTarihi?: boolean
   ingestionId?: boolean
   kayitSayisi?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["islenmisMesaj"]>
 
 export type IslenmisMesajSelectScalar = {
   parmakIzi?: boolean
+  ofisId?: boolean
   grup?: boolean
   mesajTarihi?: boolean
   ingestionId?: boolean
@@ -410,13 +592,25 @@ export type IslenmisMesajSelectScalar = {
   createdAt?: boolean
 }
 
-export type IslenmisMesajOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"parmakIzi" | "grup" | "mesajTarihi" | "ingestionId" | "kayitSayisi" | "createdAt", ExtArgs["result"]["islenmisMesaj"]>
+export type IslenmisMesajOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"parmakIzi" | "ofisId" | "grup" | "mesajTarihi" | "ingestionId" | "kayitSayisi" | "createdAt", ExtArgs["result"]["islenmisMesaj"]>
+export type IslenmisMesajInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type IslenmisMesajIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type IslenmisMesajIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
 
 export type $IslenmisMesajPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "IslenmisMesaj"
-  objects: {}
+  objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     parmakIzi: string
+    ofisId: string
     grup: string | null
     mesajTarihi: Date | null
     ingestionId: string | null
@@ -816,6 +1010,7 @@ readonly fields: IslenmisMesajFieldRefs;
  */
 export interface Prisma__IslenmisMesajClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -846,6 +1041,7 @@ export interface Prisma__IslenmisMesajClient<T, Null = never, ExtArgs extends ru
  */
 export interface IslenmisMesajFieldRefs {
   readonly parmakIzi: Prisma.FieldRef<"IslenmisMesaj", 'String'>
+  readonly ofisId: Prisma.FieldRef<"IslenmisMesaj", 'String'>
   readonly grup: Prisma.FieldRef<"IslenmisMesaj", 'String'>
   readonly mesajTarihi: Prisma.FieldRef<"IslenmisMesaj", 'DateTime'>
   readonly ingestionId: Prisma.FieldRef<"IslenmisMesaj", 'String'>
@@ -868,6 +1064,10 @@ export type IslenmisMesajFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.IslenmisMesajOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajInclude<ExtArgs> | null
+  /**
    * Filter, which IslenmisMesaj to fetch.
    */
   where: Prisma.IslenmisMesajWhereUniqueInput
@@ -886,6 +1086,10 @@ export type IslenmisMesajFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.IslenmisMesajOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajInclude<ExtArgs> | null
+  /**
    * Filter, which IslenmisMesaj to fetch.
    */
   where: Prisma.IslenmisMesajWhereUniqueInput
@@ -903,6 +1107,10 @@ export type IslenmisMesajFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the IslenmisMesaj
    */
   omit?: Prisma.IslenmisMesajOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajInclude<ExtArgs> | null
   /**
    * Filter, which IslenmisMesaj to fetch.
    */
@@ -952,6 +1160,10 @@ export type IslenmisMesajFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
    */
   omit?: Prisma.IslenmisMesajOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajInclude<ExtArgs> | null
+  /**
    * Filter, which IslenmisMesaj to fetch.
    */
   where?: Prisma.IslenmisMesajWhereInput
@@ -999,6 +1211,10 @@ export type IslenmisMesajFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the IslenmisMesaj
    */
   omit?: Prisma.IslenmisMesajOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajInclude<ExtArgs> | null
   /**
    * Filter, which IslenmisMesajs to fetch.
    */
@@ -1048,6 +1264,10 @@ export type IslenmisMesajCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   omit?: Prisma.IslenmisMesajOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajInclude<ExtArgs> | null
+  /**
    * The data needed to create a IslenmisMesaj.
    */
   data: Prisma.XOR<Prisma.IslenmisMesajCreateInput, Prisma.IslenmisMesajUncheckedCreateInput>
@@ -1081,6 +1301,10 @@ export type IslenmisMesajCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    */
   data: Prisma.IslenmisMesajCreateManyInput | Prisma.IslenmisMesajCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1095,6 +1319,10 @@ export type IslenmisMesajUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the IslenmisMesaj
    */
   omit?: Prisma.IslenmisMesajOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajInclude<ExtArgs> | null
   /**
    * The data needed to update a IslenmisMesaj.
    */
@@ -1147,6 +1375,10 @@ export type IslenmisMesajUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * Limit how many IslenmisMesajs to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1161,6 +1393,10 @@ export type IslenmisMesajUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the IslenmisMesaj
    */
   omit?: Prisma.IslenmisMesajOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajInclude<ExtArgs> | null
   /**
    * The filter to search for the IslenmisMesaj to update in case it exists.
    */
@@ -1187,6 +1423,10 @@ export type IslenmisMesajDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the IslenmisMesaj
    */
   omit?: Prisma.IslenmisMesajOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajInclude<ExtArgs> | null
   /**
    * Filter which IslenmisMesaj to delete.
    */
@@ -1219,4 +1459,8 @@ export type IslenmisMesajDefaultArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the IslenmisMesaj
    */
   omit?: Prisma.IslenmisMesajOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslenmisMesajInclude<ExtArgs> | null
 }

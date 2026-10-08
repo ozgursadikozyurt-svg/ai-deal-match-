@@ -48,6 +48,7 @@ export type IngestionLogSumAggregateOutputType = {
 
 export type IngestionLogMinAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   kanal: $Enums.VeriKanali | null
   dosyaAdi: string | null
   grupAdi: string | null
@@ -63,6 +64,7 @@ export type IngestionLogMinAggregateOutputType = {
 
 export type IngestionLogMaxAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   kanal: $Enums.VeriKanali | null
   dosyaAdi: string | null
   grupAdi: string | null
@@ -78,6 +80,7 @@ export type IngestionLogMaxAggregateOutputType = {
 
 export type IngestionLogCountAggregateOutputType = {
   id: number
+  ofisId: number
   kanal: number
   dosyaAdi: number
   grupAdi: number
@@ -117,6 +120,7 @@ export type IngestionLogSumAggregateInputType = {
 
 export type IngestionLogMinAggregateInputType = {
   id?: true
+  ofisId?: true
   kanal?: true
   dosyaAdi?: true
   grupAdi?: true
@@ -132,6 +136,7 @@ export type IngestionLogMinAggregateInputType = {
 
 export type IngestionLogMaxAggregateInputType = {
   id?: true
+  ofisId?: true
   kanal?: true
   dosyaAdi?: true
   grupAdi?: true
@@ -147,6 +152,7 @@ export type IngestionLogMaxAggregateInputType = {
 
 export type IngestionLogCountAggregateInputType = {
   id?: true
+  ofisId?: true
   kanal?: true
   dosyaAdi?: true
   grupAdi?: true
@@ -251,6 +257,7 @@ export type IngestionLogGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 
 export type IngestionLogGroupByOutputType = {
   id: string
+  ofisId: string
   kanal: $Enums.VeriKanali
   dosyaAdi: string | null
   grupAdi: string | null
@@ -291,6 +298,7 @@ export type IngestionLogWhereInput = {
   OR?: Prisma.IngestionLogWhereInput[]
   NOT?: Prisma.IngestionLogWhereInput | Prisma.IngestionLogWhereInput[]
   id?: Prisma.StringFilter<"IngestionLog"> | string
+  ofisId?: Prisma.StringFilter<"IngestionLog"> | string
   kanal?: Prisma.EnumVeriKanaliFilter<"IngestionLog"> | $Enums.VeriKanali
   dosyaAdi?: Prisma.StringNullableFilter<"IngestionLog"> | string | null
   grupAdi?: Prisma.StringNullableFilter<"IngestionLog"> | string | null
@@ -304,10 +312,12 @@ export type IngestionLogWhereInput = {
   hata?: Prisma.IntFilter<"IngestionLog"> | number
   detay?: Prisma.JsonNullableFilter<"IngestionLog">
   createdAt?: Prisma.DateTimeFilter<"IngestionLog"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
 }
 
 export type IngestionLogOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kanal?: Prisma.SortOrder
   dosyaAdi?: Prisma.SortOrderInput | Prisma.SortOrder
   grupAdi?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -321,6 +331,7 @@ export type IngestionLogOrderByWithRelationInput = {
   hata?: Prisma.SortOrder
   detay?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
 }
 
 export type IngestionLogWhereUniqueInput = Prisma.AtLeast<{
@@ -328,6 +339,7 @@ export type IngestionLogWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.IngestionLogWhereInput | Prisma.IngestionLogWhereInput[]
   OR?: Prisma.IngestionLogWhereInput[]
   NOT?: Prisma.IngestionLogWhereInput | Prisma.IngestionLogWhereInput[]
+  ofisId?: Prisma.StringFilter<"IngestionLog"> | string
   kanal?: Prisma.EnumVeriKanaliFilter<"IngestionLog"> | $Enums.VeriKanali
   dosyaAdi?: Prisma.StringNullableFilter<"IngestionLog"> | string | null
   grupAdi?: Prisma.StringNullableFilter<"IngestionLog"> | string | null
@@ -341,10 +353,12 @@ export type IngestionLogWhereUniqueInput = Prisma.AtLeast<{
   hata?: Prisma.IntFilter<"IngestionLog"> | number
   detay?: Prisma.JsonNullableFilter<"IngestionLog">
   createdAt?: Prisma.DateTimeFilter<"IngestionLog"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
 }, "id">
 
 export type IngestionLogOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kanal?: Prisma.SortOrder
   dosyaAdi?: Prisma.SortOrderInput | Prisma.SortOrder
   grupAdi?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -370,6 +384,7 @@ export type IngestionLogScalarWhereWithAggregatesInput = {
   OR?: Prisma.IngestionLogScalarWhereWithAggregatesInput[]
   NOT?: Prisma.IngestionLogScalarWhereWithAggregatesInput | Prisma.IngestionLogScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"IngestionLog"> | string
+  ofisId?: Prisma.StringWithAggregatesFilter<"IngestionLog"> | string
   kanal?: Prisma.EnumVeriKanaliWithAggregatesFilter<"IngestionLog"> | $Enums.VeriKanali
   dosyaAdi?: Prisma.StringNullableWithAggregatesFilter<"IngestionLog"> | string | null
   grupAdi?: Prisma.StringNullableWithAggregatesFilter<"IngestionLog"> | string | null
@@ -400,10 +415,12 @@ export type IngestionLogCreateInput = {
   hata?: number
   detay?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutIngestionLoglariInput
 }
 
 export type IngestionLogUncheckedCreateInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   dosyaAdi?: string | null
   grupAdi?: string | null
@@ -434,10 +451,12 @@ export type IngestionLogUpdateInput = {
   hata?: Prisma.IntFieldUpdateOperationsInput | number
   detay?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutIngestionLoglariNestedInput
 }
 
 export type IngestionLogUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   dosyaAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grupAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -455,6 +474,7 @@ export type IngestionLogUncheckedUpdateInput = {
 
 export type IngestionLogCreateManyInput = {
   id?: string
+  ofisId?: string
   kanal: $Enums.VeriKanali
   dosyaAdi?: string | null
   grupAdi?: string | null
@@ -489,6 +509,7 @@ export type IngestionLogUpdateManyMutationInput = {
 
 export type IngestionLogUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
   dosyaAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grupAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -504,8 +525,19 @@ export type IngestionLogUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type IngestionLogListRelationFilter = {
+  every?: Prisma.IngestionLogWhereInput
+  some?: Prisma.IngestionLogWhereInput
+  none?: Prisma.IngestionLogWhereInput
+}
+
+export type IngestionLogOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type IngestionLogCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kanal?: Prisma.SortOrder
   dosyaAdi?: Prisma.SortOrder
   grupAdi?: Prisma.SortOrder
@@ -533,6 +565,7 @@ export type IngestionLogAvgOrderByAggregateInput = {
 
 export type IngestionLogMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kanal?: Prisma.SortOrder
   dosyaAdi?: Prisma.SortOrder
   grupAdi?: Prisma.SortOrder
@@ -548,6 +581,7 @@ export type IngestionLogMaxOrderByAggregateInput = {
 
 export type IngestionLogMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kanal?: Prisma.SortOrder
   dosyaAdi?: Prisma.SortOrder
   grupAdi?: Prisma.SortOrder
@@ -571,6 +605,48 @@ export type IngestionLogSumOrderByAggregateInput = {
   hata?: Prisma.SortOrder
 }
 
+export type IngestionLogCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.IngestionLogCreateWithoutOfisInput, Prisma.IngestionLogUncheckedCreateWithoutOfisInput> | Prisma.IngestionLogCreateWithoutOfisInput[] | Prisma.IngestionLogUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.IngestionLogCreateOrConnectWithoutOfisInput | Prisma.IngestionLogCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.IngestionLogCreateManyOfisInputEnvelope
+  connect?: Prisma.IngestionLogWhereUniqueInput | Prisma.IngestionLogWhereUniqueInput[]
+}
+
+export type IngestionLogUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.IngestionLogCreateWithoutOfisInput, Prisma.IngestionLogUncheckedCreateWithoutOfisInput> | Prisma.IngestionLogCreateWithoutOfisInput[] | Prisma.IngestionLogUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.IngestionLogCreateOrConnectWithoutOfisInput | Prisma.IngestionLogCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.IngestionLogCreateManyOfisInputEnvelope
+  connect?: Prisma.IngestionLogWhereUniqueInput | Prisma.IngestionLogWhereUniqueInput[]
+}
+
+export type IngestionLogUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.IngestionLogCreateWithoutOfisInput, Prisma.IngestionLogUncheckedCreateWithoutOfisInput> | Prisma.IngestionLogCreateWithoutOfisInput[] | Prisma.IngestionLogUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.IngestionLogCreateOrConnectWithoutOfisInput | Prisma.IngestionLogCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.IngestionLogUpsertWithWhereUniqueWithoutOfisInput | Prisma.IngestionLogUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.IngestionLogCreateManyOfisInputEnvelope
+  set?: Prisma.IngestionLogWhereUniqueInput | Prisma.IngestionLogWhereUniqueInput[]
+  disconnect?: Prisma.IngestionLogWhereUniqueInput | Prisma.IngestionLogWhereUniqueInput[]
+  delete?: Prisma.IngestionLogWhereUniqueInput | Prisma.IngestionLogWhereUniqueInput[]
+  connect?: Prisma.IngestionLogWhereUniqueInput | Prisma.IngestionLogWhereUniqueInput[]
+  update?: Prisma.IngestionLogUpdateWithWhereUniqueWithoutOfisInput | Prisma.IngestionLogUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.IngestionLogUpdateManyWithWhereWithoutOfisInput | Prisma.IngestionLogUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.IngestionLogScalarWhereInput | Prisma.IngestionLogScalarWhereInput[]
+}
+
+export type IngestionLogUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.IngestionLogCreateWithoutOfisInput, Prisma.IngestionLogUncheckedCreateWithoutOfisInput> | Prisma.IngestionLogCreateWithoutOfisInput[] | Prisma.IngestionLogUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.IngestionLogCreateOrConnectWithoutOfisInput | Prisma.IngestionLogCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.IngestionLogUpsertWithWhereUniqueWithoutOfisInput | Prisma.IngestionLogUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.IngestionLogCreateManyOfisInputEnvelope
+  set?: Prisma.IngestionLogWhereUniqueInput | Prisma.IngestionLogWhereUniqueInput[]
+  disconnect?: Prisma.IngestionLogWhereUniqueInput | Prisma.IngestionLogWhereUniqueInput[]
+  delete?: Prisma.IngestionLogWhereUniqueInput | Prisma.IngestionLogWhereUniqueInput[]
+  connect?: Prisma.IngestionLogWhereUniqueInput | Prisma.IngestionLogWhereUniqueInput[]
+  update?: Prisma.IngestionLogUpdateWithWhereUniqueWithoutOfisInput | Prisma.IngestionLogUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.IngestionLogUpdateManyWithWhereWithoutOfisInput | Prisma.IngestionLogUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.IngestionLogScalarWhereInput | Prisma.IngestionLogScalarWhereInput[]
+}
+
 export type IngestionLogCreatedosyaParmakIzleriInput = {
   set: string[]
 }
@@ -580,10 +656,160 @@ export type IngestionLogUpdatedosyaParmakIzleriInput = {
   push?: string | string[]
 }
 
+export type IngestionLogCreateWithoutOfisInput = {
+  id?: string
+  kanal: $Enums.VeriKanali
+  dosyaAdi?: string | null
+  grupAdi?: string | null
+  toplamMesaj?: number
+  gurultu?: number
+  yeniKayit?: number
+  duplicate?: number
+  lokasyonCozulemedi?: number
+  dosyaParmakIzleri?: Prisma.IngestionLogCreatedosyaParmakIzleriInput | string[]
+  oncedenIslenmis?: number
+  hata?: number
+  detay?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+}
+
+export type IngestionLogUncheckedCreateWithoutOfisInput = {
+  id?: string
+  kanal: $Enums.VeriKanali
+  dosyaAdi?: string | null
+  grupAdi?: string | null
+  toplamMesaj?: number
+  gurultu?: number
+  yeniKayit?: number
+  duplicate?: number
+  lokasyonCozulemedi?: number
+  dosyaParmakIzleri?: Prisma.IngestionLogCreatedosyaParmakIzleriInput | string[]
+  oncedenIslenmis?: number
+  hata?: number
+  detay?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+}
+
+export type IngestionLogCreateOrConnectWithoutOfisInput = {
+  where: Prisma.IngestionLogWhereUniqueInput
+  create: Prisma.XOR<Prisma.IngestionLogCreateWithoutOfisInput, Prisma.IngestionLogUncheckedCreateWithoutOfisInput>
+}
+
+export type IngestionLogCreateManyOfisInputEnvelope = {
+  data: Prisma.IngestionLogCreateManyOfisInput | Prisma.IngestionLogCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type IngestionLogUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.IngestionLogWhereUniqueInput
+  update: Prisma.XOR<Prisma.IngestionLogUpdateWithoutOfisInput, Prisma.IngestionLogUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.IngestionLogCreateWithoutOfisInput, Prisma.IngestionLogUncheckedCreateWithoutOfisInput>
+}
+
+export type IngestionLogUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.IngestionLogWhereUniqueInput
+  data: Prisma.XOR<Prisma.IngestionLogUpdateWithoutOfisInput, Prisma.IngestionLogUncheckedUpdateWithoutOfisInput>
+}
+
+export type IngestionLogUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.IngestionLogScalarWhereInput
+  data: Prisma.XOR<Prisma.IngestionLogUpdateManyMutationInput, Prisma.IngestionLogUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type IngestionLogScalarWhereInput = {
+  AND?: Prisma.IngestionLogScalarWhereInput | Prisma.IngestionLogScalarWhereInput[]
+  OR?: Prisma.IngestionLogScalarWhereInput[]
+  NOT?: Prisma.IngestionLogScalarWhereInput | Prisma.IngestionLogScalarWhereInput[]
+  id?: Prisma.StringFilter<"IngestionLog"> | string
+  ofisId?: Prisma.StringFilter<"IngestionLog"> | string
+  kanal?: Prisma.EnumVeriKanaliFilter<"IngestionLog"> | $Enums.VeriKanali
+  dosyaAdi?: Prisma.StringNullableFilter<"IngestionLog"> | string | null
+  grupAdi?: Prisma.StringNullableFilter<"IngestionLog"> | string | null
+  toplamMesaj?: Prisma.IntFilter<"IngestionLog"> | number
+  gurultu?: Prisma.IntFilter<"IngestionLog"> | number
+  yeniKayit?: Prisma.IntFilter<"IngestionLog"> | number
+  duplicate?: Prisma.IntFilter<"IngestionLog"> | number
+  lokasyonCozulemedi?: Prisma.IntFilter<"IngestionLog"> | number
+  dosyaParmakIzleri?: Prisma.StringNullableListFilter<"IngestionLog">
+  oncedenIslenmis?: Prisma.IntFilter<"IngestionLog"> | number
+  hata?: Prisma.IntFilter<"IngestionLog"> | number
+  detay?: Prisma.JsonNullableFilter<"IngestionLog">
+  createdAt?: Prisma.DateTimeFilter<"IngestionLog"> | Date | string
+}
+
+export type IngestionLogCreateManyOfisInput = {
+  id?: string
+  kanal: $Enums.VeriKanali
+  dosyaAdi?: string | null
+  grupAdi?: string | null
+  toplamMesaj?: number
+  gurultu?: number
+  yeniKayit?: number
+  duplicate?: number
+  lokasyonCozulemedi?: number
+  dosyaParmakIzleri?: Prisma.IngestionLogCreatedosyaParmakIzleriInput | string[]
+  oncedenIslenmis?: number
+  hata?: number
+  detay?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+}
+
+export type IngestionLogUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  dosyaAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  grupAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toplamMesaj?: Prisma.IntFieldUpdateOperationsInput | number
+  gurultu?: Prisma.IntFieldUpdateOperationsInput | number
+  yeniKayit?: Prisma.IntFieldUpdateOperationsInput | number
+  duplicate?: Prisma.IntFieldUpdateOperationsInput | number
+  lokasyonCozulemedi?: Prisma.IntFieldUpdateOperationsInput | number
+  dosyaParmakIzleri?: Prisma.IngestionLogUpdatedosyaParmakIzleriInput | string[]
+  oncedenIslenmis?: Prisma.IntFieldUpdateOperationsInput | number
+  hata?: Prisma.IntFieldUpdateOperationsInput | number
+  detay?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type IngestionLogUncheckedUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  dosyaAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  grupAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toplamMesaj?: Prisma.IntFieldUpdateOperationsInput | number
+  gurultu?: Prisma.IntFieldUpdateOperationsInput | number
+  yeniKayit?: Prisma.IntFieldUpdateOperationsInput | number
+  duplicate?: Prisma.IntFieldUpdateOperationsInput | number
+  lokasyonCozulemedi?: Prisma.IntFieldUpdateOperationsInput | number
+  dosyaParmakIzleri?: Prisma.IngestionLogUpdatedosyaParmakIzleriInput | string[]
+  oncedenIslenmis?: Prisma.IntFieldUpdateOperationsInput | number
+  hata?: Prisma.IntFieldUpdateOperationsInput | number
+  detay?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type IngestionLogUncheckedUpdateManyWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kanal?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  dosyaAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  grupAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toplamMesaj?: Prisma.IntFieldUpdateOperationsInput | number
+  gurultu?: Prisma.IntFieldUpdateOperationsInput | number
+  yeniKayit?: Prisma.IntFieldUpdateOperationsInput | number
+  duplicate?: Prisma.IntFieldUpdateOperationsInput | number
+  lokasyonCozulemedi?: Prisma.IntFieldUpdateOperationsInput | number
+  dosyaParmakIzleri?: Prisma.IngestionLogUpdatedosyaParmakIzleriInput | string[]
+  oncedenIslenmis?: Prisma.IntFieldUpdateOperationsInput | number
+  hata?: Prisma.IntFieldUpdateOperationsInput | number
+  detay?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type IngestionLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kanal?: boolean
   dosyaAdi?: boolean
   grupAdi?: boolean
@@ -597,10 +823,12 @@ export type IngestionLogSelect<ExtArgs extends runtime.Types.Extensions.Internal
   hata?: boolean
   detay?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["ingestionLog"]>
 
 export type IngestionLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kanal?: boolean
   dosyaAdi?: boolean
   grupAdi?: boolean
@@ -614,10 +842,12 @@ export type IngestionLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   hata?: boolean
   detay?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["ingestionLog"]>
 
 export type IngestionLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kanal?: boolean
   dosyaAdi?: boolean
   grupAdi?: boolean
@@ -631,10 +861,12 @@ export type IngestionLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   hata?: boolean
   detay?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["ingestionLog"]>
 
 export type IngestionLogSelectScalar = {
   id?: boolean
+  ofisId?: boolean
   kanal?: boolean
   dosyaAdi?: boolean
   grupAdi?: boolean
@@ -650,13 +882,25 @@ export type IngestionLogSelectScalar = {
   createdAt?: boolean
 }
 
-export type IngestionLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kanal" | "dosyaAdi" | "grupAdi" | "toplamMesaj" | "gurultu" | "yeniKayit" | "duplicate" | "lokasyonCozulemedi" | "dosyaParmakIzleri" | "oncedenIslenmis" | "hata" | "detay" | "createdAt", ExtArgs["result"]["ingestionLog"]>
+export type IngestionLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "kanal" | "dosyaAdi" | "grupAdi" | "toplamMesaj" | "gurultu" | "yeniKayit" | "duplicate" | "lokasyonCozulemedi" | "dosyaParmakIzleri" | "oncedenIslenmis" | "hata" | "detay" | "createdAt", ExtArgs["result"]["ingestionLog"]>
+export type IngestionLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type IngestionLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type IngestionLogIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
 
 export type $IngestionLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "IngestionLog"
-  objects: {}
+  objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ofisId: string
     kanal: $Enums.VeriKanali
     dosyaAdi: string | null
     grupAdi: string | null
@@ -1064,6 +1308,7 @@ readonly fields: IngestionLogFieldRefs;
  */
 export interface Prisma__IngestionLogClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1094,6 +1339,7 @@ export interface Prisma__IngestionLogClient<T, Null = never, ExtArgs extends run
  */
 export interface IngestionLogFieldRefs {
   readonly id: Prisma.FieldRef<"IngestionLog", 'String'>
+  readonly ofisId: Prisma.FieldRef<"IngestionLog", 'String'>
   readonly kanal: Prisma.FieldRef<"IngestionLog", 'VeriKanali'>
   readonly dosyaAdi: Prisma.FieldRef<"IngestionLog", 'String'>
   readonly grupAdi: Prisma.FieldRef<"IngestionLog", 'String'>
@@ -1124,6 +1370,10 @@ export type IngestionLogFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.IngestionLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogInclude<ExtArgs> | null
+  /**
    * Filter, which IngestionLog to fetch.
    */
   where: Prisma.IngestionLogWhereUniqueInput
@@ -1142,6 +1392,10 @@ export type IngestionLogFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Exte
    */
   omit?: Prisma.IngestionLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogInclude<ExtArgs> | null
+  /**
    * Filter, which IngestionLog to fetch.
    */
   where: Prisma.IngestionLogWhereUniqueInput
@@ -1159,6 +1413,10 @@ export type IngestionLogFindFirstArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the IngestionLog
    */
   omit?: Prisma.IngestionLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogInclude<ExtArgs> | null
   /**
    * Filter, which IngestionLog to fetch.
    */
@@ -1208,6 +1466,10 @@ export type IngestionLogFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exten
    */
   omit?: Prisma.IngestionLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogInclude<ExtArgs> | null
+  /**
    * Filter, which IngestionLog to fetch.
    */
   where?: Prisma.IngestionLogWhereInput
@@ -1255,6 +1517,10 @@ export type IngestionLogFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the IngestionLog
    */
   omit?: Prisma.IngestionLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogInclude<ExtArgs> | null
   /**
    * Filter, which IngestionLogs to fetch.
    */
@@ -1304,6 +1570,10 @@ export type IngestionLogCreateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   omit?: Prisma.IngestionLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogInclude<ExtArgs> | null
+  /**
    * The data needed to create a IngestionLog.
    */
   data: Prisma.XOR<Prisma.IngestionLogCreateInput, Prisma.IngestionLogUncheckedCreateInput>
@@ -1337,6 +1607,10 @@ export type IngestionLogCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
    */
   data: Prisma.IngestionLogCreateManyInput | Prisma.IngestionLogCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1351,6 +1625,10 @@ export type IngestionLogUpdateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the IngestionLog
    */
   omit?: Prisma.IngestionLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogInclude<ExtArgs> | null
   /**
    * The data needed to update a IngestionLog.
    */
@@ -1403,6 +1681,10 @@ export type IngestionLogUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
    * Limit how many IngestionLogs to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1417,6 +1699,10 @@ export type IngestionLogUpsertArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the IngestionLog
    */
   omit?: Prisma.IngestionLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogInclude<ExtArgs> | null
   /**
    * The filter to search for the IngestionLog to update in case it exists.
    */
@@ -1443,6 +1729,10 @@ export type IngestionLogDeleteArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the IngestionLog
    */
   omit?: Prisma.IngestionLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogInclude<ExtArgs> | null
   /**
    * Filter which IngestionLog to delete.
    */
@@ -1475,4 +1765,8 @@ export type IngestionLogDefaultArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the IngestionLog
    */
   omit?: Prisma.IngestionLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionLogInclude<ExtArgs> | null
 }

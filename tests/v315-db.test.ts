@@ -7,8 +7,12 @@ import assert from "node:assert/strict";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { degisiklikUygula, durumGetir, DegisiklikSchema } from "../src/lib/services/durum";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID, istemciyiSarmala } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
 
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 1 }) });
+
+const prisma = istemciyiSarmala(new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 1 }) }));
 const lok = [{ ilId: 7, ilceId: null, mahalleId: null, altBolgeId: null, birincil: false }];
 
 test("v3.15 migration: kisi.roller metin dizisi, mulk_ozellik.istenenKatlar ve kayit.takasaAcik kolonları var", async () => {

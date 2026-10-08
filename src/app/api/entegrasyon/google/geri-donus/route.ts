@@ -14,7 +14,7 @@ export async function GET(req: Request) {
     const t = await kodTakasEt(fetch, { code: u.searchParams.get("code") ?? "", clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET!, redirectUri: yonlendirmeAdresi() });
     if (!t.refresh_token) return geri("yenileme-anahtari-yok");
     await entegrasyon(prisma, "GOOGLE_KISILER");
-    await prisma.entegrasyon.update({ where: { saglayici: "GOOGLE_KISILER" }, data: { durum: "BAGLI", hesap: idTokenEposta(t.id_token), tokenSifreli: sifrele(t.refresh_token), syncToken: null, imlec: undefined, sonHata: null } });
+    await prisma.entegrasyon.updateMany({ where: { saglayici: "GOOGLE_KISILER" }, data: { durum: "BAGLI", hesap: idTokenEposta(t.id_token), tokenSifreli: sifrele(t.refresh_token), syncToken: null, imlec: undefined, sonHata: null } });
     await googleSenkronCalistir(prisma, { tetik: "ilk", tam: true }).catch(() => null); // kalanını zamanlayıcı tamamlar
     return geri("ok");
   } catch (e) { console.error(e); return geri("hata"); }

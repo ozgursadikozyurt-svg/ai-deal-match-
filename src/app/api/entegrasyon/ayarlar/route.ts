@@ -14,7 +14,7 @@ export async function PUT(req: Request) {
     const g = Govde.parse(await req.json());
     const e = await entegrasyon(prisma, g.saglayici);
     const yeni = { ...ayarlarOf(e), ...g.ayarlar };
-    await prisma.entegrasyon.update({ where: { saglayici: g.saglayici }, data: { ayarlar: yeni } });
+    await prisma.entegrasyon.updateMany({ where: { saglayici: g.saglayici }, data: { ayarlar: yeni } });
     return ok(yeni);
   } catch (e) { return hata(e); }
 }

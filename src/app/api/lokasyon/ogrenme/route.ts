@@ -30,7 +30,8 @@ export async function POST(req: Request) {
   try {
     const g = Govde.parse(await req.json());
     if ("reddet" in g) {
-      await prisma.lokasyonAday.update({ where: { ilId_ifade: { ilId: g.ilId, ifade: g.ifade } }, data: { durum: "REDDEDILDI" } });
+      // v3.20: benzersiz anahtar artık [ofisId, ilId, ifade] — ofisId süzgeci kiracilik katmanından gelir
+      await prisma.lokasyonAday.updateMany({ where: { ilId: g.ilId, ifade: g.ifade }, data: { durum: "REDDEDILDI" } });
       return ok({ reddedildi: g.ifade });
     }
     const seviye = g.hedef.mahalleId ? "MAHALLE" : g.hedef.altBolgeId ? "ALTBOLGE" : "ILCE";

@@ -10,8 +10,12 @@ import { PrismaClient } from "../src/generated/prisma/client";
 import { KayitCreateSchema } from "../src/lib/validation/kayit";
 import { kayitOlustur, sureUzat, ttlAyarlari } from "../src/lib/services/kayit";
 import { lokasyonCozumle, lokasyonIndeksiYukle } from "../src/lib/lokasyon/cozumle";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID, istemciyiSarmala } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
 
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 1 }) });
+
+const prisma = istemciyiSarmala(new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 1 }) }));
 
 test("migration: varsayılan TTL ayarı yüklü (v3.4 biçimi)", async () => {
   assert.deepEqual(await ttlAyarlari(prisma), { PORTFOY_SATILIK: 90, PORTFOY_KIRALIK: 45, TALEP_SATILIK: 60, TALEP_KIRALIK: 30, TALEP_ACIL: 30, DIS_ILAN: 90 }); // v3.4 migration eski biçimi çevirdi; v3.7: DIS_ILAN yoksa 90 gün eklenir

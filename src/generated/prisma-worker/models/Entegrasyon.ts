@@ -26,6 +26,7 @@ export type AggregateEntegrasyon = {
 
 export type EntegrasyonMinAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   saglayici: $Enums.EntegrasyonSaglayici | null
   durum: $Enums.EntegrasyonDurum | null
   hesap: string | null
@@ -40,6 +41,7 @@ export type EntegrasyonMinAggregateOutputType = {
 
 export type EntegrasyonMaxAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   saglayici: $Enums.EntegrasyonSaglayici | null
   durum: $Enums.EntegrasyonDurum | null
   hesap: string | null
@@ -54,6 +56,7 @@ export type EntegrasyonMaxAggregateOutputType = {
 
 export type EntegrasyonCountAggregateOutputType = {
   id: number
+  ofisId: number
   saglayici: number
   durum: number
   hesap: number
@@ -72,6 +75,7 @@ export type EntegrasyonCountAggregateOutputType = {
 
 export type EntegrasyonMinAggregateInputType = {
   id?: true
+  ofisId?: true
   saglayici?: true
   durum?: true
   hesap?: true
@@ -86,6 +90,7 @@ export type EntegrasyonMinAggregateInputType = {
 
 export type EntegrasyonMaxAggregateInputType = {
   id?: true
+  ofisId?: true
   saglayici?: true
   durum?: true
   hesap?: true
@@ -100,6 +105,7 @@ export type EntegrasyonMaxAggregateInputType = {
 
 export type EntegrasyonCountAggregateInputType = {
   id?: true
+  ofisId?: true
   saglayici?: true
   durum?: true
   hesap?: true
@@ -189,6 +195,7 @@ export type EntegrasyonGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type EntegrasyonGroupByOutputType = {
   id: string
+  ofisId: string
   saglayici: $Enums.EntegrasyonSaglayici
   durum: $Enums.EntegrasyonDurum
   hesap: string | null
@@ -226,6 +233,7 @@ export type EntegrasyonWhereInput = {
   OR?: Prisma.EntegrasyonWhereInput[]
   NOT?: Prisma.EntegrasyonWhereInput | Prisma.EntegrasyonWhereInput[]
   id?: Prisma.StringFilter<"Entegrasyon"> | string
+  ofisId?: Prisma.StringFilter<"Entegrasyon"> | string
   saglayici?: Prisma.EnumEntegrasyonSaglayiciFilter<"Entegrasyon"> | $Enums.EntegrasyonSaglayici
   durum?: Prisma.EnumEntegrasyonDurumFilter<"Entegrasyon"> | $Enums.EntegrasyonDurum
   hesap?: Prisma.StringNullableFilter<"Entegrasyon"> | string | null
@@ -238,10 +246,12 @@ export type EntegrasyonWhereInput = {
   kilitBitis?: Prisma.DateTimeNullableFilter<"Entegrasyon"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Entegrasyon"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Entegrasyon"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
 }
 
 export type EntegrasyonOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   saglayici?: Prisma.SortOrder
   durum?: Prisma.SortOrder
   hesap?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -254,14 +264,17 @@ export type EntegrasyonOrderByWithRelationInput = {
   kilitBitis?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
 }
 
 export type EntegrasyonWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  saglayici?: $Enums.EntegrasyonSaglayici
+  ofisId_saglayici?: Prisma.EntegrasyonOfisIdSaglayiciCompoundUniqueInput
   AND?: Prisma.EntegrasyonWhereInput | Prisma.EntegrasyonWhereInput[]
   OR?: Prisma.EntegrasyonWhereInput[]
   NOT?: Prisma.EntegrasyonWhereInput | Prisma.EntegrasyonWhereInput[]
+  ofisId?: Prisma.StringFilter<"Entegrasyon"> | string
+  saglayici?: Prisma.EnumEntegrasyonSaglayiciFilter<"Entegrasyon"> | $Enums.EntegrasyonSaglayici
   durum?: Prisma.EnumEntegrasyonDurumFilter<"Entegrasyon"> | $Enums.EntegrasyonDurum
   hesap?: Prisma.StringNullableFilter<"Entegrasyon"> | string | null
   tokenSifreli?: Prisma.StringNullableFilter<"Entegrasyon"> | string | null
@@ -273,10 +286,12 @@ export type EntegrasyonWhereUniqueInput = Prisma.AtLeast<{
   kilitBitis?: Prisma.DateTimeNullableFilter<"Entegrasyon"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Entegrasyon"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Entegrasyon"> | Date | string
-}, "id" | "saglayici">
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
+}, "id" | "ofisId_saglayici">
 
 export type EntegrasyonOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   saglayici?: Prisma.SortOrder
   durum?: Prisma.SortOrder
   hesap?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -299,6 +314,7 @@ export type EntegrasyonScalarWhereWithAggregatesInput = {
   OR?: Prisma.EntegrasyonScalarWhereWithAggregatesInput[]
   NOT?: Prisma.EntegrasyonScalarWhereWithAggregatesInput | Prisma.EntegrasyonScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Entegrasyon"> | string
+  ofisId?: Prisma.StringWithAggregatesFilter<"Entegrasyon"> | string
   saglayici?: Prisma.EnumEntegrasyonSaglayiciWithAggregatesFilter<"Entegrasyon"> | $Enums.EntegrasyonSaglayici
   durum?: Prisma.EnumEntegrasyonDurumWithAggregatesFilter<"Entegrasyon"> | $Enums.EntegrasyonDurum
   hesap?: Prisma.StringNullableWithAggregatesFilter<"Entegrasyon"> | string | null
@@ -327,10 +343,12 @@ export type EntegrasyonCreateInput = {
   kilitBitis?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutEntegrasyonlarInput
 }
 
 export type EntegrasyonUncheckedCreateInput = {
   id?: string
+  ofisId?: string
   saglayici: $Enums.EntegrasyonSaglayici
   durum?: $Enums.EntegrasyonDurum
   hesap?: string | null
@@ -359,10 +377,12 @@ export type EntegrasyonUpdateInput = {
   kilitBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutEntegrasyonlarNestedInput
 }
 
 export type EntegrasyonUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   saglayici?: Prisma.EnumEntegrasyonSaglayiciFieldUpdateOperationsInput | $Enums.EntegrasyonSaglayici
   durum?: Prisma.EnumEntegrasyonDurumFieldUpdateOperationsInput | $Enums.EntegrasyonDurum
   hesap?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -379,6 +399,7 @@ export type EntegrasyonUncheckedUpdateInput = {
 
 export type EntegrasyonCreateManyInput = {
   id?: string
+  ofisId?: string
   saglayici: $Enums.EntegrasyonSaglayici
   durum?: $Enums.EntegrasyonDurum
   hesap?: string | null
@@ -411,6 +432,7 @@ export type EntegrasyonUpdateManyMutationInput = {
 
 export type EntegrasyonUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   saglayici?: Prisma.EnumEntegrasyonSaglayiciFieldUpdateOperationsInput | $Enums.EntegrasyonSaglayici
   durum?: Prisma.EnumEntegrasyonDurumFieldUpdateOperationsInput | $Enums.EntegrasyonDurum
   hesap?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -425,8 +447,24 @@ export type EntegrasyonUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type EntegrasyonListRelationFilter = {
+  every?: Prisma.EntegrasyonWhereInput
+  some?: Prisma.EntegrasyonWhereInput
+  none?: Prisma.EntegrasyonWhereInput
+}
+
+export type EntegrasyonOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type EntegrasyonOfisIdSaglayiciCompoundUniqueInput = {
+  ofisId: string
+  saglayici: $Enums.EntegrasyonSaglayici
+}
+
 export type EntegrasyonCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   saglayici?: Prisma.SortOrder
   durum?: Prisma.SortOrder
   hesap?: Prisma.SortOrder
@@ -443,6 +481,7 @@ export type EntegrasyonCountOrderByAggregateInput = {
 
 export type EntegrasyonMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   saglayici?: Prisma.SortOrder
   durum?: Prisma.SortOrder
   hesap?: Prisma.SortOrder
@@ -457,6 +496,7 @@ export type EntegrasyonMaxOrderByAggregateInput = {
 
 export type EntegrasyonMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   saglayici?: Prisma.SortOrder
   durum?: Prisma.SortOrder
   hesap?: Prisma.SortOrder
@@ -469,6 +509,48 @@ export type EntegrasyonMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type EntegrasyonCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.EntegrasyonCreateWithoutOfisInput, Prisma.EntegrasyonUncheckedCreateWithoutOfisInput> | Prisma.EntegrasyonCreateWithoutOfisInput[] | Prisma.EntegrasyonUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.EntegrasyonCreateOrConnectWithoutOfisInput | Prisma.EntegrasyonCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.EntegrasyonCreateManyOfisInputEnvelope
+  connect?: Prisma.EntegrasyonWhereUniqueInput | Prisma.EntegrasyonWhereUniqueInput[]
+}
+
+export type EntegrasyonUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.EntegrasyonCreateWithoutOfisInput, Prisma.EntegrasyonUncheckedCreateWithoutOfisInput> | Prisma.EntegrasyonCreateWithoutOfisInput[] | Prisma.EntegrasyonUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.EntegrasyonCreateOrConnectWithoutOfisInput | Prisma.EntegrasyonCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.EntegrasyonCreateManyOfisInputEnvelope
+  connect?: Prisma.EntegrasyonWhereUniqueInput | Prisma.EntegrasyonWhereUniqueInput[]
+}
+
+export type EntegrasyonUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.EntegrasyonCreateWithoutOfisInput, Prisma.EntegrasyonUncheckedCreateWithoutOfisInput> | Prisma.EntegrasyonCreateWithoutOfisInput[] | Prisma.EntegrasyonUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.EntegrasyonCreateOrConnectWithoutOfisInput | Prisma.EntegrasyonCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.EntegrasyonUpsertWithWhereUniqueWithoutOfisInput | Prisma.EntegrasyonUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.EntegrasyonCreateManyOfisInputEnvelope
+  set?: Prisma.EntegrasyonWhereUniqueInput | Prisma.EntegrasyonWhereUniqueInput[]
+  disconnect?: Prisma.EntegrasyonWhereUniqueInput | Prisma.EntegrasyonWhereUniqueInput[]
+  delete?: Prisma.EntegrasyonWhereUniqueInput | Prisma.EntegrasyonWhereUniqueInput[]
+  connect?: Prisma.EntegrasyonWhereUniqueInput | Prisma.EntegrasyonWhereUniqueInput[]
+  update?: Prisma.EntegrasyonUpdateWithWhereUniqueWithoutOfisInput | Prisma.EntegrasyonUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.EntegrasyonUpdateManyWithWhereWithoutOfisInput | Prisma.EntegrasyonUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.EntegrasyonScalarWhereInput | Prisma.EntegrasyonScalarWhereInput[]
+}
+
+export type EntegrasyonUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.EntegrasyonCreateWithoutOfisInput, Prisma.EntegrasyonUncheckedCreateWithoutOfisInput> | Prisma.EntegrasyonCreateWithoutOfisInput[] | Prisma.EntegrasyonUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.EntegrasyonCreateOrConnectWithoutOfisInput | Prisma.EntegrasyonCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.EntegrasyonUpsertWithWhereUniqueWithoutOfisInput | Prisma.EntegrasyonUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.EntegrasyonCreateManyOfisInputEnvelope
+  set?: Prisma.EntegrasyonWhereUniqueInput | Prisma.EntegrasyonWhereUniqueInput[]
+  disconnect?: Prisma.EntegrasyonWhereUniqueInput | Prisma.EntegrasyonWhereUniqueInput[]
+  delete?: Prisma.EntegrasyonWhereUniqueInput | Prisma.EntegrasyonWhereUniqueInput[]
+  connect?: Prisma.EntegrasyonWhereUniqueInput | Prisma.EntegrasyonWhereUniqueInput[]
+  update?: Prisma.EntegrasyonUpdateWithWhereUniqueWithoutOfisInput | Prisma.EntegrasyonUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.EntegrasyonUpdateManyWithWhereWithoutOfisInput | Prisma.EntegrasyonUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.EntegrasyonScalarWhereInput | Prisma.EntegrasyonScalarWhereInput[]
+}
+
 export type EnumEntegrasyonSaglayiciFieldUpdateOperationsInput = {
   set?: $Enums.EntegrasyonSaglayici
 }
@@ -477,10 +559,153 @@ export type EnumEntegrasyonDurumFieldUpdateOperationsInput = {
   set?: $Enums.EntegrasyonDurum
 }
 
+export type EntegrasyonCreateWithoutOfisInput = {
+  id?: string
+  saglayici: $Enums.EntegrasyonSaglayici
+  durum?: $Enums.EntegrasyonDurum
+  hesap?: string | null
+  tokenSifreli?: string | null
+  syncToken?: string | null
+  imlec?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ayarlar?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sonSenkron?: Date | string | null
+  sonHata?: string | null
+  kilitBitis?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type EntegrasyonUncheckedCreateWithoutOfisInput = {
+  id?: string
+  saglayici: $Enums.EntegrasyonSaglayici
+  durum?: $Enums.EntegrasyonDurum
+  hesap?: string | null
+  tokenSifreli?: string | null
+  syncToken?: string | null
+  imlec?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ayarlar?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sonSenkron?: Date | string | null
+  sonHata?: string | null
+  kilitBitis?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type EntegrasyonCreateOrConnectWithoutOfisInput = {
+  where: Prisma.EntegrasyonWhereUniqueInput
+  create: Prisma.XOR<Prisma.EntegrasyonCreateWithoutOfisInput, Prisma.EntegrasyonUncheckedCreateWithoutOfisInput>
+}
+
+export type EntegrasyonCreateManyOfisInputEnvelope = {
+  data: Prisma.EntegrasyonCreateManyOfisInput | Prisma.EntegrasyonCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type EntegrasyonUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.EntegrasyonWhereUniqueInput
+  update: Prisma.XOR<Prisma.EntegrasyonUpdateWithoutOfisInput, Prisma.EntegrasyonUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.EntegrasyonCreateWithoutOfisInput, Prisma.EntegrasyonUncheckedCreateWithoutOfisInput>
+}
+
+export type EntegrasyonUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.EntegrasyonWhereUniqueInput
+  data: Prisma.XOR<Prisma.EntegrasyonUpdateWithoutOfisInput, Prisma.EntegrasyonUncheckedUpdateWithoutOfisInput>
+}
+
+export type EntegrasyonUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.EntegrasyonScalarWhereInput
+  data: Prisma.XOR<Prisma.EntegrasyonUpdateManyMutationInput, Prisma.EntegrasyonUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type EntegrasyonScalarWhereInput = {
+  AND?: Prisma.EntegrasyonScalarWhereInput | Prisma.EntegrasyonScalarWhereInput[]
+  OR?: Prisma.EntegrasyonScalarWhereInput[]
+  NOT?: Prisma.EntegrasyonScalarWhereInput | Prisma.EntegrasyonScalarWhereInput[]
+  id?: Prisma.StringFilter<"Entegrasyon"> | string
+  ofisId?: Prisma.StringFilter<"Entegrasyon"> | string
+  saglayici?: Prisma.EnumEntegrasyonSaglayiciFilter<"Entegrasyon"> | $Enums.EntegrasyonSaglayici
+  durum?: Prisma.EnumEntegrasyonDurumFilter<"Entegrasyon"> | $Enums.EntegrasyonDurum
+  hesap?: Prisma.StringNullableFilter<"Entegrasyon"> | string | null
+  tokenSifreli?: Prisma.StringNullableFilter<"Entegrasyon"> | string | null
+  syncToken?: Prisma.StringNullableFilter<"Entegrasyon"> | string | null
+  imlec?: Prisma.JsonNullableFilter<"Entegrasyon">
+  ayarlar?: Prisma.JsonNullableFilter<"Entegrasyon">
+  sonSenkron?: Prisma.DateTimeNullableFilter<"Entegrasyon"> | Date | string | null
+  sonHata?: Prisma.StringNullableFilter<"Entegrasyon"> | string | null
+  kilitBitis?: Prisma.DateTimeNullableFilter<"Entegrasyon"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"Entegrasyon"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Entegrasyon"> | Date | string
+}
+
+export type EntegrasyonCreateManyOfisInput = {
+  id?: string
+  saglayici: $Enums.EntegrasyonSaglayici
+  durum?: $Enums.EntegrasyonDurum
+  hesap?: string | null
+  tokenSifreli?: string | null
+  syncToken?: string | null
+  imlec?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ayarlar?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sonSenkron?: Date | string | null
+  sonHata?: string | null
+  kilitBitis?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type EntegrasyonUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  saglayici?: Prisma.EnumEntegrasyonSaglayiciFieldUpdateOperationsInput | $Enums.EntegrasyonSaglayici
+  durum?: Prisma.EnumEntegrasyonDurumFieldUpdateOperationsInput | $Enums.EntegrasyonDurum
+  hesap?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenSifreli?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imlec?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ayarlar?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sonSenkron?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sonHata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kilitBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type EntegrasyonUncheckedUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  saglayici?: Prisma.EnumEntegrasyonSaglayiciFieldUpdateOperationsInput | $Enums.EntegrasyonSaglayici
+  durum?: Prisma.EnumEntegrasyonDurumFieldUpdateOperationsInput | $Enums.EntegrasyonDurum
+  hesap?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenSifreli?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imlec?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ayarlar?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sonSenkron?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sonHata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kilitBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type EntegrasyonUncheckedUpdateManyWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  saglayici?: Prisma.EnumEntegrasyonSaglayiciFieldUpdateOperationsInput | $Enums.EntegrasyonSaglayici
+  durum?: Prisma.EnumEntegrasyonDurumFieldUpdateOperationsInput | $Enums.EntegrasyonDurum
+  hesap?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenSifreli?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imlec?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ayarlar?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sonSenkron?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sonHata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kilitBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type EntegrasyonSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   saglayici?: boolean
   durum?: boolean
   hesap?: boolean
@@ -493,10 +718,12 @@ export type EntegrasyonSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   kilitBitis?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["entegrasyon"]>
 
 export type EntegrasyonSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   saglayici?: boolean
   durum?: boolean
   hesap?: boolean
@@ -509,10 +736,12 @@ export type EntegrasyonSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   kilitBitis?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["entegrasyon"]>
 
 export type EntegrasyonSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   saglayici?: boolean
   durum?: boolean
   hesap?: boolean
@@ -525,10 +754,12 @@ export type EntegrasyonSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   kilitBitis?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["entegrasyon"]>
 
 export type EntegrasyonSelectScalar = {
   id?: boolean
+  ofisId?: boolean
   saglayici?: boolean
   durum?: boolean
   hesap?: boolean
@@ -543,13 +774,25 @@ export type EntegrasyonSelectScalar = {
   updatedAt?: boolean
 }
 
-export type EntegrasyonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "saglayici" | "durum" | "hesap" | "tokenSifreli" | "syncToken" | "imlec" | "ayarlar" | "sonSenkron" | "sonHata" | "kilitBitis" | "createdAt" | "updatedAt", ExtArgs["result"]["entegrasyon"]>
+export type EntegrasyonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "saglayici" | "durum" | "hesap" | "tokenSifreli" | "syncToken" | "imlec" | "ayarlar" | "sonSenkron" | "sonHata" | "kilitBitis" | "createdAt" | "updatedAt", ExtArgs["result"]["entegrasyon"]>
+export type EntegrasyonInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type EntegrasyonIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type EntegrasyonIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
 
 export type $EntegrasyonPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Entegrasyon"
-  objects: {}
+  objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ofisId: string
     saglayici: $Enums.EntegrasyonSaglayici
     durum: $Enums.EntegrasyonDurum
     hesap: string | null
@@ -962,6 +1205,7 @@ readonly fields: EntegrasyonFieldRefs;
  */
 export interface Prisma__EntegrasyonClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -992,6 +1236,7 @@ export interface Prisma__EntegrasyonClient<T, Null = never, ExtArgs extends runt
  */
 export interface EntegrasyonFieldRefs {
   readonly id: Prisma.FieldRef<"Entegrasyon", 'String'>
+  readonly ofisId: Prisma.FieldRef<"Entegrasyon", 'String'>
   readonly saglayici: Prisma.FieldRef<"Entegrasyon", 'EntegrasyonSaglayici'>
   readonly durum: Prisma.FieldRef<"Entegrasyon", 'EntegrasyonDurum'>
   readonly hesap: Prisma.FieldRef<"Entegrasyon", 'String'>
@@ -1021,6 +1266,10 @@ export type EntegrasyonFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   omit?: Prisma.EntegrasyonOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonInclude<ExtArgs> | null
+  /**
    * Filter, which Entegrasyon to fetch.
    */
   where: Prisma.EntegrasyonWhereUniqueInput
@@ -1039,6 +1288,10 @@ export type EntegrasyonFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Exten
    */
   omit?: Prisma.EntegrasyonOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonInclude<ExtArgs> | null
+  /**
    * Filter, which Entegrasyon to fetch.
    */
   where: Prisma.EntegrasyonWhereUniqueInput
@@ -1056,6 +1309,10 @@ export type EntegrasyonFindFirstArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the Entegrasyon
    */
   omit?: Prisma.EntegrasyonOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonInclude<ExtArgs> | null
   /**
    * Filter, which Entegrasyon to fetch.
    */
@@ -1105,6 +1362,10 @@ export type EntegrasyonFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extens
    */
   omit?: Prisma.EntegrasyonOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonInclude<ExtArgs> | null
+  /**
    * Filter, which Entegrasyon to fetch.
    */
   where?: Prisma.EntegrasyonWhereInput
@@ -1152,6 +1413,10 @@ export type EntegrasyonFindManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the Entegrasyon
    */
   omit?: Prisma.EntegrasyonOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonInclude<ExtArgs> | null
   /**
    * Filter, which Entegrasyons to fetch.
    */
@@ -1201,6 +1466,10 @@ export type EntegrasyonCreateArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   omit?: Prisma.EntegrasyonOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonInclude<ExtArgs> | null
+  /**
    * The data needed to create a Entegrasyon.
    */
   data: Prisma.XOR<Prisma.EntegrasyonCreateInput, Prisma.EntegrasyonUncheckedCreateInput>
@@ -1234,6 +1503,10 @@ export type EntegrasyonCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    */
   data: Prisma.EntegrasyonCreateManyInput | Prisma.EntegrasyonCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1248,6 +1521,10 @@ export type EntegrasyonUpdateArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Omit specific fields from the Entegrasyon
    */
   omit?: Prisma.EntegrasyonOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonInclude<ExtArgs> | null
   /**
    * The data needed to update a Entegrasyon.
    */
@@ -1300,6 +1577,10 @@ export type EntegrasyonUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * Limit how many Entegrasyons to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1314,6 +1595,10 @@ export type EntegrasyonUpsertArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Omit specific fields from the Entegrasyon
    */
   omit?: Prisma.EntegrasyonOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonInclude<ExtArgs> | null
   /**
    * The filter to search for the Entegrasyon to update in case it exists.
    */
@@ -1340,6 +1625,10 @@ export type EntegrasyonDeleteArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Omit specific fields from the Entegrasyon
    */
   omit?: Prisma.EntegrasyonOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonInclude<ExtArgs> | null
   /**
    * Filter which Entegrasyon to delete.
    */
@@ -1372,4 +1661,8 @@ export type EntegrasyonDefaultArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the Entegrasyon
    */
   omit?: Prisma.EntegrasyonOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntegrasyonInclude<ExtArgs> | null
 }

@@ -11,7 +11,7 @@ import { aiJsonIste, AiHatasi } from "@/lib/ai/saglayici";
 export async function POST(req: Request) {
   try {
     const g = z.object({ ai: AiAyarSchema.optional() }).parse(await req.json().catch(() => ({})));
-    const ayar = g.ai ?? aiAyarNormalize((await prisma.ayar.findUnique({ where: { anahtar: "ai" } }))?.deger);
+    const ayar = g.ai ?? aiAyarNormalize((await prisma.ayar.findFirst({ where: { anahtar: "ai" } }))?.deger);
     const t = Date.now();
     try {
       await aiJsonIste(ayar, process.env.AI_API_KEY || process.env.GEMINI_API_KEY, 'Yalnızca şu JSON\'u döndür: {"tamam": true}', { zamanAsimiMs: 15_000 });

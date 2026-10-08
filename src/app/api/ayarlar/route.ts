@@ -6,12 +6,13 @@
 //   paylasim (v3.10): portföy föyündeki imza · calismaIli (v3.10): varsayılan il (plaka)
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { ayarYaz } from "@/lib/services/ayar";
 import { hata, ok } from "@/lib/http/yanit";
 import { TtlAyarSchema, ttlAyarlari } from "@/lib/services/kayit";
 import { AiAyarSchema, PaylasimAyarSchema, aiAyarNormalize, paylasimNormalize, calismaIliNormalize } from "@/lib/domain/ayarlar";
 
-const oku = async (anahtar: string) => (await prisma.ayar.findUnique({ where: { anahtar } }))?.deger;
-const yaz = (anahtar: string, deger: unknown) => prisma.ayar.upsert({ where: { anahtar }, update: { deger: deger as object }, create: { anahtar, deger: deger as object } });
+const oku = async (anahtar: string) => (await prisma.ayar.findFirst({ where: { anahtar } }))?.deger;
+const yaz = (anahtar: string, deger: unknown) => ayarYaz(prisma, anahtar, deger);
 
 export async function GET() {
   try {

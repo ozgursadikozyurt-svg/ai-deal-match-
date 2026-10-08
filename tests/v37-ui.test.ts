@@ -16,6 +16,10 @@ import { Baglantilar } from "../demo/baglantilar";
 import { VeriGirisi } from "../demo/ice-aktarma";
 import { TopluMesaj } from "../demo/toplu-giris";
 import { ORNEK_TOPLANTI_NOTU } from "../demo/ornek-dosyalar";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 const { kayitlar, kisiler } = ornekVeriyiKur();
 const d: DepoDurumu = { veriSurumu: "t", kayitlar: kayitlar.map((k, i) => (i === 0 ? { ...k, notlar: [{ id: "n1", tarih: "2026-09-30T10:00:00Z", tur: "GORUSME", metin: "Bütçeyi artırabilir", kisiId: k.veri.kisiler?.[0]?.kisiId ?? null }] } : k)), eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN }, ogrenilen: [], adaylar: [], aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [] };

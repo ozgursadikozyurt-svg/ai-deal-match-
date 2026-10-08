@@ -12,7 +12,7 @@ import { z } from "zod";
 export { TTL_VARSAYILAN, TtlAyarSchema, varsayilanValidUntil, type TtlAyar } from "../domain/gecerlilik";
 import { ttlNormalize, varsayilanValidUntil as vu, type TtlAyar as TA } from "../domain/gecerlilik";
 export async function ttlAyarlari(prisma: PrismaClient): Promise<TA> {
-  const a = await prisma.ayar.findUnique({ where: { anahtar: "ttl" } });
+  const a = await prisma.ayar.findFirst({ where: { anahtar: "ttl" } });
   return ttlNormalize(a?.deger);
 }
 

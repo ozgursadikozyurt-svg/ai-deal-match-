@@ -554,10 +554,6 @@ export type EnumYerlesimTipiFieldUpdateOperationsInput = {
   set?: $Enums.YerlesimTipi
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type NullableFloatFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number

@@ -43,6 +43,7 @@ export type KayitFotoSumAggregateOutputType = {
 
 export type KayitFotoMinAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   kayitId: string | null
   sira: number | null
   ad: string | null
@@ -56,6 +57,7 @@ export type KayitFotoMinAggregateOutputType = {
 
 export type KayitFotoMaxAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   kayitId: string | null
   sira: number | null
   ad: string | null
@@ -69,6 +71,7 @@ export type KayitFotoMaxAggregateOutputType = {
 
 export type KayitFotoCountAggregateOutputType = {
   id: number
+  ofisId: number
   kayitId: number
   sira: number
   ad: number
@@ -98,6 +101,7 @@ export type KayitFotoSumAggregateInputType = {
 
 export type KayitFotoMinAggregateInputType = {
   id?: true
+  ofisId?: true
   kayitId?: true
   sira?: true
   ad?: true
@@ -111,6 +115,7 @@ export type KayitFotoMinAggregateInputType = {
 
 export type KayitFotoMaxAggregateInputType = {
   id?: true
+  ofisId?: true
   kayitId?: true
   sira?: true
   ad?: true
@@ -124,6 +129,7 @@ export type KayitFotoMaxAggregateInputType = {
 
 export type KayitFotoCountAggregateInputType = {
   id?: true
+  ofisId?: true
   kayitId?: true
   sira?: true
   ad?: true
@@ -224,6 +230,7 @@ export type KayitFotoGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 
 export type KayitFotoGroupByOutputType = {
   id: string
+  ofisId: string
   kayitId: string
   sira: number
   ad: string
@@ -260,6 +267,7 @@ export type KayitFotoWhereInput = {
   OR?: Prisma.KayitFotoWhereInput[]
   NOT?: Prisma.KayitFotoWhereInput | Prisma.KayitFotoWhereInput[]
   id?: Prisma.StringFilter<"KayitFoto"> | string
+  ofisId?: Prisma.StringFilter<"KayitFoto"> | string
   kayitId?: Prisma.StringFilter<"KayitFoto"> | string
   sira?: Prisma.IntFilter<"KayitFoto"> | number
   ad?: Prisma.StringFilter<"KayitFoto"> | string
@@ -269,11 +277,13 @@ export type KayitFotoWhereInput = {
   boy?: Prisma.IntFilter<"KayitFoto"> | number
   boyut?: Prisma.IntFilter<"KayitFoto"> | number
   createdAt?: Prisma.DateTimeFilter<"KayitFoto"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
   kayit?: Prisma.XOR<Prisma.KayitScalarRelationFilter, Prisma.KayitWhereInput>
 }
 
 export type KayitFotoOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   sira?: Prisma.SortOrder
   ad?: Prisma.SortOrder
@@ -283,6 +293,7 @@ export type KayitFotoOrderByWithRelationInput = {
   boy?: Prisma.SortOrder
   boyut?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
   kayit?: Prisma.KayitOrderByWithRelationInput
 }
 
@@ -291,6 +302,7 @@ export type KayitFotoWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.KayitFotoWhereInput | Prisma.KayitFotoWhereInput[]
   OR?: Prisma.KayitFotoWhereInput[]
   NOT?: Prisma.KayitFotoWhereInput | Prisma.KayitFotoWhereInput[]
+  ofisId?: Prisma.StringFilter<"KayitFoto"> | string
   kayitId?: Prisma.StringFilter<"KayitFoto"> | string
   sira?: Prisma.IntFilter<"KayitFoto"> | number
   ad?: Prisma.StringFilter<"KayitFoto"> | string
@@ -300,11 +312,13 @@ export type KayitFotoWhereUniqueInput = Prisma.AtLeast<{
   boy?: Prisma.IntFilter<"KayitFoto"> | number
   boyut?: Prisma.IntFilter<"KayitFoto"> | number
   createdAt?: Prisma.DateTimeFilter<"KayitFoto"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
   kayit?: Prisma.XOR<Prisma.KayitScalarRelationFilter, Prisma.KayitWhereInput>
 }, "id">
 
 export type KayitFotoOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   sira?: Prisma.SortOrder
   ad?: Prisma.SortOrder
@@ -326,6 +340,7 @@ export type KayitFotoScalarWhereWithAggregatesInput = {
   OR?: Prisma.KayitFotoScalarWhereWithAggregatesInput[]
   NOT?: Prisma.KayitFotoScalarWhereWithAggregatesInput | Prisma.KayitFotoScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"KayitFoto"> | string
+  ofisId?: Prisma.StringWithAggregatesFilter<"KayitFoto"> | string
   kayitId?: Prisma.StringWithAggregatesFilter<"KayitFoto"> | string
   sira?: Prisma.IntWithAggregatesFilter<"KayitFoto"> | number
   ad?: Prisma.StringWithAggregatesFilter<"KayitFoto"> | string
@@ -347,11 +362,13 @@ export type KayitFotoCreateInput = {
   boy: number
   boyut: number
   createdAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitFotolariInput
   kayit: Prisma.KayitCreateNestedOneWithoutFotolarInput
 }
 
 export type KayitFotoUncheckedCreateInput = {
   id?: string
+  ofisId?: string
   kayitId: string
   sira?: number
   ad: string
@@ -373,11 +390,13 @@ export type KayitFotoUpdateInput = {
   boy?: Prisma.IntFieldUpdateOperationsInput | number
   boyut?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitFotolariNestedInput
   kayit?: Prisma.KayitUpdateOneRequiredWithoutFotolarNestedInput
 }
 
 export type KayitFotoUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kayitId?: Prisma.StringFieldUpdateOperationsInput | string
   sira?: Prisma.IntFieldUpdateOperationsInput | number
   ad?: Prisma.StringFieldUpdateOperationsInput | string
@@ -391,6 +410,7 @@ export type KayitFotoUncheckedUpdateInput = {
 
 export type KayitFotoCreateManyInput = {
   id?: string
+  ofisId?: string
   kayitId: string
   sira?: number
   ad: string
@@ -416,6 +436,7 @@ export type KayitFotoUpdateManyMutationInput = {
 
 export type KayitFotoUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   kayitId?: Prisma.StringFieldUpdateOperationsInput | string
   sira?: Prisma.IntFieldUpdateOperationsInput | number
   ad?: Prisma.StringFieldUpdateOperationsInput | string
@@ -439,6 +460,7 @@ export type KayitFotoOrderByRelationAggregateInput = {
 
 export type KayitFotoCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   sira?: Prisma.SortOrder
   ad?: Prisma.SortOrder
@@ -459,6 +481,7 @@ export type KayitFotoAvgOrderByAggregateInput = {
 
 export type KayitFotoMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   sira?: Prisma.SortOrder
   ad?: Prisma.SortOrder
@@ -472,6 +495,7 @@ export type KayitFotoMaxOrderByAggregateInput = {
 
 export type KayitFotoMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   kayitId?: Prisma.SortOrder
   sira?: Prisma.SortOrder
   ad?: Prisma.SortOrder
@@ -488,6 +512,48 @@ export type KayitFotoSumOrderByAggregateInput = {
   en?: Prisma.SortOrder
   boy?: Prisma.SortOrder
   boyut?: Prisma.SortOrder
+}
+
+export type KayitFotoCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.KayitFotoCreateWithoutOfisInput, Prisma.KayitFotoUncheckedCreateWithoutOfisInput> | Prisma.KayitFotoCreateWithoutOfisInput[] | Prisma.KayitFotoUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitFotoCreateOrConnectWithoutOfisInput | Prisma.KayitFotoCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.KayitFotoCreateManyOfisInputEnvelope
+  connect?: Prisma.KayitFotoWhereUniqueInput | Prisma.KayitFotoWhereUniqueInput[]
+}
+
+export type KayitFotoUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.KayitFotoCreateWithoutOfisInput, Prisma.KayitFotoUncheckedCreateWithoutOfisInput> | Prisma.KayitFotoCreateWithoutOfisInput[] | Prisma.KayitFotoUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitFotoCreateOrConnectWithoutOfisInput | Prisma.KayitFotoCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.KayitFotoCreateManyOfisInputEnvelope
+  connect?: Prisma.KayitFotoWhereUniqueInput | Prisma.KayitFotoWhereUniqueInput[]
+}
+
+export type KayitFotoUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.KayitFotoCreateWithoutOfisInput, Prisma.KayitFotoUncheckedCreateWithoutOfisInput> | Prisma.KayitFotoCreateWithoutOfisInput[] | Prisma.KayitFotoUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitFotoCreateOrConnectWithoutOfisInput | Prisma.KayitFotoCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.KayitFotoUpsertWithWhereUniqueWithoutOfisInput | Prisma.KayitFotoUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.KayitFotoCreateManyOfisInputEnvelope
+  set?: Prisma.KayitFotoWhereUniqueInput | Prisma.KayitFotoWhereUniqueInput[]
+  disconnect?: Prisma.KayitFotoWhereUniqueInput | Prisma.KayitFotoWhereUniqueInput[]
+  delete?: Prisma.KayitFotoWhereUniqueInput | Prisma.KayitFotoWhereUniqueInput[]
+  connect?: Prisma.KayitFotoWhereUniqueInput | Prisma.KayitFotoWhereUniqueInput[]
+  update?: Prisma.KayitFotoUpdateWithWhereUniqueWithoutOfisInput | Prisma.KayitFotoUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.KayitFotoUpdateManyWithWhereWithoutOfisInput | Prisma.KayitFotoUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.KayitFotoScalarWhereInput | Prisma.KayitFotoScalarWhereInput[]
+}
+
+export type KayitFotoUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.KayitFotoCreateWithoutOfisInput, Prisma.KayitFotoUncheckedCreateWithoutOfisInput> | Prisma.KayitFotoCreateWithoutOfisInput[] | Prisma.KayitFotoUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitFotoCreateOrConnectWithoutOfisInput | Prisma.KayitFotoCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.KayitFotoUpsertWithWhereUniqueWithoutOfisInput | Prisma.KayitFotoUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.KayitFotoCreateManyOfisInputEnvelope
+  set?: Prisma.KayitFotoWhereUniqueInput | Prisma.KayitFotoWhereUniqueInput[]
+  disconnect?: Prisma.KayitFotoWhereUniqueInput | Prisma.KayitFotoWhereUniqueInput[]
+  delete?: Prisma.KayitFotoWhereUniqueInput | Prisma.KayitFotoWhereUniqueInput[]
+  connect?: Prisma.KayitFotoWhereUniqueInput | Prisma.KayitFotoWhereUniqueInput[]
+  update?: Prisma.KayitFotoUpdateWithWhereUniqueWithoutOfisInput | Prisma.KayitFotoUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.KayitFotoUpdateManyWithWhereWithoutOfisInput | Prisma.KayitFotoUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.KayitFotoScalarWhereInput | Prisma.KayitFotoScalarWhereInput[]
 }
 
 export type KayitFotoCreateNestedManyWithoutKayitInput = {
@@ -532,8 +598,22 @@ export type KayitFotoUncheckedUpdateManyWithoutKayitNestedInput = {
   deleteMany?: Prisma.KayitFotoScalarWhereInput | Prisma.KayitFotoScalarWhereInput[]
 }
 
-export type KayitFotoCreateWithoutKayitInput = {
+export type KayitFotoCreateWithoutOfisInput = {
   id?: string
+  sira?: number
+  ad: string
+  depoYolu: string
+  icerikTuru?: string
+  en: number
+  boy: number
+  boyut: number
+  createdAt?: Date | string
+  kayit: Prisma.KayitCreateNestedOneWithoutFotolarInput
+}
+
+export type KayitFotoUncheckedCreateWithoutOfisInput = {
+  id?: string
+  kayitId: string
   sira?: number
   ad: string
   depoYolu: string
@@ -544,8 +624,65 @@ export type KayitFotoCreateWithoutKayitInput = {
   createdAt?: Date | string
 }
 
+export type KayitFotoCreateOrConnectWithoutOfisInput = {
+  where: Prisma.KayitFotoWhereUniqueInput
+  create: Prisma.XOR<Prisma.KayitFotoCreateWithoutOfisInput, Prisma.KayitFotoUncheckedCreateWithoutOfisInput>
+}
+
+export type KayitFotoCreateManyOfisInputEnvelope = {
+  data: Prisma.KayitFotoCreateManyOfisInput | Prisma.KayitFotoCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type KayitFotoUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.KayitFotoWhereUniqueInput
+  update: Prisma.XOR<Prisma.KayitFotoUpdateWithoutOfisInput, Prisma.KayitFotoUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.KayitFotoCreateWithoutOfisInput, Prisma.KayitFotoUncheckedCreateWithoutOfisInput>
+}
+
+export type KayitFotoUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.KayitFotoWhereUniqueInput
+  data: Prisma.XOR<Prisma.KayitFotoUpdateWithoutOfisInput, Prisma.KayitFotoUncheckedUpdateWithoutOfisInput>
+}
+
+export type KayitFotoUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.KayitFotoScalarWhereInput
+  data: Prisma.XOR<Prisma.KayitFotoUpdateManyMutationInput, Prisma.KayitFotoUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type KayitFotoScalarWhereInput = {
+  AND?: Prisma.KayitFotoScalarWhereInput | Prisma.KayitFotoScalarWhereInput[]
+  OR?: Prisma.KayitFotoScalarWhereInput[]
+  NOT?: Prisma.KayitFotoScalarWhereInput | Prisma.KayitFotoScalarWhereInput[]
+  id?: Prisma.StringFilter<"KayitFoto"> | string
+  ofisId?: Prisma.StringFilter<"KayitFoto"> | string
+  kayitId?: Prisma.StringFilter<"KayitFoto"> | string
+  sira?: Prisma.IntFilter<"KayitFoto"> | number
+  ad?: Prisma.StringFilter<"KayitFoto"> | string
+  depoYolu?: Prisma.StringFilter<"KayitFoto"> | string
+  icerikTuru?: Prisma.StringFilter<"KayitFoto"> | string
+  en?: Prisma.IntFilter<"KayitFoto"> | number
+  boy?: Prisma.IntFilter<"KayitFoto"> | number
+  boyut?: Prisma.IntFilter<"KayitFoto"> | number
+  createdAt?: Prisma.DateTimeFilter<"KayitFoto"> | Date | string
+}
+
+export type KayitFotoCreateWithoutKayitInput = {
+  id?: string
+  sira?: number
+  ad: string
+  depoYolu: string
+  icerikTuru?: string
+  en: number
+  boy: number
+  boyut: number
+  createdAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitFotolariInput
+}
+
 export type KayitFotoUncheckedCreateWithoutKayitInput = {
   id?: string
+  ofisId?: string
   sira?: number
   ad: string
   depoYolu: string
@@ -582,24 +719,61 @@ export type KayitFotoUpdateManyWithWhereWithoutKayitInput = {
   data: Prisma.XOR<Prisma.KayitFotoUpdateManyMutationInput, Prisma.KayitFotoUncheckedUpdateManyWithoutKayitInput>
 }
 
-export type KayitFotoScalarWhereInput = {
-  AND?: Prisma.KayitFotoScalarWhereInput | Prisma.KayitFotoScalarWhereInput[]
-  OR?: Prisma.KayitFotoScalarWhereInput[]
-  NOT?: Prisma.KayitFotoScalarWhereInput | Prisma.KayitFotoScalarWhereInput[]
-  id?: Prisma.StringFilter<"KayitFoto"> | string
-  kayitId?: Prisma.StringFilter<"KayitFoto"> | string
-  sira?: Prisma.IntFilter<"KayitFoto"> | number
-  ad?: Prisma.StringFilter<"KayitFoto"> | string
-  depoYolu?: Prisma.StringFilter<"KayitFoto"> | string
-  icerikTuru?: Prisma.StringFilter<"KayitFoto"> | string
-  en?: Prisma.IntFilter<"KayitFoto"> | number
-  boy?: Prisma.IntFilter<"KayitFoto"> | number
-  boyut?: Prisma.IntFilter<"KayitFoto"> | number
-  createdAt?: Prisma.DateTimeFilter<"KayitFoto"> | Date | string
+export type KayitFotoCreateManyOfisInput = {
+  id?: string
+  kayitId: string
+  sira?: number
+  ad: string
+  depoYolu: string
+  icerikTuru?: string
+  en: number
+  boy: number
+  boyut: number
+  createdAt?: Date | string
+}
+
+export type KayitFotoUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sira?: Prisma.IntFieldUpdateOperationsInput | number
+  ad?: Prisma.StringFieldUpdateOperationsInput | string
+  depoYolu?: Prisma.StringFieldUpdateOperationsInput | string
+  icerikTuru?: Prisma.StringFieldUpdateOperationsInput | string
+  en?: Prisma.IntFieldUpdateOperationsInput | number
+  boy?: Prisma.IntFieldUpdateOperationsInput | number
+  boyut?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  kayit?: Prisma.KayitUpdateOneRequiredWithoutFotolarNestedInput
+}
+
+export type KayitFotoUncheckedUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kayitId?: Prisma.StringFieldUpdateOperationsInput | string
+  sira?: Prisma.IntFieldUpdateOperationsInput | number
+  ad?: Prisma.StringFieldUpdateOperationsInput | string
+  depoYolu?: Prisma.StringFieldUpdateOperationsInput | string
+  icerikTuru?: Prisma.StringFieldUpdateOperationsInput | string
+  en?: Prisma.IntFieldUpdateOperationsInput | number
+  boy?: Prisma.IntFieldUpdateOperationsInput | number
+  boyut?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type KayitFotoUncheckedUpdateManyWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kayitId?: Prisma.StringFieldUpdateOperationsInput | string
+  sira?: Prisma.IntFieldUpdateOperationsInput | number
+  ad?: Prisma.StringFieldUpdateOperationsInput | string
+  depoYolu?: Prisma.StringFieldUpdateOperationsInput | string
+  icerikTuru?: Prisma.StringFieldUpdateOperationsInput | string
+  en?: Prisma.IntFieldUpdateOperationsInput | number
+  boy?: Prisma.IntFieldUpdateOperationsInput | number
+  boyut?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type KayitFotoCreateManyKayitInput = {
   id?: string
+  ofisId?: string
   sira?: number
   ad: string
   depoYolu: string
@@ -620,10 +794,12 @@ export type KayitFotoUpdateWithoutKayitInput = {
   boy?: Prisma.IntFieldUpdateOperationsInput | number
   boyut?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitFotolariNestedInput
 }
 
 export type KayitFotoUncheckedUpdateWithoutKayitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   sira?: Prisma.IntFieldUpdateOperationsInput | number
   ad?: Prisma.StringFieldUpdateOperationsInput | string
   depoYolu?: Prisma.StringFieldUpdateOperationsInput | string
@@ -636,6 +812,7 @@ export type KayitFotoUncheckedUpdateWithoutKayitInput = {
 
 export type KayitFotoUncheckedUpdateManyWithoutKayitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   sira?: Prisma.IntFieldUpdateOperationsInput | number
   ad?: Prisma.StringFieldUpdateOperationsInput | string
   depoYolu?: Prisma.StringFieldUpdateOperationsInput | string
@@ -650,6 +827,7 @@ export type KayitFotoUncheckedUpdateManyWithoutKayitInput = {
 
 export type KayitFotoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   sira?: boolean
   ad?: boolean
@@ -659,11 +837,13 @@ export type KayitFotoSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   boy?: boolean
   boyut?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kayitFoto"]>
 
 export type KayitFotoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   sira?: boolean
   ad?: boolean
@@ -673,11 +853,13 @@ export type KayitFotoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   boy?: boolean
   boyut?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kayitFoto"]>
 
 export type KayitFotoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   sira?: boolean
   ad?: boolean
@@ -687,11 +869,13 @@ export type KayitFotoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   boy?: boolean
   boyut?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kayitFoto"]>
 
 export type KayitFotoSelectScalar = {
   id?: boolean
+  ofisId?: boolean
   kayitId?: boolean
   sira?: boolean
   ad?: boolean
@@ -703,24 +887,29 @@ export type KayitFotoSelectScalar = {
   createdAt?: boolean
 }
 
-export type KayitFotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kayitId" | "sira" | "ad" | "depoYolu" | "icerikTuru" | "en" | "boy" | "boyut" | "createdAt", ExtArgs["result"]["kayitFoto"]>
+export type KayitFotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "kayitId" | "sira" | "ad" | "depoYolu" | "icerikTuru" | "en" | "boy" | "boyut" | "createdAt", ExtArgs["result"]["kayitFoto"]>
 export type KayitFotoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
 }
 export type KayitFotoIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
 }
 export type KayitFotoIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
 }
 
 export type $KayitFotoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "KayitFoto"
   objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
     kayit: Prisma.$KayitPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ofisId: string
     kayitId: string
     /**
      * 0 = kapak
@@ -1130,6 +1319,7 @@ readonly fields: KayitFotoFieldRefs;
  */
 export interface Prisma__KayitFotoClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   kayit<T extends Prisma.KayitDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KayitDefaultArgs<ExtArgs>>): Prisma.Prisma__KayitClient<runtime.Types.Result.GetResult<Prisma.$KayitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1161,6 +1351,7 @@ export interface Prisma__KayitFotoClient<T, Null = never, ExtArgs extends runtim
  */
 export interface KayitFotoFieldRefs {
   readonly id: Prisma.FieldRef<"KayitFoto", 'String'>
+  readonly ofisId: Prisma.FieldRef<"KayitFoto", 'String'>
   readonly kayitId: Prisma.FieldRef<"KayitFoto", 'String'>
   readonly sira: Prisma.FieldRef<"KayitFoto", 'Int'>
   readonly ad: Prisma.FieldRef<"KayitFoto", 'String'>

@@ -54,6 +54,9 @@ export type KayitSumAggregateOutputType = {
 
 export type KayitMinAggregateOutputType = {
   id: string | null
+  ofisId: string | null
+  sahipKullaniciId: string | null
+  gorunurluk: $Enums.Gorunurluk | null
   tip: $Enums.KayitTipi | null
   durum: $Enums.Durum | null
   aciliyet: $Enums.Aciliyet | null
@@ -112,6 +115,9 @@ export type KayitMinAggregateOutputType = {
 
 export type KayitMaxAggregateOutputType = {
   id: string | null
+  ofisId: string | null
+  sahipKullaniciId: string | null
+  gorunurluk: $Enums.Gorunurluk | null
   tip: $Enums.KayitTipi | null
   durum: $Enums.Durum | null
   aciliyet: $Enums.Aciliyet | null
@@ -170,6 +176,9 @@ export type KayitMaxAggregateOutputType = {
 
 export type KayitCountAggregateOutputType = {
   id: number
+  ofisId: number
+  sahipKullaniciId: number
+  gorunurluk: number
   tip: number
   durum: number
   aciliyet: number
@@ -262,6 +271,9 @@ export type KayitSumAggregateInputType = {
 
 export type KayitMinAggregateInputType = {
   id?: true
+  ofisId?: true
+  sahipKullaniciId?: true
+  gorunurluk?: true
   tip?: true
   durum?: true
   aciliyet?: true
@@ -320,6 +332,9 @@ export type KayitMinAggregateInputType = {
 
 export type KayitMaxAggregateInputType = {
   id?: true
+  ofisId?: true
+  sahipKullaniciId?: true
+  gorunurluk?: true
   tip?: true
   durum?: true
   aciliyet?: true
@@ -378,6 +393,9 @@ export type KayitMaxAggregateInputType = {
 
 export type KayitCountAggregateInputType = {
   id?: true
+  ofisId?: true
+  sahipKullaniciId?: true
+  gorunurluk?: true
   tip?: true
   durum?: true
   aciliyet?: true
@@ -529,6 +547,9 @@ export type KayitGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 
 export type KayitGroupByOutputType = {
   id: string
+  ofisId: string
+  sahipKullaniciId: string | null
+  gorunurluk: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum: $Enums.Durum
   aciliyet: $Enums.Aciliyet
@@ -616,6 +637,9 @@ export type KayitWhereInput = {
   OR?: Prisma.KayitWhereInput[]
   NOT?: Prisma.KayitWhereInput | Prisma.KayitWhereInput[]
   id?: Prisma.StringFilter<"Kayit"> | string
+  ofisId?: Prisma.StringFilter<"Kayit"> | string
+  sahipKullaniciId?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFilter<"Kayit"> | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFilter<"Kayit"> | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFilter<"Kayit"> | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFilter<"Kayit"> | $Enums.Aciliyet
@@ -676,6 +700,8 @@ export type KayitWhereInput = {
   aiModelVersiyon?: Prisma.StringNullableFilter<"Kayit"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Kayit"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Kayit"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
+  sahipKullanici?: Prisma.XOR<Prisma.KullaniciNullableScalarRelationFilter, Prisma.KullaniciWhereInput> | null
   lokasyonlar?: Prisma.KayitLokasyonListRelationFilter
   kisi?: Prisma.XOR<Prisma.KisiNullableScalarRelationFilter, Prisma.KisiWhereInput> | null
   kisiBaglari?: Prisma.KayitKisiListRelationFilter
@@ -690,6 +716,9 @@ export type KayitWhereInput = {
 
 export type KayitOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
+  sahipKullaniciId?: Prisma.SortOrderInput | Prisma.SortOrder
+  gorunurluk?: Prisma.SortOrder
   tip?: Prisma.SortOrder
   durum?: Prisma.SortOrder
   aciliyet?: Prisma.SortOrder
@@ -750,6 +779,8 @@ export type KayitOrderByWithRelationInput = {
   aiModelVersiyon?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
+  sahipKullanici?: Prisma.KullaniciOrderByWithRelationInput
   lokasyonlar?: Prisma.KayitLokasyonOrderByRelationAggregateInput
   kisi?: Prisma.KisiOrderByWithRelationInput
   kisiBaglari?: Prisma.KayitKisiOrderByRelationAggregateInput
@@ -764,11 +795,14 @@ export type KayitOrderByWithRelationInput = {
 
 export type KayitWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  fingerprint?: string
-  notionId?: string
+  ofisId_fingerprint?: Prisma.KayitOfisIdFingerprintCompoundUniqueInput
+  ofisId_notionId?: Prisma.KayitOfisIdNotionIdCompoundUniqueInput
   AND?: Prisma.KayitWhereInput | Prisma.KayitWhereInput[]
   OR?: Prisma.KayitWhereInput[]
   NOT?: Prisma.KayitWhereInput | Prisma.KayitWhereInput[]
+  ofisId?: Prisma.StringFilter<"Kayit"> | string
+  sahipKullaniciId?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFilter<"Kayit"> | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFilter<"Kayit"> | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFilter<"Kayit"> | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFilter<"Kayit"> | $Enums.Aciliyet
@@ -820,6 +854,8 @@ export type KayitWhereUniqueInput = Prisma.AtLeast<{
   ozelSartlar?: Prisma.StringNullableListFilter<"Kayit">
   validUntil?: Prisma.DateTimeFilter<"Kayit"> | Date | string
   ttlUyariGonderildi?: Prisma.BoolFilter<"Kayit"> | boolean
+  fingerprint?: Prisma.StringFilter<"Kayit"> | string
+  notionId?: Prisma.StringNullableFilter<"Kayit"> | string | null
   notionSonSync?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
   notionSnapshot?: Prisma.JsonNullableFilter<"Kayit">
   notionGeriYazim?: Prisma.JsonNullableFilter<"Kayit">
@@ -827,6 +863,8 @@ export type KayitWhereUniqueInput = Prisma.AtLeast<{
   aiModelVersiyon?: Prisma.StringNullableFilter<"Kayit"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Kayit"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Kayit"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
+  sahipKullanici?: Prisma.XOR<Prisma.KullaniciNullableScalarRelationFilter, Prisma.KullaniciWhereInput> | null
   lokasyonlar?: Prisma.KayitLokasyonListRelationFilter
   kisi?: Prisma.XOR<Prisma.KisiNullableScalarRelationFilter, Prisma.KisiWhereInput> | null
   kisiBaglari?: Prisma.KayitKisiListRelationFilter
@@ -837,10 +875,13 @@ export type KayitWhereUniqueInput = Prisma.AtLeast<{
   portfoyMatchleri?: Prisma.MatchListRelationFilter
   portalKaynagi?: Prisma.XOR<Prisma.PortalIlanNullableScalarRelationFilter, Prisma.PortalIlanWhereInput> | null
   auditLoglari?: Prisma.AuditLogListRelationFilter
-}, "id" | "fingerprint" | "notionId">
+}, "id" | "ofisId_fingerprint" | "ofisId_notionId">
 
 export type KayitOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
+  sahipKullaniciId?: Prisma.SortOrderInput | Prisma.SortOrder
+  gorunurluk?: Prisma.SortOrder
   tip?: Prisma.SortOrder
   durum?: Prisma.SortOrder
   aciliyet?: Prisma.SortOrder
@@ -913,6 +954,9 @@ export type KayitScalarWhereWithAggregatesInput = {
   OR?: Prisma.KayitScalarWhereWithAggregatesInput[]
   NOT?: Prisma.KayitScalarWhereWithAggregatesInput | Prisma.KayitScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Kayit"> | string
+  ofisId?: Prisma.StringWithAggregatesFilter<"Kayit"> | string
+  sahipKullaniciId?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
+  gorunurluk?: Prisma.EnumGorunurlukWithAggregatesFilter<"Kayit"> | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiWithAggregatesFilter<"Kayit"> | $Enums.KayitTipi
   durum?: Prisma.EnumDurumWithAggregatesFilter<"Kayit"> | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetWithAggregatesFilter<"Kayit"> | $Enums.Aciliyet
@@ -977,6 +1021,7 @@ export type KayitScalarWhereWithAggregatesInput = {
 
 export type KayitCreateInput = {
   id?: string
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -1036,6 +1081,8 @@ export type KayitCreateInput = {
   aiModelVersiyon?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
   lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
   kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
@@ -1050,6 +1097,9 @@ export type KayitCreateInput = {
 
 export type KayitUncheckedCreateInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -1123,6 +1173,7 @@ export type KayitUncheckedCreateInput = {
 
 export type KayitUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -1182,6 +1233,8 @@ export type KayitUpdateInput = {
   aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
   lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
   kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
@@ -1196,6 +1249,9 @@ export type KayitUpdateInput = {
 
 export type KayitUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -1269,6 +1325,9 @@ export type KayitUncheckedUpdateInput = {
 
 export type KayitCreateManyInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -1333,6 +1392,7 @@ export type KayitCreateManyInput = {
 
 export type KayitUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -1396,6 +1456,9 @@ export type KayitUpdateManyMutationInput = {
 
 export type KayitUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -1458,6 +1521,16 @@ export type KayitUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type KayitListRelationFilter = {
+  every?: Prisma.KayitWhereInput
+  some?: Prisma.KayitWhereInput
+  none?: Prisma.KayitWhereInput
+}
+
+export type KayitOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type KayitScalarRelationFilter = {
   is?: Prisma.KayitWhereInput
   isNot?: Prisma.KayitWhereInput
@@ -1487,8 +1560,21 @@ export type StringNullableListFilter<$PrismaModel = never> = {
   isEmpty?: boolean
 }
 
+export type KayitOfisIdFingerprintCompoundUniqueInput = {
+  ofisId: string
+  fingerprint: string
+}
+
+export type KayitOfisIdNotionIdCompoundUniqueInput = {
+  ofisId: string
+  notionId: string
+}
+
 export type KayitCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
+  sahipKullaniciId?: Prisma.SortOrder
+  gorunurluk?: Prisma.SortOrder
   tip?: Prisma.SortOrder
   durum?: Prisma.SortOrder
   aciliyet?: Prisma.SortOrder
@@ -1566,6 +1652,9 @@ export type KayitAvgOrderByAggregateInput = {
 
 export type KayitMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
+  sahipKullaniciId?: Prisma.SortOrder
+  gorunurluk?: Prisma.SortOrder
   tip?: Prisma.SortOrder
   durum?: Prisma.SortOrder
   aciliyet?: Prisma.SortOrder
@@ -1624,6 +1713,9 @@ export type KayitMaxOrderByAggregateInput = {
 
 export type KayitMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
+  sahipKullaniciId?: Prisma.SortOrder
+  gorunurluk?: Prisma.SortOrder
   tip?: Prisma.SortOrder
   durum?: Prisma.SortOrder
   aciliyet?: Prisma.SortOrder
@@ -1698,14 +1790,88 @@ export type KayitNullableScalarRelationFilter = {
   isNot?: Prisma.KayitWhereInput | null
 }
 
-export type KayitListRelationFilter = {
-  every?: Prisma.KayitWhereInput
-  some?: Prisma.KayitWhereInput
-  none?: Prisma.KayitWhereInput
+export type KayitCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.KayitCreateWithoutOfisInput, Prisma.KayitUncheckedCreateWithoutOfisInput> | Prisma.KayitCreateWithoutOfisInput[] | Prisma.KayitUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitCreateOrConnectWithoutOfisInput | Prisma.KayitCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.KayitCreateManyOfisInputEnvelope
+  connect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
 }
 
-export type KayitOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
+export type KayitUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.KayitCreateWithoutOfisInput, Prisma.KayitUncheckedCreateWithoutOfisInput> | Prisma.KayitCreateWithoutOfisInput[] | Prisma.KayitUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitCreateOrConnectWithoutOfisInput | Prisma.KayitCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.KayitCreateManyOfisInputEnvelope
+  connect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+}
+
+export type KayitUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.KayitCreateWithoutOfisInput, Prisma.KayitUncheckedCreateWithoutOfisInput> | Prisma.KayitCreateWithoutOfisInput[] | Prisma.KayitUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitCreateOrConnectWithoutOfisInput | Prisma.KayitCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.KayitUpsertWithWhereUniqueWithoutOfisInput | Prisma.KayitUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.KayitCreateManyOfisInputEnvelope
+  set?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  disconnect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  delete?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  connect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  update?: Prisma.KayitUpdateWithWhereUniqueWithoutOfisInput | Prisma.KayitUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.KayitUpdateManyWithWhereWithoutOfisInput | Prisma.KayitUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.KayitScalarWhereInput | Prisma.KayitScalarWhereInput[]
+}
+
+export type KayitUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.KayitCreateWithoutOfisInput, Prisma.KayitUncheckedCreateWithoutOfisInput> | Prisma.KayitCreateWithoutOfisInput[] | Prisma.KayitUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.KayitCreateOrConnectWithoutOfisInput | Prisma.KayitCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.KayitUpsertWithWhereUniqueWithoutOfisInput | Prisma.KayitUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.KayitCreateManyOfisInputEnvelope
+  set?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  disconnect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  delete?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  connect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  update?: Prisma.KayitUpdateWithWhereUniqueWithoutOfisInput | Prisma.KayitUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.KayitUpdateManyWithWhereWithoutOfisInput | Prisma.KayitUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.KayitScalarWhereInput | Prisma.KayitScalarWhereInput[]
+}
+
+export type KayitCreateNestedManyWithoutSahipKullaniciInput = {
+  create?: Prisma.XOR<Prisma.KayitCreateWithoutSahipKullaniciInput, Prisma.KayitUncheckedCreateWithoutSahipKullaniciInput> | Prisma.KayitCreateWithoutSahipKullaniciInput[] | Prisma.KayitUncheckedCreateWithoutSahipKullaniciInput[]
+  connectOrCreate?: Prisma.KayitCreateOrConnectWithoutSahipKullaniciInput | Prisma.KayitCreateOrConnectWithoutSahipKullaniciInput[]
+  createMany?: Prisma.KayitCreateManySahipKullaniciInputEnvelope
+  connect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+}
+
+export type KayitUncheckedCreateNestedManyWithoutSahipKullaniciInput = {
+  create?: Prisma.XOR<Prisma.KayitCreateWithoutSahipKullaniciInput, Prisma.KayitUncheckedCreateWithoutSahipKullaniciInput> | Prisma.KayitCreateWithoutSahipKullaniciInput[] | Prisma.KayitUncheckedCreateWithoutSahipKullaniciInput[]
+  connectOrCreate?: Prisma.KayitCreateOrConnectWithoutSahipKullaniciInput | Prisma.KayitCreateOrConnectWithoutSahipKullaniciInput[]
+  createMany?: Prisma.KayitCreateManySahipKullaniciInputEnvelope
+  connect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+}
+
+export type KayitUpdateManyWithoutSahipKullaniciNestedInput = {
+  create?: Prisma.XOR<Prisma.KayitCreateWithoutSahipKullaniciInput, Prisma.KayitUncheckedCreateWithoutSahipKullaniciInput> | Prisma.KayitCreateWithoutSahipKullaniciInput[] | Prisma.KayitUncheckedCreateWithoutSahipKullaniciInput[]
+  connectOrCreate?: Prisma.KayitCreateOrConnectWithoutSahipKullaniciInput | Prisma.KayitCreateOrConnectWithoutSahipKullaniciInput[]
+  upsert?: Prisma.KayitUpsertWithWhereUniqueWithoutSahipKullaniciInput | Prisma.KayitUpsertWithWhereUniqueWithoutSahipKullaniciInput[]
+  createMany?: Prisma.KayitCreateManySahipKullaniciInputEnvelope
+  set?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  disconnect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  delete?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  connect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  update?: Prisma.KayitUpdateWithWhereUniqueWithoutSahipKullaniciInput | Prisma.KayitUpdateWithWhereUniqueWithoutSahipKullaniciInput[]
+  updateMany?: Prisma.KayitUpdateManyWithWhereWithoutSahipKullaniciInput | Prisma.KayitUpdateManyWithWhereWithoutSahipKullaniciInput[]
+  deleteMany?: Prisma.KayitScalarWhereInput | Prisma.KayitScalarWhereInput[]
+}
+
+export type KayitUncheckedUpdateManyWithoutSahipKullaniciNestedInput = {
+  create?: Prisma.XOR<Prisma.KayitCreateWithoutSahipKullaniciInput, Prisma.KayitUncheckedCreateWithoutSahipKullaniciInput> | Prisma.KayitCreateWithoutSahipKullaniciInput[] | Prisma.KayitUncheckedCreateWithoutSahipKullaniciInput[]
+  connectOrCreate?: Prisma.KayitCreateOrConnectWithoutSahipKullaniciInput | Prisma.KayitCreateOrConnectWithoutSahipKullaniciInput[]
+  upsert?: Prisma.KayitUpsertWithWhereUniqueWithoutSahipKullaniciInput | Prisma.KayitUpsertWithWhereUniqueWithoutSahipKullaniciInput[]
+  createMany?: Prisma.KayitCreateManySahipKullaniciInputEnvelope
+  set?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  disconnect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  delete?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  connect?: Prisma.KayitWhereUniqueInput | Prisma.KayitWhereUniqueInput[]
+  update?: Prisma.KayitUpdateWithWhereUniqueWithoutSahipKullaniciInput | Prisma.KayitUpdateWithWhereUniqueWithoutSahipKullaniciInput[]
+  updateMany?: Prisma.KayitUpdateManyWithWhereWithoutSahipKullaniciInput | Prisma.KayitUpdateManyWithWhereWithoutSahipKullaniciInput[]
+  deleteMany?: Prisma.KayitScalarWhereInput | Prisma.KayitScalarWhereInput[]
 }
 
 export type KayitCreateNestedOneWithoutLokasyonlarInput = {
@@ -1732,6 +1898,10 @@ export type KayitCreatealternatifIslemTipleriInput = {
 
 export type KayitCreateozelSartlarInput = {
   set: string[]
+}
+
+export type EnumGorunurlukFieldUpdateOperationsInput = {
+  set?: $Enums.Gorunurluk
 }
 
 export type EnumKayitTipiFieldUpdateOperationsInput = {
@@ -1798,10 +1968,6 @@ export type EnumIlanSahibiTipiFieldUpdateOperationsInput = {
 
 export type EnumHavuzFieldUpdateOperationsInput = {
   set?: $Enums.Havuz
-}
-
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
 }
 
 export type NullableEnumMusteriKaynagiFieldUpdateOperationsInput = {
@@ -1977,8 +2143,9 @@ export type KayitUpdateOneRequiredWithoutFotolarNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.KayitUpdateToOneWithWhereWithoutFotolarInput, Prisma.KayitUpdateWithoutFotolarInput>, Prisma.KayitUncheckedUpdateWithoutFotolarInput>
 }
 
-export type KayitCreateWithoutLokasyonlarInput = {
+export type KayitCreateWithoutOfisInput = {
   id?: string
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -2038,6 +2205,430 @@ export type KayitCreateWithoutLokasyonlarInput = {
   aiModelVersiyon?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
+  lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
+  kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
+  kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
+  gorusmeNotlari?: Prisma.KayitNotCreateNestedManyWithoutKayitInput
+  fotolar?: Prisma.KayitFotoCreateNestedManyWithoutKayitInput
+  ozellik?: Prisma.MulkOzellikCreateNestedOneWithoutKayitInput
+  talepMatchleri?: Prisma.MatchCreateNestedManyWithoutTalepInput
+  portfoyMatchleri?: Prisma.MatchCreateNestedManyWithoutPortfoyInput
+  portalKaynagi?: Prisma.PortalIlanCreateNestedOneWithoutKayitInput
+  auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutKayitInput
+}
+
+export type KayitUncheckedCreateWithoutOfisInput = {
+  id?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
+  tip: $Enums.KayitTipi
+  durum?: $Enums.Durum
+  aciliyet?: $Enums.Aciliyet
+  anaKategori: $Enums.AnaKategori
+  mulkTipi: $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitCreatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi: $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitCreatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: $Enums.ParaBirimi
+  fiyatPeriyodu?: $Enums.FiyatPeriyodu
+  krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
+  m2?: number | null
+  netM2?: number | null
+  minM2?: number | null
+  maxM2?: number | null
+  m2ToleransYuzde?: number | null
+  odaSayisi?: string | null
+  lokasyonHam?: string | null
+  adres?: string | null
+  enlem?: number | null
+  boylam?: number | null
+  veriKanali?: $Enums.VeriKanali
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  havuz?: $Enums.Havuz
+  yetkili?: boolean
+  yetkiBitis?: Date | string | null
+  musteriKaynagi?: $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
+  kisiId?: string | null
+  gondeAdi?: string | null
+  gondeTelefon?: string | null
+  gondeSirket?: string | null
+  kayitGrubu?: string | null
+  mesajTarihi?: Date | string | null
+  kaynakDosya?: string | null
+  ingestionId?: string | null
+  portalUrl?: string | null
+  portalIlanNo?: string | null
+  portalIlanSahibi?: string | null
+  baslik?: string | null
+  ozet?: string | null
+  hamMetin?: string | null
+  operasyonNotu?: string | null
+  arsivNotu?: string | null
+  ozelSartlar?: Prisma.KayitCreateozelSartlarInput | string[]
+  validUntil: Date | string
+  ttlUyariGonderildi?: boolean
+  fingerprint: string
+  notionId?: string | null
+  notionSonSync?: Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lokasyonlar?: Prisma.KayitLokasyonUncheckedCreateNestedManyWithoutKayitInput
+  kisiBaglari?: Prisma.KayitKisiUncheckedCreateNestedManyWithoutKayitInput
+  gorusmeNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutKayitInput
+  fotolar?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutKayitInput
+  ozellik?: Prisma.MulkOzellikUncheckedCreateNestedOneWithoutKayitInput
+  talepMatchleri?: Prisma.MatchUncheckedCreateNestedManyWithoutTalepInput
+  portfoyMatchleri?: Prisma.MatchUncheckedCreateNestedManyWithoutPortfoyInput
+  portalKaynagi?: Prisma.PortalIlanUncheckedCreateNestedOneWithoutKayitInput
+  auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutKayitInput
+}
+
+export type KayitCreateOrConnectWithoutOfisInput = {
+  where: Prisma.KayitWhereUniqueInput
+  create: Prisma.XOR<Prisma.KayitCreateWithoutOfisInput, Prisma.KayitUncheckedCreateWithoutOfisInput>
+}
+
+export type KayitCreateManyOfisInputEnvelope = {
+  data: Prisma.KayitCreateManyOfisInput | Prisma.KayitCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type KayitUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.KayitWhereUniqueInput
+  update: Prisma.XOR<Prisma.KayitUpdateWithoutOfisInput, Prisma.KayitUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.KayitCreateWithoutOfisInput, Prisma.KayitUncheckedCreateWithoutOfisInput>
+}
+
+export type KayitUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.KayitWhereUniqueInput
+  data: Prisma.XOR<Prisma.KayitUpdateWithoutOfisInput, Prisma.KayitUncheckedUpdateWithoutOfisInput>
+}
+
+export type KayitUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.KayitScalarWhereInput
+  data: Prisma.XOR<Prisma.KayitUpdateManyMutationInput, Prisma.KayitUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type KayitScalarWhereInput = {
+  AND?: Prisma.KayitScalarWhereInput | Prisma.KayitScalarWhereInput[]
+  OR?: Prisma.KayitScalarWhereInput[]
+  NOT?: Prisma.KayitScalarWhereInput | Prisma.KayitScalarWhereInput[]
+  id?: Prisma.StringFilter<"Kayit"> | string
+  ofisId?: Prisma.StringFilter<"Kayit"> | string
+  sahipKullaniciId?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFilter<"Kayit"> | $Enums.Gorunurluk
+  tip?: Prisma.EnumKayitTipiFilter<"Kayit"> | $Enums.KayitTipi
+  durum?: Prisma.EnumDurumFilter<"Kayit"> | $Enums.Durum
+  aciliyet?: Prisma.EnumAciliyetFilter<"Kayit"> | $Enums.Aciliyet
+  anaKategori?: Prisma.EnumAnaKategoriFilter<"Kayit"> | $Enums.AnaKategori
+  mulkTipi?: Prisma.EnumMulkTipiFilter<"Kayit"> | $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.EnumMulkTipiNullableListFilter<"Kayit">
+  islemTipi?: Prisma.EnumIslemTipiFilter<"Kayit"> | $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.EnumIslemTipiNullableListFilter<"Kayit">
+  fiyat?: Prisma.DecimalNullableFilter<"Kayit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: Prisma.DecimalNullableFilter<"Kayit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: Prisma.DecimalNullableFilter<"Kayit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: Prisma.EnumParaBirimiFilter<"Kayit"> | $Enums.ParaBirimi
+  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFilter<"Kayit"> | $Enums.FiyatPeriyodu
+  krediyeUygun?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
+  takasaAcik?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
+  m2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
+  netM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
+  minM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
+  maxM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
+  m2ToleransYuzde?: Prisma.FloatNullableFilter<"Kayit"> | number | null
+  odaSayisi?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  lokasyonHam?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  adres?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  enlem?: Prisma.FloatNullableFilter<"Kayit"> | number | null
+  boylam?: Prisma.FloatNullableFilter<"Kayit"> | number | null
+  veriKanali?: Prisma.EnumVeriKanaliFilter<"Kayit"> | $Enums.VeriKanali
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFilter<"Kayit"> | $Enums.IlanSahibiTipi
+  havuz?: Prisma.EnumHavuzFilter<"Kayit"> | $Enums.Havuz
+  yetkili?: Prisma.BoolFilter<"Kayit"> | boolean
+  yetkiBitis?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
+  musteriKaynagi?: Prisma.EnumMusteriKaynagiNullableFilter<"Kayit"> | $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFilter<"Kayit"> | $Enums.PortfoyAlinabilirlik
+  kisiId?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  gondeAdi?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  gondeTelefon?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  gondeSirket?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  kayitGrubu?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  mesajTarihi?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
+  kaynakDosya?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  ingestionId?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  portalUrl?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  portalIlanNo?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  portalIlanSahibi?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  baslik?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  ozet?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  hamMetin?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  operasyonNotu?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  arsivNotu?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  ozelSartlar?: Prisma.StringNullableListFilter<"Kayit">
+  validUntil?: Prisma.DateTimeFilter<"Kayit"> | Date | string
+  ttlUyariGonderildi?: Prisma.BoolFilter<"Kayit"> | boolean
+  fingerprint?: Prisma.StringFilter<"Kayit"> | string
+  notionId?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  notionSonSync?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
+  notionSnapshot?: Prisma.JsonNullableFilter<"Kayit">
+  notionGeriYazim?: Prisma.JsonNullableFilter<"Kayit">
+  alanGuvenleri?: Prisma.JsonNullableFilter<"Kayit">
+  aiModelVersiyon?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Kayit"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Kayit"> | Date | string
+}
+
+export type KayitCreateWithoutSahipKullaniciInput = {
+  id?: string
+  gorunurluk?: $Enums.Gorunurluk
+  tip: $Enums.KayitTipi
+  durum?: $Enums.Durum
+  aciliyet?: $Enums.Aciliyet
+  anaKategori: $Enums.AnaKategori
+  mulkTipi: $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitCreatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi: $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitCreatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: $Enums.ParaBirimi
+  fiyatPeriyodu?: $Enums.FiyatPeriyodu
+  krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
+  m2?: number | null
+  netM2?: number | null
+  minM2?: number | null
+  maxM2?: number | null
+  m2ToleransYuzde?: number | null
+  odaSayisi?: string | null
+  lokasyonHam?: string | null
+  adres?: string | null
+  enlem?: number | null
+  boylam?: number | null
+  veriKanali?: $Enums.VeriKanali
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  havuz?: $Enums.Havuz
+  yetkili?: boolean
+  yetkiBitis?: Date | string | null
+  musteriKaynagi?: $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
+  gondeAdi?: string | null
+  gondeTelefon?: string | null
+  gondeSirket?: string | null
+  kayitGrubu?: string | null
+  mesajTarihi?: Date | string | null
+  kaynakDosya?: string | null
+  ingestionId?: string | null
+  portalUrl?: string | null
+  portalIlanNo?: string | null
+  portalIlanSahibi?: string | null
+  baslik?: string | null
+  ozet?: string | null
+  hamMetin?: string | null
+  operasyonNotu?: string | null
+  arsivNotu?: string | null
+  ozelSartlar?: Prisma.KayitCreateozelSartlarInput | string[]
+  validUntil: Date | string
+  ttlUyariGonderildi?: boolean
+  fingerprint: string
+  notionId?: string | null
+  notionSonSync?: Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
+  kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
+  kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
+  gorusmeNotlari?: Prisma.KayitNotCreateNestedManyWithoutKayitInput
+  fotolar?: Prisma.KayitFotoCreateNestedManyWithoutKayitInput
+  ozellik?: Prisma.MulkOzellikCreateNestedOneWithoutKayitInput
+  talepMatchleri?: Prisma.MatchCreateNestedManyWithoutTalepInput
+  portfoyMatchleri?: Prisma.MatchCreateNestedManyWithoutPortfoyInput
+  portalKaynagi?: Prisma.PortalIlanCreateNestedOneWithoutKayitInput
+  auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutKayitInput
+}
+
+export type KayitUncheckedCreateWithoutSahipKullaniciInput = {
+  id?: string
+  ofisId?: string
+  gorunurluk?: $Enums.Gorunurluk
+  tip: $Enums.KayitTipi
+  durum?: $Enums.Durum
+  aciliyet?: $Enums.Aciliyet
+  anaKategori: $Enums.AnaKategori
+  mulkTipi: $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitCreatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi: $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitCreatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: $Enums.ParaBirimi
+  fiyatPeriyodu?: $Enums.FiyatPeriyodu
+  krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
+  m2?: number | null
+  netM2?: number | null
+  minM2?: number | null
+  maxM2?: number | null
+  m2ToleransYuzde?: number | null
+  odaSayisi?: string | null
+  lokasyonHam?: string | null
+  adres?: string | null
+  enlem?: number | null
+  boylam?: number | null
+  veriKanali?: $Enums.VeriKanali
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  havuz?: $Enums.Havuz
+  yetkili?: boolean
+  yetkiBitis?: Date | string | null
+  musteriKaynagi?: $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
+  kisiId?: string | null
+  gondeAdi?: string | null
+  gondeTelefon?: string | null
+  gondeSirket?: string | null
+  kayitGrubu?: string | null
+  mesajTarihi?: Date | string | null
+  kaynakDosya?: string | null
+  ingestionId?: string | null
+  portalUrl?: string | null
+  portalIlanNo?: string | null
+  portalIlanSahibi?: string | null
+  baslik?: string | null
+  ozet?: string | null
+  hamMetin?: string | null
+  operasyonNotu?: string | null
+  arsivNotu?: string | null
+  ozelSartlar?: Prisma.KayitCreateozelSartlarInput | string[]
+  validUntil: Date | string
+  ttlUyariGonderildi?: boolean
+  fingerprint: string
+  notionId?: string | null
+  notionSonSync?: Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lokasyonlar?: Prisma.KayitLokasyonUncheckedCreateNestedManyWithoutKayitInput
+  kisiBaglari?: Prisma.KayitKisiUncheckedCreateNestedManyWithoutKayitInput
+  gorusmeNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutKayitInput
+  fotolar?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutKayitInput
+  ozellik?: Prisma.MulkOzellikUncheckedCreateNestedOneWithoutKayitInput
+  talepMatchleri?: Prisma.MatchUncheckedCreateNestedManyWithoutTalepInput
+  portfoyMatchleri?: Prisma.MatchUncheckedCreateNestedManyWithoutPortfoyInput
+  portalKaynagi?: Prisma.PortalIlanUncheckedCreateNestedOneWithoutKayitInput
+  auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutKayitInput
+}
+
+export type KayitCreateOrConnectWithoutSahipKullaniciInput = {
+  where: Prisma.KayitWhereUniqueInput
+  create: Prisma.XOR<Prisma.KayitCreateWithoutSahipKullaniciInput, Prisma.KayitUncheckedCreateWithoutSahipKullaniciInput>
+}
+
+export type KayitCreateManySahipKullaniciInputEnvelope = {
+  data: Prisma.KayitCreateManySahipKullaniciInput | Prisma.KayitCreateManySahipKullaniciInput[]
+  skipDuplicates?: boolean
+}
+
+export type KayitUpsertWithWhereUniqueWithoutSahipKullaniciInput = {
+  where: Prisma.KayitWhereUniqueInput
+  update: Prisma.XOR<Prisma.KayitUpdateWithoutSahipKullaniciInput, Prisma.KayitUncheckedUpdateWithoutSahipKullaniciInput>
+  create: Prisma.XOR<Prisma.KayitCreateWithoutSahipKullaniciInput, Prisma.KayitUncheckedCreateWithoutSahipKullaniciInput>
+}
+
+export type KayitUpdateWithWhereUniqueWithoutSahipKullaniciInput = {
+  where: Prisma.KayitWhereUniqueInput
+  data: Prisma.XOR<Prisma.KayitUpdateWithoutSahipKullaniciInput, Prisma.KayitUncheckedUpdateWithoutSahipKullaniciInput>
+}
+
+export type KayitUpdateManyWithWhereWithoutSahipKullaniciInput = {
+  where: Prisma.KayitScalarWhereInput
+  data: Prisma.XOR<Prisma.KayitUpdateManyMutationInput, Prisma.KayitUncheckedUpdateManyWithoutSahipKullaniciInput>
+}
+
+export type KayitCreateWithoutLokasyonlarInput = {
+  id?: string
+  gorunurluk?: $Enums.Gorunurluk
+  tip: $Enums.KayitTipi
+  durum?: $Enums.Durum
+  aciliyet?: $Enums.Aciliyet
+  anaKategori: $Enums.AnaKategori
+  mulkTipi: $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitCreatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi: $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitCreatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: $Enums.ParaBirimi
+  fiyatPeriyodu?: $Enums.FiyatPeriyodu
+  krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
+  m2?: number | null
+  netM2?: number | null
+  minM2?: number | null
+  maxM2?: number | null
+  m2ToleransYuzde?: number | null
+  odaSayisi?: string | null
+  lokasyonHam?: string | null
+  adres?: string | null
+  enlem?: number | null
+  boylam?: number | null
+  veriKanali?: $Enums.VeriKanali
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  havuz?: $Enums.Havuz
+  yetkili?: boolean
+  yetkiBitis?: Date | string | null
+  musteriKaynagi?: $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
+  gondeAdi?: string | null
+  gondeTelefon?: string | null
+  gondeSirket?: string | null
+  kayitGrubu?: string | null
+  mesajTarihi?: Date | string | null
+  kaynakDosya?: string | null
+  ingestionId?: string | null
+  portalUrl?: string | null
+  portalIlanNo?: string | null
+  portalIlanSahibi?: string | null
+  baslik?: string | null
+  ozet?: string | null
+  hamMetin?: string | null
+  operasyonNotu?: string | null
+  arsivNotu?: string | null
+  ozelSartlar?: Prisma.KayitCreateozelSartlarInput | string[]
+  validUntil: Date | string
+  ttlUyariGonderildi?: boolean
+  fingerprint: string
+  notionId?: string | null
+  notionSonSync?: Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
   kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
   gorusmeNotlari?: Prisma.KayitNotCreateNestedManyWithoutKayitInput
@@ -2051,6 +2642,9 @@ export type KayitCreateWithoutLokasyonlarInput = {
 
 export type KayitUncheckedCreateWithoutLokasyonlarInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -2139,6 +2733,7 @@ export type KayitUpdateToOneWithWhereWithoutLokasyonlarInput = {
 
 export type KayitUpdateWithoutLokasyonlarInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -2198,6 +2793,8 @@ export type KayitUpdateWithoutLokasyonlarInput = {
   aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
   kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
   gorusmeNotlari?: Prisma.KayitNotUpdateManyWithoutKayitNestedInput
@@ -2211,6 +2808,9 @@ export type KayitUpdateWithoutLokasyonlarInput = {
 
 export type KayitUncheckedUpdateWithoutLokasyonlarInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -2283,6 +2883,7 @@ export type KayitUncheckedUpdateWithoutLokasyonlarInput = {
 
 export type KayitCreateWithoutOzellikInput = {
   id?: string
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -2342,6 +2943,8 @@ export type KayitCreateWithoutOzellikInput = {
   aiModelVersiyon?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
   lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
   kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
@@ -2355,6 +2958,9 @@ export type KayitCreateWithoutOzellikInput = {
 
 export type KayitUncheckedCreateWithoutOzellikInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -2443,6 +3049,7 @@ export type KayitUpdateToOneWithWhereWithoutOzellikInput = {
 
 export type KayitUpdateWithoutOzellikInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -2502,6 +3109,8 @@ export type KayitUpdateWithoutOzellikInput = {
   aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
   lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
   kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
@@ -2515,6 +3124,9 @@ export type KayitUpdateWithoutOzellikInput = {
 
 export type KayitUncheckedUpdateWithoutOzellikInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -2587,6 +3199,7 @@ export type KayitUncheckedUpdateWithoutOzellikInput = {
 
 export type KayitCreateWithoutKisiInput = {
   id?: string
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -2646,6 +3259,8 @@ export type KayitCreateWithoutKisiInput = {
   aiModelVersiyon?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
   lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
   kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
   gorusmeNotlari?: Prisma.KayitNotCreateNestedManyWithoutKayitInput
@@ -2659,6 +3274,9 @@ export type KayitCreateWithoutKisiInput = {
 
 export type KayitUncheckedCreateWithoutKisiInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -2755,75 +3373,9 @@ export type KayitUpdateManyWithWhereWithoutKisiInput = {
   data: Prisma.XOR<Prisma.KayitUpdateManyMutationInput, Prisma.KayitUncheckedUpdateManyWithoutKisiInput>
 }
 
-export type KayitScalarWhereInput = {
-  AND?: Prisma.KayitScalarWhereInput | Prisma.KayitScalarWhereInput[]
-  OR?: Prisma.KayitScalarWhereInput[]
-  NOT?: Prisma.KayitScalarWhereInput | Prisma.KayitScalarWhereInput[]
-  id?: Prisma.StringFilter<"Kayit"> | string
-  tip?: Prisma.EnumKayitTipiFilter<"Kayit"> | $Enums.KayitTipi
-  durum?: Prisma.EnumDurumFilter<"Kayit"> | $Enums.Durum
-  aciliyet?: Prisma.EnumAciliyetFilter<"Kayit"> | $Enums.Aciliyet
-  anaKategori?: Prisma.EnumAnaKategoriFilter<"Kayit"> | $Enums.AnaKategori
-  mulkTipi?: Prisma.EnumMulkTipiFilter<"Kayit"> | $Enums.MulkTipi
-  alternatifMulkTipleri?: Prisma.EnumMulkTipiNullableListFilter<"Kayit">
-  islemTipi?: Prisma.EnumIslemTipiFilter<"Kayit"> | $Enums.IslemTipi
-  alternatifIslemTipleri?: Prisma.EnumIslemTipiNullableListFilter<"Kayit">
-  fiyat?: Prisma.DecimalNullableFilter<"Kayit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  minFiyat?: Prisma.DecimalNullableFilter<"Kayit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  maxFiyat?: Prisma.DecimalNullableFilter<"Kayit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  paraBirimi?: Prisma.EnumParaBirimiFilter<"Kayit"> | $Enums.ParaBirimi
-  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFilter<"Kayit"> | $Enums.FiyatPeriyodu
-  krediyeUygun?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
-  takasaAcik?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
-  m2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
-  netM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
-  minM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
-  maxM2?: Prisma.FloatNullableFilter<"Kayit"> | number | null
-  m2ToleransYuzde?: Prisma.FloatNullableFilter<"Kayit"> | number | null
-  odaSayisi?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  lokasyonHam?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  adres?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  enlem?: Prisma.FloatNullableFilter<"Kayit"> | number | null
-  boylam?: Prisma.FloatNullableFilter<"Kayit"> | number | null
-  veriKanali?: Prisma.EnumVeriKanaliFilter<"Kayit"> | $Enums.VeriKanali
-  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFilter<"Kayit"> | $Enums.IlanSahibiTipi
-  havuz?: Prisma.EnumHavuzFilter<"Kayit"> | $Enums.Havuz
-  yetkili?: Prisma.BoolFilter<"Kayit"> | boolean
-  yetkiBitis?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
-  musteriKaynagi?: Prisma.EnumMusteriKaynagiNullableFilter<"Kayit"> | $Enums.MusteriKaynagi | null
-  portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFilter<"Kayit"> | $Enums.PortfoyAlinabilirlik
-  kisiId?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  gondeAdi?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  gondeTelefon?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  gondeSirket?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  kayitGrubu?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  mesajTarihi?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
-  kaynakDosya?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  ingestionId?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  portalUrl?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  portalIlanNo?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  portalIlanSahibi?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  baslik?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  ozet?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  hamMetin?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  operasyonNotu?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  arsivNotu?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  ozelSartlar?: Prisma.StringNullableListFilter<"Kayit">
-  validUntil?: Prisma.DateTimeFilter<"Kayit"> | Date | string
-  ttlUyariGonderildi?: Prisma.BoolFilter<"Kayit"> | boolean
-  fingerprint?: Prisma.StringFilter<"Kayit"> | string
-  notionId?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  notionSonSync?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
-  notionSnapshot?: Prisma.JsonNullableFilter<"Kayit">
-  notionGeriYazim?: Prisma.JsonNullableFilter<"Kayit">
-  alanGuvenleri?: Prisma.JsonNullableFilter<"Kayit">
-  aiModelVersiyon?: Prisma.StringNullableFilter<"Kayit"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"Kayit"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Kayit"> | Date | string
-}
-
 export type KayitCreateWithoutKisiBaglariInput = {
   id?: string
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -2883,6 +3435,8 @@ export type KayitCreateWithoutKisiBaglariInput = {
   aiModelVersiyon?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
   lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
   gorusmeNotlari?: Prisma.KayitNotCreateNestedManyWithoutKayitInput
@@ -2896,6 +3450,9 @@ export type KayitCreateWithoutKisiBaglariInput = {
 
 export type KayitUncheckedCreateWithoutKisiBaglariInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -2984,6 +3541,7 @@ export type KayitUpdateToOneWithWhereWithoutKisiBaglariInput = {
 
 export type KayitUpdateWithoutKisiBaglariInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -3043,6 +3601,8 @@ export type KayitUpdateWithoutKisiBaglariInput = {
   aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
   lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
   gorusmeNotlari?: Prisma.KayitNotUpdateManyWithoutKayitNestedInput
@@ -3056,6 +3616,9 @@ export type KayitUpdateWithoutKisiBaglariInput = {
 
 export type KayitUncheckedUpdateWithoutKisiBaglariInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -3128,6 +3691,7 @@ export type KayitUncheckedUpdateWithoutKisiBaglariInput = {
 
 export type KayitCreateWithoutTalepMatchleriInput = {
   id?: string
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -3187,6 +3751,8 @@ export type KayitCreateWithoutTalepMatchleriInput = {
   aiModelVersiyon?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
   lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
   kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
@@ -3200,6 +3766,9 @@ export type KayitCreateWithoutTalepMatchleriInput = {
 
 export type KayitUncheckedCreateWithoutTalepMatchleriInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -3277,6 +3846,7 @@ export type KayitCreateOrConnectWithoutTalepMatchleriInput = {
 
 export type KayitCreateWithoutPortfoyMatchleriInput = {
   id?: string
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -3336,6 +3906,8 @@ export type KayitCreateWithoutPortfoyMatchleriInput = {
   aiModelVersiyon?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
   lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
   kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
@@ -3349,6 +3921,9 @@ export type KayitCreateWithoutPortfoyMatchleriInput = {
 
 export type KayitUncheckedCreateWithoutPortfoyMatchleriInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -3437,6 +4012,7 @@ export type KayitUpdateToOneWithWhereWithoutTalepMatchleriInput = {
 
 export type KayitUpdateWithoutTalepMatchleriInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -3496,6 +4072,8 @@ export type KayitUpdateWithoutTalepMatchleriInput = {
   aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
   lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
   kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
@@ -3509,6 +4087,9 @@ export type KayitUpdateWithoutTalepMatchleriInput = {
 
 export type KayitUncheckedUpdateWithoutTalepMatchleriInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -3592,6 +4173,7 @@ export type KayitUpdateToOneWithWhereWithoutPortfoyMatchleriInput = {
 
 export type KayitUpdateWithoutPortfoyMatchleriInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -3651,6 +4233,8 @@ export type KayitUpdateWithoutPortfoyMatchleriInput = {
   aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
   lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
   kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
@@ -3664,6 +4248,9 @@ export type KayitUpdateWithoutPortfoyMatchleriInput = {
 
 export type KayitUncheckedUpdateWithoutPortfoyMatchleriInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -3736,6 +4323,7 @@ export type KayitUncheckedUpdateWithoutPortfoyMatchleriInput = {
 
 export type KayitCreateWithoutPortalKaynagiInput = {
   id?: string
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -3795,6 +4383,8 @@ export type KayitCreateWithoutPortalKaynagiInput = {
   aiModelVersiyon?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
   lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
   kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
@@ -3808,6 +4398,9 @@ export type KayitCreateWithoutPortalKaynagiInput = {
 
 export type KayitUncheckedCreateWithoutPortalKaynagiInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -3896,6 +4489,7 @@ export type KayitUpdateToOneWithWhereWithoutPortalKaynagiInput = {
 
 export type KayitUpdateWithoutPortalKaynagiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -3955,6 +4549,8 @@ export type KayitUpdateWithoutPortalKaynagiInput = {
   aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
   lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
   kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
@@ -3968,6 +4564,9 @@ export type KayitUpdateWithoutPortalKaynagiInput = {
 
 export type KayitUncheckedUpdateWithoutPortalKaynagiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -4040,6 +4639,7 @@ export type KayitUncheckedUpdateWithoutPortalKaynagiInput = {
 
 export type KayitCreateWithoutAuditLoglariInput = {
   id?: string
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -4099,6 +4699,8 @@ export type KayitCreateWithoutAuditLoglariInput = {
   aiModelVersiyon?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
   lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
   kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
@@ -4112,6 +4714,9 @@ export type KayitCreateWithoutAuditLoglariInput = {
 
 export type KayitUncheckedCreateWithoutAuditLoglariInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -4200,6 +4805,7 @@ export type KayitUpdateToOneWithWhereWithoutAuditLoglariInput = {
 
 export type KayitUpdateWithoutAuditLoglariInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -4259,6 +4865,8 @@ export type KayitUpdateWithoutAuditLoglariInput = {
   aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
   lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
   kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
@@ -4272,6 +4880,9 @@ export type KayitUpdateWithoutAuditLoglariInput = {
 
 export type KayitUncheckedUpdateWithoutAuditLoglariInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -4344,6 +4955,7 @@ export type KayitUncheckedUpdateWithoutAuditLoglariInput = {
 
 export type KayitCreateWithoutGorusmeNotlariInput = {
   id?: string
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -4403,6 +5015,8 @@ export type KayitCreateWithoutGorusmeNotlariInput = {
   aiModelVersiyon?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
   lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
   kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
@@ -4416,6 +5030,9 @@ export type KayitCreateWithoutGorusmeNotlariInput = {
 
 export type KayitUncheckedCreateWithoutGorusmeNotlariInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -4504,6 +5121,7 @@ export type KayitUpdateToOneWithWhereWithoutGorusmeNotlariInput = {
 
 export type KayitUpdateWithoutGorusmeNotlariInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -4563,6 +5181,8 @@ export type KayitUpdateWithoutGorusmeNotlariInput = {
   aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
   lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
   kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
@@ -4576,6 +5196,9 @@ export type KayitUpdateWithoutGorusmeNotlariInput = {
 
 export type KayitUncheckedUpdateWithoutGorusmeNotlariInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -4648,6 +5271,7 @@ export type KayitUncheckedUpdateWithoutGorusmeNotlariInput = {
 
 export type KayitCreateWithoutFotolarInput = {
   id?: string
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -4707,6 +5331,8 @@ export type KayitCreateWithoutFotolarInput = {
   aiModelVersiyon?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKayitlarInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKayitlarInput
   lokasyonlar?: Prisma.KayitLokasyonCreateNestedManyWithoutKayitInput
   kisi?: Prisma.KisiCreateNestedOneWithoutKayitlarInput
   kisiBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKayitInput
@@ -4720,6 +5346,9 @@ export type KayitCreateWithoutFotolarInput = {
 
 export type KayitUncheckedCreateWithoutFotolarInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -4808,6 +5437,7 @@ export type KayitUpdateToOneWithWhereWithoutFotolarInput = {
 
 export type KayitUpdateWithoutFotolarInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -4867,6 +5497,8 @@ export type KayitUpdateWithoutFotolarInput = {
   aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
   lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
   kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
   kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
@@ -4880,6 +5512,9 @@ export type KayitUpdateWithoutFotolarInput = {
 
 export type KayitUncheckedUpdateWithoutFotolarInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -4950,8 +5585,575 @@ export type KayitUncheckedUpdateWithoutFotolarInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutKayitNestedInput
 }
 
+export type KayitCreateManyOfisInput = {
+  id?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
+  tip: $Enums.KayitTipi
+  durum?: $Enums.Durum
+  aciliyet?: $Enums.Aciliyet
+  anaKategori: $Enums.AnaKategori
+  mulkTipi: $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitCreatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi: $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitCreatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: $Enums.ParaBirimi
+  fiyatPeriyodu?: $Enums.FiyatPeriyodu
+  krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
+  m2?: number | null
+  netM2?: number | null
+  minM2?: number | null
+  maxM2?: number | null
+  m2ToleransYuzde?: number | null
+  odaSayisi?: string | null
+  lokasyonHam?: string | null
+  adres?: string | null
+  enlem?: number | null
+  boylam?: number | null
+  veriKanali?: $Enums.VeriKanali
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  havuz?: $Enums.Havuz
+  yetkili?: boolean
+  yetkiBitis?: Date | string | null
+  musteriKaynagi?: $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
+  kisiId?: string | null
+  gondeAdi?: string | null
+  gondeTelefon?: string | null
+  gondeSirket?: string | null
+  kayitGrubu?: string | null
+  mesajTarihi?: Date | string | null
+  kaynakDosya?: string | null
+  ingestionId?: string | null
+  portalUrl?: string | null
+  portalIlanNo?: string | null
+  portalIlanSahibi?: string | null
+  baslik?: string | null
+  ozet?: string | null
+  hamMetin?: string | null
+  operasyonNotu?: string | null
+  arsivNotu?: string | null
+  ozelSartlar?: Prisma.KayitCreateozelSartlarInput | string[]
+  validUntil: Date | string
+  ttlUyariGonderildi?: boolean
+  fingerprint: string
+  notionId?: string | null
+  notionSonSync?: Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type KayitUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
+  durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
+  anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
+  mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitUpdatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi?: Prisma.EnumIslemTipiFieldUpdateOperationsInput | $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitUpdatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
+  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
+  krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  maxM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  m2ToleransYuzde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  odaSayisi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lokasyonHam?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adres?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enlem?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boylam?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  veriKanali?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
+  yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
+  gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeSirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kayitGrubu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mesajTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kaynakDosya?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozelSartlar?: Prisma.KayitUpdateozelSartlarInput | string[]
+  validUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ttlUyariGonderildi?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionSonSync?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
+  lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
+  kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
+  kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
+  gorusmeNotlari?: Prisma.KayitNotUpdateManyWithoutKayitNestedInput
+  fotolar?: Prisma.KayitFotoUpdateManyWithoutKayitNestedInput
+  ozellik?: Prisma.MulkOzellikUpdateOneWithoutKayitNestedInput
+  talepMatchleri?: Prisma.MatchUpdateManyWithoutTalepNestedInput
+  portfoyMatchleri?: Prisma.MatchUpdateManyWithoutPortfoyNestedInput
+  portalKaynagi?: Prisma.PortalIlanUpdateOneWithoutKayitNestedInput
+  auditLoglari?: Prisma.AuditLogUpdateManyWithoutKayitNestedInput
+}
+
+export type KayitUncheckedUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
+  durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
+  anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
+  mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitUpdatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi?: Prisma.EnumIslemTipiFieldUpdateOperationsInput | $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitUpdatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
+  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
+  krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  maxM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  m2ToleransYuzde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  odaSayisi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lokasyonHam?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adres?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enlem?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boylam?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  veriKanali?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
+  yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
+  kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeSirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kayitGrubu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mesajTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kaynakDosya?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozelSartlar?: Prisma.KayitUpdateozelSartlarInput | string[]
+  validUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ttlUyariGonderildi?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionSonSync?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lokasyonlar?: Prisma.KayitLokasyonUncheckedUpdateManyWithoutKayitNestedInput
+  kisiBaglari?: Prisma.KayitKisiUncheckedUpdateManyWithoutKayitNestedInput
+  gorusmeNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutKayitNestedInput
+  fotolar?: Prisma.KayitFotoUncheckedUpdateManyWithoutKayitNestedInput
+  ozellik?: Prisma.MulkOzellikUncheckedUpdateOneWithoutKayitNestedInput
+  talepMatchleri?: Prisma.MatchUncheckedUpdateManyWithoutTalepNestedInput
+  portfoyMatchleri?: Prisma.MatchUncheckedUpdateManyWithoutPortfoyNestedInput
+  portalKaynagi?: Prisma.PortalIlanUncheckedUpdateOneWithoutKayitNestedInput
+  auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutKayitNestedInput
+}
+
+export type KayitUncheckedUpdateManyWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
+  durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
+  anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
+  mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitUpdatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi?: Prisma.EnumIslemTipiFieldUpdateOperationsInput | $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitUpdatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
+  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
+  krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  maxM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  m2ToleransYuzde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  odaSayisi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lokasyonHam?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adres?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enlem?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boylam?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  veriKanali?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
+  yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
+  kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeSirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kayitGrubu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mesajTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kaynakDosya?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozelSartlar?: Prisma.KayitUpdateozelSartlarInput | string[]
+  validUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ttlUyariGonderildi?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionSonSync?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type KayitCreateManySahipKullaniciInput = {
+  id?: string
+  ofisId?: string
+  gorunurluk?: $Enums.Gorunurluk
+  tip: $Enums.KayitTipi
+  durum?: $Enums.Durum
+  aciliyet?: $Enums.Aciliyet
+  anaKategori: $Enums.AnaKategori
+  mulkTipi: $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitCreatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi: $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitCreatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: $Enums.ParaBirimi
+  fiyatPeriyodu?: $Enums.FiyatPeriyodu
+  krediyeUygun?: boolean | null
+  takasaAcik?: boolean | null
+  m2?: number | null
+  netM2?: number | null
+  minM2?: number | null
+  maxM2?: number | null
+  m2ToleransYuzde?: number | null
+  odaSayisi?: string | null
+  lokasyonHam?: string | null
+  adres?: string | null
+  enlem?: number | null
+  boylam?: number | null
+  veriKanali?: $Enums.VeriKanali
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  havuz?: $Enums.Havuz
+  yetkili?: boolean
+  yetkiBitis?: Date | string | null
+  musteriKaynagi?: $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
+  kisiId?: string | null
+  gondeAdi?: string | null
+  gondeTelefon?: string | null
+  gondeSirket?: string | null
+  kayitGrubu?: string | null
+  mesajTarihi?: Date | string | null
+  kaynakDosya?: string | null
+  ingestionId?: string | null
+  portalUrl?: string | null
+  portalIlanNo?: string | null
+  portalIlanSahibi?: string | null
+  baslik?: string | null
+  ozet?: string | null
+  hamMetin?: string | null
+  operasyonNotu?: string | null
+  arsivNotu?: string | null
+  ozelSartlar?: Prisma.KayitCreateozelSartlarInput | string[]
+  validUntil: Date | string
+  ttlUyariGonderildi?: boolean
+  fingerprint: string
+  notionId?: string | null
+  notionSonSync?: Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type KayitUpdateWithoutSahipKullaniciInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
+  durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
+  anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
+  mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitUpdatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi?: Prisma.EnumIslemTipiFieldUpdateOperationsInput | $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitUpdatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
+  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
+  krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  maxM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  m2ToleransYuzde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  odaSayisi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lokasyonHam?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adres?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enlem?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boylam?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  veriKanali?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
+  yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
+  gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeSirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kayitGrubu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mesajTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kaynakDosya?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozelSartlar?: Prisma.KayitUpdateozelSartlarInput | string[]
+  validUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ttlUyariGonderildi?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionSonSync?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
+  kisi?: Prisma.KisiUpdateOneWithoutKayitlarNestedInput
+  kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
+  gorusmeNotlari?: Prisma.KayitNotUpdateManyWithoutKayitNestedInput
+  fotolar?: Prisma.KayitFotoUpdateManyWithoutKayitNestedInput
+  ozellik?: Prisma.MulkOzellikUpdateOneWithoutKayitNestedInput
+  talepMatchleri?: Prisma.MatchUpdateManyWithoutTalepNestedInput
+  portfoyMatchleri?: Prisma.MatchUpdateManyWithoutPortfoyNestedInput
+  portalKaynagi?: Prisma.PortalIlanUpdateOneWithoutKayitNestedInput
+  auditLoglari?: Prisma.AuditLogUpdateManyWithoutKayitNestedInput
+}
+
+export type KayitUncheckedUpdateWithoutSahipKullaniciInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
+  durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
+  anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
+  mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitUpdatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi?: Prisma.EnumIslemTipiFieldUpdateOperationsInput | $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitUpdatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
+  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
+  krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  maxM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  m2ToleransYuzde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  odaSayisi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lokasyonHam?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adres?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enlem?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boylam?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  veriKanali?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
+  yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
+  kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeSirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kayitGrubu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mesajTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kaynakDosya?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozelSartlar?: Prisma.KayitUpdateozelSartlarInput | string[]
+  validUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ttlUyariGonderildi?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionSonSync?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lokasyonlar?: Prisma.KayitLokasyonUncheckedUpdateManyWithoutKayitNestedInput
+  kisiBaglari?: Prisma.KayitKisiUncheckedUpdateManyWithoutKayitNestedInput
+  gorusmeNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutKayitNestedInput
+  fotolar?: Prisma.KayitFotoUncheckedUpdateManyWithoutKayitNestedInput
+  ozellik?: Prisma.MulkOzellikUncheckedUpdateOneWithoutKayitNestedInput
+  talepMatchleri?: Prisma.MatchUncheckedUpdateManyWithoutTalepNestedInput
+  portfoyMatchleri?: Prisma.MatchUncheckedUpdateManyWithoutPortfoyNestedInput
+  portalKaynagi?: Prisma.PortalIlanUncheckedUpdateOneWithoutKayitNestedInput
+  auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutKayitNestedInput
+}
+
+export type KayitUncheckedUpdateManyWithoutSahipKullaniciInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
+  durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
+  anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
+  mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
+  alternatifMulkTipleri?: Prisma.KayitUpdatealternatifMulkTipleriInput | $Enums.MulkTipi[]
+  islemTipi?: Prisma.EnumIslemTipiFieldUpdateOperationsInput | $Enums.IslemTipi
+  alternatifIslemTipleri?: Prisma.KayitUpdatealternatifIslemTipleriInput | $Enums.IslemTipi[]
+  fiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  minFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxFiyat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  paraBirimi?: Prisma.EnumParaBirimiFieldUpdateOperationsInput | $Enums.ParaBirimi
+  fiyatPeriyodu?: Prisma.EnumFiyatPeriyoduFieldUpdateOperationsInput | $Enums.FiyatPeriyodu
+  krediyeUygun?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  takasaAcik?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  m2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  netM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  minM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  maxM2?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  m2ToleransYuzde?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  odaSayisi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lokasyonHam?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adres?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enlem?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  boylam?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  veriKanali?: Prisma.EnumVeriKanaliFieldUpdateOperationsInput | $Enums.VeriKanali
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
+  yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
+  kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gondeSirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kayitGrubu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mesajTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kaynakDosya?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ingestionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozelSartlar?: Prisma.KayitUpdateozelSartlarInput | string[]
+  validUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ttlUyariGonderildi?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionSonSync?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionGeriYazim?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  alanGuvenleri?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type KayitCreateManyKisiInput = {
   id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
   aciliyet?: $Enums.Aciliyet
@@ -5015,6 +6217,7 @@ export type KayitCreateManyKisiInput = {
 
 export type KayitUpdateWithoutKisiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -5074,6 +6277,8 @@ export type KayitUpdateWithoutKisiInput = {
   aiModelVersiyon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKayitlarNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKayitlarNestedInput
   lokasyonlar?: Prisma.KayitLokasyonUpdateManyWithoutKayitNestedInput
   kisiBaglari?: Prisma.KayitKisiUpdateManyWithoutKayitNestedInput
   gorusmeNotlari?: Prisma.KayitNotUpdateManyWithoutKayitNestedInput
@@ -5087,6 +6292,9 @@ export type KayitUpdateWithoutKisiInput = {
 
 export type KayitUncheckedUpdateWithoutKisiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -5159,6 +6367,9 @@ export type KayitUncheckedUpdateWithoutKisiInput = {
 
 export type KayitUncheckedUpdateManyWithoutKisiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
@@ -5307,6 +6518,9 @@ export type KayitCountOutputTypeCountAuditLoglariArgs<ExtArgs extends runtime.Ty
 
 export type KayitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
+  sahipKullaniciId?: boolean
+  gorunurluk?: boolean
   tip?: boolean
   durum?: boolean
   aciliyet?: boolean
@@ -5367,6 +6581,8 @@ export type KayitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   aiModelVersiyon?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+  sahipKullanici?: boolean | Prisma.Kayit$sahipKullaniciArgs<ExtArgs>
   lokasyonlar?: boolean | Prisma.Kayit$lokasyonlarArgs<ExtArgs>
   kisi?: boolean | Prisma.Kayit$kisiArgs<ExtArgs>
   kisiBaglari?: boolean | Prisma.Kayit$kisiBaglariArgs<ExtArgs>
@@ -5382,6 +6598,9 @@ export type KayitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 
 export type KayitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
+  sahipKullaniciId?: boolean
+  gorunurluk?: boolean
   tip?: boolean
   durum?: boolean
   aciliyet?: boolean
@@ -5442,11 +6661,16 @@ export type KayitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   aiModelVersiyon?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+  sahipKullanici?: boolean | Prisma.Kayit$sahipKullaniciArgs<ExtArgs>
   kisi?: boolean | Prisma.Kayit$kisiArgs<ExtArgs>
 }, ExtArgs["result"]["kayit"]>
 
 export type KayitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
+  sahipKullaniciId?: boolean
+  gorunurluk?: boolean
   tip?: boolean
   durum?: boolean
   aciliyet?: boolean
@@ -5507,11 +6731,16 @@ export type KayitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   aiModelVersiyon?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+  sahipKullanici?: boolean | Prisma.Kayit$sahipKullaniciArgs<ExtArgs>
   kisi?: boolean | Prisma.Kayit$kisiArgs<ExtArgs>
 }, ExtArgs["result"]["kayit"]>
 
 export type KayitSelectScalar = {
   id?: boolean
+  ofisId?: boolean
+  sahipKullaniciId?: boolean
+  gorunurluk?: boolean
   tip?: boolean
   durum?: boolean
   aciliyet?: boolean
@@ -5574,8 +6803,10 @@ export type KayitSelectScalar = {
   updatedAt?: boolean
 }
 
-export type KayitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tip" | "durum" | "aciliyet" | "anaKategori" | "mulkTipi" | "alternatifMulkTipleri" | "islemTipi" | "alternatifIslemTipleri" | "fiyat" | "minFiyat" | "maxFiyat" | "paraBirimi" | "fiyatPeriyodu" | "krediyeUygun" | "takasaAcik" | "m2" | "netM2" | "minM2" | "maxM2" | "m2ToleransYuzde" | "odaSayisi" | "lokasyonHam" | "adres" | "enlem" | "boylam" | "veriKanali" | "ilanSahibiTipi" | "havuz" | "yetkili" | "yetkiBitis" | "musteriKaynagi" | "portfoyAlinabilirlik" | "kisiId" | "gondeAdi" | "gondeTelefon" | "gondeSirket" | "kayitGrubu" | "mesajTarihi" | "kaynakDosya" | "ingestionId" | "portalUrl" | "portalIlanNo" | "portalIlanSahibi" | "baslik" | "ozet" | "hamMetin" | "operasyonNotu" | "arsivNotu" | "ozelSartlar" | "validUntil" | "ttlUyariGonderildi" | "fingerprint" | "notionId" | "notionSonSync" | "notionSnapshot" | "notionGeriYazim" | "alanGuvenleri" | "aiModelVersiyon" | "createdAt" | "updatedAt", ExtArgs["result"]["kayit"]>
+export type KayitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "sahipKullaniciId" | "gorunurluk" | "tip" | "durum" | "aciliyet" | "anaKategori" | "mulkTipi" | "alternatifMulkTipleri" | "islemTipi" | "alternatifIslemTipleri" | "fiyat" | "minFiyat" | "maxFiyat" | "paraBirimi" | "fiyatPeriyodu" | "krediyeUygun" | "takasaAcik" | "m2" | "netM2" | "minM2" | "maxM2" | "m2ToleransYuzde" | "odaSayisi" | "lokasyonHam" | "adres" | "enlem" | "boylam" | "veriKanali" | "ilanSahibiTipi" | "havuz" | "yetkili" | "yetkiBitis" | "musteriKaynagi" | "portfoyAlinabilirlik" | "kisiId" | "gondeAdi" | "gondeTelefon" | "gondeSirket" | "kayitGrubu" | "mesajTarihi" | "kaynakDosya" | "ingestionId" | "portalUrl" | "portalIlanNo" | "portalIlanSahibi" | "baslik" | "ozet" | "hamMetin" | "operasyonNotu" | "arsivNotu" | "ozelSartlar" | "validUntil" | "ttlUyariGonderildi" | "fingerprint" | "notionId" | "notionSonSync" | "notionSnapshot" | "notionGeriYazim" | "alanGuvenleri" | "aiModelVersiyon" | "createdAt" | "updatedAt", ExtArgs["result"]["kayit"]>
 export type KayitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+  sahipKullanici?: boolean | Prisma.Kayit$sahipKullaniciArgs<ExtArgs>
   lokasyonlar?: boolean | Prisma.Kayit$lokasyonlarArgs<ExtArgs>
   kisi?: boolean | Prisma.Kayit$kisiArgs<ExtArgs>
   kisiBaglari?: boolean | Prisma.Kayit$kisiBaglariArgs<ExtArgs>
@@ -5589,15 +6820,21 @@ export type KayitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   _count?: boolean | Prisma.KayitCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type KayitIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+  sahipKullanici?: boolean | Prisma.Kayit$sahipKullaniciArgs<ExtArgs>
   kisi?: boolean | Prisma.Kayit$kisiArgs<ExtArgs>
 }
 export type KayitIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+  sahipKullanici?: boolean | Prisma.Kayit$sahipKullaniciArgs<ExtArgs>
   kisi?: boolean | Prisma.Kayit$kisiArgs<ExtArgs>
 }
 
 export type $KayitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Kayit"
   objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
+    sahipKullanici: Prisma.$KullaniciPayload<ExtArgs> | null
     lokasyonlar: Prisma.$KayitLokasyonPayload<ExtArgs>[]
     kisi: Prisma.$KisiPayload<ExtArgs> | null
     kisiBaglari: Prisma.$KayitKisiPayload<ExtArgs>[]
@@ -5617,6 +6854,18 @@ export type $KayitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    /**
+     * v3.20 — kaydın ait olduğu ofis
+     */
+    ofisId: string
+    /**
+     * v3.20 — kaydı giren danışman (null = ofis ortak / içe aktarma)
+     */
+    sahipKullaniciId: string | null
+    /**
+     * v3.20 — OFIS: ofisin tamamı görür · OZEL: yalnızca sahibi ve ofis yöneticisi görür
+     */
+    gorunurluk: $Enums.Gorunurluk
     tip: $Enums.KayitTipi
     durum: $Enums.Durum
     aciliyet: $Enums.Aciliyet
@@ -5680,6 +6929,9 @@ export type $KayitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     ozelSartlar: string[]
     validUntil: Date
     ttlUyariGonderildi: boolean
+    /**
+     * v3.20 — mükerrer kontrolü ofis içinde: iki ofis aynı ilanı ayrı ayrı tutabilir
+     */
     fingerprint: string
     notionId: string | null
     notionSonSync: Date | null
@@ -6089,6 +7341,8 @@ readonly fields: KayitFieldRefs;
  */
 export interface Prisma__KayitClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  sahipKullanici<T extends Prisma.Kayit$sahipKullaniciArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Kayit$sahipKullaniciArgs<ExtArgs>>): Prisma.Prisma__KullaniciClient<runtime.Types.Result.GetResult<Prisma.$KullaniciPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   lokasyonlar<T extends Prisma.Kayit$lokasyonlarArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Kayit$lokasyonlarArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KayitLokasyonPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   kisi<T extends Prisma.Kayit$kisiArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Kayit$kisiArgs<ExtArgs>>): Prisma.Prisma__KisiClient<runtime.Types.Result.GetResult<Prisma.$KisiPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   kisiBaglari<T extends Prisma.Kayit$kisiBaglariArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Kayit$kisiBaglariArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KayitKisiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -6129,6 +7383,9 @@ export interface Prisma__KayitClient<T, Null = never, ExtArgs extends runtime.Ty
  */
 export interface KayitFieldRefs {
   readonly id: Prisma.FieldRef<"Kayit", 'String'>
+  readonly ofisId: Prisma.FieldRef<"Kayit", 'String'>
+  readonly sahipKullaniciId: Prisma.FieldRef<"Kayit", 'String'>
+  readonly gorunurluk: Prisma.FieldRef<"Kayit", 'Gorunurluk'>
   readonly tip: Prisma.FieldRef<"Kayit", 'KayitTipi'>
   readonly durum: Prisma.FieldRef<"Kayit", 'Durum'>
   readonly aciliyet: Prisma.FieldRef<"Kayit", 'Aciliyet'>
@@ -6587,6 +7844,25 @@ export type KayitDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many Kayits to delete.
    */
   limit?: number
+}
+
+/**
+ * Kayit.sahipKullanici
+ */
+export type Kayit$sahipKullaniciArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Kullanici
+   */
+  select?: Prisma.KullaniciSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Kullanici
+   */
+  omit?: Prisma.KullaniciOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KullaniciInclude<ExtArgs> | null
+  where?: Prisma.KullaniciWhereInput
 }
 
 /**

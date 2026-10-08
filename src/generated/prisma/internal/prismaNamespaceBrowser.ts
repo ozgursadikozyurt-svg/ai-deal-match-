@@ -51,6 +51,9 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Ofis: 'Ofis',
+  Kullanici: 'Kullanici',
+  Davet: 'Davet',
   Il: 'Il',
   Ilce: 'Ilce',
   Mahalle: 'Mahalle',
@@ -92,6 +95,57 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const OfisScalarFieldEnum = {
+  id: 'id',
+  ad: 'ad',
+  slug: 'slug',
+  durum: 'durum',
+  plan: 'plan',
+  sinirsiz: 'sinirsiz',
+  denemeBitis: 'denemeBitis',
+  telefon: 'telefon',
+  sehir: 'sehir',
+  notlar: 'notlar',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OfisScalarFieldEnum = (typeof OfisScalarFieldEnum)[keyof typeof OfisScalarFieldEnum]
+
+
+export const KullaniciScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  eposta: 'eposta',
+  adSoyad: 'adSoyad',
+  telefon: 'telefon',
+  rol: 'rol',
+  aktif: 'aktif',
+  sonGiris: 'sonGiris',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type KullaniciScalarFieldEnum = (typeof KullaniciScalarFieldEnum)[keyof typeof KullaniciScalarFieldEnum]
+
+
+export const DavetScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  kodOzeti: 'kodOzeti',
+  eposta: 'eposta',
+  rol: 'rol',
+  durum: 'durum',
+  sonKullanma: 'sonKullanma',
+  olusturanId: 'olusturanId',
+  kullanilan: 'kullanilan',
+  kullananEposta: 'kullananEposta',
+  createdAt: 'createdAt'
+} as const
+
+export type DavetScalarFieldEnum = (typeof DavetScalarFieldEnum)[keyof typeof DavetScalarFieldEnum]
 
 
 export const IlScalarFieldEnum = {
@@ -182,6 +236,7 @@ export type LokasyonAliasScalarFieldEnum = (typeof LokasyonAliasScalarFieldEnum)
 
 export const LokasyonAdayScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   ilId: 'ilId',
   ifade: 'ifade',
   ornekMetin: 'ornekMetin',
@@ -196,6 +251,7 @@ export type LokasyonAdayScalarFieldEnum = (typeof LokasyonAdayScalarFieldEnum)[k
 
 
 export const AyarScalarFieldEnum = {
+  ofisId: 'ofisId',
   anahtar: 'anahtar',
   deger: 'deger',
   updatedAt: 'updatedAt'
@@ -220,6 +276,9 @@ export type KayitLokasyonScalarFieldEnum = (typeof KayitLokasyonScalarFieldEnum)
 
 export const KayitScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
+  sahipKullaniciId: 'sahipKullaniciId',
+  gorunurluk: 'gorunurluk',
   tip: 'tip',
   durum: 'durum',
   aciliyet: 'aciliyet',
@@ -415,6 +474,9 @@ export type MulkOzellikScalarFieldEnum = (typeof MulkOzellikScalarFieldEnum)[key
 
 export const KisiScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
+  sahipKullaniciId: 'sahipKullaniciId',
+  gorunurluk: 'gorunurluk',
   adSoyad: 'adSoyad',
   telefon: 'telefon',
   ikincilTelefon: 'ikincilTelefon',
@@ -455,6 +517,7 @@ export type KayitKisiScalarFieldEnum = (typeof KayitKisiScalarFieldEnum)[keyof t
 
 export const IslenmisMesajScalarFieldEnum = {
   parmakIzi: 'parmakIzi',
+  ofisId: 'ofisId',
   grup: 'grup',
   mesajTarihi: 'mesajTarihi',
   ingestionId: 'ingestionId',
@@ -467,6 +530,7 @@ export type IslenmisMesajScalarFieldEnum = (typeof IslenmisMesajScalarFieldEnum)
 
 export const MatchScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   talepId: 'talepId',
   portfoyId: 'portfoyId',
   portalIlanId: 'portalIlanId',
@@ -498,6 +562,7 @@ export type MatchScalarFieldEnum = (typeof MatchScalarFieldEnum)[keyof typeof Ma
 
 export const PortalIlanScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kanal: 'kanal',
   url: 'url',
   ilanNo: 'ilanNo',
@@ -532,6 +597,7 @@ export type PortalIlanScalarFieldEnum = (typeof PortalIlanScalarFieldEnum)[keyof
 
 export const AuditLogScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kayitId: 'kayitId',
   alan: 'alan',
   eskiDeger: 'eskiDeger',
@@ -545,6 +611,7 @@ export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typ
 
 export const IngestionLogScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kanal: 'kanal',
   dosyaAdi: 'dosyaAdi',
   grupAdi: 'grupAdi',
@@ -565,6 +632,7 @@ export type IngestionLogScalarFieldEnum = (typeof IngestionLogScalarFieldEnum)[k
 
 export const EntegrasyonScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   saglayici: 'saglayici',
   durum: 'durum',
   hesap: 'hesap',
@@ -584,6 +652,7 @@ export type EntegrasyonScalarFieldEnum = (typeof EntegrasyonScalarFieldEnum)[key
 
 export const SenkronCalismaScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   saglayici: 'saglayici',
   tetik: 'tetik',
   baslangic: 'baslangic',
@@ -606,6 +675,7 @@ export type SenkronCalismaScalarFieldEnum = (typeof SenkronCalismaScalarFieldEnu
 
 export const SenkronCakismaScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   saglayici: 'saglayici',
   hedefTip: 'hedefTip',
   hedefId: 'hedefId',
@@ -623,6 +693,7 @@ export type SenkronCakismaScalarFieldEnum = (typeof SenkronCakismaScalarFieldEnu
 
 export const NotionSyncLogScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kayitId: 'kayitId',
   notionId: 'notionId',
   yon: 'yon',
@@ -636,6 +707,7 @@ export type NotionSyncLogScalarFieldEnum = (typeof NotionSyncLogScalarFieldEnum)
 
 export const KayitNotScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kayitId: 'kayitId',
   tur: 'tur',
   metin: 'metin',
@@ -649,6 +721,7 @@ export type KayitNotScalarFieldEnum = (typeof KayitNotScalarFieldEnum)[keyof typ
 
 export const KayitFotoScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kayitId: 'kayitId',
   sira: 'sira',
   ad: 'ad',

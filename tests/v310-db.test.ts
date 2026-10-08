@@ -7,8 +7,12 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID, istemciyiSarmala } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
 
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 1 }) });
+
+const prisma = istemciyiSarmala(new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 1 }) }));
 (globalThis as any).prisma = prisma;
 const json = async (r: Response) => ({ durum: r.status, veri: (await r.json()) as any });
 
@@ -79,7 +83,7 @@ test("fotoğraflar: depo kapalıyken 503; açıkken yükle → listele → sıra
     assert.equal(a.durum, 201); assert.equal(a.veri.sira, 0); assert.equal(b.veri.sira, 1); assert.equal(b.veri.ad, "mutfak");
     assert.match(a.veri.url, /^https:\/\/proje\.supabase\.co\/storage\/v1\/object\/sign\/portfoy\//);
     assert.equal(a.veri.depoYolu, undefined, "depo yolu istemciye verilmez");
-    assert.equal(depo[0], `POST object/portfoy/${portfoy.id}/${a.veri.id}.jpg`);
+    assert.equal(depo[0], `POST object/portfoy/${VARSAYILAN_OFIS_ID}/${portfoy.id}/${a.veri.id}.jpg`);
     const liste = await json(await GET(new Request("http://x"), ctx(portfoy.id)));
     assert.deepEqual(liste.veri.map((f: any) => f.ad), ["salon", "mutfak"]);
     const sira = await json(await PATCH(new Request("http://x", { method: "PATCH", body: JSON.stringify({ sira: [b.veri.id, a.veri.id] }) }), ctx(portfoy.id)));

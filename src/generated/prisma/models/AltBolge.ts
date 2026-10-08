@@ -627,10 +627,6 @@ export type EnumAltBolgeTipiFieldUpdateOperationsInput = {
   set?: $Enums.AltBolgeTipi
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number

@@ -21,6 +21,10 @@ import { filtreUygula, bosFiltre } from "../demo/filtre";
 import { KaydetGostergesi } from "../demo/canli-gosterge";
 import { sunucudanDurum, imzaAl, planla } from "../demo/canli-esle";
 import { hafizaBaslat, useKalici } from "../demo/hafiza";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 const es = (t: OnizlemeKayit, p: OnizlemeKayit) => eslesmeOnizle(t, p, BAGLAM);
 const T: OnizlemeKayit = { tip: "TALEP", mulkTipi: "DAIRE", islemTipi: "SATILIK", lokasyonlar: [] };

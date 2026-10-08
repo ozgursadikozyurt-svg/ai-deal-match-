@@ -26,4 +26,6 @@ export function fotoDenetle(d: { tur: string; boyut: number }, mevcutSayi: numbe
   return null;
 }
 /** Depodaki yol: portfoy/<kayitId>/<fotoId>.jpg */
-export const fotoYolu = (kayitId: string, fotoId: string, tur = "image/jpeg") => `${kayitId}/${fotoId}.${tur === "image/png" ? "png" : tur === "image/webp" ? "webp" : "jpg"}`;
+/// v3.20 — yol ofis klasörüyle başlar: <ofisId>/<kayitId>/<fotoId>.jpg
+/// v3.19 ve öncesinde yüklenmiş fotoğrafların yolu (<kayitId>/…) olduğu gibi kalır ve okunmaya devam eder.
+export const fotoYolu = (ofisId: string, kayitId: string, fotoId: string, tur = "image/jpeg") => `${ofisId}/${kayitId}/${fotoId}.${tur === "image/png" ? "png" : tur === "image/webp" ? "webp" : "jpg"}`;

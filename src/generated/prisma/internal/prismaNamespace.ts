@@ -397,6 +397,9 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
+  Ofis: 'Ofis',
+  Kullanici: 'Kullanici',
+  Davet: 'Davet',
   Il: 'Il',
   Ilce: 'Ilce',
   Mahalle: 'Mahalle',
@@ -437,10 +440,232 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "il" | "ilce" | "mahalle" | "altBolge" | "altBolgeMahalle" | "ilceKomsuluk" | "lokasyonAlias" | "lokasyonAday" | "ayar" | "kayitLokasyon" | "kayit" | "mulkOzellik" | "kisi" | "kayitKisi" | "islenmisMesaj" | "match" | "portalIlan" | "auditLog" | "ingestionLog" | "entegrasyon" | "senkronCalisma" | "senkronCakisma" | "notionSyncLog" | "kayitNot" | "kayitFoto"
+    modelProps: "ofis" | "kullanici" | "davet" | "il" | "ilce" | "mahalle" | "altBolge" | "altBolgeMahalle" | "ilceKomsuluk" | "lokasyonAlias" | "lokasyonAday" | "ayar" | "kayitLokasyon" | "kayit" | "mulkOzellik" | "kisi" | "kayitKisi" | "islenmisMesaj" | "match" | "portalIlan" | "auditLog" | "ingestionLog" | "entegrasyon" | "senkronCalisma" | "senkronCakisma" | "notionSyncLog" | "kayitNot" | "kayitFoto"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
+    Ofis: {
+      payload: Prisma.$OfisPayload<ExtArgs>
+      fields: Prisma.OfisFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OfisFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfisPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OfisFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfisPayload>
+        }
+        findFirst: {
+          args: Prisma.OfisFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfisPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OfisFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfisPayload>
+        }
+        findMany: {
+          args: Prisma.OfisFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfisPayload>[]
+        }
+        create: {
+          args: Prisma.OfisCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfisPayload>
+        }
+        createMany: {
+          args: Prisma.OfisCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OfisCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfisPayload>[]
+        }
+        delete: {
+          args: Prisma.OfisDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfisPayload>
+        }
+        update: {
+          args: Prisma.OfisUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfisPayload>
+        }
+        deleteMany: {
+          args: Prisma.OfisDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OfisUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OfisUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfisPayload>[]
+        }
+        upsert: {
+          args: Prisma.OfisUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfisPayload>
+        }
+        aggregate: {
+          args: Prisma.OfisAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOfis>
+        }
+        groupBy: {
+          args: Prisma.OfisGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OfisGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OfisCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OfisCountAggregateOutputType> | number
+        }
+      }
+    }
+    Kullanici: {
+      payload: Prisma.$KullaniciPayload<ExtArgs>
+      fields: Prisma.KullaniciFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.KullaniciFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KullaniciPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.KullaniciFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KullaniciPayload>
+        }
+        findFirst: {
+          args: Prisma.KullaniciFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KullaniciPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.KullaniciFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KullaniciPayload>
+        }
+        findMany: {
+          args: Prisma.KullaniciFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KullaniciPayload>[]
+        }
+        create: {
+          args: Prisma.KullaniciCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KullaniciPayload>
+        }
+        createMany: {
+          args: Prisma.KullaniciCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.KullaniciCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KullaniciPayload>[]
+        }
+        delete: {
+          args: Prisma.KullaniciDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KullaniciPayload>
+        }
+        update: {
+          args: Prisma.KullaniciUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KullaniciPayload>
+        }
+        deleteMany: {
+          args: Prisma.KullaniciDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.KullaniciUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.KullaniciUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KullaniciPayload>[]
+        }
+        upsert: {
+          args: Prisma.KullaniciUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KullaniciPayload>
+        }
+        aggregate: {
+          args: Prisma.KullaniciAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateKullanici>
+        }
+        groupBy: {
+          args: Prisma.KullaniciGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KullaniciGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.KullaniciCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KullaniciCountAggregateOutputType> | number
+        }
+      }
+    }
+    Davet: {
+      payload: Prisma.$DavetPayload<ExtArgs>
+      fields: Prisma.DavetFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DavetFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DavetPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DavetFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DavetPayload>
+        }
+        findFirst: {
+          args: Prisma.DavetFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DavetPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DavetFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DavetPayload>
+        }
+        findMany: {
+          args: Prisma.DavetFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DavetPayload>[]
+        }
+        create: {
+          args: Prisma.DavetCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DavetPayload>
+        }
+        createMany: {
+          args: Prisma.DavetCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DavetCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DavetPayload>[]
+        }
+        delete: {
+          args: Prisma.DavetDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DavetPayload>
+        }
+        update: {
+          args: Prisma.DavetUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DavetPayload>
+        }
+        deleteMany: {
+          args: Prisma.DavetDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DavetUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DavetUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DavetPayload>[]
+        }
+        upsert: {
+          args: Prisma.DavetUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DavetPayload>
+        }
+        aggregate: {
+          args: Prisma.DavetAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDavet>
+        }
+        groupBy: {
+          args: Prisma.DavetGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DavetGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DavetCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DavetCountAggregateOutputType> | number
+        }
+      }
+    }
     Il: {
       payload: Prisma.$IlPayload<ExtArgs>
       fields: Prisma.IlFieldRefs
@@ -2330,6 +2555,57 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const OfisScalarFieldEnum = {
+  id: 'id',
+  ad: 'ad',
+  slug: 'slug',
+  durum: 'durum',
+  plan: 'plan',
+  sinirsiz: 'sinirsiz',
+  denemeBitis: 'denemeBitis',
+  telefon: 'telefon',
+  sehir: 'sehir',
+  notlar: 'notlar',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OfisScalarFieldEnum = (typeof OfisScalarFieldEnum)[keyof typeof OfisScalarFieldEnum]
+
+
+export const KullaniciScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  eposta: 'eposta',
+  adSoyad: 'adSoyad',
+  telefon: 'telefon',
+  rol: 'rol',
+  aktif: 'aktif',
+  sonGiris: 'sonGiris',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type KullaniciScalarFieldEnum = (typeof KullaniciScalarFieldEnum)[keyof typeof KullaniciScalarFieldEnum]
+
+
+export const DavetScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  kodOzeti: 'kodOzeti',
+  eposta: 'eposta',
+  rol: 'rol',
+  durum: 'durum',
+  sonKullanma: 'sonKullanma',
+  olusturanId: 'olusturanId',
+  kullanilan: 'kullanilan',
+  kullananEposta: 'kullananEposta',
+  createdAt: 'createdAt'
+} as const
+
+export type DavetScalarFieldEnum = (typeof DavetScalarFieldEnum)[keyof typeof DavetScalarFieldEnum]
+
+
 export const IlScalarFieldEnum = {
   id: 'id',
   plaka: 'plaka',
@@ -2418,6 +2694,7 @@ export type LokasyonAliasScalarFieldEnum = (typeof LokasyonAliasScalarFieldEnum)
 
 export const LokasyonAdayScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   ilId: 'ilId',
   ifade: 'ifade',
   ornekMetin: 'ornekMetin',
@@ -2432,6 +2709,7 @@ export type LokasyonAdayScalarFieldEnum = (typeof LokasyonAdayScalarFieldEnum)[k
 
 
 export const AyarScalarFieldEnum = {
+  ofisId: 'ofisId',
   anahtar: 'anahtar',
   deger: 'deger',
   updatedAt: 'updatedAt'
@@ -2456,6 +2734,9 @@ export type KayitLokasyonScalarFieldEnum = (typeof KayitLokasyonScalarFieldEnum)
 
 export const KayitScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
+  sahipKullaniciId: 'sahipKullaniciId',
+  gorunurluk: 'gorunurluk',
   tip: 'tip',
   durum: 'durum',
   aciliyet: 'aciliyet',
@@ -2651,6 +2932,9 @@ export type MulkOzellikScalarFieldEnum = (typeof MulkOzellikScalarFieldEnum)[key
 
 export const KisiScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
+  sahipKullaniciId: 'sahipKullaniciId',
+  gorunurluk: 'gorunurluk',
   adSoyad: 'adSoyad',
   telefon: 'telefon',
   ikincilTelefon: 'ikincilTelefon',
@@ -2691,6 +2975,7 @@ export type KayitKisiScalarFieldEnum = (typeof KayitKisiScalarFieldEnum)[keyof t
 
 export const IslenmisMesajScalarFieldEnum = {
   parmakIzi: 'parmakIzi',
+  ofisId: 'ofisId',
   grup: 'grup',
   mesajTarihi: 'mesajTarihi',
   ingestionId: 'ingestionId',
@@ -2703,6 +2988,7 @@ export type IslenmisMesajScalarFieldEnum = (typeof IslenmisMesajScalarFieldEnum)
 
 export const MatchScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   talepId: 'talepId',
   portfoyId: 'portfoyId',
   portalIlanId: 'portalIlanId',
@@ -2734,6 +3020,7 @@ export type MatchScalarFieldEnum = (typeof MatchScalarFieldEnum)[keyof typeof Ma
 
 export const PortalIlanScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kanal: 'kanal',
   url: 'url',
   ilanNo: 'ilanNo',
@@ -2768,6 +3055,7 @@ export type PortalIlanScalarFieldEnum = (typeof PortalIlanScalarFieldEnum)[keyof
 
 export const AuditLogScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kayitId: 'kayitId',
   alan: 'alan',
   eskiDeger: 'eskiDeger',
@@ -2781,6 +3069,7 @@ export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typ
 
 export const IngestionLogScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kanal: 'kanal',
   dosyaAdi: 'dosyaAdi',
   grupAdi: 'grupAdi',
@@ -2801,6 +3090,7 @@ export type IngestionLogScalarFieldEnum = (typeof IngestionLogScalarFieldEnum)[k
 
 export const EntegrasyonScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   saglayici: 'saglayici',
   durum: 'durum',
   hesap: 'hesap',
@@ -2820,6 +3110,7 @@ export type EntegrasyonScalarFieldEnum = (typeof EntegrasyonScalarFieldEnum)[key
 
 export const SenkronCalismaScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   saglayici: 'saglayici',
   tetik: 'tetik',
   baslangic: 'baslangic',
@@ -2842,6 +3133,7 @@ export type SenkronCalismaScalarFieldEnum = (typeof SenkronCalismaScalarFieldEnu
 
 export const SenkronCakismaScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   saglayici: 'saglayici',
   hedefTip: 'hedefTip',
   hedefId: 'hedefId',
@@ -2859,6 +3151,7 @@ export type SenkronCakismaScalarFieldEnum = (typeof SenkronCakismaScalarFieldEnu
 
 export const NotionSyncLogScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kayitId: 'kayitId',
   notionId: 'notionId',
   yon: 'yon',
@@ -2872,6 +3165,7 @@ export type NotionSyncLogScalarFieldEnum = (typeof NotionSyncLogScalarFieldEnum)
 
 export const KayitNotScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kayitId: 'kayitId',
   tur: 'tur',
   metin: 'metin',
@@ -2885,6 +3179,7 @@ export type KayitNotScalarFieldEnum = (typeof KayitNotScalarFieldEnum)[keyof typ
 
 export const KayitFotoScalarFieldEnum = {
   id: 'id',
+  ofisId: 'ofisId',
   kayitId: 'kayitId',
   sira: 'sira',
   ad: 'ad',
@@ -2954,20 +3249,6 @@ export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof Json
 
 
 /**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-/**
  * Reference to a field of type 'String'
  */
 export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
@@ -2978,6 +3259,97 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
  * Reference to a field of type 'String[]'
  */
 export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
+    
+
+
+/**
+ * Reference to a field of type 'OfisDurumu'
+ */
+export type EnumOfisDurumuFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OfisDurumu'>
+    
+
+
+/**
+ * Reference to a field of type 'OfisDurumu[]'
+ */
+export type ListEnumOfisDurumuFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OfisDurumu[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Plan'
+ */
+export type EnumPlanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Plan'>
+    
+
+
+/**
+ * Reference to a field of type 'Plan[]'
+ */
+export type ListEnumPlanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Plan[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime'
+ */
+export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime[]'
+ */
+export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Rol'
+ */
+export type EnumRolFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Rol'>
+    
+
+
+/**
+ * Reference to a field of type 'Rol[]'
+ */
+export type ListEnumRolFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Rol[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DavetDurumu'
+ */
+export type EnumDavetDurumuFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DavetDurumu'>
+    
+
+
+/**
+ * Reference to a field of type 'DavetDurumu[]'
+ */
+export type ListEnumDavetDurumuFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DavetDurumu[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -3024,13 +3396,6 @@ export type ListEnumAltBolgeTipiFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
  * Reference to a field of type 'LokasyonSeviyesi'
  */
 export type EnumLokasyonSeviyesiFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LokasyonSeviyesi'>
@@ -3059,20 +3424,6 @@ export type ListEnumAliasTipiFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
 
 
 /**
- * Reference to a field of type 'DateTime'
- */
-export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-/**
- * Reference to a field of type 'DateTime[]'
- */
-export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
-    
-
-
-/**
  * Reference to a field of type 'Json'
  */
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -3097,6 +3448,20 @@ export type EnumAdayDurumuFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'AdayDurumu[]'
  */
 export type ListEnumAdayDurumuFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdayDurumu[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Gorunurluk'
+ */
+export type EnumGorunurlukFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gorunurluk'>
+    
+
+
+/**
+ * Reference to a field of type 'Gorunurluk[]'
+ */
+export type ListEnumGorunurlukFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gorunurluk[]'>
     
 
 
@@ -3824,6 +4189,9 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
  */
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
+  ofis?: Prisma.OfisOmit
+  kullanici?: Prisma.KullaniciOmit
+  davet?: Prisma.DavetOmit
   il?: Prisma.IlOmit
   ilce?: Prisma.IlceOmit
   mahalle?: Prisma.MahalleOmit

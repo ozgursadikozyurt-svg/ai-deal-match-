@@ -27,6 +27,10 @@ import { SayiGir, TelGirdisi, binlikYaz, sayiYap } from "../demo/girdi";
 import { AiAyarlari, PaylasimAyarlari, CalismaIliAyari } from "../demo/ayarlar-ek";
 import { AkilliKutu } from "../demo/ai-kutusu";
 import { Fotograflar } from "../demo/fotograflar";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 const { kayitlar, kisiler } = ornekVeriyiKur();
 const durum = { veriSurumu: "t", kayitlar, eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN }, ogrenilen: [], adaylar: [], aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], baglantilar: { google: bosBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [] } as unknown as DepoDurumu;
@@ -205,7 +209,8 @@ test("fotoğraf kuralları: küçültme ölçüsü, tür / boyut / adet denetimi
   assert.match(fotoDenetle({ tur: "image/jpeg", boyut: 300_000 }, FOTO_SINIR)!, /en fazla 8/);
   assert.match(fotoDenetle({ tur: "application/pdf", boyut: 300_000 }, 0)!, /JPG/);
   assert.match(fotoDenetle({ tur: "image/jpeg", boyut: 5_000_000 }, 0)!, /küçültülmeden/);
-  assert.equal(fotoYolu("k1", "f1"), "k1/f1.jpg"); assert.equal(fotoYolu("k1", "f1", "image/webp"), "k1/f1.webp");
+  // v3.20: yol ofis klasörüyle başlar
+  assert.equal(fotoYolu("o1", "k1", "f1"), "o1/k1/f1.jpg"); assert.equal(fotoYolu("o1", "k1", "f1", "image/webp"), "o1/k1/f1.webp");
 });
 
 test("dosya deposu (Supabase Storage): yükleme, imzalı bağlantı, silme çağrıları; ayar yoksa kapalı", async () => {

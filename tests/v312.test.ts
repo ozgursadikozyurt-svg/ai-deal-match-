@@ -70,6 +70,10 @@ test("sürüm 3.12 kayıtlı", () => {
 import { kuralAdaylari } from "../demo/ice-aktarma";
 import { depoYukle } from "../demo/depo";
 import { sohbetiAyristir, onFiltre } from "../src/lib/ingest/whatsapp";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 test("içe aktarma: yapay zekâ olmadan adaylar hemen çıkar; kullanıcının üç örneği portföy, fiyat ve konumla gelir", () => {
   const sohbet = [

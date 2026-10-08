@@ -11,6 +11,10 @@ import { eslesmeOnizle, eksikVeriUyarilari, type OnizlemeKayit } from "../src/li
 import { kisiTablosuMu, kisiSutunlariniTani, kisiSatiriOku, telefonCozumle, etiketlerdenRoller, paketle } from "../src/lib/ingest/kisi-tablosu";
 import { SISTEM_ROLLERI } from "../src/lib/domain/roller";
 import { BAGLAM } from "../demo/lokasyon";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 test("fiyat jargonu: M/MTL, satılıkta küçük sayı, kirada bin, boşluklu binlik", () => {
   const f = (m: string) => hizliAyristir(m).fiyat;

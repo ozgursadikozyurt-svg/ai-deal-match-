@@ -18,6 +18,21 @@ export { Prisma }
 export * as $Enums from './enums'
 export * from './enums';
 /**
+ * Model Ofis
+ * 
+ */
+export type Ofis = Prisma.OfisModel
+/**
+ * Model Kullanici
+ * 
+ */
+export type Kullanici = Prisma.KullaniciModel
+/**
+ * Model Davet
+ * Davetle hesap açma: yönetici bir bağlantı üretir, kişi e-postasını doğrulayıp o ofise girer.
+ */
+export type Davet = Prisma.DavetModel
+/**
  * Model Il
  * 
  */
@@ -63,6 +78,7 @@ export type LokasyonAday = Prisma.LokasyonAdayModel
 /**
  * Model Ayar
  * v3.3 — Kullanıcının ekrandan değiştirebildiği ayarlar (TTL gün sayıları vb.)
+ * v3.20 — ayarlar ofis başına tutulur (birincil anahtar: ofisId + anahtar)
  */
 export type Ayar = Prisma.AyarModel
 /**

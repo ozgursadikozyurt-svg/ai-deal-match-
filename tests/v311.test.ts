@@ -9,6 +9,10 @@ import { KOMSULUK_OZETI } from "../src/lib/lokasyon/komsuluk";
 import { BAGLAM, KOMSULUK, coz, belirsizKonumOnar, lokEtiket } from "../demo/lokasyon";
 import { DENEY_SONUCU } from "../scripts/deney/model-karsilastir";
 import { SURUM, SURUM_GECMISI } from "../src/lib/surum";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 const lok = (ham: string, portfoy: boolean) => coz(ham).lokasyonlar.map((l, i) => ({ ilId: l.ilId, ilceId: l.ilceId, mahalleId: l.mahalleId, altBolgeId: l.altBolgeId, birincil: portfoy && i === 0 }));
 const T = (ham: string, v: Partial<OnizlemeKayit> = {}): OnizlemeKayit => ({ tip: "TALEP", mulkTipi: "DAIRE", islemTipi: "SATILIK", lokasyonlar: lok(ham, false), ...v });

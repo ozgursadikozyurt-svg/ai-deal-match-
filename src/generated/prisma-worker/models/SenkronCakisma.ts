@@ -26,6 +26,7 @@ export type AggregateSenkronCakisma = {
 
 export type SenkronCakismaMinAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   saglayici: $Enums.EntegrasyonSaglayici | null
   hedefTip: string | null
   hedefId: string | null
@@ -37,6 +38,7 @@ export type SenkronCakismaMinAggregateOutputType = {
 
 export type SenkronCakismaMaxAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   saglayici: $Enums.EntegrasyonSaglayici | null
   hedefTip: string | null
   hedefId: string | null
@@ -48,6 +50,7 @@ export type SenkronCakismaMaxAggregateOutputType = {
 
 export type SenkronCakismaCountAggregateOutputType = {
   id: number
+  ofisId: number
   saglayici: number
   hedefTip: number
   hedefId: number
@@ -64,6 +67,7 @@ export type SenkronCakismaCountAggregateOutputType = {
 
 export type SenkronCakismaMinAggregateInputType = {
   id?: true
+  ofisId?: true
   saglayici?: true
   hedefTip?: true
   hedefId?: true
@@ -75,6 +79,7 @@ export type SenkronCakismaMinAggregateInputType = {
 
 export type SenkronCakismaMaxAggregateInputType = {
   id?: true
+  ofisId?: true
   saglayici?: true
   hedefTip?: true
   hedefId?: true
@@ -86,6 +91,7 @@ export type SenkronCakismaMaxAggregateInputType = {
 
 export type SenkronCakismaCountAggregateInputType = {
   id?: true
+  ofisId?: true
   saglayici?: true
   hedefTip?: true
   hedefId?: true
@@ -173,6 +179,7 @@ export type SenkronCakismaGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 
 export type SenkronCakismaGroupByOutputType = {
   id: string
+  ofisId: string
   saglayici: $Enums.EntegrasyonSaglayici
   hedefTip: string
   hedefId: string
@@ -208,6 +215,7 @@ export type SenkronCakismaWhereInput = {
   OR?: Prisma.SenkronCakismaWhereInput[]
   NOT?: Prisma.SenkronCakismaWhereInput | Prisma.SenkronCakismaWhereInput[]
   id?: Prisma.StringFilter<"SenkronCakisma"> | string
+  ofisId?: Prisma.StringFilter<"SenkronCakisma"> | string
   saglayici?: Prisma.EnumEntegrasyonSaglayiciFilter<"SenkronCakisma"> | $Enums.EntegrasyonSaglayici
   hedefTip?: Prisma.StringFilter<"SenkronCakisma"> | string
   hedefId?: Prisma.StringFilter<"SenkronCakisma"> | string
@@ -218,10 +226,12 @@ export type SenkronCakismaWhereInput = {
   durum?: Prisma.EnumCakismaDurumFilter<"SenkronCakisma"> | $Enums.CakismaDurum
   createdAt?: Prisma.DateTimeFilter<"SenkronCakisma"> | Date | string
   cozuldu?: Prisma.DateTimeNullableFilter<"SenkronCakisma"> | Date | string | null
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
 }
 
 export type SenkronCakismaOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   saglayici?: Prisma.SortOrder
   hedefTip?: Prisma.SortOrder
   hedefId?: Prisma.SortOrder
@@ -232,6 +242,7 @@ export type SenkronCakismaOrderByWithRelationInput = {
   durum?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   cozuldu?: Prisma.SortOrderInput | Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
 }
 
 export type SenkronCakismaWhereUniqueInput = Prisma.AtLeast<{
@@ -239,6 +250,7 @@ export type SenkronCakismaWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.SenkronCakismaWhereInput | Prisma.SenkronCakismaWhereInput[]
   OR?: Prisma.SenkronCakismaWhereInput[]
   NOT?: Prisma.SenkronCakismaWhereInput | Prisma.SenkronCakismaWhereInput[]
+  ofisId?: Prisma.StringFilter<"SenkronCakisma"> | string
   saglayici?: Prisma.EnumEntegrasyonSaglayiciFilter<"SenkronCakisma"> | $Enums.EntegrasyonSaglayici
   hedefTip?: Prisma.StringFilter<"SenkronCakisma"> | string
   hedefId?: Prisma.StringFilter<"SenkronCakisma"> | string
@@ -249,10 +261,12 @@ export type SenkronCakismaWhereUniqueInput = Prisma.AtLeast<{
   durum?: Prisma.EnumCakismaDurumFilter<"SenkronCakisma"> | $Enums.CakismaDurum
   createdAt?: Prisma.DateTimeFilter<"SenkronCakisma"> | Date | string
   cozuldu?: Prisma.DateTimeNullableFilter<"SenkronCakisma"> | Date | string | null
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
 }, "id">
 
 export type SenkronCakismaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   saglayici?: Prisma.SortOrder
   hedefTip?: Prisma.SortOrder
   hedefId?: Prisma.SortOrder
@@ -273,6 +287,7 @@ export type SenkronCakismaScalarWhereWithAggregatesInput = {
   OR?: Prisma.SenkronCakismaScalarWhereWithAggregatesInput[]
   NOT?: Prisma.SenkronCakismaScalarWhereWithAggregatesInput | Prisma.SenkronCakismaScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"SenkronCakisma"> | string
+  ofisId?: Prisma.StringWithAggregatesFilter<"SenkronCakisma"> | string
   saglayici?: Prisma.EnumEntegrasyonSaglayiciWithAggregatesFilter<"SenkronCakisma"> | $Enums.EntegrasyonSaglayici
   hedefTip?: Prisma.StringWithAggregatesFilter<"SenkronCakisma"> | string
   hedefId?: Prisma.StringWithAggregatesFilter<"SenkronCakisma"> | string
@@ -297,10 +312,12 @@ export type SenkronCakismaCreateInput = {
   durum?: $Enums.CakismaDurum
   createdAt?: Date | string
   cozuldu?: Date | string | null
+  ofis?: Prisma.OfisCreateNestedOneWithoutSenkronCakismalariInput
 }
 
 export type SenkronCakismaUncheckedCreateInput = {
   id?: string
+  ofisId?: string
   saglayici: $Enums.EntegrasyonSaglayici
   hedefTip: string
   hedefId: string
@@ -325,10 +342,12 @@ export type SenkronCakismaUpdateInput = {
   durum?: Prisma.EnumCakismaDurumFieldUpdateOperationsInput | $Enums.CakismaDurum
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cozuldu?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutSenkronCakismalariNestedInput
 }
 
 export type SenkronCakismaUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   saglayici?: Prisma.EnumEntegrasyonSaglayiciFieldUpdateOperationsInput | $Enums.EntegrasyonSaglayici
   hedefTip?: Prisma.StringFieldUpdateOperationsInput | string
   hedefId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -343,6 +362,7 @@ export type SenkronCakismaUncheckedUpdateInput = {
 
 export type SenkronCakismaCreateManyInput = {
   id?: string
+  ofisId?: string
   saglayici: $Enums.EntegrasyonSaglayici
   hedefTip: string
   hedefId: string
@@ -371,6 +391,7 @@ export type SenkronCakismaUpdateManyMutationInput = {
 
 export type SenkronCakismaUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   saglayici?: Prisma.EnumEntegrasyonSaglayiciFieldUpdateOperationsInput | $Enums.EntegrasyonSaglayici
   hedefTip?: Prisma.StringFieldUpdateOperationsInput | string
   hedefId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -383,8 +404,19 @@ export type SenkronCakismaUncheckedUpdateManyInput = {
   cozuldu?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
+export type SenkronCakismaListRelationFilter = {
+  every?: Prisma.SenkronCakismaWhereInput
+  some?: Prisma.SenkronCakismaWhereInput
+  none?: Prisma.SenkronCakismaWhereInput
+}
+
+export type SenkronCakismaOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type SenkronCakismaCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   saglayici?: Prisma.SortOrder
   hedefTip?: Prisma.SortOrder
   hedefId?: Prisma.SortOrder
@@ -399,6 +431,7 @@ export type SenkronCakismaCountOrderByAggregateInput = {
 
 export type SenkronCakismaMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   saglayici?: Prisma.SortOrder
   hedefTip?: Prisma.SortOrder
   hedefId?: Prisma.SortOrder
@@ -410,6 +443,7 @@ export type SenkronCakismaMaxOrderByAggregateInput = {
 
 export type SenkronCakismaMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   saglayici?: Prisma.SortOrder
   hedefTip?: Prisma.SortOrder
   hedefId?: Prisma.SortOrder
@@ -419,14 +453,185 @@ export type SenkronCakismaMinOrderByAggregateInput = {
   cozuldu?: Prisma.SortOrder
 }
 
+export type SenkronCakismaCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.SenkronCakismaCreateWithoutOfisInput, Prisma.SenkronCakismaUncheckedCreateWithoutOfisInput> | Prisma.SenkronCakismaCreateWithoutOfisInput[] | Prisma.SenkronCakismaUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.SenkronCakismaCreateOrConnectWithoutOfisInput | Prisma.SenkronCakismaCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.SenkronCakismaCreateManyOfisInputEnvelope
+  connect?: Prisma.SenkronCakismaWhereUniqueInput | Prisma.SenkronCakismaWhereUniqueInput[]
+}
+
+export type SenkronCakismaUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.SenkronCakismaCreateWithoutOfisInput, Prisma.SenkronCakismaUncheckedCreateWithoutOfisInput> | Prisma.SenkronCakismaCreateWithoutOfisInput[] | Prisma.SenkronCakismaUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.SenkronCakismaCreateOrConnectWithoutOfisInput | Prisma.SenkronCakismaCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.SenkronCakismaCreateManyOfisInputEnvelope
+  connect?: Prisma.SenkronCakismaWhereUniqueInput | Prisma.SenkronCakismaWhereUniqueInput[]
+}
+
+export type SenkronCakismaUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.SenkronCakismaCreateWithoutOfisInput, Prisma.SenkronCakismaUncheckedCreateWithoutOfisInput> | Prisma.SenkronCakismaCreateWithoutOfisInput[] | Prisma.SenkronCakismaUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.SenkronCakismaCreateOrConnectWithoutOfisInput | Prisma.SenkronCakismaCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.SenkronCakismaUpsertWithWhereUniqueWithoutOfisInput | Prisma.SenkronCakismaUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.SenkronCakismaCreateManyOfisInputEnvelope
+  set?: Prisma.SenkronCakismaWhereUniqueInput | Prisma.SenkronCakismaWhereUniqueInput[]
+  disconnect?: Prisma.SenkronCakismaWhereUniqueInput | Prisma.SenkronCakismaWhereUniqueInput[]
+  delete?: Prisma.SenkronCakismaWhereUniqueInput | Prisma.SenkronCakismaWhereUniqueInput[]
+  connect?: Prisma.SenkronCakismaWhereUniqueInput | Prisma.SenkronCakismaWhereUniqueInput[]
+  update?: Prisma.SenkronCakismaUpdateWithWhereUniqueWithoutOfisInput | Prisma.SenkronCakismaUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.SenkronCakismaUpdateManyWithWhereWithoutOfisInput | Prisma.SenkronCakismaUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.SenkronCakismaScalarWhereInput | Prisma.SenkronCakismaScalarWhereInput[]
+}
+
+export type SenkronCakismaUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.SenkronCakismaCreateWithoutOfisInput, Prisma.SenkronCakismaUncheckedCreateWithoutOfisInput> | Prisma.SenkronCakismaCreateWithoutOfisInput[] | Prisma.SenkronCakismaUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.SenkronCakismaCreateOrConnectWithoutOfisInput | Prisma.SenkronCakismaCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.SenkronCakismaUpsertWithWhereUniqueWithoutOfisInput | Prisma.SenkronCakismaUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.SenkronCakismaCreateManyOfisInputEnvelope
+  set?: Prisma.SenkronCakismaWhereUniqueInput | Prisma.SenkronCakismaWhereUniqueInput[]
+  disconnect?: Prisma.SenkronCakismaWhereUniqueInput | Prisma.SenkronCakismaWhereUniqueInput[]
+  delete?: Prisma.SenkronCakismaWhereUniqueInput | Prisma.SenkronCakismaWhereUniqueInput[]
+  connect?: Prisma.SenkronCakismaWhereUniqueInput | Prisma.SenkronCakismaWhereUniqueInput[]
+  update?: Prisma.SenkronCakismaUpdateWithWhereUniqueWithoutOfisInput | Prisma.SenkronCakismaUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.SenkronCakismaUpdateManyWithWhereWithoutOfisInput | Prisma.SenkronCakismaUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.SenkronCakismaScalarWhereInput | Prisma.SenkronCakismaScalarWhereInput[]
+}
+
 export type EnumCakismaDurumFieldUpdateOperationsInput = {
   set?: $Enums.CakismaDurum
+}
+
+export type SenkronCakismaCreateWithoutOfisInput = {
+  id?: string
+  saglayici: $Enums.EntegrasyonSaglayici
+  hedefTip: string
+  hedefId: string
+  alan: string
+  onceki?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  yerel?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  uzak?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: $Enums.CakismaDurum
+  createdAt?: Date | string
+  cozuldu?: Date | string | null
+}
+
+export type SenkronCakismaUncheckedCreateWithoutOfisInput = {
+  id?: string
+  saglayici: $Enums.EntegrasyonSaglayici
+  hedefTip: string
+  hedefId: string
+  alan: string
+  onceki?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  yerel?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  uzak?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: $Enums.CakismaDurum
+  createdAt?: Date | string
+  cozuldu?: Date | string | null
+}
+
+export type SenkronCakismaCreateOrConnectWithoutOfisInput = {
+  where: Prisma.SenkronCakismaWhereUniqueInput
+  create: Prisma.XOR<Prisma.SenkronCakismaCreateWithoutOfisInput, Prisma.SenkronCakismaUncheckedCreateWithoutOfisInput>
+}
+
+export type SenkronCakismaCreateManyOfisInputEnvelope = {
+  data: Prisma.SenkronCakismaCreateManyOfisInput | Prisma.SenkronCakismaCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type SenkronCakismaUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.SenkronCakismaWhereUniqueInput
+  update: Prisma.XOR<Prisma.SenkronCakismaUpdateWithoutOfisInput, Prisma.SenkronCakismaUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.SenkronCakismaCreateWithoutOfisInput, Prisma.SenkronCakismaUncheckedCreateWithoutOfisInput>
+}
+
+export type SenkronCakismaUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.SenkronCakismaWhereUniqueInput
+  data: Prisma.XOR<Prisma.SenkronCakismaUpdateWithoutOfisInput, Prisma.SenkronCakismaUncheckedUpdateWithoutOfisInput>
+}
+
+export type SenkronCakismaUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.SenkronCakismaScalarWhereInput
+  data: Prisma.XOR<Prisma.SenkronCakismaUpdateManyMutationInput, Prisma.SenkronCakismaUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type SenkronCakismaScalarWhereInput = {
+  AND?: Prisma.SenkronCakismaScalarWhereInput | Prisma.SenkronCakismaScalarWhereInput[]
+  OR?: Prisma.SenkronCakismaScalarWhereInput[]
+  NOT?: Prisma.SenkronCakismaScalarWhereInput | Prisma.SenkronCakismaScalarWhereInput[]
+  id?: Prisma.StringFilter<"SenkronCakisma"> | string
+  ofisId?: Prisma.StringFilter<"SenkronCakisma"> | string
+  saglayici?: Prisma.EnumEntegrasyonSaglayiciFilter<"SenkronCakisma"> | $Enums.EntegrasyonSaglayici
+  hedefTip?: Prisma.StringFilter<"SenkronCakisma"> | string
+  hedefId?: Prisma.StringFilter<"SenkronCakisma"> | string
+  alan?: Prisma.StringFilter<"SenkronCakisma"> | string
+  onceki?: Prisma.JsonNullableFilter<"SenkronCakisma">
+  yerel?: Prisma.JsonNullableFilter<"SenkronCakisma">
+  uzak?: Prisma.JsonNullableFilter<"SenkronCakisma">
+  durum?: Prisma.EnumCakismaDurumFilter<"SenkronCakisma"> | $Enums.CakismaDurum
+  createdAt?: Prisma.DateTimeFilter<"SenkronCakisma"> | Date | string
+  cozuldu?: Prisma.DateTimeNullableFilter<"SenkronCakisma"> | Date | string | null
+}
+
+export type SenkronCakismaCreateManyOfisInput = {
+  id?: string
+  saglayici: $Enums.EntegrasyonSaglayici
+  hedefTip: string
+  hedefId: string
+  alan: string
+  onceki?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  yerel?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  uzak?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: $Enums.CakismaDurum
+  createdAt?: Date | string
+  cozuldu?: Date | string | null
+}
+
+export type SenkronCakismaUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  saglayici?: Prisma.EnumEntegrasyonSaglayiciFieldUpdateOperationsInput | $Enums.EntegrasyonSaglayici
+  hedefTip?: Prisma.StringFieldUpdateOperationsInput | string
+  hedefId?: Prisma.StringFieldUpdateOperationsInput | string
+  alan?: Prisma.StringFieldUpdateOperationsInput | string
+  onceki?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  yerel?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  uzak?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: Prisma.EnumCakismaDurumFieldUpdateOperationsInput | $Enums.CakismaDurum
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cozuldu?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type SenkronCakismaUncheckedUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  saglayici?: Prisma.EnumEntegrasyonSaglayiciFieldUpdateOperationsInput | $Enums.EntegrasyonSaglayici
+  hedefTip?: Prisma.StringFieldUpdateOperationsInput | string
+  hedefId?: Prisma.StringFieldUpdateOperationsInput | string
+  alan?: Prisma.StringFieldUpdateOperationsInput | string
+  onceki?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  yerel?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  uzak?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: Prisma.EnumCakismaDurumFieldUpdateOperationsInput | $Enums.CakismaDurum
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cozuldu?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type SenkronCakismaUncheckedUpdateManyWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  saglayici?: Prisma.EnumEntegrasyonSaglayiciFieldUpdateOperationsInput | $Enums.EntegrasyonSaglayici
+  hedefTip?: Prisma.StringFieldUpdateOperationsInput | string
+  hedefId?: Prisma.StringFieldUpdateOperationsInput | string
+  alan?: Prisma.StringFieldUpdateOperationsInput | string
+  onceki?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  yerel?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  uzak?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: Prisma.EnumCakismaDurumFieldUpdateOperationsInput | $Enums.CakismaDurum
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cozuldu?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
 
 export type SenkronCakismaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   saglayici?: boolean
   hedefTip?: boolean
   hedefId?: boolean
@@ -437,10 +642,12 @@ export type SenkronCakismaSelect<ExtArgs extends runtime.Types.Extensions.Intern
   durum?: boolean
   createdAt?: boolean
   cozuldu?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["senkronCakisma"]>
 
 export type SenkronCakismaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   saglayici?: boolean
   hedefTip?: boolean
   hedefId?: boolean
@@ -451,10 +658,12 @@ export type SenkronCakismaSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   durum?: boolean
   createdAt?: boolean
   cozuldu?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["senkronCakisma"]>
 
 export type SenkronCakismaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   saglayici?: boolean
   hedefTip?: boolean
   hedefId?: boolean
@@ -465,10 +674,12 @@ export type SenkronCakismaSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   durum?: boolean
   createdAt?: boolean
   cozuldu?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["senkronCakisma"]>
 
 export type SenkronCakismaSelectScalar = {
   id?: boolean
+  ofisId?: boolean
   saglayici?: boolean
   hedefTip?: boolean
   hedefId?: boolean
@@ -481,13 +692,25 @@ export type SenkronCakismaSelectScalar = {
   cozuldu?: boolean
 }
 
-export type SenkronCakismaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "saglayici" | "hedefTip" | "hedefId" | "alan" | "onceki" | "yerel" | "uzak" | "durum" | "createdAt" | "cozuldu", ExtArgs["result"]["senkronCakisma"]>
+export type SenkronCakismaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "saglayici" | "hedefTip" | "hedefId" | "alan" | "onceki" | "yerel" | "uzak" | "durum" | "createdAt" | "cozuldu", ExtArgs["result"]["senkronCakisma"]>
+export type SenkronCakismaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type SenkronCakismaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type SenkronCakismaIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
 
 export type $SenkronCakismaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SenkronCakisma"
-  objects: {}
+  objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ofisId: string
     saglayici: $Enums.EntegrasyonSaglayici
     hedefTip: string
     hedefId: string
@@ -892,6 +1115,7 @@ readonly fields: SenkronCakismaFieldRefs;
  */
 export interface Prisma__SenkronCakismaClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -922,6 +1146,7 @@ export interface Prisma__SenkronCakismaClient<T, Null = never, ExtArgs extends r
  */
 export interface SenkronCakismaFieldRefs {
   readonly id: Prisma.FieldRef<"SenkronCakisma", 'String'>
+  readonly ofisId: Prisma.FieldRef<"SenkronCakisma", 'String'>
   readonly saglayici: Prisma.FieldRef<"SenkronCakisma", 'EntegrasyonSaglayici'>
   readonly hedefTip: Prisma.FieldRef<"SenkronCakisma", 'String'>
   readonly hedefId: Prisma.FieldRef<"SenkronCakisma", 'String'>
@@ -949,6 +1174,10 @@ export type SenkronCakismaFindUniqueArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.SenkronCakismaOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaInclude<ExtArgs> | null
+  /**
    * Filter, which SenkronCakisma to fetch.
    */
   where: Prisma.SenkronCakismaWhereUniqueInput
@@ -967,6 +1196,10 @@ export type SenkronCakismaFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ex
    */
   omit?: Prisma.SenkronCakismaOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaInclude<ExtArgs> | null
+  /**
    * Filter, which SenkronCakisma to fetch.
    */
   where: Prisma.SenkronCakismaWhereUniqueInput
@@ -984,6 +1217,10 @@ export type SenkronCakismaFindFirstArgs<ExtArgs extends runtime.Types.Extensions
    * Omit specific fields from the SenkronCakisma
    */
   omit?: Prisma.SenkronCakismaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaInclude<ExtArgs> | null
   /**
    * Filter, which SenkronCakisma to fetch.
    */
@@ -1033,6 +1270,10 @@ export type SenkronCakismaFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.SenkronCakismaOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaInclude<ExtArgs> | null
+  /**
    * Filter, which SenkronCakisma to fetch.
    */
   where?: Prisma.SenkronCakismaWhereInput
@@ -1080,6 +1321,10 @@ export type SenkronCakismaFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the SenkronCakisma
    */
   omit?: Prisma.SenkronCakismaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaInclude<ExtArgs> | null
   /**
    * Filter, which SenkronCakismas to fetch.
    */
@@ -1129,6 +1374,10 @@ export type SenkronCakismaCreateArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.SenkronCakismaOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaInclude<ExtArgs> | null
+  /**
    * The data needed to create a SenkronCakisma.
    */
   data: Prisma.XOR<Prisma.SenkronCakismaCreateInput, Prisma.SenkronCakismaUncheckedCreateInput>
@@ -1162,6 +1411,10 @@ export type SenkronCakismaCreateManyAndReturnArgs<ExtArgs extends runtime.Types.
    */
   data: Prisma.SenkronCakismaCreateManyInput | Prisma.SenkronCakismaCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1176,6 +1429,10 @@ export type SenkronCakismaUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the SenkronCakisma
    */
   omit?: Prisma.SenkronCakismaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaInclude<ExtArgs> | null
   /**
    * The data needed to update a SenkronCakisma.
    */
@@ -1228,6 +1485,10 @@ export type SenkronCakismaUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.
    * Limit how many SenkronCakismas to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1242,6 +1503,10 @@ export type SenkronCakismaUpsertArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the SenkronCakisma
    */
   omit?: Prisma.SenkronCakismaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaInclude<ExtArgs> | null
   /**
    * The filter to search for the SenkronCakisma to update in case it exists.
    */
@@ -1268,6 +1533,10 @@ export type SenkronCakismaDeleteArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the SenkronCakisma
    */
   omit?: Prisma.SenkronCakismaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaInclude<ExtArgs> | null
   /**
    * Filter which SenkronCakisma to delete.
    */
@@ -1300,4 +1569,8 @@ export type SenkronCakismaDefaultArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the SenkronCakisma
    */
   omit?: Prisma.SenkronCakismaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronCakismaInclude<ExtArgs> | null
 }

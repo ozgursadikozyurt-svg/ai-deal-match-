@@ -7,9 +7,13 @@ import assert from "node:assert/strict";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { ORNEK_PORTAL_SAYFASI, ORNEK_SOHBET } from "../demo/ornek-metinler";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID, istemciyiSarmala } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 // Test veritabanı (PGlite) tek bağlantı kabul eder: rota src/lib/db'deki istemciyi kullandığı için önce tek bağlantılı istemci yerleştirilir.
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 1 }) });
+const prisma = istemciyiSarmala(new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 1 }) }));
 (globalThis as any).prisma = prisma;
 const cagir = async (govde: unknown) => { const { POST } = await import("../src/app/api/ai/yorumla/route"); const r = await POST(new Request("http://x/api/ai/yorumla", { method: "POST", body: JSON.stringify(govde) })); return { durum: r.status, veri: (await r.json()) as any }; };
 

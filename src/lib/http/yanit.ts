@@ -9,6 +9,10 @@ export function hata(e: unknown) {
   const kod = (e as { code?: string })?.code;
   if (kod === "P2002") return Response.json({ hata: "DUPLICATE", mesaj: "Bu kayıt zaten var (fingerprint)" }, { status: 409 });
   if (kod === "P2025") return Response.json({ hata: "BULUNAMADI" }, { status: 404 });
+  // v3.20: yetki / plan / kiracılık hataları kendi durum kodunu taşır (403, 402, 400…)
+  const durum = (e as { durum?: number })?.durum;
+  if (typeof durum === "number" && durum >= 400 && durum < 500)
+    return Response.json({ hata: durum === 403 ? "YETKI" : durum === 402 ? "PLAN" : "ISTEK", mesaj: String((e as Error)?.message ?? e).slice(0, 400) }, { status: durum });
   console.error(e);
   // v4.0: canlı uygulama girişle korunduğu için hata metni gösterilir (tek kullanıcı; sorun gidermeyi kolaylaştırır)
   return Response.json({ hata: "SUNUCU", mesaj: String((e as Error)?.message ?? e).slice(0, 400) }, { status: 500 });

@@ -380,10 +380,6 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
-}
-
 export type IlCreateNestedOneWithoutIlcelerInput = {
   create?: Prisma.XOR<Prisma.IlCreateWithoutIlcelerInput, Prisma.IlUncheckedCreateWithoutIlcelerInput>
   connectOrCreate?: Prisma.IlCreateOrConnectWithoutIlcelerInput

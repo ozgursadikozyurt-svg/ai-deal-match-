@@ -11,7 +11,7 @@ const G = z.object({ istem: z.string().min(1).max(200_000), sistem: z.string().m
 export async function POST(req: Request) {
   try {
     const g = G.parse(await req.json());
-    const ayar = aiAyarNormalize((await prisma.ayar.findUnique({ where: { anahtar: "ai" } }))?.deger);
+    const ayar = aiAyarNormalize((await prisma.ayar.findFirst({ where: { anahtar: "ai" } }))?.deger);
     try {
       const sonuc = await aiJsonIste(ayar, process.env.AI_API_KEY || process.env.GEMINI_API_KEY, g.istem, { sistem: g.sistem, zamanAsimiMs: 45_000 });
       return ok({ sonuc });

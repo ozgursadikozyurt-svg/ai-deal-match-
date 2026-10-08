@@ -39,6 +39,7 @@ export type LokasyonAdaySumAggregateOutputType = {
 
 export type LokasyonAdayMinAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   ilId: number | null
   ifade: string | null
   ornekMetin: string | null
@@ -50,6 +51,7 @@ export type LokasyonAdayMinAggregateOutputType = {
 
 export type LokasyonAdayMaxAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   ilId: number | null
   ifade: string | null
   ornekMetin: string | null
@@ -61,6 +63,7 @@ export type LokasyonAdayMaxAggregateOutputType = {
 
 export type LokasyonAdayCountAggregateOutputType = {
   id: number
+  ofisId: number
   ilId: number
   ifade: number
   ornekMetin: number
@@ -85,6 +88,7 @@ export type LokasyonAdaySumAggregateInputType = {
 
 export type LokasyonAdayMinAggregateInputType = {
   id?: true
+  ofisId?: true
   ilId?: true
   ifade?: true
   ornekMetin?: true
@@ -96,6 +100,7 @@ export type LokasyonAdayMinAggregateInputType = {
 
 export type LokasyonAdayMaxAggregateInputType = {
   id?: true
+  ofisId?: true
   ilId?: true
   ifade?: true
   ornekMetin?: true
@@ -107,6 +112,7 @@ export type LokasyonAdayMaxAggregateInputType = {
 
 export type LokasyonAdayCountAggregateInputType = {
   id?: true
+  ofisId?: true
   ilId?: true
   ifade?: true
   ornekMetin?: true
@@ -206,6 +212,7 @@ export type LokasyonAdayGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 
 export type LokasyonAdayGroupByOutputType = {
   id: string
+  ofisId: string
   ilId: number
   ifade: string
   ornekMetin: string | null
@@ -241,6 +248,7 @@ export type LokasyonAdayWhereInput = {
   OR?: Prisma.LokasyonAdayWhereInput[]
   NOT?: Prisma.LokasyonAdayWhereInput | Prisma.LokasyonAdayWhereInput[]
   id?: Prisma.StringFilter<"LokasyonAday"> | string
+  ofisId?: Prisma.StringFilter<"LokasyonAday"> | string
   ilId?: Prisma.IntFilter<"LokasyonAday"> | number
   ifade?: Prisma.StringFilter<"LokasyonAday"> | string
   ornekMetin?: Prisma.StringNullableFilter<"LokasyonAday"> | string | null
@@ -249,10 +257,12 @@ export type LokasyonAdayWhereInput = {
   durum?: Prisma.EnumAdayDurumuFilter<"LokasyonAday"> | $Enums.AdayDurumu
   sonGorulme?: Prisma.DateTimeFilter<"LokasyonAday"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"LokasyonAday"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
 }
 
 export type LokasyonAdayOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   ilId?: Prisma.SortOrder
   ifade?: Prisma.SortOrder
   ornekMetin?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -261,14 +271,16 @@ export type LokasyonAdayOrderByWithRelationInput = {
   durum?: Prisma.SortOrder
   sonGorulme?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
 }
 
 export type LokasyonAdayWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  ilId_ifade?: Prisma.LokasyonAdayIlIdIfadeCompoundUniqueInput
+  ofisId_ilId_ifade?: Prisma.LokasyonAdayOfisIdIlIdIfadeCompoundUniqueInput
   AND?: Prisma.LokasyonAdayWhereInput | Prisma.LokasyonAdayWhereInput[]
   OR?: Prisma.LokasyonAdayWhereInput[]
   NOT?: Prisma.LokasyonAdayWhereInput | Prisma.LokasyonAdayWhereInput[]
+  ofisId?: Prisma.StringFilter<"LokasyonAday"> | string
   ilId?: Prisma.IntFilter<"LokasyonAday"> | number
   ifade?: Prisma.StringFilter<"LokasyonAday"> | string
   ornekMetin?: Prisma.StringNullableFilter<"LokasyonAday"> | string | null
@@ -277,10 +289,12 @@ export type LokasyonAdayWhereUniqueInput = Prisma.AtLeast<{
   durum?: Prisma.EnumAdayDurumuFilter<"LokasyonAday"> | $Enums.AdayDurumu
   sonGorulme?: Prisma.DateTimeFilter<"LokasyonAday"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"LokasyonAday"> | Date | string
-}, "id" | "ilId_ifade">
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
+}, "id" | "ofisId_ilId_ifade">
 
 export type LokasyonAdayOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   ilId?: Prisma.SortOrder
   ifade?: Prisma.SortOrder
   ornekMetin?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -301,6 +315,7 @@ export type LokasyonAdayScalarWhereWithAggregatesInput = {
   OR?: Prisma.LokasyonAdayScalarWhereWithAggregatesInput[]
   NOT?: Prisma.LokasyonAdayScalarWhereWithAggregatesInput | Prisma.LokasyonAdayScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"LokasyonAday"> | string
+  ofisId?: Prisma.StringWithAggregatesFilter<"LokasyonAday"> | string
   ilId?: Prisma.IntWithAggregatesFilter<"LokasyonAday"> | number
   ifade?: Prisma.StringWithAggregatesFilter<"LokasyonAday"> | string
   ornekMetin?: Prisma.StringNullableWithAggregatesFilter<"LokasyonAday"> | string | null
@@ -321,10 +336,12 @@ export type LokasyonAdayCreateInput = {
   durum?: $Enums.AdayDurumu
   sonGorulme?: Date | string
   createdAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutLokasyonAdaylariInput
 }
 
 export type LokasyonAdayUncheckedCreateInput = {
   id?: string
+  ofisId?: string
   ilId?: number
   ifade: string
   ornekMetin?: string | null
@@ -345,10 +362,12 @@ export type LokasyonAdayUpdateInput = {
   durum?: Prisma.EnumAdayDurumuFieldUpdateOperationsInput | $Enums.AdayDurumu
   sonGorulme?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutLokasyonAdaylariNestedInput
 }
 
 export type LokasyonAdayUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   ilId?: Prisma.IntFieldUpdateOperationsInput | number
   ifade?: Prisma.StringFieldUpdateOperationsInput | string
   ornekMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -361,6 +380,7 @@ export type LokasyonAdayUncheckedUpdateInput = {
 
 export type LokasyonAdayCreateManyInput = {
   id?: string
+  ofisId?: string
   ilId?: number
   ifade: string
   ornekMetin?: string | null
@@ -385,6 +405,7 @@ export type LokasyonAdayUpdateManyMutationInput = {
 
 export type LokasyonAdayUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   ilId?: Prisma.IntFieldUpdateOperationsInput | number
   ifade?: Prisma.StringFieldUpdateOperationsInput | string
   ornekMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -395,13 +416,25 @@ export type LokasyonAdayUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type LokasyonAdayIlIdIfadeCompoundUniqueInput = {
+export type LokasyonAdayListRelationFilter = {
+  every?: Prisma.LokasyonAdayWhereInput
+  some?: Prisma.LokasyonAdayWhereInput
+  none?: Prisma.LokasyonAdayWhereInput
+}
+
+export type LokasyonAdayOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type LokasyonAdayOfisIdIlIdIfadeCompoundUniqueInput = {
+  ofisId: string
   ilId: number
   ifade: string
 }
 
 export type LokasyonAdayCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   ilId?: Prisma.SortOrder
   ifade?: Prisma.SortOrder
   ornekMetin?: Prisma.SortOrder
@@ -419,6 +452,7 @@ export type LokasyonAdayAvgOrderByAggregateInput = {
 
 export type LokasyonAdayMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   ilId?: Prisma.SortOrder
   ifade?: Prisma.SortOrder
   ornekMetin?: Prisma.SortOrder
@@ -430,6 +464,7 @@ export type LokasyonAdayMaxOrderByAggregateInput = {
 
 export type LokasyonAdayMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   ilId?: Prisma.SortOrder
   ifade?: Prisma.SortOrder
   ornekMetin?: Prisma.SortOrder
@@ -444,14 +479,171 @@ export type LokasyonAdaySumOrderByAggregateInput = {
   gorulme?: Prisma.SortOrder
 }
 
+export type LokasyonAdayCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.LokasyonAdayCreateWithoutOfisInput, Prisma.LokasyonAdayUncheckedCreateWithoutOfisInput> | Prisma.LokasyonAdayCreateWithoutOfisInput[] | Prisma.LokasyonAdayUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.LokasyonAdayCreateOrConnectWithoutOfisInput | Prisma.LokasyonAdayCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.LokasyonAdayCreateManyOfisInputEnvelope
+  connect?: Prisma.LokasyonAdayWhereUniqueInput | Prisma.LokasyonAdayWhereUniqueInput[]
+}
+
+export type LokasyonAdayUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.LokasyonAdayCreateWithoutOfisInput, Prisma.LokasyonAdayUncheckedCreateWithoutOfisInput> | Prisma.LokasyonAdayCreateWithoutOfisInput[] | Prisma.LokasyonAdayUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.LokasyonAdayCreateOrConnectWithoutOfisInput | Prisma.LokasyonAdayCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.LokasyonAdayCreateManyOfisInputEnvelope
+  connect?: Prisma.LokasyonAdayWhereUniqueInput | Prisma.LokasyonAdayWhereUniqueInput[]
+}
+
+export type LokasyonAdayUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.LokasyonAdayCreateWithoutOfisInput, Prisma.LokasyonAdayUncheckedCreateWithoutOfisInput> | Prisma.LokasyonAdayCreateWithoutOfisInput[] | Prisma.LokasyonAdayUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.LokasyonAdayCreateOrConnectWithoutOfisInput | Prisma.LokasyonAdayCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.LokasyonAdayUpsertWithWhereUniqueWithoutOfisInput | Prisma.LokasyonAdayUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.LokasyonAdayCreateManyOfisInputEnvelope
+  set?: Prisma.LokasyonAdayWhereUniqueInput | Prisma.LokasyonAdayWhereUniqueInput[]
+  disconnect?: Prisma.LokasyonAdayWhereUniqueInput | Prisma.LokasyonAdayWhereUniqueInput[]
+  delete?: Prisma.LokasyonAdayWhereUniqueInput | Prisma.LokasyonAdayWhereUniqueInput[]
+  connect?: Prisma.LokasyonAdayWhereUniqueInput | Prisma.LokasyonAdayWhereUniqueInput[]
+  update?: Prisma.LokasyonAdayUpdateWithWhereUniqueWithoutOfisInput | Prisma.LokasyonAdayUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.LokasyonAdayUpdateManyWithWhereWithoutOfisInput | Prisma.LokasyonAdayUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.LokasyonAdayScalarWhereInput | Prisma.LokasyonAdayScalarWhereInput[]
+}
+
+export type LokasyonAdayUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.LokasyonAdayCreateWithoutOfisInput, Prisma.LokasyonAdayUncheckedCreateWithoutOfisInput> | Prisma.LokasyonAdayCreateWithoutOfisInput[] | Prisma.LokasyonAdayUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.LokasyonAdayCreateOrConnectWithoutOfisInput | Prisma.LokasyonAdayCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.LokasyonAdayUpsertWithWhereUniqueWithoutOfisInput | Prisma.LokasyonAdayUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.LokasyonAdayCreateManyOfisInputEnvelope
+  set?: Prisma.LokasyonAdayWhereUniqueInput | Prisma.LokasyonAdayWhereUniqueInput[]
+  disconnect?: Prisma.LokasyonAdayWhereUniqueInput | Prisma.LokasyonAdayWhereUniqueInput[]
+  delete?: Prisma.LokasyonAdayWhereUniqueInput | Prisma.LokasyonAdayWhereUniqueInput[]
+  connect?: Prisma.LokasyonAdayWhereUniqueInput | Prisma.LokasyonAdayWhereUniqueInput[]
+  update?: Prisma.LokasyonAdayUpdateWithWhereUniqueWithoutOfisInput | Prisma.LokasyonAdayUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.LokasyonAdayUpdateManyWithWhereWithoutOfisInput | Prisma.LokasyonAdayUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.LokasyonAdayScalarWhereInput | Prisma.LokasyonAdayScalarWhereInput[]
+}
+
 export type EnumAdayDurumuFieldUpdateOperationsInput = {
   set?: $Enums.AdayDurumu
+}
+
+export type LokasyonAdayCreateWithoutOfisInput = {
+  id?: string
+  ilId?: number
+  ifade: string
+  ornekMetin?: string | null
+  gorulme?: number
+  birlikteGecis?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  durum?: $Enums.AdayDurumu
+  sonGorulme?: Date | string
+  createdAt?: Date | string
+}
+
+export type LokasyonAdayUncheckedCreateWithoutOfisInput = {
+  id?: string
+  ilId?: number
+  ifade: string
+  ornekMetin?: string | null
+  gorulme?: number
+  birlikteGecis?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  durum?: $Enums.AdayDurumu
+  sonGorulme?: Date | string
+  createdAt?: Date | string
+}
+
+export type LokasyonAdayCreateOrConnectWithoutOfisInput = {
+  where: Prisma.LokasyonAdayWhereUniqueInput
+  create: Prisma.XOR<Prisma.LokasyonAdayCreateWithoutOfisInput, Prisma.LokasyonAdayUncheckedCreateWithoutOfisInput>
+}
+
+export type LokasyonAdayCreateManyOfisInputEnvelope = {
+  data: Prisma.LokasyonAdayCreateManyOfisInput | Prisma.LokasyonAdayCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type LokasyonAdayUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.LokasyonAdayWhereUniqueInput
+  update: Prisma.XOR<Prisma.LokasyonAdayUpdateWithoutOfisInput, Prisma.LokasyonAdayUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.LokasyonAdayCreateWithoutOfisInput, Prisma.LokasyonAdayUncheckedCreateWithoutOfisInput>
+}
+
+export type LokasyonAdayUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.LokasyonAdayWhereUniqueInput
+  data: Prisma.XOR<Prisma.LokasyonAdayUpdateWithoutOfisInput, Prisma.LokasyonAdayUncheckedUpdateWithoutOfisInput>
+}
+
+export type LokasyonAdayUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.LokasyonAdayScalarWhereInput
+  data: Prisma.XOR<Prisma.LokasyonAdayUpdateManyMutationInput, Prisma.LokasyonAdayUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type LokasyonAdayScalarWhereInput = {
+  AND?: Prisma.LokasyonAdayScalarWhereInput | Prisma.LokasyonAdayScalarWhereInput[]
+  OR?: Prisma.LokasyonAdayScalarWhereInput[]
+  NOT?: Prisma.LokasyonAdayScalarWhereInput | Prisma.LokasyonAdayScalarWhereInput[]
+  id?: Prisma.StringFilter<"LokasyonAday"> | string
+  ofisId?: Prisma.StringFilter<"LokasyonAday"> | string
+  ilId?: Prisma.IntFilter<"LokasyonAday"> | number
+  ifade?: Prisma.StringFilter<"LokasyonAday"> | string
+  ornekMetin?: Prisma.StringNullableFilter<"LokasyonAday"> | string | null
+  gorulme?: Prisma.IntFilter<"LokasyonAday"> | number
+  birlikteGecis?: Prisma.JsonFilter<"LokasyonAday">
+  durum?: Prisma.EnumAdayDurumuFilter<"LokasyonAday"> | $Enums.AdayDurumu
+  sonGorulme?: Prisma.DateTimeFilter<"LokasyonAday"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"LokasyonAday"> | Date | string
+}
+
+export type LokasyonAdayCreateManyOfisInput = {
+  id?: string
+  ilId?: number
+  ifade: string
+  ornekMetin?: string | null
+  gorulme?: number
+  birlikteGecis?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  durum?: $Enums.AdayDurumu
+  sonGorulme?: Date | string
+  createdAt?: Date | string
+}
+
+export type LokasyonAdayUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ilId?: Prisma.IntFieldUpdateOperationsInput | number
+  ifade?: Prisma.StringFieldUpdateOperationsInput | string
+  ornekMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorulme?: Prisma.IntFieldUpdateOperationsInput | number
+  birlikteGecis?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  durum?: Prisma.EnumAdayDurumuFieldUpdateOperationsInput | $Enums.AdayDurumu
+  sonGorulme?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type LokasyonAdayUncheckedUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ilId?: Prisma.IntFieldUpdateOperationsInput | number
+  ifade?: Prisma.StringFieldUpdateOperationsInput | string
+  ornekMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorulme?: Prisma.IntFieldUpdateOperationsInput | number
+  birlikteGecis?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  durum?: Prisma.EnumAdayDurumuFieldUpdateOperationsInput | $Enums.AdayDurumu
+  sonGorulme?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type LokasyonAdayUncheckedUpdateManyWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ilId?: Prisma.IntFieldUpdateOperationsInput | number
+  ifade?: Prisma.StringFieldUpdateOperationsInput | string
+  ornekMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorulme?: Prisma.IntFieldUpdateOperationsInput | number
+  birlikteGecis?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  durum?: Prisma.EnumAdayDurumuFieldUpdateOperationsInput | $Enums.AdayDurumu
+  sonGorulme?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
 
 export type LokasyonAdaySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   ilId?: boolean
   ifade?: boolean
   ornekMetin?: boolean
@@ -460,10 +652,12 @@ export type LokasyonAdaySelect<ExtArgs extends runtime.Types.Extensions.Internal
   durum?: boolean
   sonGorulme?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lokasyonAday"]>
 
 export type LokasyonAdaySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   ilId?: boolean
   ifade?: boolean
   ornekMetin?: boolean
@@ -472,10 +666,12 @@ export type LokasyonAdaySelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   durum?: boolean
   sonGorulme?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lokasyonAday"]>
 
 export type LokasyonAdaySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   ilId?: boolean
   ifade?: boolean
   ornekMetin?: boolean
@@ -484,10 +680,12 @@ export type LokasyonAdaySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   durum?: boolean
   sonGorulme?: boolean
   createdAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lokasyonAday"]>
 
 export type LokasyonAdaySelectScalar = {
   id?: boolean
+  ofisId?: boolean
   ilId?: boolean
   ifade?: boolean
   ornekMetin?: boolean
@@ -498,13 +696,25 @@ export type LokasyonAdaySelectScalar = {
   createdAt?: boolean
 }
 
-export type LokasyonAdayOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ilId" | "ifade" | "ornekMetin" | "gorulme" | "birlikteGecis" | "durum" | "sonGorulme" | "createdAt", ExtArgs["result"]["lokasyonAday"]>
+export type LokasyonAdayOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "ilId" | "ifade" | "ornekMetin" | "gorulme" | "birlikteGecis" | "durum" | "sonGorulme" | "createdAt", ExtArgs["result"]["lokasyonAday"]>
+export type LokasyonAdayInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type LokasyonAdayIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
+export type LokasyonAdayIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
+}
 
 export type $LokasyonAdayPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "LokasyonAday"
-  objects: {}
+  objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ofisId: string
     ilId: number
     ifade: string
     ornekMetin: string | null
@@ -910,6 +1120,7 @@ readonly fields: LokasyonAdayFieldRefs;
  */
 export interface Prisma__LokasyonAdayClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -940,6 +1151,7 @@ export interface Prisma__LokasyonAdayClient<T, Null = never, ExtArgs extends run
  */
 export interface LokasyonAdayFieldRefs {
   readonly id: Prisma.FieldRef<"LokasyonAday", 'String'>
+  readonly ofisId: Prisma.FieldRef<"LokasyonAday", 'String'>
   readonly ilId: Prisma.FieldRef<"LokasyonAday", 'Int'>
   readonly ifade: Prisma.FieldRef<"LokasyonAday", 'String'>
   readonly ornekMetin: Prisma.FieldRef<"LokasyonAday", 'String'>
@@ -965,6 +1177,10 @@ export type LokasyonAdayFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.LokasyonAdayOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayInclude<ExtArgs> | null
+  /**
    * Filter, which LokasyonAday to fetch.
    */
   where: Prisma.LokasyonAdayWhereUniqueInput
@@ -983,6 +1199,10 @@ export type LokasyonAdayFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Exte
    */
   omit?: Prisma.LokasyonAdayOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayInclude<ExtArgs> | null
+  /**
    * Filter, which LokasyonAday to fetch.
    */
   where: Prisma.LokasyonAdayWhereUniqueInput
@@ -1000,6 +1220,10 @@ export type LokasyonAdayFindFirstArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the LokasyonAday
    */
   omit?: Prisma.LokasyonAdayOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayInclude<ExtArgs> | null
   /**
    * Filter, which LokasyonAday to fetch.
    */
@@ -1049,6 +1273,10 @@ export type LokasyonAdayFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exten
    */
   omit?: Prisma.LokasyonAdayOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayInclude<ExtArgs> | null
+  /**
    * Filter, which LokasyonAday to fetch.
    */
   where?: Prisma.LokasyonAdayWhereInput
@@ -1096,6 +1324,10 @@ export type LokasyonAdayFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the LokasyonAday
    */
   omit?: Prisma.LokasyonAdayOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayInclude<ExtArgs> | null
   /**
    * Filter, which LokasyonAdays to fetch.
    */
@@ -1145,6 +1377,10 @@ export type LokasyonAdayCreateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   omit?: Prisma.LokasyonAdayOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayInclude<ExtArgs> | null
+  /**
    * The data needed to create a LokasyonAday.
    */
   data: Prisma.XOR<Prisma.LokasyonAdayCreateInput, Prisma.LokasyonAdayUncheckedCreateInput>
@@ -1178,6 +1414,10 @@ export type LokasyonAdayCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
    */
   data: Prisma.LokasyonAdayCreateManyInput | Prisma.LokasyonAdayCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1192,6 +1432,10 @@ export type LokasyonAdayUpdateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the LokasyonAday
    */
   omit?: Prisma.LokasyonAdayOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayInclude<ExtArgs> | null
   /**
    * The data needed to update a LokasyonAday.
    */
@@ -1244,6 +1488,10 @@ export type LokasyonAdayUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
    * Limit how many LokasyonAdays to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1258,6 +1506,10 @@ export type LokasyonAdayUpsertArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the LokasyonAday
    */
   omit?: Prisma.LokasyonAdayOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayInclude<ExtArgs> | null
   /**
    * The filter to search for the LokasyonAday to update in case it exists.
    */
@@ -1284,6 +1536,10 @@ export type LokasyonAdayDeleteArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the LokasyonAday
    */
   omit?: Prisma.LokasyonAdayOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayInclude<ExtArgs> | null
   /**
    * Filter which LokasyonAday to delete.
    */
@@ -1316,4 +1572,8 @@ export type LokasyonAdayDefaultArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the LokasyonAday
    */
   omit?: Prisma.LokasyonAdayOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LokasyonAdayInclude<ExtArgs> | null
 }

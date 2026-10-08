@@ -11,6 +11,10 @@ import { portalLinkleri } from "../src/lib/portal/arama-linkleri";
 import { KayitCreateSchema } from "../src/lib/validation/kayit";
 import { ORNEK_SOHBETLER } from "../demo/ornek-sohbetler";
 import { ornekVeriyiKur } from "../demo/depo";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 test("Geçerlilik: kiralık kısa, satılık uzun; acil talep üst sınırı; eski ayar biçimi çevrilir", () => {
   assert.equal(ttlGun("PORTFOY", "SATILIK", null), 90);

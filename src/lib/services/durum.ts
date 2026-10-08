@@ -8,7 +8,8 @@ import { z } from "zod";
 import type { PrismaClient } from "../../generated/prisma/client";
 import { KayitTemel, MulkOzellikObje, KayitCreateSchema } from "../validation/kayit";
 import { fingerprint, ttlAyarlari } from "./kayit";
-import { varsayilanValidUntil as vu, TtlAyarSchema } from "../domain/gecerlilik";
+import { ayarYaz } from "./ayar";
+import { varsayilanValidUntil as vu, TtlAyarSchema, TTL_VARSAYILAN } from "../domain/gecerlilik";
 import { AiAyarSchema, PaylasimAyarSchema, aiAyarNormalize, paylasimNormalize, calismaIliNormalize } from "../domain/ayarlar";
 import { RolTanimSchema, rolNormalize, ROL_SINIRI } from "../domain/roller";
 
@@ -36,7 +37,7 @@ export async function durumGetir(prisma: PrismaClient) {
     }),
     kisiler: kisiler.map((k) => ({ id: k.id, adSoyad: k.adSoyad, telefon: k.telefon, ikincilTelefon: k.ikincilTelefon, email: k.email, sirket: k.sirket, roller: k.roller, uzmanlikAileleri: k.uzmanlikAileleri, referans: k.referans, notlar: k.notlar, whatsappGruplari: k.whatsappGruplari, olusturma: k.createdAt.toISOString(), sonIletisim: k.sonIletisim?.toISOString() ?? null, kaynak: k.kaynak === "CSV" ? "MANUEL" : k.kaynak, ilanSahibiTipi: k.ilanSahibiTipi, googleResourceName: k.googleResourceName, kaynaktaSilindi: k.kaynaktaSilindi?.toISOString() ?? null })),
     eslesmeNotlari: Object.fromEntries(eslesmeler.map((m) => [`${m.talepId}~${m.portfoyId}`, { durum: m.durum === "BEKLIYOR" ? "YENI" : m.durum, not: m.operasyonNotu ?? "", ...(m.kopmaNedeni ? { neden: m.kopmaNedeni } : {}), ...(m.koparilma ? { tarih: m.koparilma.toISOString() } : {}) }])),
-    ayarlar: { ttl: TtlAyarSchema.parse({ ...((ayarlar.find((a) => a.anahtar === "ttl")?.deger as object) ?? {}) }), ai: aiAyarNormalize(ayarlar.find((a) => a.anahtar === "ai")?.deger), paylasim: paylasimNormalize(ayarlar.find((a) => a.anahtar === "paylasim")?.deger), calismaIli: calismaIliNormalize(ayarlar.find((a) => a.anahtar === "calismaIli")?.deger), roller: rolNormalize(ayarlar.find((a) => a.anahtar === "roller")?.deger) },
+    ayarlar: { ttl: TtlAyarSchema.parse({ ...TTL_VARSAYILAN, ...((ayarlar.find((a) => a.anahtar === "ttl")?.deger as object) ?? {}) }), ai: aiAyarNormalize(ayarlar.find((a) => a.anahtar === "ai")?.deger), paylasim: paylasimNormalize(ayarlar.find((a) => a.anahtar === "paylasim")?.deger), calismaIli: calismaIliNormalize(ayarlar.find((a) => a.anahtar === "calismaIli")?.deger), roller: rolNormalize(ayarlar.find((a) => a.anahtar === "roller")?.deger) },
     arayuz: (ayarlar.find((a) => a.anahtar === ARAYUZ)?.deger ?? {}) as Record<string, unknown>,
   };
 }
@@ -84,7 +85,7 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
           await tx.kayit.update({ where: { id: k.id }, data: veri as any });
         } else {
           let fp = fingerprint(p.data);
-          if (await tx.kayit.findUnique({ where: { fingerprint: fp }, select: { id: true } })) fp = fp.slice(0, 24) + k.id.slice(0, 16);
+          if (await tx.kayit.findFirst({ where: { fingerprint: fp }, select: { id: true } })) fp = fp.slice(0, 24) + k.id.slice(0, 16);
           await tx.kayit.create({ data: { id: k.id, ...(veri as any), fingerprint: fp, ...(k.olusturma ? { createdAt: new Date(k.olusturma) } : {}) } });
         }
         if (lokasyonlar.length) await tx.kayitLokasyon.createMany({ data: lokasyonlar.map((l, sira) => ({ ...l, sira, kayitId: k.id })) });
@@ -116,13 +117,13 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
   }
   // 5) Ayarlar ve arayüz durumu (öğrenilen konumlar, test işaretleri, içe aktarma geçmişi…)
   if (g.ayarlar) {
-    const yaz = (anahtar: string, deger: unknown) => prisma.ayar.upsert({ where: { anahtar }, update: { deger: deger as any }, create: { anahtar, deger: deger as any } });
+    const yaz = (anahtar: string, deger: unknown) => ayarYaz(prisma, anahtar, deger);
     if (g.ayarlar.ttl) await yaz("ttl", TtlAyarSchema.parse(g.ayarlar.ttl));
     if (g.ayarlar.ai) await yaz("ai", g.ayarlar.ai);
     if (g.ayarlar.paylasim) await yaz("paylasim", g.ayarlar.paylasim);
     if (g.ayarlar.calismaIli != null) await yaz("calismaIli", g.ayarlar.calismaIli);
     if (g.ayarlar.roller) await yaz("roller", rolNormalize(g.ayarlar.roller)); // v3.15: özel roller + yeniden adlandırmalar
   }
-  if (g.arayuz) await prisma.ayar.upsert({ where: { anahtar: ARAYUZ }, update: { deger: g.arayuz as any }, create: { anahtar: ARAYUZ, deger: g.arayuz as any } });
+  if (g.arayuz) await ayarYaz(prisma, ARAYUZ, g.arayuz);
   return { tamam: hatalar.length === 0, hatalar };
 }

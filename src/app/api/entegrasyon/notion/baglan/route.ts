@@ -11,7 +11,7 @@ export async function POST() {
     if (!token) return Response.json({ hata: "AYAR_EKSIK", mesaj: "NOTION_TOKEN tanımlı değil (ALTYAPI §26.3)" }, { status: 503 });
     const rapor = await notionBaglantiRaporu(token);
     await entegrasyon(prisma, "NOTION");
-    await prisma.entegrasyon.update({ where: { saglayici: "NOTION" }, data: { durum: rapor.tamam ? "BAGLI" : "HATA", hesap: "Gayrimenkul CRM", sonHata: rapor.tamam ? null : "Bazı tablolara erişilemedi" } });
+    await prisma.entegrasyon.updateMany({ where: { saglayici: "NOTION" }, data: { durum: rapor.tamam ? "BAGLI" : "HATA", hesap: "Gayrimenkul CRM", sonHata: rapor.tamam ? null : "Bazı tablolara erişilemedi" } });
     const ilk = rapor.tamam ? await notionSenkronCalistir(prisma, { tetik: "ilk", tam: true }).catch((x) => ({ hata: String(x?.message ?? x) })) : null;
     return ok({ rapor, ilk });
   } catch (e) { return hata(e); }

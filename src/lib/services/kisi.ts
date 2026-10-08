@@ -31,7 +31,7 @@ export function kisiAra(prisma: PrismaClient, q: string, limit = 20) {
 export async function kisiOlusturVeyaBul(prisma: PrismaClient, girdi: z.input<typeof KisiSchema>) {
   const k = KisiSchema.parse(girdi);
   if (k.telefon) {
-    const var_ = await prisma.kisi.findUnique({ where: { telefon: k.telefon } });
+    const var_ = await prisma.kisi.findFirst({ where: { telefon: k.telefon } });
     if (var_) return prisma.kisi.update({ where: { id: var_.id }, data: { roller: [...new Set([...var_.roller, ...k.roller])], sirket: var_.sirket ?? k.sirket } });
   }
   return prisma.kisi.create({ data: { ...k, kaynak: "MANUEL" } });

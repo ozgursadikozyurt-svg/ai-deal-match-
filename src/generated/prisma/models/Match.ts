@@ -42,6 +42,7 @@ export type MatchSumAggregateOutputType = {
 
 export type MatchMinAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   talepId: string | null
   portfoyId: string | null
   portalIlanId: string | null
@@ -67,6 +68,7 @@ export type MatchMinAggregateOutputType = {
 
 export type MatchMaxAggregateOutputType = {
   id: string | null
+  ofisId: string | null
   talepId: string | null
   portfoyId: string | null
   portalIlanId: string | null
@@ -92,6 +94,7 @@ export type MatchMaxAggregateOutputType = {
 
 export type MatchCountAggregateOutputType = {
   id: number
+  ofisId: number
   talepId: number
   portfoyId: number
   portalIlanId: number
@@ -136,6 +139,7 @@ export type MatchSumAggregateInputType = {
 
 export type MatchMinAggregateInputType = {
   id?: true
+  ofisId?: true
   talepId?: true
   portfoyId?: true
   portalIlanId?: true
@@ -161,6 +165,7 @@ export type MatchMinAggregateInputType = {
 
 export type MatchMaxAggregateInputType = {
   id?: true
+  ofisId?: true
   talepId?: true
   portfoyId?: true
   portalIlanId?: true
@@ -186,6 +191,7 @@ export type MatchMaxAggregateInputType = {
 
 export type MatchCountAggregateInputType = {
   id?: true
+  ofisId?: true
   talepId?: true
   portfoyId?: true
   portalIlanId?: true
@@ -301,6 +307,7 @@ export type MatchGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 
 export type MatchGroupByOutputType = {
   id: string
+  ofisId: string
   talepId: string
   portfoyId: string | null
   portalIlanId: string | null
@@ -352,6 +359,7 @@ export type MatchWhereInput = {
   OR?: Prisma.MatchWhereInput[]
   NOT?: Prisma.MatchWhereInput | Prisma.MatchWhereInput[]
   id?: Prisma.StringFilter<"Match"> | string
+  ofisId?: Prisma.StringFilter<"Match"> | string
   talepId?: Prisma.StringFilter<"Match"> | string
   portfoyId?: Prisma.StringNullableFilter<"Match"> | string | null
   portalIlanId?: Prisma.StringNullableFilter<"Match"> | string | null
@@ -376,6 +384,7 @@ export type MatchWhereInput = {
   portfoySahibiTel?: Prisma.StringNullableFilter<"Match"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Match"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Match"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
   talep?: Prisma.XOR<Prisma.KayitScalarRelationFilter, Prisma.KayitWhereInput>
   portfoy?: Prisma.XOR<Prisma.KayitNullableScalarRelationFilter, Prisma.KayitWhereInput> | null
   portalIlan?: Prisma.XOR<Prisma.PortalIlanNullableScalarRelationFilter, Prisma.PortalIlanWhereInput> | null
@@ -383,6 +392,7 @@ export type MatchWhereInput = {
 
 export type MatchOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   talepId?: Prisma.SortOrder
   portfoyId?: Prisma.SortOrderInput | Prisma.SortOrder
   portalIlanId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -407,6 +417,7 @@ export type MatchOrderByWithRelationInput = {
   portfoySahibiTel?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  ofis?: Prisma.OfisOrderByWithRelationInput
   talep?: Prisma.KayitOrderByWithRelationInput
   portfoy?: Prisma.KayitOrderByWithRelationInput
   portalIlan?: Prisma.PortalIlanOrderByWithRelationInput
@@ -419,6 +430,7 @@ export type MatchWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.MatchWhereInput | Prisma.MatchWhereInput[]
   OR?: Prisma.MatchWhereInput[]
   NOT?: Prisma.MatchWhereInput | Prisma.MatchWhereInput[]
+  ofisId?: Prisma.StringFilter<"Match"> | string
   talepId?: Prisma.StringFilter<"Match"> | string
   portfoyId?: Prisma.StringNullableFilter<"Match"> | string | null
   portalIlanId?: Prisma.StringNullableFilter<"Match"> | string | null
@@ -443,6 +455,7 @@ export type MatchWhereUniqueInput = Prisma.AtLeast<{
   portfoySahibiTel?: Prisma.StringNullableFilter<"Match"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Match"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Match"> | Date | string
+  ofis?: Prisma.XOR<Prisma.OfisScalarRelationFilter, Prisma.OfisWhereInput>
   talep?: Prisma.XOR<Prisma.KayitScalarRelationFilter, Prisma.KayitWhereInput>
   portfoy?: Prisma.XOR<Prisma.KayitNullableScalarRelationFilter, Prisma.KayitWhereInput> | null
   portalIlan?: Prisma.XOR<Prisma.PortalIlanNullableScalarRelationFilter, Prisma.PortalIlanWhereInput> | null
@@ -450,6 +463,7 @@ export type MatchWhereUniqueInput = Prisma.AtLeast<{
 
 export type MatchOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   talepId?: Prisma.SortOrder
   portfoyId?: Prisma.SortOrderInput | Prisma.SortOrder
   portalIlanId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -486,6 +500,7 @@ export type MatchScalarWhereWithAggregatesInput = {
   OR?: Prisma.MatchScalarWhereWithAggregatesInput[]
   NOT?: Prisma.MatchScalarWhereWithAggregatesInput | Prisma.MatchScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Match"> | string
+  ofisId?: Prisma.StringWithAggregatesFilter<"Match"> | string
   talepId?: Prisma.StringWithAggregatesFilter<"Match"> | string
   portfoyId?: Prisma.StringNullableWithAggregatesFilter<"Match"> | string | null
   portalIlanId?: Prisma.StringNullableWithAggregatesFilter<"Match"> | string | null
@@ -535,6 +550,7 @@ export type MatchCreateInput = {
   portfoySahibiTel?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutMatchlerInput
   talep: Prisma.KayitCreateNestedOneWithoutTalepMatchleriInput
   portfoy?: Prisma.KayitCreateNestedOneWithoutPortfoyMatchleriInput
   portalIlan?: Prisma.PortalIlanCreateNestedOneWithoutMatchlerInput
@@ -542,6 +558,7 @@ export type MatchCreateInput = {
 
 export type MatchUncheckedCreateInput = {
   id?: string
+  ofisId?: string
   talepId: string
   portfoyId?: string | null
   portalIlanId?: string | null
@@ -591,6 +608,7 @@ export type MatchUpdateInput = {
   portfoySahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutMatchlerNestedInput
   talep?: Prisma.KayitUpdateOneRequiredWithoutTalepMatchleriNestedInput
   portfoy?: Prisma.KayitUpdateOneWithoutPortfoyMatchleriNestedInput
   portalIlan?: Prisma.PortalIlanUpdateOneWithoutMatchlerNestedInput
@@ -598,6 +616,7 @@ export type MatchUpdateInput = {
 
 export type MatchUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   talepId?: Prisma.StringFieldUpdateOperationsInput | string
   portfoyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   portalIlanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -626,6 +645,7 @@ export type MatchUncheckedUpdateInput = {
 
 export type MatchCreateManyInput = {
   id?: string
+  ofisId?: string
   talepId: string
   portfoyId?: string | null
   portalIlanId?: string | null
@@ -679,6 +699,7 @@ export type MatchUpdateManyMutationInput = {
 
 export type MatchUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   talepId?: Prisma.StringFieldUpdateOperationsInput | string
   portfoyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   portalIlanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -727,6 +748,7 @@ export type MatchTalepIdPortalIlanIdCompoundUniqueInput = {
 
 export type MatchCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   talepId?: Prisma.SortOrder
   portfoyId?: Prisma.SortOrder
   portalIlanId?: Prisma.SortOrder
@@ -762,6 +784,7 @@ export type MatchAvgOrderByAggregateInput = {
 
 export type MatchMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   talepId?: Prisma.SortOrder
   portfoyId?: Prisma.SortOrder
   portalIlanId?: Prisma.SortOrder
@@ -787,6 +810,7 @@ export type MatchMaxOrderByAggregateInput = {
 
 export type MatchMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  ofisId?: Prisma.SortOrder
   talepId?: Prisma.SortOrder
   portfoyId?: Prisma.SortOrder
   portalIlanId?: Prisma.SortOrder
@@ -815,6 +839,48 @@ export type MatchSumOrderByAggregateInput = {
   lokasyonBonus?: Prisma.SortOrder
   aiSkor?: Prisma.SortOrder
   finalSkor?: Prisma.SortOrder
+}
+
+export type MatchCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.MatchCreateWithoutOfisInput, Prisma.MatchUncheckedCreateWithoutOfisInput> | Prisma.MatchCreateWithoutOfisInput[] | Prisma.MatchUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.MatchCreateOrConnectWithoutOfisInput | Prisma.MatchCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.MatchCreateManyOfisInputEnvelope
+  connect?: Prisma.MatchWhereUniqueInput | Prisma.MatchWhereUniqueInput[]
+}
+
+export type MatchUncheckedCreateNestedManyWithoutOfisInput = {
+  create?: Prisma.XOR<Prisma.MatchCreateWithoutOfisInput, Prisma.MatchUncheckedCreateWithoutOfisInput> | Prisma.MatchCreateWithoutOfisInput[] | Prisma.MatchUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.MatchCreateOrConnectWithoutOfisInput | Prisma.MatchCreateOrConnectWithoutOfisInput[]
+  createMany?: Prisma.MatchCreateManyOfisInputEnvelope
+  connect?: Prisma.MatchWhereUniqueInput | Prisma.MatchWhereUniqueInput[]
+}
+
+export type MatchUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.MatchCreateWithoutOfisInput, Prisma.MatchUncheckedCreateWithoutOfisInput> | Prisma.MatchCreateWithoutOfisInput[] | Prisma.MatchUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.MatchCreateOrConnectWithoutOfisInput | Prisma.MatchCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.MatchUpsertWithWhereUniqueWithoutOfisInput | Prisma.MatchUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.MatchCreateManyOfisInputEnvelope
+  set?: Prisma.MatchWhereUniqueInput | Prisma.MatchWhereUniqueInput[]
+  disconnect?: Prisma.MatchWhereUniqueInput | Prisma.MatchWhereUniqueInput[]
+  delete?: Prisma.MatchWhereUniqueInput | Prisma.MatchWhereUniqueInput[]
+  connect?: Prisma.MatchWhereUniqueInput | Prisma.MatchWhereUniqueInput[]
+  update?: Prisma.MatchUpdateWithWhereUniqueWithoutOfisInput | Prisma.MatchUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.MatchUpdateManyWithWhereWithoutOfisInput | Prisma.MatchUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.MatchScalarWhereInput | Prisma.MatchScalarWhereInput[]
+}
+
+export type MatchUncheckedUpdateManyWithoutOfisNestedInput = {
+  create?: Prisma.XOR<Prisma.MatchCreateWithoutOfisInput, Prisma.MatchUncheckedCreateWithoutOfisInput> | Prisma.MatchCreateWithoutOfisInput[] | Prisma.MatchUncheckedCreateWithoutOfisInput[]
+  connectOrCreate?: Prisma.MatchCreateOrConnectWithoutOfisInput | Prisma.MatchCreateOrConnectWithoutOfisInput[]
+  upsert?: Prisma.MatchUpsertWithWhereUniqueWithoutOfisInput | Prisma.MatchUpsertWithWhereUniqueWithoutOfisInput[]
+  createMany?: Prisma.MatchCreateManyOfisInputEnvelope
+  set?: Prisma.MatchWhereUniqueInput | Prisma.MatchWhereUniqueInput[]
+  disconnect?: Prisma.MatchWhereUniqueInput | Prisma.MatchWhereUniqueInput[]
+  delete?: Prisma.MatchWhereUniqueInput | Prisma.MatchWhereUniqueInput[]
+  connect?: Prisma.MatchWhereUniqueInput | Prisma.MatchWhereUniqueInput[]
+  update?: Prisma.MatchUpdateWithWhereUniqueWithoutOfisInput | Prisma.MatchUpdateWithWhereUniqueWithoutOfisInput[]
+  updateMany?: Prisma.MatchUpdateManyWithWhereWithoutOfisInput | Prisma.MatchUpdateManyWithWhereWithoutOfisInput[]
+  deleteMany?: Prisma.MatchScalarWhereInput | Prisma.MatchScalarWhereInput[]
 }
 
 export type MatchCreateNestedManyWithoutTalepInput = {
@@ -977,6 +1043,120 @@ export type MatchUncheckedUpdateManyWithoutPortalIlanNestedInput = {
   deleteMany?: Prisma.MatchScalarWhereInput | Prisma.MatchScalarWhereInput[]
 }
 
+export type MatchCreateWithoutOfisInput = {
+  id?: string
+  havuz?: $Enums.Havuz
+  matematikSkor: number
+  lokasyonBonus?: number
+  aiSkor?: number | null
+  finalSkor: number
+  aiAnaliz?: string | null
+  uygunluk?: $Enums.Uygunluk | null
+  kritikEngeller?: Prisma.MatchCreatekritikEngellerInput | $Enums.TeknikAlan[]
+  eksikBilgiler?: Prisma.MatchCreateeksikBilgilerInput | $Enums.TeknikAlan[]
+  kriterDokumu?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: $Enums.MatchDurum
+  kopmaNedeni?: string | null
+  koparilma?: Date | string | null
+  operasyonNotu?: string | null
+  notGuncellendi?: Date | string | null
+  talepSahibiAdi?: string | null
+  talepSahibiTel?: string | null
+  portfoySahibiAdi?: string | null
+  portfoySahibiTel?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  talep: Prisma.KayitCreateNestedOneWithoutTalepMatchleriInput
+  portfoy?: Prisma.KayitCreateNestedOneWithoutPortfoyMatchleriInput
+  portalIlan?: Prisma.PortalIlanCreateNestedOneWithoutMatchlerInput
+}
+
+export type MatchUncheckedCreateWithoutOfisInput = {
+  id?: string
+  talepId: string
+  portfoyId?: string | null
+  portalIlanId?: string | null
+  havuz?: $Enums.Havuz
+  matematikSkor: number
+  lokasyonBonus?: number
+  aiSkor?: number | null
+  finalSkor: number
+  aiAnaliz?: string | null
+  uygunluk?: $Enums.Uygunluk | null
+  kritikEngeller?: Prisma.MatchCreatekritikEngellerInput | $Enums.TeknikAlan[]
+  eksikBilgiler?: Prisma.MatchCreateeksikBilgilerInput | $Enums.TeknikAlan[]
+  kriterDokumu?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: $Enums.MatchDurum
+  kopmaNedeni?: string | null
+  koparilma?: Date | string | null
+  operasyonNotu?: string | null
+  notGuncellendi?: Date | string | null
+  talepSahibiAdi?: string | null
+  talepSahibiTel?: string | null
+  portfoySahibiAdi?: string | null
+  portfoySahibiTel?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MatchCreateOrConnectWithoutOfisInput = {
+  where: Prisma.MatchWhereUniqueInput
+  create: Prisma.XOR<Prisma.MatchCreateWithoutOfisInput, Prisma.MatchUncheckedCreateWithoutOfisInput>
+}
+
+export type MatchCreateManyOfisInputEnvelope = {
+  data: Prisma.MatchCreateManyOfisInput | Prisma.MatchCreateManyOfisInput[]
+  skipDuplicates?: boolean
+}
+
+export type MatchUpsertWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.MatchWhereUniqueInput
+  update: Prisma.XOR<Prisma.MatchUpdateWithoutOfisInput, Prisma.MatchUncheckedUpdateWithoutOfisInput>
+  create: Prisma.XOR<Prisma.MatchCreateWithoutOfisInput, Prisma.MatchUncheckedCreateWithoutOfisInput>
+}
+
+export type MatchUpdateWithWhereUniqueWithoutOfisInput = {
+  where: Prisma.MatchWhereUniqueInput
+  data: Prisma.XOR<Prisma.MatchUpdateWithoutOfisInput, Prisma.MatchUncheckedUpdateWithoutOfisInput>
+}
+
+export type MatchUpdateManyWithWhereWithoutOfisInput = {
+  where: Prisma.MatchScalarWhereInput
+  data: Prisma.XOR<Prisma.MatchUpdateManyMutationInput, Prisma.MatchUncheckedUpdateManyWithoutOfisInput>
+}
+
+export type MatchScalarWhereInput = {
+  AND?: Prisma.MatchScalarWhereInput | Prisma.MatchScalarWhereInput[]
+  OR?: Prisma.MatchScalarWhereInput[]
+  NOT?: Prisma.MatchScalarWhereInput | Prisma.MatchScalarWhereInput[]
+  id?: Prisma.StringFilter<"Match"> | string
+  ofisId?: Prisma.StringFilter<"Match"> | string
+  talepId?: Prisma.StringFilter<"Match"> | string
+  portfoyId?: Prisma.StringNullableFilter<"Match"> | string | null
+  portalIlanId?: Prisma.StringNullableFilter<"Match"> | string | null
+  havuz?: Prisma.EnumHavuzFilter<"Match"> | $Enums.Havuz
+  matematikSkor?: Prisma.FloatFilter<"Match"> | number
+  lokasyonBonus?: Prisma.FloatFilter<"Match"> | number
+  aiSkor?: Prisma.FloatNullableFilter<"Match"> | number | null
+  finalSkor?: Prisma.FloatFilter<"Match"> | number
+  aiAnaliz?: Prisma.StringNullableFilter<"Match"> | string | null
+  uygunluk?: Prisma.EnumUygunlukNullableFilter<"Match"> | $Enums.Uygunluk | null
+  kritikEngeller?: Prisma.EnumTeknikAlanNullableListFilter<"Match">
+  eksikBilgiler?: Prisma.EnumTeknikAlanNullableListFilter<"Match">
+  kriterDokumu?: Prisma.JsonNullableFilter<"Match">
+  durum?: Prisma.EnumMatchDurumFilter<"Match"> | $Enums.MatchDurum
+  kopmaNedeni?: Prisma.StringNullableFilter<"Match"> | string | null
+  koparilma?: Prisma.DateTimeNullableFilter<"Match"> | Date | string | null
+  operasyonNotu?: Prisma.StringNullableFilter<"Match"> | string | null
+  notGuncellendi?: Prisma.DateTimeNullableFilter<"Match"> | Date | string | null
+  talepSahibiAdi?: Prisma.StringNullableFilter<"Match"> | string | null
+  talepSahibiTel?: Prisma.StringNullableFilter<"Match"> | string | null
+  portfoySahibiAdi?: Prisma.StringNullableFilter<"Match"> | string | null
+  portfoySahibiTel?: Prisma.StringNullableFilter<"Match"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Match"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Match"> | Date | string
+}
+
 export type MatchCreateWithoutTalepInput = {
   id?: string
   havuz?: $Enums.Havuz
@@ -1000,12 +1180,14 @@ export type MatchCreateWithoutTalepInput = {
   portfoySahibiTel?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutMatchlerInput
   portfoy?: Prisma.KayitCreateNestedOneWithoutPortfoyMatchleriInput
   portalIlan?: Prisma.PortalIlanCreateNestedOneWithoutMatchlerInput
 }
 
 export type MatchUncheckedCreateWithoutTalepInput = {
   id?: string
+  ofisId?: string
   portfoyId?: string | null
   portalIlanId?: string | null
   havuz?: $Enums.Havuz
@@ -1064,12 +1246,14 @@ export type MatchCreateWithoutPortfoyInput = {
   portfoySahibiTel?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutMatchlerInput
   talep: Prisma.KayitCreateNestedOneWithoutTalepMatchleriInput
   portalIlan?: Prisma.PortalIlanCreateNestedOneWithoutMatchlerInput
 }
 
 export type MatchUncheckedCreateWithoutPortfoyInput = {
   id?: string
+  ofisId?: string
   talepId: string
   portalIlanId?: string | null
   havuz?: $Enums.Havuz
@@ -1121,37 +1305,6 @@ export type MatchUpdateManyWithWhereWithoutTalepInput = {
   data: Prisma.XOR<Prisma.MatchUpdateManyMutationInput, Prisma.MatchUncheckedUpdateManyWithoutTalepInput>
 }
 
-export type MatchScalarWhereInput = {
-  AND?: Prisma.MatchScalarWhereInput | Prisma.MatchScalarWhereInput[]
-  OR?: Prisma.MatchScalarWhereInput[]
-  NOT?: Prisma.MatchScalarWhereInput | Prisma.MatchScalarWhereInput[]
-  id?: Prisma.StringFilter<"Match"> | string
-  talepId?: Prisma.StringFilter<"Match"> | string
-  portfoyId?: Prisma.StringNullableFilter<"Match"> | string | null
-  portalIlanId?: Prisma.StringNullableFilter<"Match"> | string | null
-  havuz?: Prisma.EnumHavuzFilter<"Match"> | $Enums.Havuz
-  matematikSkor?: Prisma.FloatFilter<"Match"> | number
-  lokasyonBonus?: Prisma.FloatFilter<"Match"> | number
-  aiSkor?: Prisma.FloatNullableFilter<"Match"> | number | null
-  finalSkor?: Prisma.FloatFilter<"Match"> | number
-  aiAnaliz?: Prisma.StringNullableFilter<"Match"> | string | null
-  uygunluk?: Prisma.EnumUygunlukNullableFilter<"Match"> | $Enums.Uygunluk | null
-  kritikEngeller?: Prisma.EnumTeknikAlanNullableListFilter<"Match">
-  eksikBilgiler?: Prisma.EnumTeknikAlanNullableListFilter<"Match">
-  kriterDokumu?: Prisma.JsonNullableFilter<"Match">
-  durum?: Prisma.EnumMatchDurumFilter<"Match"> | $Enums.MatchDurum
-  kopmaNedeni?: Prisma.StringNullableFilter<"Match"> | string | null
-  koparilma?: Prisma.DateTimeNullableFilter<"Match"> | Date | string | null
-  operasyonNotu?: Prisma.StringNullableFilter<"Match"> | string | null
-  notGuncellendi?: Prisma.DateTimeNullableFilter<"Match"> | Date | string | null
-  talepSahibiAdi?: Prisma.StringNullableFilter<"Match"> | string | null
-  talepSahibiTel?: Prisma.StringNullableFilter<"Match"> | string | null
-  portfoySahibiAdi?: Prisma.StringNullableFilter<"Match"> | string | null
-  portfoySahibiTel?: Prisma.StringNullableFilter<"Match"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"Match"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Match"> | Date | string
-}
-
 export type MatchUpsertWithWhereUniqueWithoutPortfoyInput = {
   where: Prisma.MatchWhereUniqueInput
   update: Prisma.XOR<Prisma.MatchUpdateWithoutPortfoyInput, Prisma.MatchUncheckedUpdateWithoutPortfoyInput>
@@ -1191,12 +1344,14 @@ export type MatchCreateWithoutPortalIlanInput = {
   portfoySahibiTel?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutMatchlerInput
   talep: Prisma.KayitCreateNestedOneWithoutTalepMatchleriInput
   portfoy?: Prisma.KayitCreateNestedOneWithoutPortfoyMatchleriInput
 }
 
 export type MatchUncheckedCreateWithoutPortalIlanInput = {
   id?: string
+  ofisId?: string
   talepId: string
   portfoyId?: string | null
   havuz?: $Enums.Havuz
@@ -1248,8 +1403,121 @@ export type MatchUpdateManyWithWhereWithoutPortalIlanInput = {
   data: Prisma.XOR<Prisma.MatchUpdateManyMutationInput, Prisma.MatchUncheckedUpdateManyWithoutPortalIlanInput>
 }
 
+export type MatchCreateManyOfisInput = {
+  id?: string
+  talepId: string
+  portfoyId?: string | null
+  portalIlanId?: string | null
+  havuz?: $Enums.Havuz
+  matematikSkor: number
+  lokasyonBonus?: number
+  aiSkor?: number | null
+  finalSkor: number
+  aiAnaliz?: string | null
+  uygunluk?: $Enums.Uygunluk | null
+  kritikEngeller?: Prisma.MatchCreatekritikEngellerInput | $Enums.TeknikAlan[]
+  eksikBilgiler?: Prisma.MatchCreateeksikBilgilerInput | $Enums.TeknikAlan[]
+  kriterDokumu?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: $Enums.MatchDurum
+  kopmaNedeni?: string | null
+  koparilma?: Date | string | null
+  operasyonNotu?: string | null
+  notGuncellendi?: Date | string | null
+  talepSahibiAdi?: string | null
+  talepSahibiTel?: string | null
+  portfoySahibiAdi?: string | null
+  portfoySahibiTel?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MatchUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
+  matematikSkor?: Prisma.FloatFieldUpdateOperationsInput | number
+  lokasyonBonus?: Prisma.FloatFieldUpdateOperationsInput | number
+  aiSkor?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  finalSkor?: Prisma.FloatFieldUpdateOperationsInput | number
+  aiAnaliz?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uygunluk?: Prisma.NullableEnumUygunlukFieldUpdateOperationsInput | $Enums.Uygunluk | null
+  kritikEngeller?: Prisma.MatchUpdatekritikEngellerInput | $Enums.TeknikAlan[]
+  eksikBilgiler?: Prisma.MatchUpdateeksikBilgilerInput | $Enums.TeknikAlan[]
+  kriterDokumu?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: Prisma.EnumMatchDurumFieldUpdateOperationsInput | $Enums.MatchDurum
+  kopmaNedeni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  koparilma?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notGuncellendi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  talepSahibiAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  talepSahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portfoySahibiAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portfoySahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  talep?: Prisma.KayitUpdateOneRequiredWithoutTalepMatchleriNestedInput
+  portfoy?: Prisma.KayitUpdateOneWithoutPortfoyMatchleriNestedInput
+  portalIlan?: Prisma.PortalIlanUpdateOneWithoutMatchlerNestedInput
+}
+
+export type MatchUncheckedUpdateWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  talepId?: Prisma.StringFieldUpdateOperationsInput | string
+  portfoyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
+  matematikSkor?: Prisma.FloatFieldUpdateOperationsInput | number
+  lokasyonBonus?: Prisma.FloatFieldUpdateOperationsInput | number
+  aiSkor?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  finalSkor?: Prisma.FloatFieldUpdateOperationsInput | number
+  aiAnaliz?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uygunluk?: Prisma.NullableEnumUygunlukFieldUpdateOperationsInput | $Enums.Uygunluk | null
+  kritikEngeller?: Prisma.MatchUpdatekritikEngellerInput | $Enums.TeknikAlan[]
+  eksikBilgiler?: Prisma.MatchUpdateeksikBilgilerInput | $Enums.TeknikAlan[]
+  kriterDokumu?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: Prisma.EnumMatchDurumFieldUpdateOperationsInput | $Enums.MatchDurum
+  kopmaNedeni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  koparilma?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notGuncellendi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  talepSahibiAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  talepSahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portfoySahibiAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portfoySahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MatchUncheckedUpdateManyWithoutOfisInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  talepId?: Prisma.StringFieldUpdateOperationsInput | string
+  portfoyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portalIlanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
+  matematikSkor?: Prisma.FloatFieldUpdateOperationsInput | number
+  lokasyonBonus?: Prisma.FloatFieldUpdateOperationsInput | number
+  aiSkor?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  finalSkor?: Prisma.FloatFieldUpdateOperationsInput | number
+  aiAnaliz?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uygunluk?: Prisma.NullableEnumUygunlukFieldUpdateOperationsInput | $Enums.Uygunluk | null
+  kritikEngeller?: Prisma.MatchUpdatekritikEngellerInput | $Enums.TeknikAlan[]
+  eksikBilgiler?: Prisma.MatchUpdateeksikBilgilerInput | $Enums.TeknikAlan[]
+  kriterDokumu?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  durum?: Prisma.EnumMatchDurumFieldUpdateOperationsInput | $Enums.MatchDurum
+  kopmaNedeni?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  koparilma?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notGuncellendi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  talepSahibiAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  talepSahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portfoySahibiAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  portfoySahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type MatchCreateManyTalepInput = {
   id?: string
+  ofisId?: string
   portfoyId?: string | null
   portalIlanId?: string | null
   havuz?: $Enums.Havuz
@@ -1277,6 +1545,7 @@ export type MatchCreateManyTalepInput = {
 
 export type MatchCreateManyPortfoyInput = {
   id?: string
+  ofisId?: string
   talepId: string
   portalIlanId?: string | null
   havuz?: $Enums.Havuz
@@ -1325,12 +1594,14 @@ export type MatchUpdateWithoutTalepInput = {
   portfoySahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutMatchlerNestedInput
   portfoy?: Prisma.KayitUpdateOneWithoutPortfoyMatchleriNestedInput
   portalIlan?: Prisma.PortalIlanUpdateOneWithoutMatchlerNestedInput
 }
 
 export type MatchUncheckedUpdateWithoutTalepInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   portfoyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   portalIlanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
@@ -1358,6 +1629,7 @@ export type MatchUncheckedUpdateWithoutTalepInput = {
 
 export type MatchUncheckedUpdateManyWithoutTalepInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   portfoyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   portalIlanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
@@ -1406,12 +1678,14 @@ export type MatchUpdateWithoutPortfoyInput = {
   portfoySahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutMatchlerNestedInput
   talep?: Prisma.KayitUpdateOneRequiredWithoutTalepMatchleriNestedInput
   portalIlan?: Prisma.PortalIlanUpdateOneWithoutMatchlerNestedInput
 }
 
 export type MatchUncheckedUpdateWithoutPortfoyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   talepId?: Prisma.StringFieldUpdateOperationsInput | string
   portalIlanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
@@ -1439,6 +1713,7 @@ export type MatchUncheckedUpdateWithoutPortfoyInput = {
 
 export type MatchUncheckedUpdateManyWithoutPortfoyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   talepId?: Prisma.StringFieldUpdateOperationsInput | string
   portalIlanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
@@ -1466,6 +1741,7 @@ export type MatchUncheckedUpdateManyWithoutPortfoyInput = {
 
 export type MatchCreateManyPortalIlanInput = {
   id?: string
+  ofisId?: string
   talepId: string
   portfoyId?: string | null
   havuz?: $Enums.Havuz
@@ -1514,12 +1790,14 @@ export type MatchUpdateWithoutPortalIlanInput = {
   portfoySahibiTel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutMatchlerNestedInput
   talep?: Prisma.KayitUpdateOneRequiredWithoutTalepMatchleriNestedInput
   portfoy?: Prisma.KayitUpdateOneWithoutPortfoyMatchleriNestedInput
 }
 
 export type MatchUncheckedUpdateWithoutPortalIlanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   talepId?: Prisma.StringFieldUpdateOperationsInput | string
   portfoyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
@@ -1547,6 +1825,7 @@ export type MatchUncheckedUpdateWithoutPortalIlanInput = {
 
 export type MatchUncheckedUpdateManyWithoutPortalIlanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
   talepId?: Prisma.StringFieldUpdateOperationsInput | string
   portfoyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   havuz?: Prisma.EnumHavuzFieldUpdateOperationsInput | $Enums.Havuz
@@ -1576,6 +1855,7 @@ export type MatchUncheckedUpdateManyWithoutPortalIlanInput = {
 
 export type MatchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   talepId?: boolean
   portfoyId?: boolean
   portalIlanId?: boolean
@@ -1600,6 +1880,7 @@ export type MatchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   portfoySahibiTel?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   talep?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   portfoy?: boolean | Prisma.Match$portfoyArgs<ExtArgs>
   portalIlan?: boolean | Prisma.Match$portalIlanArgs<ExtArgs>
@@ -1607,6 +1888,7 @@ export type MatchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 
 export type MatchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   talepId?: boolean
   portfoyId?: boolean
   portalIlanId?: boolean
@@ -1631,6 +1913,7 @@ export type MatchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   portfoySahibiTel?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   talep?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   portfoy?: boolean | Prisma.Match$portfoyArgs<ExtArgs>
   portalIlan?: boolean | Prisma.Match$portalIlanArgs<ExtArgs>
@@ -1638,6 +1921,7 @@ export type MatchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 
 export type MatchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  ofisId?: boolean
   talepId?: boolean
   portfoyId?: boolean
   portalIlanId?: boolean
@@ -1662,6 +1946,7 @@ export type MatchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   portfoySahibiTel?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   talep?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   portfoy?: boolean | Prisma.Match$portfoyArgs<ExtArgs>
   portalIlan?: boolean | Prisma.Match$portalIlanArgs<ExtArgs>
@@ -1669,6 +1954,7 @@ export type MatchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 
 export type MatchSelectScalar = {
   id?: boolean
+  ofisId?: boolean
   talepId?: boolean
   portfoyId?: boolean
   portalIlanId?: boolean
@@ -1695,18 +1981,21 @@ export type MatchSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "talepId" | "portfoyId" | "portalIlanId" | "havuz" | "matematikSkor" | "lokasyonBonus" | "aiSkor" | "finalSkor" | "aiAnaliz" | "uygunluk" | "kritikEngeller" | "eksikBilgiler" | "kriterDokumu" | "durum" | "kopmaNedeni" | "koparilma" | "operasyonNotu" | "notGuncellendi" | "talepSahibiAdi" | "talepSahibiTel" | "portfoySahibiAdi" | "portfoySahibiTel" | "createdAt" | "updatedAt", ExtArgs["result"]["match"]>
+export type MatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "talepId" | "portfoyId" | "portalIlanId" | "havuz" | "matematikSkor" | "lokasyonBonus" | "aiSkor" | "finalSkor" | "aiAnaliz" | "uygunluk" | "kritikEngeller" | "eksikBilgiler" | "kriterDokumu" | "durum" | "kopmaNedeni" | "koparilma" | "operasyonNotu" | "notGuncellendi" | "talepSahibiAdi" | "talepSahibiTel" | "portfoySahibiAdi" | "portfoySahibiTel" | "createdAt" | "updatedAt", ExtArgs["result"]["match"]>
 export type MatchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   talep?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   portfoy?: boolean | Prisma.Match$portfoyArgs<ExtArgs>
   portalIlan?: boolean | Prisma.Match$portalIlanArgs<ExtArgs>
 }
 export type MatchIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   talep?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   portfoy?: boolean | Prisma.Match$portfoyArgs<ExtArgs>
   portalIlan?: boolean | Prisma.Match$portalIlanArgs<ExtArgs>
 }
 export type MatchIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   talep?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   portfoy?: boolean | Prisma.Match$portfoyArgs<ExtArgs>
   portalIlan?: boolean | Prisma.Match$portalIlanArgs<ExtArgs>
@@ -1715,12 +2004,14 @@ export type MatchIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $MatchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Match"
   objects: {
+    ofis: Prisma.$OfisPayload<ExtArgs>
     talep: Prisma.$KayitPayload<ExtArgs>
     portfoy: Prisma.$KayitPayload<ExtArgs> | null
     portalIlan: Prisma.$PortalIlanPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    ofisId: string
     talepId: string
     portfoyId: string | null
     portalIlanId: string | null
@@ -2145,6 +2436,7 @@ readonly fields: MatchFieldRefs;
  */
 export interface Prisma__MatchClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ofis<T extends Prisma.OfisDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OfisDefaultArgs<ExtArgs>>): Prisma.Prisma__OfisClient<runtime.Types.Result.GetResult<Prisma.$OfisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   talep<T extends Prisma.KayitDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KayitDefaultArgs<ExtArgs>>): Prisma.Prisma__KayitClient<runtime.Types.Result.GetResult<Prisma.$KayitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   portfoy<T extends Prisma.Match$portfoyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Match$portfoyArgs<ExtArgs>>): Prisma.Prisma__KayitClient<runtime.Types.Result.GetResult<Prisma.$KayitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   portalIlan<T extends Prisma.Match$portalIlanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Match$portalIlanArgs<ExtArgs>>): Prisma.Prisma__PortalIlanClient<runtime.Types.Result.GetResult<Prisma.$PortalIlanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -2178,6 +2470,7 @@ export interface Prisma__MatchClient<T, Null = never, ExtArgs extends runtime.Ty
  */
 export interface MatchFieldRefs {
   readonly id: Prisma.FieldRef<"Match", 'String'>
+  readonly ofisId: Prisma.FieldRef<"Match", 'String'>
   readonly talepId: Prisma.FieldRef<"Match", 'String'>
   readonly portfoyId: Prisma.FieldRef<"Match", 'String'>
   readonly portalIlanId: Prisma.FieldRef<"Match", 'String'>

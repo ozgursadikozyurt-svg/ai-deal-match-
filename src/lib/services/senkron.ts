@@ -8,6 +8,7 @@
  * Kilit: Entegrasyon.kilitBitis — iki iş aynı anda aynı bağlantıyı işlemez.
  */
 import type { PrismaClient, Prisma } from "../../generated/prisma/client";
+import { ofisBaglami } from "../kiracilik";
 import { googleKisiDonustur, googleSenkronPlani, GOOGLE_ALANLARI, type GoogleDonusum, type GooglePerson, type MevcutKisi } from "../google/kisiler";
 import { erisimYenile, gruplar, kisiSayfasi, GoogleHatasi } from "../google/istemci";
 import { coz as sifreCoz } from "../guvenlik/sifre";
@@ -35,7 +36,8 @@ const J = (v: unknown) => (v ?? null) as Prisma.InputJsonValue;
 
 // ───────── Ortak ─────────
 export async function entegrasyon(prisma: PrismaClient, s: Saglayici) {
-  return prisma.entegrasyon.upsert({ where: { saglayici: s }, update: {}, create: { saglayici: s, ayarlar: J(varsayilanAyar(s)) } });
+  const { ofisId } = ofisBaglami();
+  return prisma.entegrasyon.upsert({ where: { ofisId_saglayici: { ofisId, saglayici: s } }, update: {}, create: { ofisId, saglayici: s, ayarlar: J(varsayilanAyar(s)) } });
 }
 export const ayarlarOf = (e: { ayarlar: unknown; saglayici?: string }): EntegrasyonAyarlari => ({ ...varsayilanAyar(e.saglayici ?? ""), ...((e.ayarlar as object) ?? {}) });
 
@@ -44,7 +46,7 @@ async function kilitAl(prisma: PrismaClient, s: Saglayici, ms: number): Promise<
   const r = await prisma.entegrasyon.updateMany({ where: { saglayici: s, OR: [{ kilitBitis: null }, { kilitBitis: { lt: simdi } }] }, data: { kilitBitis: new Date(simdi.getTime() + ms) } });
   return r.count === 1;
 }
-const kilitBirak = (prisma: PrismaClient, s: Saglayici) => prisma.entegrasyon.update({ where: { saglayici: s }, data: { kilitBitis: null } });
+const kilitBirak = (prisma: PrismaClient, s: Saglayici) => prisma.entegrasyon.updateMany({ where: { saglayici: s }, data: { kilitBitis: null } });
 
 async function cakismalariYaz(prisma: PrismaClient, s: Saglayici, hedefTip: "KISI" | "KAYIT", hedefId: string, cs: AlanCakismasi[]) {
   for (const c of cs) {
@@ -113,12 +115,12 @@ export async function googleSenkronCalistir(prisma: PrismaClient, o: SenkronSece
       const k = await prisma.kisi.findUnique({ where: { id: x.id } });
       await prisma.kisi.update({ where: { id: x.id }, data: { googleResourceName: null, googleSnapshot: J(null), kaynaktaSilindi: new Date(), notlar: [k?.notlar, `Google Kişiler'den silindi (${new Date().toLocaleDateString("tr-TR")})`].filter(Boolean).join("\n") } });
     }
-    await prisma.entegrasyon.update({ where: { saglayici: "GOOGLE_KISILER" }, data: { syncToken: bitti ? yeniSync : syncToken, imlec: J(bitti ? null : { sayfa }), sonSenkron: new Date(), sonHata: null } });
+    await prisma.entegrasyon.updateMany({ where: { saglayici: "GOOGLE_KISILER" }, data: { syncToken: bitti ? yeniSync : syncToken, imlec: J(bitti ? null : { sayfa }), sonSenkron: new Date(), sonHata: null } });
     await prisma.senkronCalisma.update({ where: { id: calisma.id }, data: { bitis: new Date(), durum: plan.ozet.cakisma ? "CAKISMA" : "BASARILI", yeni: plan.ozet.yeni, guncellenen: plan.ozet.guncellenen, baglanan: plan.ozet.baglanan, cakisma: plan.ozet.cakisma, atlanan: plan.ozet.atlanan, silinen: plan.ozet.silinen, devamEdecek: !bitti, ozet: J(plan.ozet) } });
     return { calismaId: calisma.id, ozet: plan.ozet, devamEdecek: !bitti };
   } catch (x: any) {
     const yeniden = x instanceof GoogleHatasi && x.neden === "YENIDEN_YETKI";
-    await prisma.entegrasyon.update({ where: { saglayici: "GOOGLE_KISILER" }, data: { sonHata: String(x?.message ?? x), ...(yeniden ? { durum: "YENIDEN_YETKI" } : {}) } });
+    await prisma.entegrasyon.updateMany({ where: { saglayici: "GOOGLE_KISILER" }, data: { sonHata: String(x?.message ?? x), ...(yeniden ? { durum: "YENIDEN_YETKI" } : {}) } });
     await prisma.senkronCalisma.update({ where: { id: calisma.id }, data: { bitis: new Date(), durum: "HATA", hata: String(x?.message ?? x).slice(0, 1000) } });
     throw x;
   } finally { await kilitBirak(prisma, "GOOGLE_KISILER"); }
@@ -226,7 +228,7 @@ export async function notionSenkronCalistir(prisma: PrismaClient, o: SenkronSece
     if (notionEslesmeleri.length) {
       const b = await lokasyonBaglamiYukle(prisma);
       for (const [tn, pn] of notionEslesmeleri) {
-        const [tk, pk] = await Promise.all([prisma.kayit.findUnique({ where: { notionId: tn }, include: { lokasyonlar: true, ozellik: true } }), prisma.kayit.findUnique({ where: { notionId: pn }, include: { lokasyonlar: true, ozellik: true } })]);
+        const [tk, pk] = await Promise.all([prisma.kayit.findFirst({ where: { notionId: tn }, include: { lokasyonlar: true, ozellik: true } }), prisma.kayit.findFirst({ where: { notionId: pn }, include: { lokasyonlar: true, ozellik: true } })]);
         if (!tk || !pk) continue;
         const s = eslesmeOnizle(kayitVeri(tk) as any, kayitVeri(pk) as any, b);
         await prisma.match.upsert({ where: { talepId_portfoyId: { talepId: tk.id, portfoyId: pk.id } }, update: {}, create: { talepId: tk.id, portfoyId: pk.id, matematikSkor: s.skor, finalSkor: s.skor, uygunluk: s.uygunluk, durum: "BILDIRILDI", operasyonNotu: "Notion'da ilişkilendirilmişti" } });
@@ -262,11 +264,11 @@ export async function notionSenkronCalistir(prisma: PrismaClient, o: SenkronSece
       }
     }
     if (tam && !devam) imlec.tamTarama = simdi.toISOString();
-    await prisma.entegrasyon.update({ where: { saglayici: "NOTION" }, data: { imlec: J(imlec), sonSenkron: new Date(), sonHata: null } });
+    await prisma.entegrasyon.updateMany({ where: { saglayici: "NOTION" }, data: { imlec: J(imlec), sonSenkron: new Date(), sonHata: null } });
     await prisma.senkronCalisma.update({ where: { id: calisma.id }, data: { bitis: new Date(), durum: ozet.cakisma ? "CAKISMA" : "BASARILI", yeni: ozet.yeni, guncellenen: ozet.guncellenen, baglanan: ozet.baglanan, cakisma: ozet.cakisma, atlanan: ozet.hatali, silinen: ozet.arsivlenen, geriYazilan: ozet.geriYazilan, devamEdecek: devam, ozet: J({ ...ozet, kontrolListesi: kontrolListesi.slice(0, 50), hataListesi: hataListesi.slice(0, 50) }) } });
     return { calismaId: calisma.id, ozet, kontrolListesi, hataListesi, devamEdecek: devam };
   } catch (x: any) {
-    await prisma.entegrasyon.update({ where: { saglayici: "NOTION" }, data: { sonHata: String(x?.message ?? x), imlec: J(imlec) } });
+    await prisma.entegrasyon.updateMany({ where: { saglayici: "NOTION" }, data: { sonHata: String(x?.message ?? x), imlec: J(imlec) } });
     await prisma.senkronCalisma.update({ where: { id: calisma.id }, data: { bitis: new Date(), durum: "HATA", hata: String(x?.message ?? x).slice(0, 1000) } });
     throw x;
   } finally { await kilitBirak(prisma, "NOTION"); }

@@ -78,6 +78,10 @@ test("mükerrer: portal ilan no en güçlü kanıt ve nedeni okunur", () => {
 
 import { hizliAyristir } from "../src/lib/ai/hizli-ayristirici";
 import { odaListesi } from "../src/lib/domain/teknik-alanlar";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 test("oda çoklu seçim: metinden okuma, ayrıştırma ve puanlama (en iyi seçenek)", () => {
   assert.equal(hizliAyristir("Fener'de 2+1 veya 3+1 daire arıyorum 5 milyon").odaSayisi, "2+1, 3+1");
   assert.deepEqual(odaListesi("2+1, 3+1").map((x) => x.oda), [2, 3]);

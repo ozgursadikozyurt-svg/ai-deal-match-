@@ -14,6 +14,10 @@ import { sohbetiAyristir, onFiltre } from "../src/lib/ingest/whatsapp";
 import { C, type Ctx } from "../demo/ortak";
 import { ornekVeriyiKur, bosBaglanti, bosGoogleBaglanti, type DepoDurumu } from "../demo/depo";
 import { DosyaAktarma } from "../demo/toplu-giris";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 test("yeni jargon kuralları: eşya, güvenlik, ısınma, balkon, imar, cephe", () => {
   const h = hizliAyristir("Konyaaltı 3+1 satılık daire 8 MTL eşyalı güvenlikli site doğalgaz kombi balkonlu güney cepheli");

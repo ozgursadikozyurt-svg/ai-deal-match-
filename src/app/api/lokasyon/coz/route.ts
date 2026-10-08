@@ -17,7 +17,7 @@ const Govde = z.object({
 export async function POST(req: Request) {
   try {
     const { metin, ilId } = Govde.parse(await req.json());
-    const il = ilId ?? calismaIliNormalize((await prisma.ayar.findUnique({ where: { anahtar: "calismaIli" } }))?.deger);
+    const il = ilId ?? calismaIliNormalize((await prisma.ayar.findFirst({ where: { anahtar: "calismaIli" } }))?.deger);
     return ok(cokIlliCozumle(metin, await cokIlliIndeks(prisma, Array.isArray(metin) ? metin.join(", ") : metin, il)));
   } catch (e) { return hata(e); }
 }

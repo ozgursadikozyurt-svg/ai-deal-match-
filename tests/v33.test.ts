@@ -15,6 +15,10 @@ import { AiParseCiktiSchema } from "../src/lib/ai/gemini-cikti-semasi";
 import { coz, BAGLAM } from "../demo/lokasyon";
 import { ornekVeriyiKur } from "../demo/depo";
 import { ORNEK_SOHBETLER, hazirAiSonucu } from "../demo/ornek-sohbetler";
+import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
+// v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
+SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+
 
 test("WhatsApp: Android + iOS biçimi, çok satırlı mesaj, sistem satırı, gönderen numarası", () => {
   const a = sohbetiAyristir("14.09.2026 09:12 - Ahmet gruba katıldı\n14.09.2026 09:15 - Havva: Muratpaşa 3+1 120m²\nasansörlü. 6M TL\n14.09.2026 09:16 - +90 530 457 32 56: 400 m2 depo kiralık", "WhatsApp Sohbeti - EMLAK BORSASI.txt");

@@ -19,7 +19,7 @@ const Girdi = z.object({ metin: z.string().trim().min(3).max(8000) });
 export async function POST(req: Request) {
   try {
     const { metin } = Girdi.parse(await req.json());
-    const ix = await cokIlliIndeks(prisma, metin, calismaIliNormalize((await prisma.ayar.findUnique({ where: { anahtar: "calismaIli" } }))?.deger));
+    const ix = await cokIlliIndeks(prisma, metin, calismaIliNormalize((await prisma.ayar.findFirst({ where: { anahtar: "calismaIli" } }))?.deger));
     const konum = cokIlliCozumle(konumBul(metin, ix), ix);
     if (metinTuru(metin) === "SORU") {
       const f = soruFiltresi(metin);
