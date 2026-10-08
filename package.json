@@ -1,6 +1,6 @@
 {
   "name": "anahtarcrm",
-  "version": "3.20.0",
+  "version": "3.21.0",
   "description": "Anahtar CRM — yapay zekâ destekli talep / portföy eşleştirme (canlı sürüm: Cloudflare Workers + Supabase)",
   "scripts": {
     "db:generate": "prisma generate",
@@ -22,6 +22,7 @@
     "canli:yayinla": "npm run canli:build && wrangler deploy",
     "canli:istemci": "prisma generate",
     "canli:test:depo": "tsx scripts/canli-depo-testi.ts",
+    "canli:test:google": "tsx scripts/canli-google-testi.ts",
     "canli:test:giris": "tsx scripts/canli-jwks-testi.ts",
     "canli:test:arayuz": "tsx scripts/canli-yedek-uret.ts && node scripts/canli-arayuz-testi.mjs"
   },

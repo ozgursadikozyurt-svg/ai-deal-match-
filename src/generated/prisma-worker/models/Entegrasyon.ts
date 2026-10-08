@@ -803,7 +803,7 @@ export type $EntegrasyonPayload<ExtArgs extends runtime.Types.Extensions.Interna
      */
     imlec: runtime.JsonValue | null
     /**
-     * { otomatik: boolean, aralikDk: 15, geriYaz: boolean, sadeceEtiketler: string[] }
+     * { otomatik, aralikDk, geriYaz, googleYaz (v3.21: çift yönlü), sadeceEtiketler, baglayanKullaniciId, baglanti (ISO), yazmaIzni }
      */
     ayarlar: runtime.JsonValue | null
     sonSenkron: Date | null

@@ -255,6 +255,7 @@ export type OfisWhereInput = {
   auditLoglari?: Prisma.AuditLogListRelationFilter
   kayitNotlari?: Prisma.KayitNotListRelationFilter
   kayitFotolari?: Prisma.KayitFotoListRelationFilter
+  senkronHaricleri?: Prisma.SenkronHaricListRelationFilter
 }
 
 export type OfisOrderByWithRelationInput = {
@@ -287,6 +288,7 @@ export type OfisOrderByWithRelationInput = {
   auditLoglari?: Prisma.AuditLogOrderByRelationAggregateInput
   kayitNotlari?: Prisma.KayitNotOrderByRelationAggregateInput
   kayitFotolari?: Prisma.KayitFotoOrderByRelationAggregateInput
+  senkronHaricleri?: Prisma.SenkronHaricOrderByRelationAggregateInput
 }
 
 export type OfisWhereUniqueInput = Prisma.AtLeast<{
@@ -322,6 +324,7 @@ export type OfisWhereUniqueInput = Prisma.AtLeast<{
   auditLoglari?: Prisma.AuditLogListRelationFilter
   kayitNotlari?: Prisma.KayitNotListRelationFilter
   kayitFotolari?: Prisma.KayitFotoListRelationFilter
+  senkronHaricleri?: Prisma.SenkronHaricListRelationFilter
 }, "id" | "slug">
 
 export type OfisOrderByWithAggregationInput = {
@@ -390,6 +393,7 @@ export type OfisCreateInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateInput = {
@@ -422,6 +426,7 @@ export type OfisUncheckedCreateInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUpdateInput = {
@@ -454,6 +459,7 @@ export type OfisUpdateInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateInput = {
@@ -486,6 +492,7 @@ export type OfisUncheckedUpdateInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateManyInput = {
@@ -779,6 +786,20 @@ export type OfisUpdateOneRequiredWithoutEntegrasyonlarNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OfisUpdateToOneWithWhereWithoutEntegrasyonlarInput, Prisma.OfisUpdateWithoutEntegrasyonlarInput>, Prisma.OfisUncheckedUpdateWithoutEntegrasyonlarInput>
 }
 
+export type OfisCreateNestedOneWithoutSenkronHaricleriInput = {
+  create?: Prisma.XOR<Prisma.OfisCreateWithoutSenkronHaricleriInput, Prisma.OfisUncheckedCreateWithoutSenkronHaricleriInput>
+  connectOrCreate?: Prisma.OfisCreateOrConnectWithoutSenkronHaricleriInput
+  connect?: Prisma.OfisWhereUniqueInput
+}
+
+export type OfisUpdateOneRequiredWithoutSenkronHaricleriNestedInput = {
+  create?: Prisma.XOR<Prisma.OfisCreateWithoutSenkronHaricleriInput, Prisma.OfisUncheckedCreateWithoutSenkronHaricleriInput>
+  connectOrCreate?: Prisma.OfisCreateOrConnectWithoutSenkronHaricleriInput
+  upsert?: Prisma.OfisUpsertWithoutSenkronHaricleriInput
+  connect?: Prisma.OfisWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OfisUpdateToOneWithWhereWithoutSenkronHaricleriInput, Prisma.OfisUpdateWithoutSenkronHaricleriInput>, Prisma.OfisUncheckedUpdateWithoutSenkronHaricleriInput>
+}
+
 export type OfisCreateNestedOneWithoutSenkronCalismalariInput = {
   create?: Prisma.XOR<Prisma.OfisCreateWithoutSenkronCalismalariInput, Prisma.OfisUncheckedCreateWithoutSenkronCalismalariInput>
   connectOrCreate?: Prisma.OfisCreateOrConnectWithoutSenkronCalismalariInput
@@ -878,6 +899,7 @@ export type OfisCreateWithoutKullanicilarInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutKullanicilarInput = {
@@ -909,6 +931,7 @@ export type OfisUncheckedCreateWithoutKullanicilarInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutKullanicilarInput = {
@@ -956,6 +979,7 @@ export type OfisUpdateWithoutKullanicilarInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutKullanicilarInput = {
@@ -987,6 +1011,7 @@ export type OfisUncheckedUpdateWithoutKullanicilarInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutDavetlerInput = {
@@ -1018,6 +1043,7 @@ export type OfisCreateWithoutDavetlerInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutDavetlerInput = {
@@ -1049,6 +1075,7 @@ export type OfisUncheckedCreateWithoutDavetlerInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutDavetlerInput = {
@@ -1096,6 +1123,7 @@ export type OfisUpdateWithoutDavetlerInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutDavetlerInput = {
@@ -1127,6 +1155,7 @@ export type OfisUncheckedUpdateWithoutDavetlerInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutLokasyonAdaylariInput = {
@@ -1158,6 +1187,7 @@ export type OfisCreateWithoutLokasyonAdaylariInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutLokasyonAdaylariInput = {
@@ -1189,6 +1219,7 @@ export type OfisUncheckedCreateWithoutLokasyonAdaylariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutLokasyonAdaylariInput = {
@@ -1236,6 +1267,7 @@ export type OfisUpdateWithoutLokasyonAdaylariInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutLokasyonAdaylariInput = {
@@ -1267,6 +1299,7 @@ export type OfisUncheckedUpdateWithoutLokasyonAdaylariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutAyarlarInput = {
@@ -1298,6 +1331,7 @@ export type OfisCreateWithoutAyarlarInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutAyarlarInput = {
@@ -1329,6 +1363,7 @@ export type OfisUncheckedCreateWithoutAyarlarInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutAyarlarInput = {
@@ -1376,6 +1411,7 @@ export type OfisUpdateWithoutAyarlarInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutAyarlarInput = {
@@ -1407,6 +1443,7 @@ export type OfisUncheckedUpdateWithoutAyarlarInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutKayitlarInput = {
@@ -1438,6 +1475,7 @@ export type OfisCreateWithoutKayitlarInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutKayitlarInput = {
@@ -1469,6 +1507,7 @@ export type OfisUncheckedCreateWithoutKayitlarInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutKayitlarInput = {
@@ -1516,6 +1555,7 @@ export type OfisUpdateWithoutKayitlarInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutKayitlarInput = {
@@ -1547,6 +1587,7 @@ export type OfisUncheckedUpdateWithoutKayitlarInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutKisilerInput = {
@@ -1578,6 +1619,7 @@ export type OfisCreateWithoutKisilerInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutKisilerInput = {
@@ -1609,6 +1651,7 @@ export type OfisUncheckedCreateWithoutKisilerInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutKisilerInput = {
@@ -1656,6 +1699,7 @@ export type OfisUpdateWithoutKisilerInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutKisilerInput = {
@@ -1687,6 +1731,7 @@ export type OfisUncheckedUpdateWithoutKisilerInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutIslenmisMesajlarInput = {
@@ -1718,6 +1763,7 @@ export type OfisCreateWithoutIslenmisMesajlarInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutIslenmisMesajlarInput = {
@@ -1749,6 +1795,7 @@ export type OfisUncheckedCreateWithoutIslenmisMesajlarInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutIslenmisMesajlarInput = {
@@ -1796,6 +1843,7 @@ export type OfisUpdateWithoutIslenmisMesajlarInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutIslenmisMesajlarInput = {
@@ -1827,6 +1875,7 @@ export type OfisUncheckedUpdateWithoutIslenmisMesajlarInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutMatchlerInput = {
@@ -1858,6 +1907,7 @@ export type OfisCreateWithoutMatchlerInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutMatchlerInput = {
@@ -1889,6 +1939,7 @@ export type OfisUncheckedCreateWithoutMatchlerInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutMatchlerInput = {
@@ -1936,6 +1987,7 @@ export type OfisUpdateWithoutMatchlerInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutMatchlerInput = {
@@ -1967,6 +2019,7 @@ export type OfisUncheckedUpdateWithoutMatchlerInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutPortalIlanlariInput = {
@@ -1998,6 +2051,7 @@ export type OfisCreateWithoutPortalIlanlariInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutPortalIlanlariInput = {
@@ -2029,6 +2083,7 @@ export type OfisUncheckedCreateWithoutPortalIlanlariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutPortalIlanlariInput = {
@@ -2076,6 +2131,7 @@ export type OfisUpdateWithoutPortalIlanlariInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutPortalIlanlariInput = {
@@ -2107,6 +2163,7 @@ export type OfisUncheckedUpdateWithoutPortalIlanlariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutAuditLoglariInput = {
@@ -2138,6 +2195,7 @@ export type OfisCreateWithoutAuditLoglariInput = {
   ingestionLoglari?: Prisma.IngestionLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutAuditLoglariInput = {
@@ -2169,6 +2227,7 @@ export type OfisUncheckedCreateWithoutAuditLoglariInput = {
   ingestionLoglari?: Prisma.IngestionLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutAuditLoglariInput = {
@@ -2216,6 +2275,7 @@ export type OfisUpdateWithoutAuditLoglariInput = {
   ingestionLoglari?: Prisma.IngestionLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutAuditLoglariInput = {
@@ -2247,6 +2307,7 @@ export type OfisUncheckedUpdateWithoutAuditLoglariInput = {
   ingestionLoglari?: Prisma.IngestionLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutIngestionLoglariInput = {
@@ -2278,6 +2339,7 @@ export type OfisCreateWithoutIngestionLoglariInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutIngestionLoglariInput = {
@@ -2309,6 +2371,7 @@ export type OfisUncheckedCreateWithoutIngestionLoglariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutIngestionLoglariInput = {
@@ -2356,6 +2419,7 @@ export type OfisUpdateWithoutIngestionLoglariInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutIngestionLoglariInput = {
@@ -2387,6 +2451,7 @@ export type OfisUncheckedUpdateWithoutIngestionLoglariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutEntegrasyonlarInput = {
@@ -2418,6 +2483,7 @@ export type OfisCreateWithoutEntegrasyonlarInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutEntegrasyonlarInput = {
@@ -2449,6 +2515,7 @@ export type OfisUncheckedCreateWithoutEntegrasyonlarInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutEntegrasyonlarInput = {
@@ -2496,6 +2563,7 @@ export type OfisUpdateWithoutEntegrasyonlarInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutEntegrasyonlarInput = {
@@ -2520,6 +2588,151 @@ export type OfisUncheckedUpdateWithoutEntegrasyonlarInput = {
   lokasyonAdaylari?: Prisma.LokasyonAdayUncheckedUpdateManyWithoutOfisNestedInput
   islenmisMesajlar?: Prisma.IslenmisMesajUncheckedUpdateManyWithoutOfisNestedInput
   portalIlanlari?: Prisma.PortalIlanUncheckedUpdateManyWithoutOfisNestedInput
+  senkronCalismalari?: Prisma.SenkronCalismaUncheckedUpdateManyWithoutOfisNestedInput
+  senkronCakismalari?: Prisma.SenkronCakismaUncheckedUpdateManyWithoutOfisNestedInput
+  notionSyncLoglari?: Prisma.NotionSyncLogUncheckedUpdateManyWithoutOfisNestedInput
+  ingestionLoglari?: Prisma.IngestionLogUncheckedUpdateManyWithoutOfisNestedInput
+  auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
+  kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
+  kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
+}
+
+export type OfisCreateWithoutSenkronHaricleriInput = {
+  id?: string
+  ad: string
+  slug: string
+  durum?: $Enums.OfisDurumu
+  plan?: $Enums.Plan
+  sinirsiz?: boolean
+  denemeBitis?: Date | string | null
+  telefon?: string | null
+  sehir?: string | null
+  notlar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
+  davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
+  kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
+  kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
+  matchler?: Prisma.MatchCreateNestedManyWithoutOfisInput
+  ayarlar?: Prisma.AyarCreateNestedManyWithoutOfisInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayCreateNestedManyWithoutOfisInput
+  islenmisMesajlar?: Prisma.IslenmisMesajCreateNestedManyWithoutOfisInput
+  portalIlanlari?: Prisma.PortalIlanCreateNestedManyWithoutOfisInput
+  entegrasyonlar?: Prisma.EntegrasyonCreateNestedManyWithoutOfisInput
+  senkronCalismalari?: Prisma.SenkronCalismaCreateNestedManyWithoutOfisInput
+  senkronCakismalari?: Prisma.SenkronCakismaCreateNestedManyWithoutOfisInput
+  notionSyncLoglari?: Prisma.NotionSyncLogCreateNestedManyWithoutOfisInput
+  ingestionLoglari?: Prisma.IngestionLogCreateNestedManyWithoutOfisInput
+  auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
+  kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
+  kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+}
+
+export type OfisUncheckedCreateWithoutSenkronHaricleriInput = {
+  id?: string
+  ad: string
+  slug: string
+  durum?: $Enums.OfisDurumu
+  plan?: $Enums.Plan
+  sinirsiz?: boolean
+  denemeBitis?: Date | string | null
+  telefon?: string | null
+  sehir?: string | null
+  notlar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
+  davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
+  kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
+  kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
+  matchler?: Prisma.MatchUncheckedCreateNestedManyWithoutOfisInput
+  ayarlar?: Prisma.AyarUncheckedCreateNestedManyWithoutOfisInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayUncheckedCreateNestedManyWithoutOfisInput
+  islenmisMesajlar?: Prisma.IslenmisMesajUncheckedCreateNestedManyWithoutOfisInput
+  portalIlanlari?: Prisma.PortalIlanUncheckedCreateNestedManyWithoutOfisInput
+  entegrasyonlar?: Prisma.EntegrasyonUncheckedCreateNestedManyWithoutOfisInput
+  senkronCalismalari?: Prisma.SenkronCalismaUncheckedCreateNestedManyWithoutOfisInput
+  senkronCakismalari?: Prisma.SenkronCakismaUncheckedCreateNestedManyWithoutOfisInput
+  notionSyncLoglari?: Prisma.NotionSyncLogUncheckedCreateNestedManyWithoutOfisInput
+  ingestionLoglari?: Prisma.IngestionLogUncheckedCreateNestedManyWithoutOfisInput
+  auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
+  kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
+  kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+}
+
+export type OfisCreateOrConnectWithoutSenkronHaricleriInput = {
+  where: Prisma.OfisWhereUniqueInput
+  create: Prisma.XOR<Prisma.OfisCreateWithoutSenkronHaricleriInput, Prisma.OfisUncheckedCreateWithoutSenkronHaricleriInput>
+}
+
+export type OfisUpsertWithoutSenkronHaricleriInput = {
+  update: Prisma.XOR<Prisma.OfisUpdateWithoutSenkronHaricleriInput, Prisma.OfisUncheckedUpdateWithoutSenkronHaricleriInput>
+  create: Prisma.XOR<Prisma.OfisCreateWithoutSenkronHaricleriInput, Prisma.OfisUncheckedCreateWithoutSenkronHaricleriInput>
+  where?: Prisma.OfisWhereInput
+}
+
+export type OfisUpdateToOneWithWhereWithoutSenkronHaricleriInput = {
+  where?: Prisma.OfisWhereInput
+  data: Prisma.XOR<Prisma.OfisUpdateWithoutSenkronHaricleriInput, Prisma.OfisUncheckedUpdateWithoutSenkronHaricleriInput>
+}
+
+export type OfisUpdateWithoutSenkronHaricleriInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  durum?: Prisma.EnumOfisDurumuFieldUpdateOperationsInput | $Enums.OfisDurumu
+  plan?: Prisma.EnumPlanFieldUpdateOperationsInput | $Enums.Plan
+  sinirsiz?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  denemeBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sehir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
+  davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
+  kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
+  kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
+  matchler?: Prisma.MatchUpdateManyWithoutOfisNestedInput
+  ayarlar?: Prisma.AyarUpdateManyWithoutOfisNestedInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayUpdateManyWithoutOfisNestedInput
+  islenmisMesajlar?: Prisma.IslenmisMesajUpdateManyWithoutOfisNestedInput
+  portalIlanlari?: Prisma.PortalIlanUpdateManyWithoutOfisNestedInput
+  entegrasyonlar?: Prisma.EntegrasyonUpdateManyWithoutOfisNestedInput
+  senkronCalismalari?: Prisma.SenkronCalismaUpdateManyWithoutOfisNestedInput
+  senkronCakismalari?: Prisma.SenkronCakismaUpdateManyWithoutOfisNestedInput
+  notionSyncLoglari?: Prisma.NotionSyncLogUpdateManyWithoutOfisNestedInput
+  ingestionLoglari?: Prisma.IngestionLogUpdateManyWithoutOfisNestedInput
+  auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
+  kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
+  kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+}
+
+export type OfisUncheckedUpdateWithoutSenkronHaricleriInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  durum?: Prisma.EnumOfisDurumuFieldUpdateOperationsInput | $Enums.OfisDurumu
+  plan?: Prisma.EnumPlanFieldUpdateOperationsInput | $Enums.Plan
+  sinirsiz?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  denemeBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sehir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
+  davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
+  kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
+  kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
+  matchler?: Prisma.MatchUncheckedUpdateManyWithoutOfisNestedInput
+  ayarlar?: Prisma.AyarUncheckedUpdateManyWithoutOfisNestedInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayUncheckedUpdateManyWithoutOfisNestedInput
+  islenmisMesajlar?: Prisma.IslenmisMesajUncheckedUpdateManyWithoutOfisNestedInput
+  portalIlanlari?: Prisma.PortalIlanUncheckedUpdateManyWithoutOfisNestedInput
+  entegrasyonlar?: Prisma.EntegrasyonUncheckedUpdateManyWithoutOfisNestedInput
   senkronCalismalari?: Prisma.SenkronCalismaUncheckedUpdateManyWithoutOfisNestedInput
   senkronCakismalari?: Prisma.SenkronCakismaUncheckedUpdateManyWithoutOfisNestedInput
   notionSyncLoglari?: Prisma.NotionSyncLogUncheckedUpdateManyWithoutOfisNestedInput
@@ -2558,6 +2771,7 @@ export type OfisCreateWithoutSenkronCalismalariInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutSenkronCalismalariInput = {
@@ -2589,6 +2803,7 @@ export type OfisUncheckedCreateWithoutSenkronCalismalariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutSenkronCalismalariInput = {
@@ -2636,6 +2851,7 @@ export type OfisUpdateWithoutSenkronCalismalariInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutSenkronCalismalariInput = {
@@ -2667,6 +2883,7 @@ export type OfisUncheckedUpdateWithoutSenkronCalismalariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutSenkronCakismalariInput = {
@@ -2698,6 +2915,7 @@ export type OfisCreateWithoutSenkronCakismalariInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutSenkronCakismalariInput = {
@@ -2729,6 +2947,7 @@ export type OfisUncheckedCreateWithoutSenkronCakismalariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutSenkronCakismalariInput = {
@@ -2776,6 +2995,7 @@ export type OfisUpdateWithoutSenkronCakismalariInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutSenkronCakismalariInput = {
@@ -2807,6 +3027,7 @@ export type OfisUncheckedUpdateWithoutSenkronCakismalariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutNotionSyncLoglariInput = {
@@ -2838,6 +3059,7 @@ export type OfisCreateWithoutNotionSyncLoglariInput = {
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutNotionSyncLoglariInput = {
@@ -2869,6 +3091,7 @@ export type OfisUncheckedCreateWithoutNotionSyncLoglariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutNotionSyncLoglariInput = {
@@ -2916,6 +3139,7 @@ export type OfisUpdateWithoutNotionSyncLoglariInput = {
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutNotionSyncLoglariInput = {
@@ -2947,6 +3171,7 @@ export type OfisUncheckedUpdateWithoutNotionSyncLoglariInput = {
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutKayitNotlariInput = {
@@ -2978,6 +3203,7 @@ export type OfisCreateWithoutKayitNotlariInput = {
   ingestionLoglari?: Prisma.IngestionLogCreateNestedManyWithoutOfisInput
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutKayitNotlariInput = {
@@ -3009,6 +3235,7 @@ export type OfisUncheckedCreateWithoutKayitNotlariInput = {
   ingestionLoglari?: Prisma.IngestionLogUncheckedCreateNestedManyWithoutOfisInput
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutKayitNotlariInput = {
@@ -3056,6 +3283,7 @@ export type OfisUpdateWithoutKayitNotlariInput = {
   ingestionLoglari?: Prisma.IngestionLogUpdateManyWithoutOfisNestedInput
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutKayitNotlariInput = {
@@ -3087,6 +3315,7 @@ export type OfisUncheckedUpdateWithoutKayitNotlariInput = {
   ingestionLoglari?: Prisma.IngestionLogUncheckedUpdateManyWithoutOfisNestedInput
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisCreateWithoutKayitFotolariInput = {
@@ -3118,6 +3347,7 @@ export type OfisCreateWithoutKayitFotolariInput = {
   ingestionLoglari?: Prisma.IngestionLogCreateNestedManyWithoutOfisInput
   auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
 }
 
 export type OfisUncheckedCreateWithoutKayitFotolariInput = {
@@ -3149,6 +3379,7 @@ export type OfisUncheckedCreateWithoutKayitFotolariInput = {
   ingestionLoglari?: Prisma.IngestionLogUncheckedCreateNestedManyWithoutOfisInput
   auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
 }
 
 export type OfisCreateOrConnectWithoutKayitFotolariInput = {
@@ -3196,6 +3427,7 @@ export type OfisUpdateWithoutKayitFotolariInput = {
   ingestionLoglari?: Prisma.IngestionLogUpdateManyWithoutOfisNestedInput
   auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
 }
 
 export type OfisUncheckedUpdateWithoutKayitFotolariInput = {
@@ -3227,6 +3459,7 @@ export type OfisUncheckedUpdateWithoutKayitFotolariInput = {
   ingestionLoglari?: Prisma.IngestionLogUncheckedUpdateManyWithoutOfisNestedInput
   auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
 }
 
 
@@ -3252,6 +3485,7 @@ export type OfisCountOutputType = {
   auditLoglari: number
   kayitNotlari: number
   kayitFotolari: number
+  senkronHaricleri: number
 }
 
 export type OfisCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3272,6 +3506,7 @@ export type OfisCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   auditLoglari?: boolean | OfisCountOutputTypeCountAuditLoglariArgs
   kayitNotlari?: boolean | OfisCountOutputTypeCountKayitNotlariArgs
   kayitFotolari?: boolean | OfisCountOutputTypeCountKayitFotolariArgs
+  senkronHaricleri?: boolean | OfisCountOutputTypeCountSenkronHaricleriArgs
 }
 
 /**
@@ -3403,6 +3638,13 @@ export type OfisCountOutputTypeCountKayitFotolariArgs<ExtArgs extends runtime.Ty
   where?: Prisma.KayitFotoWhereInput
 }
 
+/**
+ * OfisCountOutputType without action
+ */
+export type OfisCountOutputTypeCountSenkronHaricleriArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SenkronHaricWhereInput
+}
+
 
 export type OfisSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3434,6 +3676,7 @@ export type OfisSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   auditLoglari?: boolean | Prisma.Ofis$auditLoglariArgs<ExtArgs>
   kayitNotlari?: boolean | Prisma.Ofis$kayitNotlariArgs<ExtArgs>
   kayitFotolari?: boolean | Prisma.Ofis$kayitFotolariArgs<ExtArgs>
+  senkronHaricleri?: boolean | Prisma.Ofis$senkronHaricleriArgs<ExtArgs>
   _count?: boolean | Prisma.OfisCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["ofis"]>
 
@@ -3501,6 +3744,7 @@ export type OfisInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   auditLoglari?: boolean | Prisma.Ofis$auditLoglariArgs<ExtArgs>
   kayitNotlari?: boolean | Prisma.Ofis$kayitNotlariArgs<ExtArgs>
   kayitFotolari?: boolean | Prisma.Ofis$kayitFotolariArgs<ExtArgs>
+  senkronHaricleri?: boolean | Prisma.Ofis$senkronHaricleriArgs<ExtArgs>
   _count?: boolean | Prisma.OfisCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OfisIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3526,6 +3770,7 @@ export type $OfisPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     auditLoglari: Prisma.$AuditLogPayload<ExtArgs>[]
     kayitNotlari: Prisma.$KayitNotPayload<ExtArgs>[]
     kayitFotolari: Prisma.$KayitFotoPayload<ExtArgs>[]
+    senkronHaricleri: Prisma.$SenkronHaricPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3963,6 +4208,7 @@ export interface Prisma__OfisClient<T, Null = never, ExtArgs extends runtime.Typ
   auditLoglari<T extends Prisma.Ofis$auditLoglariArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$auditLoglariArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   kayitNotlari<T extends Prisma.Ofis$kayitNotlariArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$kayitNotlariArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KayitNotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   kayitFotolari<T extends Prisma.Ofis$kayitFotolariArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$kayitFotolariArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KayitFotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  senkronHaricleri<T extends Prisma.Ofis$senkronHaricleriArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$senkronHaricleriArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SenkronHaricPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4802,6 +5048,30 @@ export type Ofis$kayitFotolariArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.KayitFotoScalarFieldEnum | Prisma.KayitFotoScalarFieldEnum[]
+}
+
+/**
+ * Ofis.senkronHaricleri
+ */
+export type Ofis$senkronHaricleriArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SenkronHaric
+   */
+  select?: Prisma.SenkronHaricSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SenkronHaric
+   */
+  omit?: Prisma.SenkronHaricOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SenkronHaricInclude<ExtArgs> | null
+  where?: Prisma.SenkronHaricWhereInput
+  orderBy?: Prisma.SenkronHaricOrderByWithRelationInput | Prisma.SenkronHaricOrderByWithRelationInput[]
+  cursor?: Prisma.SenkronHaricWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SenkronHaricScalarFieldEnum | Prisma.SenkronHaricScalarFieldEnum[]
 }
 
 /**

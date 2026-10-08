@@ -649,6 +649,7 @@ model Ofis {
   auditLoglari       AuditLog[]
   kayitNotlari       KayitNot[]
   kayitFotolari      KayitFoto[]
+  senkronHaricleri   SenkronHaric[]
 
   @@index([durum])
   @@map("ofis")
@@ -1241,6 +1242,9 @@ model Kisi {
   notionSnapshot Json?
   /// Dış kaynakta silindiğinde (Google/Notion) — kişi Anahtar'da silinmez, yalnızca işaretlenir
   kaynaktaSilindi DateTime?
+  /// v3.21 — çift yönlü Google: bu kişi Google Kişiler'e eklenmeyi bekliyor (elle eklenen ya da "Google'a gönder" denen kişi).
+  /// Gönderilince null olur ve googleResourceName dolar. Toplu içe aktarılan kişiler kendiliğinden işaretlenmez.
+  googleBekliyor  DateTime?
   /// v3.7 — bu kişiyle yapılan görüşme notları
   kayitNotlari   KayitNot[]
   // v3.4 — Notion "Müşteri-Yatırımcılar-Kişiler" alanları
@@ -1259,6 +1263,7 @@ model Kisi {
   @@unique([ofisId, notionId])
   @@index([adSoyad])
   @@index([ofisId, sahipKullaniciId])
+  @@index([ofisId, googleBekliyor])
   @@map("kisi")
 }
 
@@ -1455,7 +1460,7 @@ model Entegrasyon {
   syncToken   String?              // Google People API artımlı senkron anahtarı
   /// Notion: tablo başına { sonDuzenleme }; Google: { sayfaToken }
   imlec       Json?
-  /// { otomatik: boolean, aralikDk: 15, geriYaz: boolean, sadeceEtiketler: string[] }
+  /// { otomatik, aralikDk, geriYaz, googleYaz (v3.21: çift yönlü), sadeceEtiketler, baglayanKullaniciId, baglanti (ISO), yazmaIzni }
   ayarlar     Json?
   sonSenkron  DateTime?
   sonHata     String?
@@ -1465,6 +1470,26 @@ model Entegrasyon {
 
   @@unique([ofisId, saglayici])
   @@map("entegrasyon")
+}
+
+/// v3.21 — Anahtar'dan silinen kişi dış kaynakta (Google) SİLİNMEZ; ama bir sonraki eşitlemede geri de gelmemelidir.
+/// Silinen kişinin dış kimliği ve telefon anahtarı (son 10 hane) burada tutulur; senkron bu listedekileri yeniden eklemez.
+/// "Silinenleri yeniden getir" bu listeyi boşaltır.
+model SenkronHaric {
+  id             String               @id @default(cuid())
+  ofisId         String @default("")
+  ofis           Ofis                 @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  saglayici      EntegrasyonSaglayici
+  /// Google: people/c123… (kişi Google'a bağlı değilken silindiyse boş)
+  disKimlik      String?
+  /// Telefonun son 10 hanesi (src/lib/senkron/birlestir.ts › telAnahtari)
+  telefonAnahtar String?
+  ad             String?
+  createdAt      DateTime             @default(now())
+
+  @@index([ofisId, saglayici, disKimlik])
+  @@index([ofisId, saglayici, telefonAnahtar])
+  @@map("senkron_haric")
 }
 
 /// v3.6 — her senkron çalışmasının özeti (Bağlantılar ekranındaki geçmiş)

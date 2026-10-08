@@ -4,9 +4,15 @@
 import { prisma } from "@/lib/db";
 import { hata, ok } from "@/lib/http/yanit";
 import { entegrasyon, notionBaglantiRaporu, notionSenkronCalistir } from "@/lib/services/senkron";
+import { notionAcik } from "@/lib/ozellikler";
+import { ofisBaglami } from "@/lib/kiracilik";
+import { yetkiGerek } from "@/lib/guvenlik/yetki";
 
 export async function POST() {
   try {
+    // v3.21 — Notion senkronu gizli (src/lib/ozellikler.ts). Kod yerinde; anahtar açılırsa yeniden çalışır.
+    if (!notionAcik()) return Response.json({ hata: "KAPALI", mesaj: "Notion bağlantısı bu sürümde kapalı" }, { status: 404 });
+    yetkiGerek(ofisBaglami().rol, "ofis.entegrasyon");
     const token = process.env.NOTION_TOKEN;
     if (!token) return Response.json({ hata: "AYAR_EKSIK", mesaj: "NOTION_TOKEN tanımlı değil (ALTYAPI §26.3)" }, { status: 503 });
     const rapor = await notionBaglantiRaporu(token);

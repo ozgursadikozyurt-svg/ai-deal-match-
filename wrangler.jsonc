@@ -1,4 +1,4 @@
-// Anahtar CRM v3.14 · 3 Ekim 2026 — Cloudflare Workers yapılandırması (arayüz + API + zamanlayıcı tek projede)
+// Anahtar CRM v3.21 · 8 Ekim 2026 (v3.14'ten) — Cloudflare Workers yapılandırması (arayüz + API + zamanlayıcı tek projede)
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "anahtarcrm",
@@ -6,11 +6,13 @@
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "directory": "dist/canli", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"], "binding": "ASSETS" },
-  "triggers": { "crons": ["0 3 * * *", "0 4 * * sun"] },
+  // v3.21 — üçüncü zamanlayıcı: 15 dakikada bir Google Kişiler eşitlemesi (Google'ı bağlı ofisler; bağlı ofis yoksa hiçbir şey yapmaz)
+  "triggers": { "crons": ["0 3 * * *", "0 4 * * sun", "*/15 * * * *"] },
   "observability": { "enabled": true },
   // v3.17 — Cloudflare panelinden (Settings → Variables and Secrets) elle girilen değişkenler her yayında silinmesin.
   // Bu dosyada "vars" bloğu YOKTUR; keep_vars olmadan wrangler, paneldeki değişkenleri yayın sırasında temizler.
   "keep_vars": true,
   // Gizli değerler Cloudflare panelinde: Settings → Variables and Secrets (bkz. CANLIYA_ALMA_REHBERI):
   //   DATABASE_URL, DIRECT_URL, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, IZINLI_EPOSTALAR, AI_API_KEY, CRON_SECRET
+  //   v3.21 (Google ile bağlan): GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET  — bkz. docs/GOOGLE_BAGLANTI_KURULUMU
 }

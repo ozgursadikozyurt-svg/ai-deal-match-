@@ -19,7 +19,7 @@ export interface SunucuDurumu {
 }
 
 /** null değerli alanlar arayüzde "yok" demektir (undefined): sunucudan gelen null'lar atılır */
-const nullAt = (o: Record<string, unknown>) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== null));
+export const nullAt = (o: Record<string, unknown>) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== null));
 
 export function sunucudanDurum(s: SunucuDurumu): DepoDurumu {
   const a = s.arayuz ?? {};
@@ -33,14 +33,15 @@ export function sunucudanDurum(s: SunucuDurumu): DepoDurumu {
     roller: rolNormalize(s.ayarlar?.roller),
     kisiler: s.kisiler.map((k) => nullAt(k)) as unknown as Kisi[],
     islenmisMesajlar: a.islenmisMesajlar ?? [], dosyaIzleri: a.dosyaIzleri ?? {}, favoriler: a.favoriler ?? [],
-    baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleBekleyen: [],
+    baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleBekleyen: [], googleCanli: null,
   };
 }
 
 // ───────── fark hesabı ─────────
 export interface Imza { kayit: Map<string, string>; kisi: Map<string, string>; es: Map<string, string>; ayar: Record<string, string>; arayuz: string }
-const KISI_ALANLARI = ["id", "adSoyad", "telefon", "ikincilTelefon", "email", "sirket", "roller", "uzmanlikAileleri", "referans", "notlar", "whatsappGruplari", "olusturma", "sonIletisim", "kaynak", "ilanSahibiTipi"] as const;
-const kisiYuku = (k: Kisi) => Object.fromEntries(KISI_ALANLARI.map((a) => [a, (k as any)[a]]).filter(([, v]) => v !== undefined));
+// v3.21 — googleaGonder: "bu kişiyi Google'a da ekle" isteği (elle eklenen kişi / "Google'a gönder"). Sunucu, Google bağlı ve çift yönlü açıksa uygular.
+const KISI_ALANLARI = ["id", "adSoyad", "telefon", "ikincilTelefon", "email", "sirket", "roller", "uzmanlikAileleri", "referans", "notlar", "whatsappGruplari", "olusturma", "sonIletisim", "kaynak", "ilanSahibiTipi", "googleaGonder"] as const;
+export const kisiYuku = (k: Kisi) => Object.fromEntries(KISI_ALANLARI.map((a) => [a, (k as any)[a]]).filter(([, v]) => v !== undefined));
 const kayitYuku = (k: Kayit) => ({ id: k.id, olusturma: k.olusturma, veri: k.veri, notlar: k.notlar ?? [] });
 const arayuzYuku = (d: DepoDurumu) => ({ testler: d.testler, geriBildirim: d.geriBildirim, ogrenilen: d.ogrenilen, adaylar: d.adaylar, iceAktarmaGecmisi: d.iceAktarmaGecmisi, islenmisMesajlar: d.islenmisMesajlar, dosyaIzleri: d.dosyaIzleri, favoriler: d.favoriler ?? [] });
 const ayarYuku = (d: DepoDurumu) => ({ ttl: d.ayarlar.ttl, ai: aiAyari(d), paylasim: paylasimAyari(d), calismaIli: calismaIli(d), roller: d.roller ?? [] });

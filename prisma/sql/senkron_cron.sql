@@ -1,3 +1,5 @@
+-- v3.21 NOTU: Bu dosya ARTIK GEREKMEZ. Otomatik Google eşitlemesi Cloudflare zamanlayıcısıyla çalışır (wrangler.jsonc › "*/15 * * * *").
+-- Yalnızca Cloudflare dışında bir kurulumda dış zamanlayıcı gerekirse kullanın; /api/senkron/calistir CRON_SECRET ile tüm ofisleri eşitler.
 -- Anahtar CRM v3.13 · 3 Ekim 2026
 -- Otomatik senkron zamanlayıcısı — Supabase SQL Editor'de BİR KEZ çalıştırın (migration'a dahil değildir;
 -- adres ve gizli anahtar size özeldir). pg_cron + pg_net Supabase'de ücretsiz plana dahildir.

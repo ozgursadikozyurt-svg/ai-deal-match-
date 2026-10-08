@@ -41,6 +41,7 @@ export type KisiMinAggregateOutputType = {
   notionId: string | null
   googleEtag: string | null
   kaynaktaSilindi: Date | null
+  googleBekliyor: Date | null
   referans: string | null
   sonIletisim: Date | null
   createdAt: Date | null
@@ -64,6 +65,7 @@ export type KisiMaxAggregateOutputType = {
   notionId: string | null
   googleEtag: string | null
   kaynaktaSilindi: Date | null
+  googleBekliyor: Date | null
   referans: string | null
   sonIletisim: Date | null
   createdAt: Date | null
@@ -90,6 +92,7 @@ export type KisiCountAggregateOutputType = {
   googleSnapshot: number
   notionSnapshot: number
   kaynaktaSilindi: number
+  googleBekliyor: number
   uzmanlikAileleri: number
   referans: number
   whatsappGruplari: number
@@ -117,6 +120,7 @@ export type KisiMinAggregateInputType = {
   notionId?: true
   googleEtag?: true
   kaynaktaSilindi?: true
+  googleBekliyor?: true
   referans?: true
   sonIletisim?: true
   createdAt?: true
@@ -140,6 +144,7 @@ export type KisiMaxAggregateInputType = {
   notionId?: true
   googleEtag?: true
   kaynaktaSilindi?: true
+  googleBekliyor?: true
   referans?: true
   sonIletisim?: true
   createdAt?: true
@@ -166,6 +171,7 @@ export type KisiCountAggregateInputType = {
   googleSnapshot?: true
   notionSnapshot?: true
   kaynaktaSilindi?: true
+  googleBekliyor?: true
   uzmanlikAileleri?: true
   referans?: true
   whatsappGruplari?: true
@@ -267,6 +273,7 @@ export type KisiGroupByOutputType = {
   googleSnapshot: runtime.JsonValue | null
   notionSnapshot: runtime.JsonValue | null
   kaynaktaSilindi: Date | null
+  googleBekliyor: Date | null
   uzmanlikAileleri: string[]
   referans: string | null
   whatsappGruplari: string[]
@@ -316,6 +323,7 @@ export type KisiWhereInput = {
   googleSnapshot?: Prisma.JsonNullableFilter<"Kisi">
   notionSnapshot?: Prisma.JsonNullableFilter<"Kisi">
   kaynaktaSilindi?: Prisma.DateTimeNullableFilter<"Kisi"> | Date | string | null
+  googleBekliyor?: Prisma.DateTimeNullableFilter<"Kisi"> | Date | string | null
   uzmanlikAileleri?: Prisma.StringNullableListFilter<"Kisi">
   referans?: Prisma.StringNullableFilter<"Kisi"> | string | null
   whatsappGruplari?: Prisma.StringNullableListFilter<"Kisi">
@@ -349,6 +357,7 @@ export type KisiOrderByWithRelationInput = {
   googleSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   notionSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   kaynaktaSilindi?: Prisma.SortOrderInput | Prisma.SortOrder
+  googleBekliyor?: Prisma.SortOrderInput | Prisma.SortOrder
   uzmanlikAileleri?: Prisma.SortOrder
   referans?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappGruplari?: Prisma.SortOrder
@@ -388,6 +397,7 @@ export type KisiWhereUniqueInput = Prisma.AtLeast<{
   googleSnapshot?: Prisma.JsonNullableFilter<"Kisi">
   notionSnapshot?: Prisma.JsonNullableFilter<"Kisi">
   kaynaktaSilindi?: Prisma.DateTimeNullableFilter<"Kisi"> | Date | string | null
+  googleBekliyor?: Prisma.DateTimeNullableFilter<"Kisi"> | Date | string | null
   uzmanlikAileleri?: Prisma.StringNullableListFilter<"Kisi">
   referans?: Prisma.StringNullableFilter<"Kisi"> | string | null
   whatsappGruplari?: Prisma.StringNullableListFilter<"Kisi">
@@ -421,6 +431,7 @@ export type KisiOrderByWithAggregationInput = {
   googleSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   notionSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   kaynaktaSilindi?: Prisma.SortOrderInput | Prisma.SortOrder
+  googleBekliyor?: Prisma.SortOrderInput | Prisma.SortOrder
   uzmanlikAileleri?: Prisma.SortOrder
   referans?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappGruplari?: Prisma.SortOrder
@@ -455,6 +466,7 @@ export type KisiScalarWhereWithAggregatesInput = {
   googleSnapshot?: Prisma.JsonNullableWithAggregatesFilter<"Kisi">
   notionSnapshot?: Prisma.JsonNullableWithAggregatesFilter<"Kisi">
   kaynaktaSilindi?: Prisma.DateTimeNullableWithAggregatesFilter<"Kisi"> | Date | string | null
+  googleBekliyor?: Prisma.DateTimeNullableWithAggregatesFilter<"Kisi"> | Date | string | null
   uzmanlikAileleri?: Prisma.StringNullableListFilter<"Kisi">
   referans?: Prisma.StringNullableWithAggregatesFilter<"Kisi"> | string | null
   whatsappGruplari?: Prisma.StringNullableListFilter<"Kisi">
@@ -481,6 +493,7 @@ export type KisiCreateInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -514,6 +527,7 @@ export type KisiUncheckedCreateInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -543,6 +557,7 @@ export type KisiUpdateInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -576,6 +591,7 @@ export type KisiUncheckedUpdateInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -607,6 +623,7 @@ export type KisiCreateManyInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -633,6 +650,7 @@ export type KisiUpdateManyMutationInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -661,6 +679,7 @@ export type KisiUncheckedUpdateManyInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -719,6 +738,7 @@ export type KisiCountOrderByAggregateInput = {
   googleSnapshot?: Prisma.SortOrder
   notionSnapshot?: Prisma.SortOrder
   kaynaktaSilindi?: Prisma.SortOrder
+  googleBekliyor?: Prisma.SortOrder
   uzmanlikAileleri?: Prisma.SortOrder
   referans?: Prisma.SortOrder
   whatsappGruplari?: Prisma.SortOrder
@@ -744,6 +764,7 @@ export type KisiMaxOrderByAggregateInput = {
   notionId?: Prisma.SortOrder
   googleEtag?: Prisma.SortOrder
   kaynaktaSilindi?: Prisma.SortOrder
+  googleBekliyor?: Prisma.SortOrder
   referans?: Prisma.SortOrder
   sonIletisim?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -767,6 +788,7 @@ export type KisiMinOrderByAggregateInput = {
   notionId?: Prisma.SortOrder
   googleEtag?: Prisma.SortOrder
   kaynaktaSilindi?: Prisma.SortOrder
+  googleBekliyor?: Prisma.SortOrder
   referans?: Prisma.SortOrder
   sonIletisim?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -957,6 +979,7 @@ export type KisiCreateWithoutOfisInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -988,6 +1011,7 @@ export type KisiUncheckedCreateWithoutOfisInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -1048,6 +1072,7 @@ export type KisiScalarWhereInput = {
   googleSnapshot?: Prisma.JsonNullableFilter<"Kisi">
   notionSnapshot?: Prisma.JsonNullableFilter<"Kisi">
   kaynaktaSilindi?: Prisma.DateTimeNullableFilter<"Kisi"> | Date | string | null
+  googleBekliyor?: Prisma.DateTimeNullableFilter<"Kisi"> | Date | string | null
   uzmanlikAileleri?: Prisma.StringNullableListFilter<"Kisi">
   referans?: Prisma.StringNullableFilter<"Kisi"> | string | null
   whatsappGruplari?: Prisma.StringNullableListFilter<"Kisi">
@@ -1074,6 +1099,7 @@ export type KisiCreateWithoutSahipKullaniciInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -1105,6 +1131,7 @@ export type KisiUncheckedCreateWithoutSahipKullaniciInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -1160,6 +1187,7 @@ export type KisiCreateWithoutKayitlarInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -1192,6 +1220,7 @@ export type KisiUncheckedCreateWithoutKayitlarInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -1236,6 +1265,7 @@ export type KisiUpdateWithoutKayitlarInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1268,6 +1298,7 @@ export type KisiUncheckedUpdateWithoutKayitlarInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1296,6 +1327,7 @@ export type KisiCreateWithoutKayitBaglariInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -1328,6 +1360,7 @@ export type KisiUncheckedCreateWithoutKayitBaglariInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -1372,6 +1405,7 @@ export type KisiUpdateWithoutKayitBaglariInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1404,6 +1438,7 @@ export type KisiUncheckedUpdateWithoutKayitBaglariInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1432,6 +1467,7 @@ export type KisiCreateWithoutKayitNotlariInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -1464,6 +1500,7 @@ export type KisiUncheckedCreateWithoutKayitNotlariInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -1508,6 +1545,7 @@ export type KisiUpdateWithoutKayitNotlariInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1540,6 +1578,7 @@ export type KisiUncheckedUpdateWithoutKayitNotlariInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1569,6 +1608,7 @@ export type KisiCreateManyOfisInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -1595,6 +1635,7 @@ export type KisiUpdateWithoutOfisInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1626,6 +1667,7 @@ export type KisiUncheckedUpdateWithoutOfisInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1656,6 +1698,7 @@ export type KisiUncheckedUpdateManyWithoutOfisInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1683,6 +1726,7 @@ export type KisiCreateManySahipKullaniciInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
   uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
   referans?: string | null
   whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
@@ -1709,6 +1753,7 @@ export type KisiUpdateWithoutSahipKullaniciInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1740,6 +1785,7 @@ export type KisiUncheckedUpdateWithoutSahipKullaniciInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1770,6 +1816,7 @@ export type KisiUncheckedUpdateManyWithoutSahipKullaniciInput = {
   googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
   referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
@@ -1847,6 +1894,7 @@ export type KisiSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   googleSnapshot?: boolean
   notionSnapshot?: boolean
   kaynaktaSilindi?: boolean
+  googleBekliyor?: boolean
   uzmanlikAileleri?: boolean
   referans?: boolean
   whatsappGruplari?: boolean
@@ -1881,6 +1929,7 @@ export type KisiSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   googleSnapshot?: boolean
   notionSnapshot?: boolean
   kaynaktaSilindi?: boolean
+  googleBekliyor?: boolean
   uzmanlikAileleri?: boolean
   referans?: boolean
   whatsappGruplari?: boolean
@@ -1911,6 +1960,7 @@ export type KisiSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   googleSnapshot?: boolean
   notionSnapshot?: boolean
   kaynaktaSilindi?: boolean
+  googleBekliyor?: boolean
   uzmanlikAileleri?: boolean
   referans?: boolean
   whatsappGruplari?: boolean
@@ -1941,6 +1991,7 @@ export type KisiSelectScalar = {
   googleSnapshot?: boolean
   notionSnapshot?: boolean
   kaynaktaSilindi?: boolean
+  googleBekliyor?: boolean
   uzmanlikAileleri?: boolean
   referans?: boolean
   whatsappGruplari?: boolean
@@ -1949,7 +2000,7 @@ export type KisiSelectScalar = {
   updatedAt?: boolean
 }
 
-export type KisiOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "sahipKullaniciId" | "gorunurluk" | "adSoyad" | "telefon" | "ikincilTelefon" | "email" | "sirket" | "roller" | "ilanSahibiTipi" | "kaynak" | "notlar" | "googleResourceName" | "notionId" | "googleEtag" | "googleSnapshot" | "notionSnapshot" | "kaynaktaSilindi" | "uzmanlikAileleri" | "referans" | "whatsappGruplari" | "sonIletisim" | "createdAt" | "updatedAt", ExtArgs["result"]["kisi"]>
+export type KisiOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "sahipKullaniciId" | "gorunurluk" | "adSoyad" | "telefon" | "ikincilTelefon" | "email" | "sirket" | "roller" | "ilanSahibiTipi" | "kaynak" | "notlar" | "googleResourceName" | "notionId" | "googleEtag" | "googleSnapshot" | "notionSnapshot" | "kaynaktaSilindi" | "googleBekliyor" | "uzmanlikAileleri" | "referans" | "whatsappGruplari" | "sonIletisim" | "createdAt" | "updatedAt", ExtArgs["result"]["kisi"]>
 export type KisiInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   sahipKullanici?: boolean | Prisma.Kisi$sahipKullaniciArgs<ExtArgs>
@@ -2011,6 +2062,11 @@ export type $KisiPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
      * Dış kaynakta silindiğinde (Google/Notion) — kişi Anahtar'da silinmez, yalnızca işaretlenir
      */
     kaynaktaSilindi: Date | null
+    /**
+     * v3.21 — çift yönlü Google: bu kişi Google Kişiler'e eklenmeyi bekliyor (elle eklenen ya da "Google'a gönder" denen kişi).
+     * Gönderilince null olur ve googleResourceName dolar. Toplu içe aktarılan kişiler kendiliğinden işaretlenmez.
+     */
+    googleBekliyor: Date | null
     uzmanlikAileleri: string[]
     referans: string | null
     whatsappGruplari: string[]
@@ -2464,6 +2520,7 @@ export interface KisiFieldRefs {
   readonly googleSnapshot: Prisma.FieldRef<"Kisi", 'Json'>
   readonly notionSnapshot: Prisma.FieldRef<"Kisi", 'Json'>
   readonly kaynaktaSilindi: Prisma.FieldRef<"Kisi", 'DateTime'>
+  readonly googleBekliyor: Prisma.FieldRef<"Kisi", 'DateTime'>
   readonly uzmanlikAileleri: Prisma.FieldRef<"Kisi", 'String[]'>
   readonly referans: Prisma.FieldRef<"Kisi", 'String'>
   readonly whatsappGruplari: Prisma.FieldRef<"Kisi", 'String[]'>

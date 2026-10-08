@@ -29,7 +29,7 @@ export function Bilgi({ id, ton = "bilgi", children }: { id: string; ton?: "bilg
   );
 }
 
-/** Ana sayfadaki "Notion ve Google'ı bağlayın" daveti — × ile kapatılabilir. */
+/** Ana sayfadaki "Google ile bağlanın" daveti — × ile kapatılabilir. */
 export function Kapanir({ id, children }: { id: string; children: any }) {
   const [gizli, setGizli] = useState(() => kapalilar().includes(id));
   if (gizli) return null;

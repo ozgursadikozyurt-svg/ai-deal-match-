@@ -74,6 +74,7 @@ export const ModelName = {
   AuditLog: 'AuditLog',
   IngestionLog: 'IngestionLog',
   Entegrasyon: 'Entegrasyon',
+  SenkronHaric: 'SenkronHaric',
   SenkronCalisma: 'SenkronCalisma',
   SenkronCakisma: 'SenkronCakisma',
   NotionSyncLog: 'NotionSyncLog',
@@ -492,6 +493,7 @@ export const KisiScalarFieldEnum = {
   googleSnapshot: 'googleSnapshot',
   notionSnapshot: 'notionSnapshot',
   kaynaktaSilindi: 'kaynaktaSilindi',
+  googleBekliyor: 'googleBekliyor',
   uzmanlikAileleri: 'uzmanlikAileleri',
   referans: 'referans',
   whatsappGruplari: 'whatsappGruplari',
@@ -648,6 +650,19 @@ export const EntegrasyonScalarFieldEnum = {
 } as const
 
 export type EntegrasyonScalarFieldEnum = (typeof EntegrasyonScalarFieldEnum)[keyof typeof EntegrasyonScalarFieldEnum]
+
+
+export const SenkronHaricScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  saglayici: 'saglayici',
+  disKimlik: 'disKimlik',
+  telefonAnahtar: 'telefonAnahtar',
+  ad: 'ad',
+  createdAt: 'createdAt'
+} as const
+
+export type SenkronHaricScalarFieldEnum = (typeof SenkronHaricScalarFieldEnum)[keyof typeof SenkronHaricScalarFieldEnum]
 
 
 export const SenkronCalismaScalarFieldEnum = {

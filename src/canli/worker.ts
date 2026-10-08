@@ -1,12 +1,15 @@
 /**
- * Anahtar CRM v3.20 · 7 Ekim 2026
+ * Anahtar CRM v3.21 · 8 Ekim 2026 (v3.20'den)
  * AŞAMA 7 — Cloudflare Worker girişi. Tek proje: arayüz (statik dosyalar, ASSETS) + /api (sunucu kodu) + zamanlanmış işler.
  *  - /api/yapilandirma, /api/saglik → açık (giriş ekranının ihtiyacı / sağlık kontrolü)
  *  - /api/davet/kabul → giriş şart, ofis şart değil (kişi henüz bir ofiste değil)
  *  - diğer /api/* → üç kapı: (1) oturum anahtarı doğrulanır (2) e-posta bir ofis kullanıcısına
  *    çözülür (3) istek o ofisin bağlamında çalışır; ofise ait her sorgu ofisId ile süzülür.
+ *  - /api/entegrasyon/google/geri-donus → v3.21: Google izin ekranından dönüş. Oturum başlığı OLMAZ
+ *    (tarayıcıyı Google yönlendirir); kimliği imzalı `state` taşır ve rota kendisi doğrular.
  *  - Zamanlayıcı: platform bağlamında çalışır (tüm ofisler) — her gün 03:00 (TR 06:00) uyanık
- *    tutma + süresi dolanları pasife alma; pazar 04:00 haftalık yedek
+ *    tutma + süresi dolanları pasife alma; pazar 04:00 haftalık yedek; v3.21: 15 dakikada bir
+ *    Google Kişiler eşitlemesi (Google'ı bağlı ofisler, her biri kendi bağlamında)
  */
 import { ROTALAR } from "./rotalar.generated";
 import { kimlikDogrula, izinliMi } from "./kimlik";
@@ -16,6 +19,7 @@ import { istekIcinde, prisma } from "../lib/db";
 import { kiracilikIcinde, platformOlarak, KiracilikHatasi } from "../lib/kiracilik";
 import { YetkiHatasi } from "../lib/guvenlik/yetki";
 import { tamYedek, yedegiDepola } from "../lib/services/yedek";
+import { tumOfislerdeGoogleSenkron } from "../lib/services/senkron";
 
 export interface Env {
   ASSETS: { fetch: (r: Request) => Promise<Response> };
@@ -53,6 +57,12 @@ export async function apiIsle(req: Request, env: Env): Promise<Response> {
   const cron = !!env.CRON_SECRET && req.headers.get("authorization") === `Bearer ${env.CRON_SECRET}`;
   if (url.pathname === "/api/saglik" || cron) {
     return istekIcinde(env.DATABASE_URL, () => platformOlarak(() => isle(req, { params })).catch(hataYaniti));
+  }
+
+  // 1b) v3.21 — Google'dan dönüş: oturum başlığı yoktur. Rota imzalı state'i doğrular, kullanıcıyı veritabanından
+  //     yeniden denetler ve işi yalnızca o ofisin bağlamında yapar (src/app/api/entegrasyon/google/geri-donus/route.ts).
+  if (url.pathname === "/api/entegrasyon/google/geri-donus") {
+    return istekIcinde(env.DATABASE_URL, () => isle(req, { params }).catch(hataYaniti));
   }
 
   // 2) Oturum anahtarı (JWT) → e-posta
@@ -96,8 +106,11 @@ export default {
         await prisma.$queryRawUnsafe("SELECT 1");
         await fetch(`${env.SUPABASE_URL.replace(/\/$/, "")}/rest/v1/`, { headers: { apikey: env.SUPABASE_ANON_KEY } }).catch(() => {});
         await prisma.kayit.updateMany({ where: { durum: "ACTIVE", validUntil: { lt: new Date() } }, data: { durum: "EXPIRED" } });
-      } else {
+      } else if (ev.cron.startsWith("0 4")) {
         await yedegiDepola(JSON.stringify(await tamYedek(prisma)), env);
+      } else {
+        // v3.21 — Google Kişiler: en uzun süredir eşitlenmeyen ofisler önce; her ofis kendi bağlamında
+        if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) await tumOfislerdeGoogleSenkron(prisma, { enFazla: 5, butceMs: 12_000 });
       }
     })));
   },

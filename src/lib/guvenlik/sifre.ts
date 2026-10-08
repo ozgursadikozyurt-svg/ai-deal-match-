@@ -1,16 +1,24 @@
 /**
  * Anahtar CRM v3.13 · 3 Ekim 2026
  * Bağlantı anahtarlarının (Google yenileme anahtarı) veritabanında şifreli saklanması — AES-256-GCM.
- * Anahtar: ENTEGRASYON_SIFRE_ANAHTARI (32 bayt, base64). Üretmek için: `openssl rand -base64 32`
+ * Anahtar: ENTEGRASYON_SIFRE_ANAHTARI (32 bayt, base64; `openssl rand -base64 32`). v3.21: tanımlı değilse
+ * SUPABASE_SERVICE_ROLE_KEY (yoksa DATABASE_URL) üzerinden türetilir — ayrı bir değişken girmek zorunlu değildir.
  * Biçim: "v1:<iv b64>:<etiket b64>:<şifreli b64>"
  */
-import { createCipheriv, createDecipheriv, randomBytes, createHmac, timingSafeEqual } from "node:crypto";
+import { createCipheriv, createDecipheriv, randomBytes, createHmac, createHash, timingSafeEqual } from "node:crypto";
 
 function anahtar(ham = process.env.ENTEGRASYON_SIFRE_ANAHTARI): Buffer {
-  if (!ham) throw new Error("ENTEGRASYON_SIFRE_ANAHTARI tanımlı değil (openssl rand -base64 32)");
-  const k = Buffer.from(ham, "base64");
-  if (k.length !== 32) throw new Error("ENTEGRASYON_SIFRE_ANAHTARI 32 bayt (base64) olmalı");
-  return k;
+  if (ham) {
+    const k = Buffer.from(ham, "base64");
+    if (k.length !== 32) throw new Error("ENTEGRASYON_SIFRE_ANAHTARI 32 bayt (base64) olmalı");
+    return k;
+  }
+  // v3.21 — kurulumu kolaylaştırmak için: ENTEGRASYON_SIFRE_ANAHTARI verilmediyse anahtar, zaten gizli olan
+  // sunucu değerlerinden türetilir (ek bir değişken girmek gerekmez). Bu değerler değişirse saklı Google
+  // anahtarı çözülemez; kullanıcı "Google ile bağlan"a yeniden basar (veri kaybı olmaz).
+  const tohum = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.DATABASE_URL;
+  if (!tohum) throw new Error("Şifreleme anahtarı üretilemedi: ENTEGRASYON_SIFRE_ANAHTARI ya da SUPABASE_SERVICE_ROLE_KEY tanımlı olmalı");
+  return createHash("sha256").update("anahtarcrm-entegrasyon-v1:" + tohum).digest();
 }
 
 export function sifrele(metin: string, ham?: string): string {

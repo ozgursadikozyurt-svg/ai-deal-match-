@@ -1,4 +1,4 @@
-# Anahtar CRM (anahtarcrm) — v3.14 · 3 Ekim 2026
+# Anahtar CRM (anahtarcrm) — v3.21 · 8 Ekim 2026
 
 > Önceki adlar: Anakey, Anahtar.ai. Canlı proje/Worker/depo adı **anahtarcrm** (v3.14). (Bu dosya v3.5'ten beri güncellenmemişti; v3.9'da güncellendi.)
 
@@ -19,6 +19,14 @@ npx wrangler dev --port 8799 --local --test-scheduled &
 npm run canli:test && npm run canli:test:depo && npm run canli:test:giris && npm run canli:test:arayuz
 ```
 (`canli:test` boş veritabanı bekler. `canli:test:arayuz` jsdom kullanır.)
+
+## Google ile bağlan — çift yönlü Google Kişiler (v3.21)
+- Kullanıcı için tek adım: Bağlantılar › **Google ile bağlan** → Google'da "İzin ver". Kurallar ve platform kurulumu (bir kez): **`docs/GOOGLE_BAGLANTI_KURULUMU_v3.21_8Ekim2026.md`**; mimari: **`docs/ANAHTAR_CRM_EK_v3.21_8Ekim2026.md`**.
+- Kural özeti: Google'a eklenen Anahtar'a düşer · Anahtar'da elle eklenen / düzeltilen Google'a yazılır · **Anahtar'dan silinen Google'dan silinmez** (ve geri gelmez) · Google'da silinen Anahtar'da kalır.
+- Cloudflare'e girilecek iki değer: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`. Girilmezse özellik kapalı kalır.
+- Otomatik eşitleme: Cloudflare zamanlayıcısı (15 dk, `wrangler.jsonc`). `prisma/sql/senkron_cron.sql` (Supabase pg_cron) artık gerekmez.
+- Notion senkronu gizlidir: `src/lib/ozellikler.ts` (`notion: false`). Kod ve tablolar yerinde.
+- Yerel uçtan uca sınama (gerçek Worker + sahte Google): `.dev.vars.ornek` içindeki Google satırlarıyla `npx wrangler dev --port 8799 --local --test-scheduled` ve `npm run canli:test:google`.
 
 ## Emlak jargonu
 
@@ -90,6 +98,10 @@ tests/v33-db.test.ts                 4 veritabanlı test (ayar, konut + kaynak, 
 tests/v34.test.ts                    5 veritabanısız test (kiralık/satılık süre, tekrar yükleme, portal bağlantıları, kişiler)
 tests/v35.test.ts                    7 veritabanısız test (Talep DNA, uyum matrisi, havuz, hızlı ayrıştırıcı, soru → filtre, fırsat)
 tests/v36*.test.ts … v38*.test.ts    senkron (Notion, Google), toplu giriş, görüşme notları, tekrar kontrolü, eşleşmeyi kopar, dışa aktarma
+tests/v321.test.ts                   11 veritabanısız test (çift yönlü Google planlayıcıları, silme güvencesi, Notion gizli, kayıt kuyruğu birleştirme)
+tests/v321-db.test.ts                12 veritabanlı test (sahte Google ile çift yönlü eşitleme, çok ofis, bağlanma akışı) · tests/sahte-google.ts
+src/lib/ozellikler.ts                v3.21 özellik anahtarları (Notion gizli)
+demo/google-baglanti.ts              v3.21 canlı arayüzün Google çağrıları (bağlan, eşitle, sessiz eşitleme)
 tests/v39.test.ts                    10 veritabanısız test (akıllı yorumlayıcı, çekirdek düzeltmeleri, yeni ekranlar)
 tests/v39-db.test.ts                 2 veritabanlı test (POST /api/ai/yorumla)
 tests/v310.test.ts                   17 veritabanısız test (para simgeleri, güven kuralı, telefon, çoklu tip, Türkiye konum, yapay zekâ istemcisi, föy + PDF, fotoğraf kuralları, depo)
