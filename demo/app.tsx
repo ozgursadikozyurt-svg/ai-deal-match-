@@ -39,9 +39,11 @@ import { EslesmeKarti, TalepTercihleri, Kapanir, PIPELINE } from "./kartlar";
 import { havuzKatmani, portfoyEdinmeFirsati } from "../src/lib/eslestirme/havuz";
 import { AkilliKutu } from "./ai-kutusu";
 import { Baglantilar, SenkronDurumu } from "./baglantilar";
+import { notionAcik } from "../src/lib/ozellikler";
+import { googleOtomatik } from "./google-baglanti";
 import { Logo, LogoIsaret, Ikon, SolMenu, AltCubuk, type NavOge } from "./kabuk";
 import { MARKA } from "../src/lib/marka";
-import { bosBaglanti } from "./depo";
+import { bosBaglanti, bosGoogleBaglanti } from "./depo";
 import { AiAyarlari, PaylasimAyarlari, CalismaIliAyari } from "./ayarlar-ek";
 import { CanliAyarKarti } from "./canli-ayar";
 import { Fotograflar } from "./fotograflar";
@@ -61,11 +63,16 @@ function AnaSayfa({ donus }: { donus?: boolean } = {}) {
   return <div className="yigin">
     <div className="karsilama"><h1>{(() => { const h = new Date().getHours(); return h < 11 ? "Günaydın" : h < 18 ? "İyi günler" : "İyi akşamlar"; })()} Özgür</h1><p>{aktif.filter((k) => k.veri.tip === "TALEP").length} aktif talep, {aktif.filter((k) => k.veri.tip === "PORTFOY").length} portföy ve {sunulabilir.length} sunulabilir eşleşme seni bekliyor.</p></div>
     <AkilliKutu donus={donus} />
-    {(bag.notion.durum !== "BAGLI" || bag.google.durum !== "BAGLI") && <Kapanir id="baglan-davet"><button className="kart baglan-davet" onClick={() => git({ ad: "baglantilar" })}>
-      <span className="bd-logolar"><span className="bk-logo notion">N</span><span className="bk-logo google">G</span></span>
-      <span><b>{bag.notion.durum !== "BAGLI" && bag.google.durum !== "BAGLI" ? "Notion ve Google Kişiler'i bağlayın" : bag.notion.durum !== "BAGLI" ? "Notion'u da bağlayın" : "Google Kişiler'i de bağlayın"}</b><br /><small>Mevcut talep, portföy ve kişileriniz tek seferde gelsin, hemen eşleştirmeye girsin.</small></span>
-      <Ikon ad="baglanti" /></button></Kapanir>}
-    {(d.cakismalar ?? []).length > 0 && <button className="uyari-kutu" onClick={() => git({ ad: "baglantilar" })} style={{ border: 0, cursor: "pointer", textAlign: "left" }}><b>{d.cakismalar.length} senkron çakışması</b> seçiminizi bekliyor — Bağlantılar'da karar verin.</button>}
+    {/* v3.21 — Notion gizli (src/lib/ozellikler.ts): davet yalnızca Google içindir. Canlıda: Google bu kurulumda açıksa ve kullanıcı bağlayabiliyorsa. */}
+    {(() => {
+      const notionEksik = notionAcik() && bag.notion.durum !== "BAGLI", googleEksik = bag.google.durum !== "BAGLI" && (!CANLI.acik || (!!d.googleCanli?.hazir && !!d.googleCanli?.yetkili));
+      if (!notionEksik && !googleEksik) return null;
+      return <Kapanir id={notionAcik() ? "baglan-davet" : "baglan-davet-google"}><button className="kart baglan-davet" onClick={() => git({ ad: "baglantilar" })}>
+        <span className="bd-logolar">{notionAcik() && <span className="bk-logo notion">N</span>}<span className="bk-logo google">G</span></span>
+        <span><b>{notionEksik && googleEksik ? "Notion ve Google Kişiler'i bağlayın" : notionEksik ? "Notion'u da bağlayın" : "Google ile bağlanın"}</b><br /><small>{notionAcik() ? "Mevcut talep, portföy ve kişileriniz tek seferde gelsin, hemen eşleştirmeye girsin." : "Telefon rehberiniz ile Anahtar CRM çift yönlü eşitlensin: telefona kaydettiğiniz kişi buraya düşsün, burada eklediğiniz telefona gitsin."}</small></span>
+        <Ikon ad="baglanti" /></button></Kapanir>;
+    })()}
+    {(d.cakismalar ?? []).filter((c) => notionAcik() || c.saglayici !== "NOTION").length > 0 && <button className="uyari-kutu" onClick={() => git({ ad: "baglantilar" })} style={{ border: 0, cursor: "pointer", textAlign: "left" }}><b>{d.cakismalar.filter((c) => notionAcik() || c.saglayici !== "NOTION").length} eşitleme çakışması</b> seçiminizi bekliyor — Bağlantılar'da karar verin.</button>}
     <div className="istat">
       {([[aktif.filter((k) => k.veri.tip === "TALEP").length, "Aktif talep", () => git({ ad: "liste", tip: "TALEP" })], [aktif.filter((k) => k.veri.tip === "PORTFOY").length, "Aktif portföy", () => git({ ad: "liste", tip: "PORTFOY" })], [sunulabilir.length, "Sunulabilir eşleşme", () => git({ ad: "eslesmeler" })], [yaklasan.length, "14 gün içinde süresi dolacak", () => git({ ad: "liste", tip: "PORTFOY" })]] as const).map(([n, l, f]) =>
         <button key={l} className="istat-kutu" onClick={f}><b>{n}</b><span>{l}</span></button>)}
@@ -460,8 +467,8 @@ function Ayarlar() {
     </section>
     <section className="kart">
       <h3>Örnek veriyi sıfırla</h3>
-      <p className="ipucu">Eklediğiniz, düzenlediğiniz kayıtlar ve kişiler, eşleşme notları, içe aktarmalar ve Notion/Google bağlantıları silinir; örnek veri baştan yüklenir. Test işaretleriniz, notlarınız, ayarlar ve öğrettiğiniz konumlar korunur.</p>
-      {!onay ? <button className="btn" onClick={() => setOnay(true)}>Sıfırla…</button> : <div className="satir"><span>Emin misiniz?</span><button className="btn tehlike" onClick={() => { const { kayitlar, adaylar } = ornekVeriyiKur(); guncelle((x) => ({ ...x, kayitlar, adaylar, kisiler: ornekVeriyiKur().kisiler, eslesmeNotlari: {}, aktifIceAktarma: null, iceAktarmaGecmisi: [], baglantilar: { google: bosBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [] })); setOnay(false); bildir("Örnek veri yeniden yüklendi"); git({ ad: "ana" }); }}>Evet, sıfırla</button><button className="btn" onClick={() => setOnay(false)}>Vazgeç</button></div>}
+      <p className="ipucu">Eklediğiniz, düzenlediğiniz kayıtlar ve kişiler, eşleşme notları, içe aktarmalar ve Google bağlantısı silinir; örnek veri baştan yüklenir. Test işaretleriniz, notlarınız, ayarlar ve öğrettiğiniz konumlar korunur.</p>
+      {!onay ? <button className="btn" onClick={() => setOnay(true)}>Sıfırla…</button> : <div className="satir"><span>Emin misiniz?</span><button className="btn tehlike" onClick={() => { const { kayitlar, adaylar } = ornekVeriyiKur(); guncelle((x) => ({ ...x, kayitlar, adaylar, kisiler: ornekVeriyiKur().kisiler, eslesmeNotlari: {}, aktifIceAktarma: null, iceAktarmaGecmisi: [], baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleHaric: [], googleGiden: [], googleBekleyen: [] })); setOnay(false); bildir("Örnek veri yeniden yüklendi"); git({ ad: "ana" }); }}>Evet, sıfırla</button><button className="btn" onClick={() => setOnay(false)}>Vazgeç</button></div>}
     </section>
     </>}
   </div>;
@@ -502,7 +509,7 @@ function sekmeOf(e: Ekran, d: DepoDurumu): string {
 export function Uygulama() {
   const [yuk] = useState(depoYukle);
   const [d, setD] = useState<DepoDurumu>(yuk.durum);
-  const [ekran, setEkran] = useState<Ekran>({ ad: "ana" });
+  const [ekran, setEkran] = useState<Ekran>(CANLI.acik && CANLI.googleDonus ? { ad: "baglantilar" } : { ad: "ana" }); // v3.21: Google izin ekranından dönüşte doğrudan Bağlantılar
   const [gecmis, setGecmis] = useState<Ekran[]>([]); // v3.16 — ekran geçmişi: her ekranda "← Geri"
   const [mesaj, setMesaj] = useState<string | null>(yuk.yenilendi ? `v${SURUM}: örnek veri yenilendi` : null);
   const [surumAcik, setSurumAcik] = useState(false);
@@ -513,6 +520,7 @@ export function Uygulama() {
   useEffect(() => { depoKaydet(d); }, [d]);
   useEffect(() => { let iptal = false; (async () => { try { const s = CANLI.acik ? CANLI.sample : await (window as any).claude?.use("sample"); if (!iptal) setSample(() => s ?? null); /* fonksiyon doğrudan verilirse React onu güncelleyici sanıp çağırıyordu → v3.3 hatası "n.json is not a function" */ } catch { if (!iptal) setSample(null); } })(); return () => { iptal = true; }; }, []);
   useEffect(() => { if (!mesaj) return; const t = setTimeout(() => setMesaj(null), 2600); return () => clearTimeout(t); }, [mesaj]);
+  useEffect(() => googleOtomatik((f) => setD((x) => f(x))), []); // v3.21 canlı: açılışta ve 5 dakikada bir sessiz Google eşitlemesi
   const ctx: Ctx = {
     d, guncelle: (f) => setD((x) => f(x)), bildir: setMesaj, ornekHatalari: yuk.hatalar, sample,
     kayitKaydet: (k) => setD((x) => ({ ...x, kayitlar: x.kayitlar.some((y) => y.id === k.id) ? x.kayitlar.map((y) => (y.id === k.id ? k : y)) : [k, ...x.kayitlar] })),
@@ -523,7 +531,9 @@ export function Uygulama() {
   const aktifSekme = sekmeOf(ekran, d);
   const [menuAcik, setMenuAcik] = useState(false);
   const git = (e: Ekran) => { setMenuAcik(false); ctx.git(e); };
-  const cakisma = (d.cakismalar ?? []).length;
+  const cakisma = (d.cakismalar ?? []).filter((c) => notionAcik() || c.saglayici !== "NOTION").length;
+  // v3.21 — Bağlantılar canlıda da var: Google bu kurulumda açıksa herkese, açık değilse yalnızca platform yöneticisine (kurulum adımları için)
+  const baglantilarGorunur = !CANLI.acik || !!d.googleCanli?.hazir || CANLI.oturum?.bilgi?.kullanici.rol === "PLATFORM_YONETICISI";
   const nav: NavOge[] = [
     { k: "ana", etiket: "Ana Sayfa", ikon: "ana", git: () => git({ ad: "ana" }) },
     { k: "liste-T", etiket: "Talepler", ikon: "talep", git: () => git({ ad: "liste", tip: "TALEP" }) },
@@ -531,7 +541,7 @@ export function Uygulama() {
     { k: "eslesmeler", etiket: "Eşleşmeler", ikon: "eslesme", git: () => git({ ad: "eslesmeler" }) },
     { k: "izleme", etiket: "İzleme", ikon: "anahtar", git: () => git({ ad: "izleme" }), rozet: (d.favoriler ?? []).length || undefined },
     { k: "kisiler", etiket: "Kişiler", ikon: "kisi", git: () => git({ ad: "kisiler" }) },
-    ...(CANLI.acik ? [] : [{ k: "baglantilar", etiket: "Bağlantılar", ikon: "baglanti", git: () => git({ ad: "baglantilar" }), rozet: cakisma, alt: true } as NavOge]), // canlıda Notion/Google bağlantıları sonraki aşama
+    ...(baglantilarGorunur ? [{ k: "baglantilar", etiket: "Bağlantılar", ikon: "baglanti", git: () => git({ ad: "baglantilar" }), rozet: cakisma, alt: true } as NavOge] : []),
     { k: "veri", etiket: "Veri Girişi", ikon: "veri", git: () => git({ ad: "veri" }), alt: true },
     { k: "konumlar", etiket: "Konumlar", ikon: "konum", git: () => git({ ad: "konumlar" }), alt: true },
     ...(yonetimGorunur() ? [{ k: "yonetim", etiket: "Yönetim", ikon: "kisi", git: () => git({ ad: "yonetim" }), alt: true } as NavOge] : []), // v3.20
@@ -564,7 +574,7 @@ export function Uygulama() {
       {ekran.ad === "baglantilar" && <Baglantilar />}
       {ekran.ad === "yonetim" && <Yonetim />}
     </main>
-    <footer className="ayak">{MARKA.ad} v{SURUM} · {TARIH} — Demo: veriler yalnızca bu tarayıcıda saklanır; kişi adları ve telefonlar kurgusaldır</footer>
+    <footer className="ayak">{MARKA.ad} v{SURUM} · {TARIH}{CANLI.acik ? "" : " — Demo: veriler yalnızca bu tarayıcıda saklanır; kişi adları ve telefonlar kurgusaldır"}</footer>
     </div>
     <AltCubuk ogeler={nav.slice(0, 5)} aktif={aktifSekme} />
   </div>

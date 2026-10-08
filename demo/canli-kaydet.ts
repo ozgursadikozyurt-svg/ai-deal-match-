@@ -4,8 +4,8 @@
  * yalnızca değişenler POST /api/durum ile sunucuya yazılır. Sunucunun reddettiği kayıtlar (doğrulama hatası) "değişmemiş" sayılmaz, hata listesinde görünür.
  * Ağ koparsa değişiklikler bellekte durur, aralıklarla yeniden denenir; sekme kapatılırken bekleyen iş varsa tarayıcı uyarır.
  */
-import { imzaAl, planla, type Imza } from "./canli-esle";
-import type { DepoDurumu } from "./depo";
+import { imzaAl, planla, kisiYuku, type Imza } from "./canli-esle";
+import type { DepoDurumu, Kisi } from "./depo";
 
 export type KaydetAdi = "kayitli" | "bekliyor" | "kaydediliyor" | "hata";
 export interface KaydetDurumu { ad: KaydetAdi; hatalar: { id: string; mesaj: string }[]; mesaj?: string }
@@ -72,5 +72,30 @@ export function kaydediciKur(a: { api: Api; baslangic: DepoDurumu; durum: (s: Ka
     },
     async hemen() { if (zaman) { clearTimeout(zaman); zaman = undefined; } await (calisiyor ?? Promise.resolve()); await calistir(); },
     bekliyorMu: () => !!zaman || !!calisiyor || hatalar.length > 0 || !planla(imza, son).bos,
+    /**
+     * v3.21 — Google eşitlemesi kişileri SUNUCUDA değiştirir (yeni gelenler, güncellenenler, Google'a bağlananlar). Arayüz
+     * sunucudaki listeyi alınca bu işlev iki şeyi birlikte yapar: (1) yeni durumu üretir, (2) gelen kişileri "zaten kayıtlı"
+     * sayar — yoksa kuyruk onları yeniden sunucuya yazmaya (ya da eksik görüp SİLMEYE) kalkardı.
+     * Kaydedilmemiş yerel iş korunur: düzenlenmiş ama henüz yazılmamış kişi yerel hâliyle kalır, yeni eklenmiş kişi listede
+     * durur, silinmiş ama silmesi henüz gitmemiş kişi geri gelmez. Üçü de bir sonraki kayıtta sunucuya gider.
+     */
+    kisileriBirlestir(d: DepoDurumu, sunucu: Kisi[]): DepoDurumu {
+      const yerel = new Map(d.kisiler.map((k) => [k.id, k]));
+      const yerelImza = imzaAl(d).kisi;
+      const kirli = (id: string) => yerelImza.has(id) && imza.kisi.get(id) !== yerelImza.get(id); // yerelde var, kaydedilmemiş değişikliği var
+      const silinecek = (id: string) => imza.kisi.has(id) && !yerelImza.has(id);                    // yerelde silindi, silme henüz gitmedi
+      const sunucuIds = new Set(sunucu.map((k) => k.id));
+      const kisiler: Kisi[] = [];
+      const yeniImza = new Map<string, string>();
+      for (const k of sunucu) {
+        if (silinecek(k.id)) { yeniImza.set(k.id, imza.kisi.get(k.id)!); continue; }
+        if (kirli(k.id)) { kisiler.push(yerel.get(k.id)!); if (imza.kisi.has(k.id)) yeniImza.set(k.id, imza.kisi.get(k.id)!); continue; }
+        kisiler.push(k); yeniImza.set(k.id, JSON.stringify(kisiYuku(k)));
+      }
+      for (const k of d.kisiler) if (!sunucuIds.has(k.id) && !imza.kisi.has(k.id)) kisiler.push(k); // yeni eklenmiş, henüz yazılmamış
+      const y = { ...d, kisiler };
+      imza = { ...imza, kisi: yeniImza }; son = y;
+      return y;
+    },
   };
 }

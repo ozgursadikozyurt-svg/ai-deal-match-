@@ -8,3 +8,10 @@ SUPABASE_JWT_SECRET=test-gizli-anahtar-en-az-32-karakter-olmali-123
 IZINLI_EPOSTALAR=ozgur@test.com
 AI_API_KEY=
 CRON_SECRET=cron-test
+
+# v3.21 — Google ile bağlan. Canlıda yalnızca ilk ikisi girilir (Cloudflare › Variables and Secrets).
+# Yerel uçtan uca sınamada (npm run canli:test:google) sahte Google :9002'de çalışır; son iki satır yalnızca bunun içindir.
+GOOGLE_CLIENT_ID=test
+GOOGLE_CLIENT_SECRET=test
+GOOGLE_OAUTH_TABANI=http://127.0.0.1:9002
+GOOGLE_PEOPLE_TABANI=http://127.0.0.1:9002

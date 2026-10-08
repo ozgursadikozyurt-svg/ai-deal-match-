@@ -420,6 +420,7 @@ export const ModelName = {
   AuditLog: 'AuditLog',
   IngestionLog: 'IngestionLog',
   Entegrasyon: 'Entegrasyon',
+  SenkronHaric: 'SenkronHaric',
   SenkronCalisma: 'SenkronCalisma',
   SenkronCakisma: 'SenkronCakisma',
   NotionSyncLog: 'NotionSyncLog',
@@ -440,7 +441,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "ofis" | "kullanici" | "davet" | "il" | "ilce" | "mahalle" | "altBolge" | "altBolgeMahalle" | "ilceKomsuluk" | "lokasyonAlias" | "lokasyonAday" | "ayar" | "kayitLokasyon" | "kayit" | "mulkOzellik" | "kisi" | "kayitKisi" | "islenmisMesaj" | "match" | "portalIlan" | "auditLog" | "ingestionLog" | "entegrasyon" | "senkronCalisma" | "senkronCakisma" | "notionSyncLog" | "kayitNot" | "kayitFoto"
+    modelProps: "ofis" | "kullanici" | "davet" | "il" | "ilce" | "mahalle" | "altBolge" | "altBolgeMahalle" | "ilceKomsuluk" | "lokasyonAlias" | "lokasyonAday" | "ayar" | "kayitLokasyon" | "kayit" | "mulkOzellik" | "kisi" | "kayitKisi" | "islenmisMesaj" | "match" | "portalIlan" | "auditLog" | "ingestionLog" | "entegrasyon" | "senkronHaric" | "senkronCalisma" | "senkronCakisma" | "notionSyncLog" | "kayitNot" | "kayitFoto"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2146,6 +2147,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SenkronHaric: {
+      payload: Prisma.$SenkronHaricPayload<ExtArgs>
+      fields: Prisma.SenkronHaricFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SenkronHaricFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SenkronHaricPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SenkronHaricFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SenkronHaricPayload>
+        }
+        findFirst: {
+          args: Prisma.SenkronHaricFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SenkronHaricPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SenkronHaricFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SenkronHaricPayload>
+        }
+        findMany: {
+          args: Prisma.SenkronHaricFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SenkronHaricPayload>[]
+        }
+        create: {
+          args: Prisma.SenkronHaricCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SenkronHaricPayload>
+        }
+        createMany: {
+          args: Prisma.SenkronHaricCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SenkronHaricCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SenkronHaricPayload>[]
+        }
+        delete: {
+          args: Prisma.SenkronHaricDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SenkronHaricPayload>
+        }
+        update: {
+          args: Prisma.SenkronHaricUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SenkronHaricPayload>
+        }
+        deleteMany: {
+          args: Prisma.SenkronHaricDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SenkronHaricUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SenkronHaricUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SenkronHaricPayload>[]
+        }
+        upsert: {
+          args: Prisma.SenkronHaricUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SenkronHaricPayload>
+        }
+        aggregate: {
+          args: Prisma.SenkronHaricAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSenkronHaric>
+        }
+        groupBy: {
+          args: Prisma.SenkronHaricGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SenkronHaricGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SenkronHaricCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SenkronHaricCountAggregateOutputType> | number
+        }
+      }
+    }
     SenkronCalisma: {
       payload: Prisma.$SenkronCalismaPayload<ExtArgs>
       fields: Prisma.SenkronCalismaFieldRefs
@@ -2950,6 +3025,7 @@ export const KisiScalarFieldEnum = {
   googleSnapshot: 'googleSnapshot',
   notionSnapshot: 'notionSnapshot',
   kaynaktaSilindi: 'kaynaktaSilindi',
+  googleBekliyor: 'googleBekliyor',
   uzmanlikAileleri: 'uzmanlikAileleri',
   referans: 'referans',
   whatsappGruplari: 'whatsappGruplari',
@@ -3106,6 +3182,19 @@ export const EntegrasyonScalarFieldEnum = {
 } as const
 
 export type EntegrasyonScalarFieldEnum = (typeof EntegrasyonScalarFieldEnum)[keyof typeof EntegrasyonScalarFieldEnum]
+
+
+export const SenkronHaricScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  saglayici: 'saglayici',
+  disKimlik: 'disKimlik',
+  telefonAnahtar: 'telefonAnahtar',
+  ad: 'ad',
+  createdAt: 'createdAt'
+} as const
+
+export type SenkronHaricScalarFieldEnum = (typeof SenkronHaricScalarFieldEnum)[keyof typeof SenkronHaricScalarFieldEnum]
 
 
 export const SenkronCalismaScalarFieldEnum = {
@@ -4212,6 +4301,7 @@ export type GlobalOmitConfig = {
   auditLog?: Prisma.AuditLogOmit
   ingestionLog?: Prisma.IngestionLogOmit
   entegrasyon?: Prisma.EntegrasyonOmit
+  senkronHaric?: Prisma.SenkronHaricOmit
   senkronCalisma?: Prisma.SenkronCalismaOmit
   senkronCakisma?: Prisma.SenkronCakismaOmit
   notionSyncLog?: Prisma.NotionSyncLogOmit

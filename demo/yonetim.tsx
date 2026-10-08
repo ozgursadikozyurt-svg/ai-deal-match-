@@ -139,7 +139,7 @@ export function Yonetim() {
         <li>Fotoğraf: {sinir.fotoBasinaKayit ? `portföy başına ${sinir.fotoBasinaKayit}` : "kapalı (Pro'da açılır)"}</li>
         <li>Kullanıcı: en çok {sinir.kullanici}</li>
         <li>Günlük yapay zekâ yorumu: {sinir.gunlukAi}</li>
-        <li>Notion / Google senkronu: {sinir.entegrasyon ? "açık" : "kapalı"} · Portföy föyü (PDF/JPG): {sinir.paylasimFoyu ? "açık" : "kapalı"}</li>
+        <li>Google Kişiler eşitlemesi: {sinir.entegrasyon ? "açık" : "kapalı"} · Portföy föyü (PDF/JPG): {sinir.paylasimFoyu ? "açık" : "kapalı"}</li>
         <li>Ofisler arası ortak havuz: {sinir.ortakHavuz ? "hak tanımlı (özellik yakında)" : "Pro+ ile"}</li>
       </ul>
     </section>

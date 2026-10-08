@@ -1,5 +1,6 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026 (v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
+ * Anahtar CRM v3.21 · 8 Ekim 2026 (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
+ * v3.21 — çift yönlü Google: elle eklenen kişi ve bağlı kişideki düzeltme "Google'a gönderilecek" olur; silinen kişi Google'dan silinmez.
  * Demo — Kişiler: kişi seçici (yazdıkça arama, çoklu seçim, rol, + ile anında ekleme), kişi listesi ve kişi kartı.
  * Alanlar Notion "Müşteri-Yatırımcılar-Kişiler" tablosuna göre (ROL, Phone, Açıklama, Referans, ilişkili talep/portföy).
  */
@@ -9,11 +10,14 @@ import React, { useMemo, useRef, useState } from "react";
 import { MULK_AILELERI } from "../src/lib/domain/kategori";
 import { etiket } from "./etiketler";
 import { rolListesi, type RolTanim } from "../src/lib/domain/roller";
-import { yeniKisiId, BUGUN, NOT_TURU, type Kisi, type Kayit } from "./depo";
+import { yeniKisiId, BUGUN, NOT_TURU, CANLI, type Kisi, type Kayit, type DepoDurumu } from "./depo";
 import { useDepo, cx, Pill, IslemPill, TTL, baslikOf, fiyatOf, m2Of, lokEtiket, telYaz, tarihYaz, Kopyala, useEslesmeler, eKey, Skor, type Ctx } from "./ortak";
 import { telNormalize } from "./form";
 import { aramaLinki, whatsappLinki, selamMetni } from "../src/lib/iletisim";
-import { demoGoogleSenkron } from "./senkron-demo";
+import { demoGoogleSenkron, demoGoogleSilinenler } from "./senkron-demo";
+import { gonderimAlaniDegisti } from "../src/lib/google/kisiler";
+import { notionAcik } from "../src/lib/ozellikler";
+import { googleEsitle, ozetCumlesi } from "./google-baglanti";
 import { SiralaDugmesi, kisiSiralama, siralaUygula, type Siralama } from "./filtre";
 
 /** v3.7 — Ara + WhatsApp (WhatsApp Business kuruluysa onunla açılır) */
@@ -35,20 +39,39 @@ export type Bag = { kisiId: string; rol: string };
 /** v3.6 — kişinin geldiği yer: Google / Notion / WhatsApp / elle */
 export const kaynakOf = (k: Kisi): "GOOGLE" | "NOTION" | "WHATSAPP" | "MANUEL" => k.googleResourceName ? "GOOGLE" : k.notionId ? "NOTION" : k.kaynak === "GOOGLE" || k.kaynak === "NOTION" ? "MANUEL" : k.whatsappGruplari.length ? "WHATSAPP" : (k.kaynak ?? "MANUEL");
 const KAYNAK_ETIKET: Record<string, string> = { GOOGLE: "Google", NOTION: "Notion", WHATSAPP: "WhatsApp", MANUEL: "Elle" };
-export function KaynakRozeti({ k }: { k: Kisi }) {
-  const kk = kaynakOf(k);
-  return <>{(k.googleResourceName || kk === "GOOGLE") && <span className="kaynak-rozet google">Google</span>}{k.notionId && <span className="kaynak-rozet notion">Notion</span>}{kk === "WHATSAPP" && !k.googleResourceName && !k.notionId && <span className="kaynak-rozet wa">WhatsApp</span>}{k.kaynaktaSilindi && <span className="kaynak-rozet silindi">Google'dan silindi</span>}</>;
+/** v3.21 — Google bağlı ve çift yönlü açık mı? (demo: tarayıcı durumu · canlı: sunucudan okunan bağlantı özeti) */
+export const googleCiftYonlu = (d: DepoDurumu): boolean => d.baglantilar?.google.durum === "BAGLI" && !!d.baglantilar.google.ayar.googleYaz;
+const gAlan = (k: Kisi) => ({ adSoyad: k.adSoyad, telefon: k.telefon, ikincilTelefon: k.ikincilTelefon ?? null, email: k.email ?? null, sirket: k.sirket });
+/** Bu kişi bir sonraki eşitlemede Google'a yazılacak mı? */
+export const googleBekliyorMu = (k: Kisi): boolean => !k.kaynaktaSilindi && (!!k.googleBekliyor || (!!k.googleaGonder && !k.googleResourceName && !!k.telefon));
+/** Google'a bağlı kişide ad / telefon / e-posta / şirket düzeltildiyse "gönderilecek" diye işaretler (canlıda asıl işareti sunucu koyar; buradaki rozet içindir) */
+export const duzeltmeIsareti = (d: DepoDurumu, eski: Kisi, yeni: Kisi): Kisi => (googleCiftYonlu(d) && eski.googleResourceName && gonderimAlaniDegisti(gAlan(eski), gAlan(yeni)) ? { ...yeni, googleBekliyor: new Date().toISOString() } : yeni);
+/**
+ * Kişileri siler; bağlı oldukları kayıtlardan kişi bağını kaldırır (kayıtlar silinmez).
+ * v3.21 — Google bağlıysa silinen kişi Google'dan SİLİNMEZ; "geri gelmesin" listesine yazılır (demo: burada · canlı: sunucuda).
+ */
+export function kisileriSil(x: DepoDurumu, ids: Set<string>): DepoDurumu {
+  const silinen = x.kisiler.filter((k) => ids.has(k.id));
+  return {
+    ...x,
+    kisiler: x.kisiler.filter((k) => !ids.has(k.id)),
+    kayitlar: x.kayitlar.map((k) => ((k.veri.kisiler ?? []).some((b) => ids.has(b.kisiId)) ? { ...k, veri: { ...k.veri, kisiler: (k.veri.kisiler ?? []).filter((b) => !ids.has(b.kisiId)) } } : k)),
+    ...(CANLI.acik ? {} : { googleHaric: demoGoogleSilinenler(x, silinen) }),
+  };
 }
-
-/** Yeni kişi ekler; aynı telefon varsa mevcut kişiyi döner (tekrar oluşturmaz) */
-export function kisiEkle(guncelle: Ctx["guncelle"], d: Ctx["d"], girdi: { adSoyad: string; telefon?: string | null; sirket?: string | null; roller?: string[]; grup?: string | null }): string {
+export function KaynakRozeti({ k }: { k: Kisi }) {
+  const { d } = useDepo();
+  const kk = kaynakOf(k);
+  return <>{(k.googleResourceName || kk === "GOOGLE") && <span className="kaynak-rozet google">Google</span>}{k.notionId && <span className="kaynak-rozet notion">Notion</span>}{kk === "WHATSAPP" && !k.googleResourceName && !k.notionId && <span className="kaynak-rozet wa">WhatsApp</span>}{k.kaynaktaSilindi && <span className="kaynak-rozet silindi">Google'dan silindi</span>}{googleCiftYonlu(d) && googleBekliyorMu(k) && <span className="kaynak-rozet bekliyor" title="Bir sonraki eşitlemede Google rehberinize yazılacak">Google'a gönderilecek</span>}</>;
+}
+export function kisiEkle(guncelle: Ctx["guncelle"], d: Ctx["d"], girdi: { adSoyad: string; telefon?: string | null; sirket?: string | null; roller?: string[]; grup?: string | null; /** v3.21 — kullanıcı kişiyi ELLE ekledi: Google bağlıysa rehbere de gider. Otomatik / toplu eklemelerde verilmez. */ elle?: boolean }): string {
   const tel = telNormalize(girdi.telefon) || null;
   const var_ = tel ? d.kisiler.find((k) => k.telefon === tel) : undefined;
   if (var_) {
     guncelle((x) => ({ ...x, kisiler: x.kisiler.map((k) => (k.id === var_.id ? { ...k, roller: [...new Set([...k.roller, ...(girdi.roller ?? [])])], whatsappGruplari: girdi.grup && !k.whatsappGruplari.includes(girdi.grup) ? [...k.whatsappGruplari, girdi.grup] : k.whatsappGruplari } : k)) }));
     return var_.id;
   }
-  const yeni: Kisi = { id: yeniKisiId(), adSoyad: girdi.adSoyad.trim(), telefon: tel, sirket: girdi.sirket ?? null, roller: girdi.roller ?? [], uzmanlikAileleri: [], referans: null, notlar: null, whatsappGruplari: girdi.grup ? [girdi.grup] : [], olusturma: BUGUN.toISOString(), sonIletisim: null };
+  const yeni: Kisi = { id: yeniKisiId(), adSoyad: girdi.adSoyad.trim(), telefon: tel, sirket: girdi.sirket ?? null, roller: girdi.roller ?? [], uzmanlikAileleri: [], referans: null, notlar: null, whatsappGruplari: girdi.grup ? [girdi.grup] : [], olusturma: BUGUN.toISOString(), sonIletisim: null, ...(girdi.elle && tel ? { googleaGonder: true } : {}) };
   guncelle((x) => ({ ...x, kisiler: [yeni, ...x.kisiler] }));
   return yeni.id;
 }
@@ -86,7 +109,7 @@ export function KisiSecici({ secili, degis, varsayilanRol = "DIGER", oneri }: { 
         <div className="alan"><label htmlFor="yk-tel">Telefon</label><TelGirdisi id="yk-tel" deger={yeni.telefon} onChange={(v) => setYeni({ ...yeni, telefon: v })} /></div>
         <div className="alan"><label htmlFor="yk-rol">Bu kayıttaki rolü</label><select id="yk-rol" value={yeni.rol} onChange={(e) => setYeni({ ...yeni, rol: e.target.value })}>{KAYIT_ROLLERI.map(([r, l]) => <option key={r} value={r}>{l}</option>)}</select></div>
       </div>
-      <div className="satir"><button type="button" className="btn birincil" disabled={yeni.adSoyad.trim().length < 2 || !!telUyarisi(yeni.telefon)} onClick={() => { const id = kisiEkle(guncelle, d, { adSoyad: yeni.adSoyad, telefon: yeni.telefon }); ekle(id, yeni.rol); setYeni(null); }}>Ekle</button><button type="button" className="btn" onClick={() => setYeni(null)}>Vazgeç</button>
+      <div className="satir"><button type="button" className="btn birincil" disabled={yeni.adSoyad.trim().length < 2 || !!telUyarisi(yeni.telefon)} onClick={() => { const id = kisiEkle(guncelle, d, { elle: true, adSoyad: yeni.adSoyad, telefon: yeni.telefon }); ekle(id, yeni.rol); setYeni(null); }}>Ekle</button><button type="button" className="btn" onClick={() => setYeni(null)}>Vazgeç</button>
         {telNormalize(yeni.telefon) && d.kisiler.some((k) => k.telefon === telNormalize(yeni.telefon)) && <span className="ipucu">Bu telefon kayıtlı; mevcut kişi bağlanacak.</span>}</div>
     </div>}
   </div>;
@@ -132,26 +155,38 @@ export function Kisiler() {
   const filtreSayisi = roller.length + kaynaklar.length + (bag ? 1 : 0) + (tel ? 1 : 0);
   const filtreVar = !!(q || filtreSayisi);
   const temizle = () => { setQ(""); setRoller([]); setKaynaklar([]); setBag(""); setTel(""); };
+  // v3.21 — Google
+  const gBagli = d.baglantilar?.google.durum === "BAGLI";
+  const gGorunur = !CANLI.acik || !!d.googleCanli?.hazir;                       // canlıda Google bu kurulumda açılmadıysa düğme yok
+  const gYetkili = !CANLI.acik || !!d.googleCanli?.yetkili;
+  const [gMesgul, setGMesgul] = useState(false);
   const topluSil = () => {
     const ids = new Set(gorunenSecili.map((k) => k.id));
-    guncelle((x) => ({
-      ...x,
-      kisiler: x.kisiler.filter((k) => !ids.has(k.id)),
-      kayitlar: x.kayitlar.map((k) => ((k.veri.kisiler ?? []).some((b) => ids.has(b.kisiId)) ? { ...k, veri: { ...k.veri, kisiler: (k.veri.kisiler ?? []).filter((b) => !ids.has(b.kisiId)) } } : k)),
-    }));
-    bildir(`${ids.size} kişi silindi`); setSecili(new Set()); setSilOnay(false); setDuzenId(null);
+    guncelle((x) => kisileriSil(x, ids));
+    bildir(`${ids.size} kişi silindi${gBagli ? " — Google rehberinizde duruyor" : ""}`); setSecili(new Set()); setSilOnay(false); setDuzenId(null);
+  };
+  const googleEsitleTikla = () => {
+    if (!gBagli) return git({ ad: "baglantilar" });
+    if (CANLI.acik) { setGMesgul(true); googleEsitle(guncelle).then((o) => bildir(ozetCumlesi(o))).catch((e) => bildir("Eşitlenemedi: " + String(e?.message ?? e))).finally(() => setGMesgul(false)); return; }
+    let o: any; guncelle((x) => { const r = demoGoogleSenkron(x, "kullanici"); o = r.calisma.ozet; return r.d; }); bildir(ozetCumlesi(o));
+  };
+  const gonderilebilir = gorunenSecili.filter((k) => !k.googleResourceName && k.telefon && !k.kaynaktaSilindi && !googleBekliyorMu(k));
+  const googleaGonder = () => {
+    const ids = new Set(gonderilebilir.map((k) => k.id));
+    guncelle((x) => ({ ...x, kisiler: x.kisiler.map((k) => (ids.has(k.id) ? { ...k, googleaGonder: true } : k)) }));
+    bildir(`${ids.size} kişi bir sonraki eşitlemede Google rehberinize eklenecek`); setSecili(new Set());
   };
   const toplamBag = gorunenSecili.reduce((a, k) => a + kayitSay(k.id), 0);
-  const harici = gorunenSecili.filter((k) => k.googleResourceName || k.notionId).length;
+  const harici = gorunenSecili.filter((k) => k.googleResourceName).length;
   const degisSec = (id: string) => setSecili((x) => { const y = new Set(x); if (y.has(id)) y.delete(id); else y.add(id); return y; });
   const hepsiSecili = sirali.length > 0 && sirali.every((k) => secili.has(k.id));
   return <div className="yigin">
-    <div className="satir-ara"><h2>Kişiler</h2><div className="satir"><button className="btn" onClick={() => { if (d.baglantilar?.google.durum !== "BAGLI") return git({ ad: "baglantilar" }); let o: any; guncelle((x) => { const r = demoGoogleSenkron(x, "kullanici"); o = r.calisma.ozet; return r.d; }); bildir(o ? `Google: ${o.yeni} yeni, ${o.guncellenen + o.baglanan} güncellenen` : "Google eşitlendi"); }}>{d.baglantilar?.google.durum === "BAGLI" ? `Google'dan çek${(d.googleBekleyen ?? []).length ? ` (${d.googleBekleyen!.length} yeni)` : ""}` : "Google Kişiler'i bağla"}</button><button className="btn birincil" onClick={() => setYeniAcik(!yeniAcik)}>+ Yeni kişi</button></div></div>
+    <div className="satir-ara"><h2>Kişiler</h2><div className="satir">{gGorunur && (gBagli || gYetkili) && <button className="btn" disabled={gMesgul || (gBagli && !gYetkili)} onClick={googleEsitleTikla}>{gMesgul ? "Eşitleniyor…" : gBagli ? `Google ile eşitle${(d.googleBekleyen ?? []).length ? ` (${d.googleBekleyen!.length} yeni)` : ""}` : "Google ile bağlan"}</button>}<button className="btn birincil" onClick={() => setYeniAcik(!yeniAcik)}>+ Yeni kişi</button></div></div>
     {yeniAcik && <div className="kart"><div className="alanlar">
       <div className="alan"><label htmlFor="nk-ad">Ad soyad / firma</label><input id="nk-ad" value={yeni.adSoyad} onChange={(e) => setYeni({ ...yeni, adSoyad: e.target.value })} /></div>
       <div className="alan"><label htmlFor="nk-tel">Telefon</label><TelGirdisi id="nk-tel" deger={yeni.telefon} onChange={(v) => setYeni({ ...yeni, telefon: v })} /></div>
       <div className="alan"><label htmlFor="nk-rol">Rol</label><select id="nk-rol" value={yeni.rol} onChange={(e) => setYeni({ ...yeni, rol: e.target.value })}><option value="">—</option>{KISI_ROLLERI.map(([r, l]) => <option key={r} value={r}>{l}</option>)}</select></div>
-    </div><div className="satir"><button className="btn birincil" disabled={yeni.adSoyad.trim().length < 2 || !!telUyarisi(yeni.telefon)} onClick={() => { const id = kisiEkle(guncelle, d, { adSoyad: yeni.adSoyad, telefon: yeni.telefon, roller: yeni.rol ? [yeni.rol] : [] }); setYeni({ adSoyad: "", telefon: "", rol: "" }); setYeniAcik(false); git({ ad: "kisi", id }); }}>Ekle ve kartı aç</button></div></div>}
+    </div><div className="satir"><button className="btn birincil" disabled={yeni.adSoyad.trim().length < 2 || !!telUyarisi(yeni.telefon)} onClick={() => { const id = kisiEkle(guncelle, d, { elle: true, adSoyad: yeni.adSoyad, telefon: yeni.telefon, roller: yeni.rol ? [yeni.rol] : [] }); setYeni({ adSoyad: "", telefon: "", rol: "" }); setYeniAcik(false); git({ ad: "kisi", id }); }}>Ekle ve kartı aç</button></div></div>}
     <div className="fc"><div className="fc-ara"><span aria-hidden="true">⌕</span><input type="search" aria-label="Kişi ara" placeholder="Ara: ad, şirket, telefon, e-posta, rol, not…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       <button type="button" className={cx("fc-btn", filtreSayisi > 0 && "on")} onClick={() => setFiltreAcik(!filtreAcik)} aria-expanded={filtreAcik}>Filtrele{filtreSayisi > 0 && <b className="fc-rozet">{filtreSayisi}</b>}</button>
       <SiralaDugmesi secenekler={kisiSiralama(kSay)} s={sr} set={setSr} /></div>
@@ -168,7 +203,7 @@ export function Kisiler() {
         <div className="cip-satir">{[...KISI_ROLLERI, [ROLSUZ, "Rolü yok"] as [string, string]].map(([r, l]) => { const n = r === ROLSUZ ? d.kisiler.filter((k) => !k.roller.length).length : d.kisiler.filter((k) => k.roller.includes(r)).length; const on = roller.includes(r); if (!n && !on && r === ROLSUZ) return null; return <button key={r} className={cx("cip secilir", on && "on")} style={!n && !on ? { opacity: 0.55 } : undefined} onClick={() => setRoller(on ? roller.filter((x) => x !== r) : [...roller, r])}>{l} <small>{n}</small></button>; })}</div>
       </details>
       <details><summary>Kaynak <small className="ipucu">{kaynaklar.length ? `${kaynaklar.length} seçili` : "Tümü"}</small></summary>
-        <div className="cip-satir">{["GOOGLE", "NOTION", "WHATSAPP", "MANUEL"].map((x) => { const n = d.kisiler.filter((k) => kaynakTutar(k, x)).length; if (!n) return null; const on = kaynaklar.includes(x); return <button key={x} className={cx("cip secilir", on && "on")} onClick={() => setKaynaklar(on ? kaynaklar.filter((y) => y !== x) : [...kaynaklar, x])}>{KAYNAK_ETIKET[x]} <small>{n}</small></button>; })}</div>
+        <div className="cip-satir">{["GOOGLE", ...(notionAcik() ? ["NOTION"] : []), "WHATSAPP", "MANUEL"].map((x) => { const n = d.kisiler.filter((k) => kaynakTutar(k, x)).length; if (!n) return null; const on = kaynaklar.includes(x); return <button key={x} className={cx("cip secilir", on && "on")} onClick={() => setKaynaklar(on ? kaynaklar.filter((y) => y !== x) : [...kaynaklar, x])}>{KAYNAK_ETIKET[x]} <small>{n}</small></button>; })}</div>
       </details>
       <details><summary>Kayıt ve telefon <small className="ipucu">{[bag ? "kayıt" : "", tel ? "telefon" : ""].filter(Boolean).join(", ") || "Tümü"}</small></summary>
         <div className="satir sar">
@@ -182,11 +217,11 @@ export function Kisiler() {
       <span className="ipucu">{liste.length} kişi{gorunenSecili.length > 0 && ` · ${gorunenSecili.length} seçili`}</span>
       {!secimModu ? <button className="btn kucuk" onClick={() => setSecimModu(true)} disabled={!sirali.length}>Seç</button> : <div className="kisi-arac-sec">
         <label className="kisi-hepsi"><input type="checkbox" aria-label="Listedeki tüm kişileri seç" checked={hepsiSecili} onChange={(e) => setSecili(e.target.checked ? new Set([...secili, ...sirali.map((k) => k.id)]) : new Set([...secili].filter((id) => !sirali.some((k) => k.id === id))))} /> {filtreVar ? "Süzülenlerin" : "Tümünün"} seçimi ({sirali.length})</label>
-        {gorunenSecili.length > 0 && !silOnay && <><button className="btn kucuk" onClick={() => setSecili(new Set())}>Seçimi kaldır</button><button className="btn kucuk tehlike" onClick={() => setSilOnay(true)}>Toplu sil ({gorunenSecili.length})</button></>}
+        {gorunenSecili.length > 0 && !silOnay && <><button className="btn kucuk" onClick={() => setSecili(new Set())}>Seçimi kaldır</button>{googleCiftYonlu(d) && gonderilebilir.length > 0 && <button className="btn kucuk" onClick={googleaGonder}>Google'a gönder ({gonderilebilir.length})</button>}<button className="btn kucuk tehlike" onClick={() => setSilOnay(true)}>Toplu sil ({gorunenSecili.length})</button></>}
         <button className="btn kucuk" onClick={() => { setSecimModu(false); setSecili(new Set()); setSilOnay(false); }}>Bitti</button>
       </div>}
     </div>
-    {silOnay && <div className="hata-kutu" role="alert"><b>{gorunenSecili.length} kişi silinecek.</b> Bağlı oldukları {toplamBag} kayıttan kişi bağı kalkar (kayıtların kendisi silinmez).{harici > 0 ? ` ${harici} kişi Google/Notion'dan geldi; bağlantı açıksa bir sonraki eşitlemede geri gelebilir.` : ""}
+    {silOnay && <div className="hata-kutu" role="alert"><b>{gorunenSecili.length} kişi silinecek.</b> Bağlı oldukları {toplamBag} kayıttan kişi bağı kalkar (kayıtların kendisi silinmez).{gBagli ? <> <b>Google rehberinizden silinmez</b>{harici > 0 ? ` (${harici} kişi Google'a bağlı)` : ""}; silinen kişiler bir sonraki eşitlemede Anahtar'a geri de gelmez. İsterseniz Bağlantılar › "Silinenleri yeniden getir" ile geri alırsınız.</> : null}
       <div className="satir"><button className="btn tehlike" onClick={topluSil}>Evet, sil</button><button className="btn" onClick={() => setSilOnay(false)}>Vazgeç</button></div></div>}
     {sirali.map((k) => { const ky = kisininKayitlari(d.kayitlar, k.id); return <React.Fragment key={k.id}>
       <div className={cx("kart kisi-kart", secili.has(k.id) && "secili")} role="button" tabIndex={0} onClick={() => (secimModu ? degisSec(k.id) : git({ ad: "kisi", id: k.id }))} onKeyDown={(e) => { if (e.key === "Enter") (secimModu ? degisSec(k.id) : git({ ad: "kisi", id: k.id })); }}>
@@ -212,7 +247,7 @@ function HizliDuzen({ k, kapat }: { k: Kisi; kapat: () => void }) {
   const kaydet = () => {
     if (f.adSoyad.trim().length < 2) return bildir("Ad en az 2 karakter olmalı");
     const u = telUyarisi(f.telefon); if (u) return bildir(u);
-    guncelle((x) => ({ ...x, kisiler: x.kisiler.map((y) => (y.id === k.id ? { ...f, adSoyad: f.adSoyad.trim(), telefon: telNormalize(f.telefon) || null } : y)) }));
+    guncelle((x) => ({ ...x, kisiler: x.kisiler.map((y) => (y.id === k.id ? duzeltmeIsareti(x, y, { ...f, adSoyad: f.adSoyad.trim(), telefon: telNormalize(f.telefon) || null }) : y)) }));
     bildir("Kişi güncellendi"); kapat();
   };
   return <section className="kart form" onClick={(e) => e.stopPropagation()}>
@@ -240,7 +275,7 @@ export function KisiKarti({ id }: { id: string }) {
   const ky = kisininKayitlari(d.kayitlar, id);
   const idler = new Set(ky.map((x) => x.id));
   const kisiEs = es.filter((e) => (idler.has(e.t.id) || idler.has(e.p.id)) && e.s.uygunluk !== "UYGUN_DEGIL");
-  const kaydet = () => { if (telUyarisi(f.telefon)) { bildir(telUyarisi(f.telefon)!); return; } guncelle((x) => ({ ...x, kisiler: x.kisiler.map((y) => (y.id === id ? { ...f, telefon: telNormalize(f.telefon) || null } : y)) })); setDuzen(false); bildir("Kişi güncellendi"); };
+  const kaydet = () => { if (telUyarisi(f.telefon)) { bildir(telUyarisi(f.telefon)!); return; } guncelle((x) => ({ ...x, kisiler: x.kisiler.map((y) => (y.id === id ? duzeltmeIsareti(x, y, { ...f, telefon: telNormalize(f.telefon) || null }) : y)) })); setDuzen(false); bildir("Kişi güncellendi"); };
   const rolBagi = (kayit: Kayit) => (kayit.veri.kisiler ?? []).filter((b) => b.kisiId === id).map((b) => rolAd(b.rol, KAYIT_ROLLERI)).join(", ");
   return <div className="yigin">
     <section className="kart kisi-bas">
@@ -252,7 +287,11 @@ export function KisiKarti({ id }: { id: string }) {
         <IletisimDugmeleri tel={k.telefon} ad={k.adSoyad} />
         <div className="pill-satir"><KaynakRozeti k={k} />{k.roller.map((r) => <Pill key={r}>{rolAd(r)}</Pill>)}{k.uzmanlikAileleri.map((a) => <Pill key={a} ton="mavi">{MULK_AILELERI.find((x) => x.kod === a)?.etiket ?? a}</Pill>)}</div>
       </div>
-      <button className="btn kucuk" onClick={() => { setF(k); setDuzen(!duzen); }}>{duzen ? "Vazgeç" : "Düzenle"}</button>
+      <div className="yigin kucuk-bosluk" style={{ alignItems: "flex-end" }}>
+        <button className="btn kucuk" onClick={() => { setF(k); setDuzen(!duzen); }}>{duzen ? "Vazgeç" : "Düzenle"}</button>
+        {/* v3.21 — toplu içe aktarılmış / WhatsApp'tan gelmiş kişiyi tek tek Google rehberine gönder */}
+        {googleCiftYonlu(d) && !k.googleResourceName && k.telefon && !k.kaynaktaSilindi && !googleBekliyorMu(k) && <button className="btn kucuk" onClick={() => { guncelle((x) => ({ ...x, kisiler: x.kisiler.map((y) => (y.id === id ? { ...y, googleaGonder: true } : y)) })); bildir("Bir sonraki eşitlemede Google rehberinize eklenecek"); }}>Google'a gönder</button>}
+      </div>
     </section>
     {duzen && <section className="kart form">
       <div className="alanlar">

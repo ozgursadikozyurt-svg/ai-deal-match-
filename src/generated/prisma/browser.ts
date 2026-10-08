@@ -139,6 +139,13 @@ export type IngestionLog = Prisma.IngestionLogModel
  */
 export type Entegrasyon = Prisma.EntegrasyonModel
 /**
+ * Model SenkronHaric
+ * v3.21 — Anahtar'dan silinen kişi dış kaynakta (Google) SİLİNMEZ; ama bir sonraki eşitlemede geri de gelmemelidir.
+ * Silinen kişinin dış kimliği ve telefon anahtarı (son 10 hane) burada tutulur; senkron bu listedekileri yeniden eklemez.
+ * "Silinenleri yeniden getir" bu listeyi boşaltır.
+ */
+export type SenkronHaric = Prisma.SenkronHaricModel
+/**
  * Model SenkronCalisma
  * v3.6 — her senkron çalışmasının özeti (Bağlantılar ekranındaki geçmiş)
  */

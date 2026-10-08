@@ -1,9 +1,10 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
- * Demo: Google Kişiler ve Notion senkronu — sunucudaki planlayıcıların AYNISI (google/kisiler.ts, notion/plan.ts)
+ * Anahtar CRM v3.21 · 8 Ekim 2026 (v3.13'ten)
+ * Demo: Google Kişiler (v3.21: çift yönlü) ve Notion senkronu — sunucudaki planlayıcıların AYNISI (google/kisiler.ts, notion/plan.ts)
  * tarayıcı deposuna uygulanır. Dış veri: demo/ornek-entegrasyon.ts (1. tur ilk bağlantı, 2. tur dış değişiklik).
  */
-import { googleKisiDonustur, googleSenkronPlani, type MevcutKisi } from "../src/lib/google/kisiler";
+import { googleKisiDonustur, googleSenkronPlani, googleGonderimPlani, GONDERIM_ALANLARI, type MevcutKisi, type HaricListesi, type GonderimAdayi } from "../src/lib/google/kisiler";
+import { telAnahtari } from "../src/lib/senkron/birlestir";
 import { kisiTaslagi, portfoyTaslagi, talepTaslagi, kisidenTalep, kayitHazirla, kayitAlanlari, type KisiTaslagi, type KayitTaslagi } from "../src/lib/notion/donustur";
 import { kisiPlani, kayitPlani, type MevcutNotionKayit, type HazirKayit } from "../src/lib/notion/plan";
 import { geriYazimDegerleri, geriYazimGerekli } from "../src/lib/notion/geri-yazim";
@@ -18,16 +19,30 @@ const cid = () => "C" + Math.random().toString(36).slice(2, 8);
 const eKey = (t: string, p: string) => `${t}~${p}`;
 const toplamEslesme = (kayitlar: Kayit[]) => [...eslesmeOzetleri(kayitlar, BAGLAM).entries()].filter(([id]) => kayitlar.find((k) => k.id === id)?.veri.tip === "TALEP").reduce((a, [, o]) => a + o.sayi, 0);
 
-// ───────────────────────────── Google ─────────────────────────────
+// ───────────────────────────── Google (v3.21 — çift yönlü) ─────────────────────────────
+/** Demo: Anahtar'dan silinen kişiler "Google'dan geri gelmesin" listesine yazılır (canlıda sunucu yapar: googleSilinenleriIsaretle). Kişi Google'da DURUR. */
+export function demoGoogleSilinenler(d: DepoDurumu, silinen: Kisi[]): DepoDurumu["googleHaric"] {
+  if (d.baglantilar?.google.durum !== "BAGLI") return d.googleHaric ?? [];
+  const yeni = silinen.filter((k) => k.googleResourceName || telAnahtari(k.telefon)).map((k) => ({ kimlik: k.googleResourceName ?? null, tel: telAnahtari(k.telefon), ad: k.adSoyad, tarih: simdiIso() }));
+  return [...yeni, ...(d.googleHaric ?? [])];
+}
+/** Demo: "Silinenleri yeniden getir" — liste boşalır, rehber baştan okunur (tur sıfırlanır) */
+export function demoGoogleHaricTemizle(d: DepoDurumu): DepoDurumu {
+  return { ...d, googleHaric: [], baglantilar: { ...d.baglantilar, google: { ...d.baglantilar.google, tur: 0 } } };
+}
+const gAlan = (k: Kisi) => ({ adSoyad: k.adSoyad, telefon: k.telefon, ikincilTelefon: k.ikincilTelefon ?? null, email: k.email ?? null, sirket: k.sirket, notlar: k.notlar });
+
 export function demoGoogleSenkron(d: DepoDurumu, tetik: string): { d: DepoDurumu; calisma: DemoCalisma } {
   const b = d.baglantilar.google;
   const tur = b.tur + 1;
-  // v3.7: telefonda Google'a kaydedilen kişiler (benzetim) her çekimde gelir
+  // v3.7: telefonda Google'a kaydedilen kişiler (benzetim) her çekimde gelir. v3.21: tam okuma (tur 1) silinenleri de yeniden değerlendirir.
   const kisilerG = [...(tur === 1 ? GOOGLE_TUR1 : tur === 2 ? GOOGLE_TUR2 : []), ...(d.googleBekleyen ?? [])];
   const grupAdi = new Map(GOOGLE_GRUPLAR.map((g) => [g.resourceName, g.formattedName!]));
   const donusum = kisilerG.map((p) => googleKisiDonustur(p, grupAdi, b.ayar.sadeceEtiketler));
-  const mevcut: MevcutKisi[] = d.kisiler.map((k) => ({ id: k.id, adSoyad: k.adSoyad, telefon: k.telefon, ikincilTelefon: k.ikincilTelefon ?? null, email: k.email ?? null, sirket: k.sirket, notlar: k.notlar, roller: k.roller, googleResourceName: k.googleResourceName ?? null, googleSnapshot: (k.googleSnapshot as any) ?? null }));
-  const plan = googleSenkronPlani(mevcut, donusum);
+  const mevcut: MevcutKisi[] = d.kisiler.map((k) => ({ id: k.id, ...gAlan(k), roller: k.roller, googleResourceName: k.googleResourceName ?? null, googleSnapshot: (k.googleSnapshot as any) ?? null }));
+  // ───── 1) ÇEK: Google → Anahtar (Anahtar'dan silinmiş kişiler geri gelmez) ─────
+  const haric: HaricListesi = { kimlikler: new Set((d.googleHaric ?? []).map((h) => h.kimlik).filter((x): x is string => !!x)), telefonlar: new Set((d.googleHaric ?? []).map((h) => h.tel).filter((x): x is string => !!x)) };
+  const plan = googleSenkronPlani(mevcut, donusum, haric);
   let kisiler = d.kisiler.slice();
   const cakismalar: DemoCakisma[] = [];
   for (const x of plan.guncelle) {
@@ -35,12 +50,31 @@ export function demoGoogleSenkron(d: DepoDurumu, tetik: string): { d: DepoDurumu
     const k = kisiler.find((y) => y.id === x.id)!;
     x.cakismalar.forEach((c) => cakismalar.push({ id: cid(), saglayici: "GOOGLE_KISILER", hedefTip: "KISI", hedefId: x.id, baslik: k.adSoyad, ...c }));
   }
-  for (const x of plan.bagiKopar) kisiler = kisiler.map((k) => (k.id !== x.id ? k : { ...k, googleResourceName: null, googleSnapshot: null, kaynaktaSilindi: BUGUN.toISOString(), notlar: [k.notlar, `Google Kişiler'den silindi (${BUGUN.toLocaleDateString("tr-TR")})`].filter(Boolean).join("\n") }));
+  for (const x of plan.bagiKopar) kisiler = kisiler.map((k) => (k.id !== x.id ? k : { ...k, googleResourceName: null, googleSnapshot: null, googleBekliyor: null, googleaGonder: false, kaynaktaSilindi: BUGUN.toISOString(), notlar: [k.notlar, `Google Kişiler'den silindi (${BUGUN.toLocaleDateString("tr-TR")})`].filter(Boolean).join("\n") }));
   const yeni: Kisi[] = plan.ekle.map((x) => ({ id: yeniKisiId(), ...x.alanlar, adSoyad: x.alanlar.adSoyad!, roller: x.roller, uzmanlikAileleri: [], referans: null, whatsappGruplari: [], olusturma: BUGUN.toISOString(), sonIletisim: null, kaynak: "GOOGLE", googleResourceName: x.resourceName, googleSnapshot: x.snapshot }));
+  kisiler = [...yeni, ...kisiler];
+
+  // ───── 2) GÖNDER: Anahtar → Google (yalnızca "gönderilecek" işaretli kişiler; Google'dan hiçbir şey silinmez) ─────
+  const ozet: Record<string, number> = { ...plan.ozet, gonderilenYeni: 0, gonderilenGuncel: 0 };
+  let giden = d.googleGiden ?? [];
+  if (b.ayar.googleYaz) {
+    const cakismali = new Set([...cakismalar, ...d.cakismalar].filter((c) => c.saglayici === "GOOGLE_KISILER").map((c) => c.hedefId));
+    const gp = googleGonderimPlani(kisiler.map((k): GonderimAdayi => ({ id: k.id, ...gAlan(k), googleResourceName: k.googleResourceName ?? null, googleSnapshot: (k.googleSnapshot as any) ?? null, googleBekliyor: k.googleBekliyor ?? (k.googleaGonder ? simdiIso() : null), kaynaktaSilindi: k.kaynaktaSilindi ?? null })), { cakismali, sinir: 200, olusturma: !b.ayar.sadeceEtiketler.length });
+    const olustur = new Map(gp.olustur.map((x) => [x.id, x])), guncelle = new Map(gp.guncelle.map((x) => [x.id, x])), temizle = new Set(gp.temizle);
+    const yeniGiden: NonNullable<DepoDurumu["googleGiden"]> = [];
+    kisiler = kisiler.map((k) => {
+      const o = olustur.get(k.id), g = guncelle.get(k.id);
+      if (o) { yeniGiden.push({ ad: k.adSoyad, telefon: o.alanlar.telefon, islem: "EKLENDI", tarih: simdiIso() }); ozet.gonderilenYeni++; return { ...k, googleResourceName: "people/anahtar-" + k.id, googleSnapshot: { adSoyad: o.alanlar.adSoyad, telefon: o.alanlar.telefon, ikincilTelefon: o.alanlar.ikincilTelefon ?? null, email: o.alanlar.email ?? null, sirket: o.alanlar.sirket ?? null, notlar: null }, googleBekliyor: null, googleaGonder: false }; }
+      if (g) { yeniGiden.push({ ad: k.adSoyad, telefon: k.telefon, islem: "GUNCELLENDI", alanlar: Object.keys(g.degisen), tarih: simdiIso() }); ozet.gonderilenGuncel++; return { ...k, googleSnapshot: { ...g.onceki, ...g.degisen }, googleBekliyor: null, googleaGonder: false }; }
+      if (temizle.has(k.id)) return { ...k, googleBekliyor: null, googleaGonder: false };
+      return k;
+    });
+    giden = [...yeniGiden, ...giden].slice(0, 60);
+  }
   const atlanan = plan.atlanan.map((a) => ({ ad: kisilerG.find((p) => p.resourceName === a.resourceName)?.names?.[0]?.displayName ?? a.resourceName, neden: a.neden }));
-  const calisma: DemoCalisma = { id: cid(), saglayici: "GOOGLE_KISILER", tarih: simdiIso(), tetik, ozet: plan.ozet, kontrol: [], yeniEslesme: 0, geriYazim: [], atlanan };
+  const calisma: DemoCalisma = { id: cid(), saglayici: "GOOGLE_KISILER", tarih: simdiIso(), tetik, ozet, kontrol: [], yeniEslesme: 0, geriYazim: [], atlanan };
   return {
-    d: { ...d, googleBekleyen: [], kisiler: [...yeni, ...kisiler], cakismalar: [...cakismalar, ...d.cakismalar], senkronGecmisi: [calisma, ...d.senkronGecmisi].slice(0, 30), baglantilar: { ...d.baglantilar, google: { ...b, tur, sonSenkron: calisma.tarih } } },
+    d: { ...d, googleBekleyen: [], googleGiden: giden, kisiler, cakismalar: [...cakismalar, ...d.cakismalar], senkronGecmisi: [calisma, ...d.senkronGecmisi].slice(0, 30), baglantilar: { ...d.baglantilar, google: { ...b, tur, sonSenkron: calisma.tarih } } },
     calisma,
   };
 }
@@ -132,7 +166,8 @@ export function demoCakismalariCoz(d: DepoDurumu, ids: string[], secim: "YEREL" 
   return ids.reduce((x, id) => demoCakismaCoz(x, id, secim), d);
 }
 /** v3.7 demo — "telefonda Google'a kişi kaydettim": sonraki çekimde (canlıda en geç 5 dk) Kişiler'e gelir */
-const ORNEK_YENI = [["Deniz Akar", "+905550000301", "Emlakçılar"], ["Cem Yalın", "+905550000302", "Yatırımcılar"], ["Ece Toprak", "+905550000303", null], ["Mert Aydın", "+905550000304", "Emlakçılar"]] as const;
+// v3.21: numaralar örnek rehberdeki kişilerle çakışmayacak aralığa alındı (eskiden ilk kişi "Kemal Usta" ile aynı numaraya denk gelip yeni kişi yerine birleşiyordu)
+const ORNEK_YENI = [["Deniz Akar", "+905550000411", "Emlakçılar"], ["Cem Yalın", "+905550000421", "Yatırımcılar"], ["Ece Toprak", "+905550000431", null], ["Mert Aydın", "+905550000441", "Emlakçılar"]] as const;
 export function demoGoogleKisiKaydet(d: DepoDurumu): { d: DepoDurumu; ad: string } {
   const i = (d.googleBekleyen?.length ?? 0) + d.kisiler.filter((k) => /^people\/yeni/.test(k.googleResourceName ?? "")).length;
   const [ad, tel, etiket] = ORNEK_YENI[i % ORNEK_YENI.length];
@@ -144,7 +179,8 @@ export function demoCakismaCoz(d: DepoDurumu, id: string, secim: "YEREL" | "UZAK
   const c = d.cakismalar.find((x) => x.id === id);
   if (!c) return d;
   const kalan = d.cakismalar.filter((x) => x.id !== id);
-  if (secim === "YEREL") return { ...d, cakismalar: kalan };
+  // v3.21 — çift yönlü: "Anahtar'daki kalsın" denen Google kişi alanı bir sonraki eşitlemede Google'a yazılır
+  if (secim === "YEREL") return { ...d, cakismalar: kalan, kisiler: c.saglayici === "GOOGLE_KISILER" && c.hedefTip === "KISI" && (GONDERIM_ALANLARI as readonly string[]).includes(c.alan) ? d.kisiler.map((k) => (k.id === c.hedefId && k.googleResourceName ? { ...k, googleBekliyor: simdiIso() } : k)) : d.kisiler };
   if (c.hedefTip === "KISI") return { ...d, cakismalar: kalan, kisiler: d.kisiler.map((k) => (k.id === c.hedefId ? { ...k, [c.alan]: c.uzak } : k)) };
   return { ...d, cakismalar: kalan, kayitlar: d.kayitlar.map((k) => (k.id === c.hedefId ? { ...k, veri: { ...k.veri, [c.alan]: c.uzak } as any } : k)) };
 }

@@ -1,16 +1,17 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
- * Ekosistem senkron işi — Google Kişiler ve Notion. Planlama saf modüllerde (google/kisiler.ts, notion/plan.ts),
+ * Anahtar CRM v3.21 · 8 Ekim 2026 (v3.13'ten)
+ * Ekosistem senkron işi — Google Kişiler (v3.21: çift yönlü, çok ofisli) ve Notion (v3.21: gizli, kod yerinde). Planlama saf modüllerde (google/kisiler.ts, notion/plan.ts),
  * bu dosya planı veritabanına uygular, çalışma geçmişini ve çakışmaları yazar.
  *
- * Tetikleyiciler: Supabase pg_cron → POST /api/senkron/calistir (her 15 dk) · ekrandaki "Şimdi senkronize et".
+ * Tetikleyiciler: Cloudflare zamanlayıcısı (her 15 dk, src/canli/worker.ts) · uygulama açılışı · ekrandaki "Şimdi eşitle".
  * Süre bütçesi: iş kaldığı yeri (Google sayfa anahtarı, Notion imleci) saklar; bütçe dolarsa sonraki tetikte devam eder.
  * Kilit: Entegrasyon.kilitBitis — iki iş aynı anda aynı bağlantıyı işlemez.
  */
 import type { PrismaClient, Prisma } from "../../generated/prisma/client";
-import { ofisBaglami } from "../kiracilik";
-import { googleKisiDonustur, googleSenkronPlani, GOOGLE_ALANLARI, type GoogleDonusum, type GooglePerson, type MevcutKisi } from "../google/kisiler";
-import { erisimYenile, gruplar, kisiSayfasi, GoogleHatasi } from "../google/istemci";
+import { ofisBaglami, kiracilikIcinde } from "../kiracilik";
+import { notionAcik } from "../ozellikler";
+import { googleKisiDonustur, googleSenkronPlani, googleGonderimPlani, googleOlusturmaGovdesi, googleGuncellemeGovdesi, GOOGLE_ALANLARI, GONDERIM_ALANLARI, type GoogleDonusum, type GooglePerson, type MevcutKisi, type HaricListesi, type GonderimAdayi } from "../google/kisiler";
+import { erisimYenile, gruplar, kisiSayfasi, kisiOlustur, kisiGetir, kisiGuncelle, GoogleHatasi } from "../google/istemci";
 import { coz as sifreCoz } from "../guvenlik/sifre";
 import { notionIstemcisi, type NotionIstemcisi } from "../notion/istemci";
 import { dataSourceId, SENKRON_SIRASI, NOTION_TABLOLARI, type NotionTablo } from "../notion/yapilandirma";
@@ -23,15 +24,24 @@ import { komsulukKur } from "../lokasyon/komsuluk";
 import { lokasyonIndeksiYukle } from "../lokasyon/cozumle";
 import { kayitOlustur, ttlAyarlari } from "./kayit";
 import { varsayilanValidUntil } from "../domain/gecerlilik";
-import type { AlanCakismasi } from "../senkron/birlestir";
+import { esit, telAnahtari, type AlanCakismasi } from "../senkron/birlestir";
 
 type Saglayici = "GOOGLE_KISILER" | "NOTION";
 type Fetch = typeof fetch;
-export interface SenkronSecenek { tetik?: string; tam?: boolean; butceMs?: number; f?: Fetch; simdi?: () => Date }
-export interface EntegrasyonAyarlari { otomatik: boolean; aralikDk: number; geriYaz: boolean; googleYaz: boolean; sadeceEtiketler: string[] }
+/** Bir çağrıda dışarıya yapılan istek sayacı — Cloudflare Workers ücretsiz planda çağrı başına 50 dış istek sınırı vardır */
+export interface IstekSayaci { n: number; sinir: number }
+export interface SenkronSecenek { tetik?: string; tam?: boolean; butceMs?: number; f?: Fetch; simdi?: () => Date; sayac?: IstekSayaci }
+export interface EntegrasyonAyarlari {
+  otomatik: boolean; aralikDk: number; geriYaz: boolean;
+  /** v3.21 — çift yönlü: Anahtar'da elle eklenen / düzeltilen kişi Google'a da yazılır (varsayılan açık) */
+  googleYaz: boolean;
+  sadeceEtiketler: string[];
+  /** v3.21 — bağlantıyı kuran kullanıcı (içe aktarılan kişilerin sahibi), bağlantı zamanı, Google'ın verdiği yazma izni */
+  baglayanKullaniciId?: string; baglanti?: string; yazmaIzni?: boolean;
+}
 export const VARSAYILAN_AYAR: EntegrasyonAyarlari = { otomatik: true, aralikDk: 15, geriYaz: true, googleYaz: false, sadeceEtiketler: [] };
-/** v3.7 — Google'a kaydedilen kişi birkaç dakikada gelsin: Google varsayılanı 5 dk (People API'de anlık bildirim yok; artımlı çekim ucuz) */
-export const varsayilanAyar = (s: string): EntegrasyonAyarlari => (s === "GOOGLE_KISILER" ? { ...VARSAYILAN_AYAR, aralikDk: 5 } : VARSAYILAN_AYAR);
+/** v3.7 — Google'a kaydedilen kişi birkaç dakikada gelsin: Google varsayılanı 5 dk (People API'de anlık bildirim yok; artımlı çekim ucuz). v3.21: çift yönlü varsayılan açık. */
+export const varsayilanAyar = (s: string): EntegrasyonAyarlari => (s === "GOOGLE_KISILER" ? { ...VARSAYILAN_AYAR, aralikDk: 5, googleYaz: true } : VARSAYILAN_AYAR);
 const J = (v: unknown) => (v ?? null) as Prisma.InputJsonValue;
 
 // ───────── Ortak ─────────
@@ -75,55 +85,215 @@ export function kayitVeri(k: any): Record<string, any> {
   return { ...k, fiyat: n(k.fiyat), minFiyat: n(k.minFiyat), maxFiyat: n(k.maxFiyat), lokasyonlar: k.lokasyonlar ?? [], ozellik: k.ozellik ?? undefined };
 }
 
-// ───────────────────────────── GOOGLE KİŞİLER ─────────────────────────────
+// ───────────────────────────── GOOGLE KİŞİLER (v3.21 — çift yönlü) ─────────────────────────────
+/** Bir turda Google'dan istenen kişi sayısı. Küçük tutulur: her sayfa ayrı işlenip ilerleme saklanır (Worker süre sınırı). */
+export const GOOGLE_SAYFA_BOYU = 200;
+/** Bir turda Google'a gönderilen en çok kişi (oluşturma + güncelleme). Kalanı sonraki tura kalır. */
+export const GOOGLE_GONDERIM_SINIRI = 20;
+type GoogleOzet = { gelen: number; yeni: number; guncellenen: number; baglanan: number; degismeyen: number; cakisma: number; silinen: number; atlanan: number; birlesen: number; haric: number; gonderilenYeni: number; gonderilenGuncel: number; gonderimHata: number; gonderimKalan: number };
+const bosGoogleOzet = (): GoogleOzet => ({ gelen: 0, yeni: 0, guncellenen: 0, baglanan: 0, degismeyen: 0, cakisma: 0, silinen: 0, atlanan: 0, birlesen: 0, haric: 0, gonderilenYeni: 0, gonderilenGuncel: 0, gonderimHata: 0, gonderimKalan: 0 });
+const kisiSec = { id: true, adSoyad: true, telefon: true, ikincilTelefon: true, email: true, sirket: true, notlar: true, roller: true, googleResourceName: true, googleSnapshot: true } as const;
+
+/** Anahtar'dan silindiği için yeniden eklenmeyecek Google kişileri (kimlik + telefon anahtarı) */
+export async function googleHaricListesi(prisma: PrismaClient): Promise<HaricListesi> {
+  const h = await prisma.senkronHaric.findMany({ where: { saglayici: "GOOGLE_KISILER" }, select: { disKimlik: true, telefonAnahtar: true } });
+  return { kimlikler: new Set(h.map((x) => x.disKimlik).filter((x): x is string => !!x)), telefonlar: new Set(h.map((x) => x.telefonAnahtar).filter((x): x is string => !!x)) };
+}
+
+/**
+ * Kişiler Anahtar'dan SİLİNMEDEN HEMEN ÖNCE çağrılır. Google bağlıysa silinen kişilerin Google kimliği ve telefon
+ * anahtarı "silinenler" listesine yazılır: kişi Google'da durur (oradan silinmez), ama bir sonraki eşitlemede
+ * Anahtar'a geri de gelmez. Google bağlı değilse hiçbir şey yazılmaz.
+ */
+export async function googleSilinenleriIsaretle(prisma: PrismaClient, kisiIdleri: string[]): Promise<number> {
+  if (!kisiIdleri.length) return 0;
+  const e = await prisma.entegrasyon.findFirst({ where: { saglayici: "GOOGLE_KISILER" }, select: { durum: true } });
+  if (!e || e.durum === "BAGLI_DEGIL") return 0;
+  const kisiler = await prisma.kisi.findMany({ where: { id: { in: kisiIdleri } }, select: { adSoyad: true, telefon: true, googleResourceName: true } });
+  const satirlar = kisiler.map((k) => ({ saglayici: "GOOGLE_KISILER" as const, disKimlik: k.googleResourceName, telefonAnahtar: telAnahtari(k.telefon), ad: k.adSoyad.slice(0, 160) })).filter((x) => x.disKimlik || x.telefonAnahtar);
+  if (satirlar.length) await prisma.senkronHaric.createMany({ data: satirlar as any });
+  return satirlar.length;
+}
+
+/** Google bağlı ve çift yönlü açık mı? (kişi kaydedilirken "gönderilecek" işareti koymak için) */
+export async function googleGonderimAcik(prisma: PrismaClient): Promise<boolean> {
+  const e = await prisma.entegrasyon.findFirst({ where: { saglayici: "GOOGLE_KISILER" } });
+  if (!e || e.durum !== "BAGLI") return false;
+  const a = ayarlarOf(e);
+  return a.googleYaz && a.yazmaIzni !== false;
+}
+
+/** "Silinenleri yeniden getir": listeyi boşaltır ve bir sonraki eşitlemeyi tam eşitleme yapar (Google'daki herkes yeniden değerlendirilir). */
+export async function googleHaricTemizle(prisma: PrismaClient): Promise<{ temizlenen: number }> {
+  const r = await prisma.senkronHaric.deleteMany({ where: { saglayici: "GOOGLE_KISILER" } });
+  await prisma.entegrasyon.updateMany({ where: { saglayici: "GOOGLE_KISILER" }, data: { syncToken: null, imlec: J(null) } });
+  return { temizlenen: r.count };
+}
+
+/**
+ * Bir ofisin Google Kişiler eşitlemesi — iki aşama, tek tur:
+ *   1) ÇEK  (Google → Anahtar): sayfa sayfa (200'er). Her sayfa planlanır, uygulanır, ilerleme saklanır.
+ *      Süre bütçesi dolarsa `devamEdecek: true` döner; sonraki çağrı kaldığı sayfadan sürer.
+ *   2) GÖNDER (Anahtar → Google): çekme bittiyse ve çift yönlü açıksa. Bekleyen yeni kişiler oluşturulur,
+ *      Anahtar'da düzeltilen alanlar güncellenir. Google'dan hiçbir şey SİLİNMEZ.
+ */
 export async function googleSenkronCalistir(prisma: PrismaClient, o: SenkronSecenek = {}) {
-  const f = o.f ?? fetch, butce = o.butceMs ?? 45_000, bas = Date.now();
+  const f0 = o.f ?? fetch, butce = o.butceMs ?? 20_000, bas = Date.now();
+  // Dış istek sayacı: sınır dolunca tur erken biter, kalan iş sonraki tura kalır (Workers ücretsiz plan: çağrı başına 50)
+  const sayac = o.sayac ?? { n: 0, sinir: 40 };
+  const f = ((...a: Parameters<Fetch>) => { sayac.n++; return f0(...a); }) as Fetch;
+  const yer = (gerek = 1) => sayac.n + gerek <= sayac.sinir;
   const e = await entegrasyon(prisma, "GOOGLE_KISILER");
   if (e.durum !== "BAGLI" || !e.tokenSifreli) return { atlandi: "Google Kişiler bağlı değil" };
+  if (!yer(3)) return { atlandi: "Bu turda istek sınırı doldu" };
   if (!(await kilitAl(prisma, "GOOGLE_KISILER", butce + 15_000))) return { atlandi: "Başka bir senkron sürüyor" };
-  const calisma = await prisma.senkronCalisma.create({ data: { saglayici: "GOOGLE_KISILER", tetik: o.tetik ?? "zamanlayici" } });
+  const im: { sayfa?: string | null; calismaId?: string | null } = o.tam ? {} : { ...((e.imlec as object) ?? {}) };
+  // Yarım kalmış bir içe aktarma sürüyorsa aynı geçmiş satırı büyür (her tur için ayrı satır açılmaz)
+  const onceki = im.calismaId ? await prisma.senkronCalisma.findFirst({ where: { id: im.calismaId } }) : null;
+  const calisma = onceki ?? (await prisma.senkronCalisma.create({ data: { saglayici: "GOOGLE_KISILER", tetik: o.tetik ?? "zamanlayici" } }));
+  const ozet: GoogleOzet = { ...bosGoogleOzet(), ...((onceki?.ozet as object) ?? {}) };
+  let syncToken = o.tam ? null : e.syncToken;
+  let sayfa = im.sayfa ?? null;
+  let bitti = false, gonderimde = false;
+  const imlecYaz = () => J({ ...(sayfa ? { sayfa } : {}), ...(bitti ? {} : { calismaId: calisma.id }) });
   try {
     const ayar = ayarlarOf(e);
     const tok = await erisimYenile(f, { refreshToken: sifreCoz(e.tokenSifreli), clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET! });
     const grupAdi = new Map((await gruplar(f, tok.access_token)).map((g) => [g.resourceName, g.formattedName ?? g.name ?? ""]));
-    let syncToken = o.tam ? null : e.syncToken;
-    let sayfa = ((e.imlec as any)?.sayfa as string | null) ?? null;
-    const kisiler: GooglePerson[] = [];
-    let yeniSync: string | null = null, bitti = false;
-    while (Date.now() - bas < butce) {
-      let r;
-      try { r = await kisiSayfasi(f, tok.access_token, { sayfaToken: sayfa, syncToken }); }
-      catch (x) { if (x instanceof GoogleHatasi && x.neden === "SYNC_TOKEN_DOLDU" && syncToken) { syncToken = null; sayfa = null; kisiler.length = 0; continue; } throw x; }
-      kisiler.push(...(r.connections ?? []));
-      sayfa = r.nextPageToken ?? null;
-      if (!sayfa) { yeniSync = r.nextSyncToken ?? null; bitti = true; break; }
-    }
-    const donusum: GoogleDonusum[] = kisiler.map((p) => googleKisiDonustur(p, grupAdi, ayar.sadeceEtiketler));
-    const mevcut = (await prisma.kisi.findMany()).map((k): MevcutKisi => ({ id: k.id, adSoyad: k.adSoyad, telefon: k.telefon, ikincilTelefon: k.ikincilTelefon, email: k.email, sirket: k.sirket, notlar: k.notlar, roller: k.roller, googleResourceName: k.googleResourceName, googleSnapshot: k.googleSnapshot as any }));
-    const plan = googleSenkronPlani(mevcut, donusum);
+    // İçe aktarılan kişilerin sahibi: bağlantıyı kuran kullanıcı (hâlâ ofisteyse)
+    const sahipAday = ayar.baglayanKullaniciId ?? ofisBaglami().kullaniciId;
+    const sahip = sahipAday && (await prisma.kullanici.findFirst({ where: { id: sahipAday }, select: { id: true } })) ? sahipAday : null;
+    const haric = await googleHaricListesi(prisma);
+    const mevcut: MevcutKisi[] = (await prisma.kisi.findMany({ select: kisiSec })).map((k) => ({ ...k, googleSnapshot: k.googleSnapshot as any }));
 
-    for (const x of plan.ekle) {
-      try { await prisma.kisi.create({ data: { ...(x.alanlar as any), roller: x.roller as any, kaynak: "GOOGLE", googleResourceName: x.resourceName, googleEtag: x.etag, googleSnapshot: J(x.snapshot) } }); }
-      catch (err: any) { if (err?.code !== "P2002") throw err; plan.ozet.yeni--; plan.ozet.birlesen++; } // aynı anda başka kanaldan eklendiyse
+    // ───── 1) ÇEK: Google → Anahtar ─────
+    let sayfaSifirlandi = false;
+    while (!bitti && Date.now() - bas < butce && yer()) {
+      let r;
+      try { r = await kisiSayfasi(f, tok.access_token, { sayfaToken: sayfa, syncToken, sayfaBoyu: GOOGLE_SAYFA_BOYU }); }
+      catch (x) {
+        // Artımlı anahtarın ya da sayfa anahtarının süresi dolduysa baştan (tam) çekilir — bir kez
+        const sifirla = x instanceof GoogleHatasi && ((x.neden === "SYNC_TOKEN_DOLDU" && syncToken) || (x.durum === 400 && sayfa && !sayfaSifirlandi));
+        if (sifirla) { syncToken = null; sayfa = null; sayfaSifirlandi = true; continue; }
+        throw x;
+      }
+      const donusum: GoogleDonusum[] = (r.connections ?? []).map((p) => googleKisiDonustur(p, grupAdi, ayar.sadeceEtiketler));
+      const plan = googleSenkronPlani(mevcut, donusum, haric);
+      const mevcutById = new Map(mevcut.map((m) => [m.id, m]));
+
+      // a) yeni kişiler — tek sorgu; aynı telefon başka kanaldan / başka danışmanda varsa atlanır (birleşen sayılır)
+      if (plan.ekle.length) {
+        const eklenen = await prisma.kisi.createManyAndReturn({
+          data: plan.ekle.map((x) => ({ ...(x.alanlar as any), roller: x.roller, kaynak: "GOOGLE", googleResourceName: x.resourceName, googleEtag: x.etag, googleSnapshot: J(x.snapshot), sahipKullaniciId: sahip })),
+          skipDuplicates: true, select: kisiSec,
+        });
+        for (const k of eklenen) mevcut.push({ ...k, googleSnapshot: k.googleSnapshot as any });
+        const atlandi = plan.ekle.length - eklenen.length;
+        plan.ozet.yeni -= atlandi; plan.ozet.birlesen += atlandi;
+      }
+      // b) güncellenen / yeni bağlanan kişiler — yalnızca gerçekten değişen satır yazılır
+      for (const x of plan.guncelle) {
+        const k = mevcutById.get(x.id)!;
+        const degisti = Object.keys(x.degisiklik).length > 0 || x.yeniRoller.length > 0 || x.baglandi || !esit(k.googleSnapshot, x.snapshot);
+        if (!degisti) continue;
+        const roller = [...new Set([...k.roller, ...x.yeniRoller])];
+        try {
+          await prisma.kisi.update({ where: { id: x.id }, data: { ...(x.degisiklik as any), roller, googleResourceName: x.resourceName, googleEtag: x.etag, googleSnapshot: J(x.snapshot), kaynaktaSilindi: null } });
+          Object.assign(k, x.degisiklik, { roller, googleResourceName: x.resourceName, googleSnapshot: x.snapshot });
+        } catch (err: any) {
+          // Google'daki yeni telefon Anahtar'da başka bir kişide kayıtlı: telefon dışındaki alanlar alınır
+          if (err?.code !== "P2002") throw err;
+          const { telefon: yeniTel, ...kalan } = x.degisiklik as any;
+          await prisma.kisi.update({ where: { id: x.id }, data: { ...kalan, roller, googleResourceName: x.resourceName, googleEtag: x.etag, googleSnapshot: J(x.snapshot), kaynaktaSilindi: null } });
+          Object.assign(k, kalan, { roller, googleResourceName: x.resourceName, googleSnapshot: x.snapshot });
+          x.cakismalar.push({ alan: "telefon", onceki: k.telefon, yerel: k.telefon, uzak: yeniTel });
+          plan.ozet.cakisma++;
+        }
+        await cakismalariYaz(prisma, "GOOGLE_KISILER", "KISI", x.id, x.cakismalar);
+      }
+      // c) Google'da silinen: Anahtar'da kalır, bağı kopar
+      for (const x of plan.bagiKopar) {
+        const k = await prisma.kisi.findFirst({ where: { id: x.id }, select: { notlar: true } });
+        await prisma.kisi.update({ where: { id: x.id }, data: { googleResourceName: null, googleSnapshot: J(null), googleBekliyor: null, kaynaktaSilindi: new Date(), notlar: [k?.notlar, `Google Kişiler'den silindi (${new Date().toLocaleDateString("tr-TR")})`].filter(Boolean).join("\n") } });
+        const m = mevcutById.get(x.id); if (m) { m.googleResourceName = null; m.googleSnapshot = null; }
+      }
+      for (const a of Object.keys(plan.ozet) as (keyof typeof plan.ozet)[]) ozet[a] += plan.ozet[a];
+      sayfa = r.nextPageToken ?? null;
+      if (!sayfa) { syncToken = r.nextSyncToken ?? null; bitti = true; }
+      // İlerleme her sayfadan sonra saklanır: tur yarıda kesilse de işlenen sayfa yeniden işlenmez
+      await prisma.entegrasyon.updateMany({ where: { saglayici: "GOOGLE_KISILER" }, data: { syncToken, imlec: imlecYaz() } });
     }
-    for (const x of plan.guncelle) {
-      const k = mevcut.find((m) => m.id === x.id)!;
-      await prisma.kisi.update({ where: { id: x.id }, data: { ...(x.degisiklik as any), roller: [...new Set([...k.roller, ...x.yeniRoller])] as any, googleResourceName: x.resourceName, googleEtag: x.etag, googleSnapshot: J(x.snapshot), kaynaktaSilindi: null } });
-      await cakismalariYaz(prisma, "GOOGLE_KISILER", "KISI", x.id, x.cakismalar);
+
+    // ───── 2) GÖNDER: Anahtar → Google (çekme bittiyse) ─────
+    // Yalnızca "gönderilecek" işaretli kişiler (kisi.googleBekliyor): elle eklenen yeni kişi ya da Anahtar'da düzeltilen bağlı kişi.
+    const yazma = ayar.googleYaz && ayar.yazmaIzni !== false;
+    if (bitti && yazma && Date.now() - bas < butce) {
+      gonderimde = true;
+      const adaylar = await prisma.kisi.findMany({ where: { googleBekliyor: { not: null } }, orderBy: { googleBekliyor: "asc" }, take: 500, select: { ...kisiSec, googleBekliyor: true, kaynaktaSilindi: true } });
+      const cakismali = new Set((await prisma.senkronCakisma.findMany({ where: { saglayici: "GOOGLE_KISILER", durum: "ACIK", hedefTip: "KISI" }, select: { hedefId: true } })).map((c) => c.hedefId));
+      // Etiket süzgeci açıkken Google'da "görmediğimiz" kişiler olabilir → mükerrer açmamak için yeni kişi gönderilmez
+      const gp = googleGonderimPlani(adaylar.map((k): GonderimAdayi => ({ ...k, googleSnapshot: k.googleSnapshot as any })), { cakismali, sinir: GOOGLE_GONDERIM_SINIRI, olusturma: !ayar.sadeceEtiketler.length });
+      const snapOf = (p: GooglePerson, yedek: object) => { const d = googleKisiDonustur(p, grupAdi); return d.kisi ? Object.fromEntries(GOOGLE_ALANLARI.map((a) => [a, d.kisi![a]])) : yedek; };
+      const olumcul = (err: unknown) => err instanceof GoogleHatasi && (err.neden === "YENIDEN_YETKI" || err.durum === 403);
+      let islenmeyen = 0;
+      if (gp.temizle.length) await prisma.kisi.updateMany({ where: { id: { in: gp.temizle } }, data: { googleBekliyor: null } });
+      for (const x of gp.olustur) {
+        if (Date.now() - bas > butce || !yer(1)) { islenmeyen++; continue; }
+        try {
+          const p = await kisiOlustur(f, tok.access_token, googleOlusturmaGovdesi(x.alanlar));
+          await prisma.kisi.update({ where: { id: x.id }, data: { googleResourceName: p.resourceName, googleEtag: p.etag ?? null, googleBekliyor: null, googleSnapshot: J(snapOf(p, { ...x.alanlar, ikincilTelefon: x.alanlar.ikincilTelefon ?? null, email: x.alanlar.email ?? null, sirket: x.alanlar.sirket ?? null, notlar: null })) } });
+          ozet.gonderilenYeni++;
+        } catch (err) { if (olumcul(err)) throw err; ozet.gonderimHata++; }
+      }
+      for (const x of gp.guncelle) {
+        if (Date.now() - bas > butce || !yer(2)) { islenmeyen++; continue; }
+        try {
+          const guncel = await kisiGetir(f, tok.access_token, x.resourceName);
+          if (!guncel || guncel.metadata?.deleted) { // Google'da silinmiş: Anahtar'da kalır, bağı kopar, yeniden oluşturulmaz
+            await prisma.kisi.update({ where: { id: x.id }, data: { googleResourceName: null, googleSnapshot: J(null), googleBekliyor: null, kaynaktaSilindi: new Date() } });
+            ozet.silinen++; continue;
+          }
+          const { govde, maske } = googleGuncellemeGovdesi(guncel, x.degisen, x.onceki);
+          const sonuc = maske.length ? await kisiGuncelle(f, tok.access_token, x.resourceName, govde, maske) : guncel;
+          await prisma.kisi.update({ where: { id: x.id }, data: { googleEtag: sonuc.etag ?? null, googleBekliyor: null, googleSnapshot: J({ ...x.onceki, ...x.degisen }) } });
+          if (maske.length) ozet.gonderilenGuncel++;
+        } catch (err) { if (olumcul(err)) throw err; ozet.gonderimHata++; } // işaret durur → sonraki turda yeniden denenir
+      }
+      ozet.gonderimKalan = gp.kalan + islenmeyen;
     }
-    for (const x of plan.bagiKopar) {
-      const k = await prisma.kisi.findUnique({ where: { id: x.id } });
-      await prisma.kisi.update({ where: { id: x.id }, data: { googleResourceName: null, googleSnapshot: J(null), kaynaktaSilindi: new Date(), notlar: [k?.notlar, `Google Kişiler'den silindi (${new Date().toLocaleDateString("tr-TR")})`].filter(Boolean).join("\n") } });
-    }
-    await prisma.entegrasyon.updateMany({ where: { saglayici: "GOOGLE_KISILER" }, data: { syncToken: bitti ? yeniSync : syncToken, imlec: J(bitti ? null : { sayfa }), sonSenkron: new Date(), sonHata: null } });
-    await prisma.senkronCalisma.update({ where: { id: calisma.id }, data: { bitis: new Date(), durum: plan.ozet.cakisma ? "CAKISMA" : "BASARILI", yeni: plan.ozet.yeni, guncellenen: plan.ozet.guncellenen, baglanan: plan.ozet.baglanan, cakisma: plan.ozet.cakisma, atlanan: plan.ozet.atlanan, silinen: plan.ozet.silinen, devamEdecek: !bitti, ozet: J(plan.ozet) } });
-    return { calismaId: calisma.id, ozet: plan.ozet, devamEdecek: !bitti };
+
+    const devam = !bitti || ozet.gonderimKalan > 0;
+    await prisma.entegrasyon.updateMany({ where: { saglayici: "GOOGLE_KISILER" }, data: { syncToken, imlec: imlecYaz(), sonSenkron: new Date(), sonHata: null } });
+    await prisma.senkronCalisma.update({ where: { id: calisma.id }, data: { bitis: new Date(), durum: ozet.cakisma ? "CAKISMA" : "BASARILI", yeni: ozet.yeni, guncellenen: ozet.guncellenen, baglanan: ozet.baglanan, cakisma: ozet.cakisma, atlanan: ozet.atlanan, silinen: ozet.silinen, geriYazilan: ozet.gonderilenYeni + ozet.gonderilenGuncel, devamEdecek: devam, ozet: J(ozet) } });
+    return { calismaId: calisma.id, ozet, devamEdecek: devam };
   } catch (x: any) {
     const yeniden = x instanceof GoogleHatasi && x.neden === "YENIDEN_YETKI";
-    await prisma.entegrasyon.updateMany({ where: { saglayici: "GOOGLE_KISILER" }, data: { sonHata: String(x?.message ?? x), ...(yeniden ? { durum: "YENIDEN_YETKI" } : {}) } });
-    await prisma.senkronCalisma.update({ where: { id: calisma.id }, data: { bitis: new Date(), durum: "HATA", hata: String(x?.message ?? x).slice(0, 1000) } });
+    // Yazma izni yoksa (403) çift yönlü kapatılır; çekme çalışmaya devam eder
+    const yazmaYok = gonderimde && x instanceof GoogleHatasi && x.durum === 403;
+    await prisma.entegrasyon.updateMany({ where: { saglayici: "GOOGLE_KISILER" }, data: { sonHata: String(x?.message ?? x).slice(0, 500), syncToken, imlec: imlecYaz(), ...(yeniden ? { durum: "YENIDEN_YETKI" } : {}), ...(yazmaYok ? { ayarlar: J({ ...ayarlarOf(e), yazmaIzni: false }) } : {}) } });
+    await prisma.senkronCalisma.update({ where: { id: calisma.id }, data: { bitis: new Date(), durum: "HATA", hata: String(x?.message ?? x).slice(0, 1000), ozet: J(ozet) } });
     throw x;
   } finally { await kilitBirak(prisma, "GOOGLE_KISILER"); }
+}
+
+/**
+ * Zamanlayıcı (platform bağlamı): Google'ı bağlı ofisleri sırayla eşitler — en uzun süredir eşitlenmeyen önce.
+ * Her ofis kendi bağlamında (bağlantıyı kuran kullanıcı adına, ofis yöneticisi yetkisiyle) çalışır; ofisler birbirini görmez.
+ */
+export async function tumOfislerdeGoogleSenkron(prisma: PrismaClient, o: SenkronSecenek & { enFazla?: number } = {}) {
+  const liste = await prisma.entegrasyon.findMany({ where: { saglayici: "GOOGLE_KISILER", durum: "BAGLI", ofis: { durum: "AKTIF" } }, orderBy: { sonSenkron: { sort: "asc", nulls: "first" } }, take: o.enFazla ?? 5 });
+  const sayac: IstekSayaci = o.sayac ?? { n: 0, sinir: 40 }; // tüm ofisler için ORTAK sınır (tek Worker çağrısı)
+  const sonuc: { ofisId: string; sonuc: unknown }[] = [];
+  for (const e of liste) {
+    const a = ayarlarOf(e);
+    if (!a.otomatik || (e.sonSenkron && Date.now() - e.sonSenkron.getTime() < a.aralikDk * 60_000 - 30_000)) { sonuc.push({ ofisId: e.ofisId, sonuc: { atlandi: "Zamanı gelmedi" } }); continue; }
+    if (sayac.n + 3 > sayac.sinir) { sonuc.push({ ofisId: e.ofisId, sonuc: { atlandi: "Bu turda istek sınırı doldu" } }); continue; }
+    try {
+      const r = await kiracilikIcinde({ ofisId: e.ofisId, kullaniciId: a.baglayanKullaniciId ?? "", rol: "OFIS_YONETICISI", eposta: e.hesap ?? "" }, () => googleSenkronCalistir(prisma, { ...o, sayac, tetik: "zamanlayici", butceMs: o.butceMs ?? 12_000 }));
+      sonuc.push({ ofisId: e.ofisId, sonuc: r });
+    } catch (x: any) { sonuc.push({ ofisId: e.ofisId, sonuc: { hata: String(x?.message ?? x).slice(0, 300) } }); }
+  }
+  return sonuc;
 }
 
 // ───────────────────────────── NOTION ─────────────────────────────
@@ -294,10 +464,11 @@ export async function senkronCalistir(prisma: PrismaClient, o: SenkronSecenek & 
   const otomatik = (o.tetik ?? "zamanlayici") === "zamanlayici";
   for (const [ad, s, fn] of [["google", "GOOGLE_KISILER", googleSenkronCalistir], ["notion", "NOTION", notionSenkronCalistir]] as const) {
     if (o.kaynak && o.kaynak !== "hepsi" && o.kaynak !== ad) continue;
+    if (ad === "notion" && !notionAcik()) continue; // v3.21 — Notion senkronu gizli (src/lib/ozellikler.ts)
     const e = await entegrasyon(prisma, s);
     const a = ayarlarOf(e);
     if (otomatik && (!a.otomatik || (e.sonSenkron && Date.now() - e.sonSenkron.getTime() < a.aralikDk * 60_000 - 30_000))) { sonuc[ad] = { atlandi: "Zamanı gelmedi" }; continue; }
-    try { sonuc[ad] = await (fn as any)(prisma, { ...o, butceMs: o.butceMs ?? 25_000 }); }
+    try { sonuc[ad] = await (fn as any)(prisma, { ...o, butceMs: o.butceMs ?? 20_000 }); }
     catch (x: any) { sonuc[ad] = { hata: String(x?.message ?? x) }; }
   }
   return sonuc;
@@ -309,6 +480,9 @@ export async function cakismaCoz(prisma: PrismaClient, id: string, secim: "YEREL
   if (secim === "UZAK") {
     if (c.hedefTip === "KISI") await prisma.kisi.update({ where: { id: c.hedefId }, data: { [c.alan]: c.uzak as any } });
     else await prisma.kayit.update({ where: { id: c.hedefId }, data: { [c.alan]: c.uzak as any } });
+  } else if (c.saglayici === "GOOGLE_KISILER" && c.hedefTip === "KISI" && (GONDERIM_ALANLARI as readonly string[]).includes(c.alan)) {
+    // v3.21 — çift yönlü: "Anahtar'daki kalsın" denen değer Google'a da yazılır (bir sonraki eşitlemede)
+    await prisma.kisi.updateMany({ where: { id: c.hedefId, googleResourceName: { not: null } }, data: { googleBekliyor: new Date() } });
   }
   return prisma.senkronCakisma.update({ where: { id }, data: { durum: secim === "UZAK" ? "UZAK_SECILDI" : "YEREL_SECILDI", cozuldu: new Date() } });
 }

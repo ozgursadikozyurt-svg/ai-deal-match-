@@ -37,6 +37,7 @@ export const OFIS_MODELLERI: ReadonlySet<string> = new Set([
   "entegrasyon",
   "senkronCalisma",
   "senkronCakisma",
+  "senkronHaric",
   "notionSyncLog",
   "ingestionLog",
   "auditLog",

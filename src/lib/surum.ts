@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.15 · 5 Ekim 2026
+ * Anahtar CRM v3.21 · 8 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.20";
+export const SURUM = "3.21";
 export const TARIH = "8 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.20_8Ekim2026";
+export const DOSYA_EKI = "v3.21_8Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,33 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.21",
+    tarih: "8 Ekim 2026",
+    baslik: "Google ile bağlan: çift yönlü Google Kişiler eşitlemesi (canlıda çalışır), Notion bağlantısı gizlendi",
+    degisenler: [
+      "\"Google ile bağlan\" tek düğme: Bağlantılar ya da Kişiler ekranında düğmeye basın, Google'ın kendi izin ekranında hesabınızı seçip \"İzin ver\" deyin. Uygulamaya dönünce rehberiniz kendiliğinden içe aktarılır (ilerleme ekranda görünür). Anahtar kopyalama, ayar girme yok. Bu özellik canlıda ilk kez çalışıyor (önceki sürümlerde yalnızca demoda benzetimdi).",
+      "Çift yönlü eşitleme — kurallar: Google'a (telefonunuza) kaydettiğiniz kişi Anahtar CRM'e düşer · Anahtar CRM'de elle eklediğiniz kişi Google rehberinize eklenir · bir tarafta ad, telefon, e-posta ya da şirketi düzeltirseniz diğer tarafta da düzelir · iki tarafta aynı alan farklı değiştiyse \"çakışma\" olarak size sorulur.",
+      "Anahtar CRM'den silinen kişi Google'dan SİLİNMEZ. Kişi Google rehberinizde durur; bir sonraki eşitlemede Anahtar'a geri de gelmez. Fikir değiştirirseniz Bağlantılar › \"Silinenleri yeniden getir\". Uygulamada Google'dan kişi silen hiçbir kod yoktur (otomatik testle denetleniyor).",
+      "Google'dan silinen kişi de Anahtar CRM'de kalır (talep / portföy bağı kopmasın); yalnızca Google bağı kopar, kartına not düşülür.",
+      "Rehberiniz kirlenmez: Excel / CSV / WhatsApp ile TOPLU içe aktardığınız kişiler kendiliğinden Google'a gitmez. İstediklerinizi Kişiler › Seç › \"Google'a gönder\" ile ya da kişi kartındaki \"Google'a gönder\" düğmesiyle gönderirsiniz. Anahtar'daki notlar Google'a yazılmaz; Anahtar'da boşalttığınız bir alan Google'da silinmez; Google'daki kişinin diğer telefonları ve unvanı korunur.",
+      "Bağlandığınız anda iki tarafta zaten farklı olan bilgiler toplu hâlde Google'a yazılmaz; yalnızca bağlandıktan SONRA Anahtar'da yaptığınız düzeltmeler gider. Gönderilmeyi bekleyen kişilerde \"Google'a gönderilecek\" rozeti görünür.",
+      "Otomatik eşitleme: sunucu 15 dakikada bir, uygulama açıkken 5 dakikada bir eşitler; Kişiler ekranındaki \"Google ile eşitle\" beklemeden çalıştırır. Büyük rehberler 200'er kişilik sayfalarla, kaldığı yerden sürerek içe aktarılır (7.000 kişilik rehberde de zaman aşımı olmaz).",
+      "Çok ofisli: her ofis kendi Google hesabını bağlar, ofisler birbirinin rehberini görmez. Bağlantıyı ofis yöneticisi kurar; içe aktarılan kişilerin sahibi bağlantıyı kuran kullanıcıdır.",
+      "Güvenlik: Google şifreniz uygulamaya verilmez; kalıcı erişim anahtarı veritabanında şifreli durur; izin ekranından dönüş ofise imzalıdır (başka ofis adına bağlanılamaz). \"Bağlantıyı kaldır\" Google hesabınızdaki izni de geri alır; kişileriniz iki tarafta da kalır.",
+      "Notion bağlantısı gizlendi: Bağlantılar ekranındaki Notion kartı, ana sayfadaki Notion daveti, durum göstergesindeki Notion ve otomatik Notion eşitlemesi kapalı. Kod ve veriler yerinde; tek satırla geri açılır (src/lib/ozellikler.ts).",
+      "Platform kurulumu (yalnızca siz, bir kez): Google Cloud'da OAuth istemcisi açıp Cloudflare'e GOOGLE_CLIENT_ID ve GOOGLE_CLIENT_SECRET girilir — adım adım: docs/GOOGLE_BAGLANTI_KURULUMU_v3.21_8Ekim2026.md. Bu yapılana kadar canlıda düğme \"henüz açılmamış\" der; uygulamanın geri kalanı etkilenmez.",
+      "Veritabanı: migration 20261008100000_v321_google_cift_yonlu — yalnızca ekleme (kisi.googleBekliyor sütunu, senkron_haric tablosu); mevcut veriye dokunmaz. Yayından sonra \"Kurulumu tamamla\" düğmesi çıkar, bir kez basılır.",
+    ],
+    testEt: [
+      "Menü › Bağlantılar: Notion kartı ve ana sayfada Notion daveti görünmemeli. \"Google ile bağlan\" → \"İzin ver ve içe aktar\": örnek rehber Kişiler'e geldi mi?",
+      "Kişiler › + Yeni kişi (telefonlu) ekleyin: kartında \"Google'a gönderilecek\" rozeti çıkmalı. Bağlantılar › \"Şimdi eşitle\": alttaki \"Google rehberi (benzetim)\" kutusunda \"Google'a eklendi\" satırı görünmeli.",
+      "Google'dan gelen bir kişinin adını ya da telefonunu düzeltin → \"Şimdi eşitle\": \"Google'da güncellendi\" satırı çıkmalı.",
+      "Kişiler › Seç › Google rozetli bir kişiyi silin: uyarıda \"Google rehberinizden silinmez\" yazmalı. Bağlantılar'da \"1 kişi Anahtar'dan silindi: Google rehberinizde duruyor\" görünmeli; \"Şimdi eşitle\" deyince kişi geri GELMEMELİ. Sonra \"Silinenleri yeniden getir\" ile geri alın.",
+      "\"📱 Telefonda Google'a kişi kaydet (benzetim)\" → \"Şimdi eşitle\": yeni kişi Kişiler'de göründü mü?",
+      "\"Çift yönlü\" kutusunun işaretini kaldırın, yeni bir kişi ekleyip eşitleyin: Google'a hiçbir şey gitmemeli.",
+    ],
+  },
   {
     surum: "3.20",
     tarih: "8 Ekim 2026",

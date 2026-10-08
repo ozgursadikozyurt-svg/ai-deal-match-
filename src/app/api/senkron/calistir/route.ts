@@ -1,11 +1,17 @@
-// Anahtar CRM v3.13 · 3 Ekim 2026
+// Anahtar CRM v3.21 · 8 Ekim 2026 (v3.13'ten)
 // POST /api/senkron/calistir { kaynak?: "google"|"notion"|"hepsi", tetik?: "zamanlayici"|"kullanici", tam?: boolean }
-// Zamanlayıcı (Supabase pg_cron, prisma/sql/senkron_cron.sql) "Authorization: Bearer <CRON_SECRET>" gönderir.
-// NOT: Uygulamada henüz oturum açma yok (backlog #12) — canlıya açmadan önce kullanıcı tetiği de oturuma bağlanmalı.
+//
+// İki çağıran var:
+//  - Zamanlayıcı ("Authorization: Bearer <CRON_SECRET>") → Worker platform bağlamı kurar; Google'ı bağlı TÜM ofisler sırayla eşitlenir.
+//    (Cloudflare zamanlayıcısı aynı işi src/canli/worker.ts içinden doğrudan çağırır; bu uç dış zamanlayıcılar için durur.)
+//  - Oturum açmış ofis yöneticisi ("Şimdi eşitle", uygulama açılışı) → yalnızca kendi ofisi. Yanıttaki `devamEdecek: true`
+//    ise arayüz aynı isteği yineler (büyük rehberlerde ilk içe aktarma birkaç turda biter).
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { hata, ok } from "@/lib/http/yanit";
-import { senkronCalistir } from "@/lib/services/senkron";
+import { baglamOku, ofisBaglami } from "@/lib/kiracilik";
+import { yetkiGerek } from "@/lib/guvenlik/yetki";
+import { senkronCalistir, tumOfislerdeGoogleSenkron } from "@/lib/services/senkron";
 
 export const maxDuration = 60;
 const Govde = z.object({ kaynak: z.enum(["google", "notion", "hepsi"]).default("hepsi"), tetik: z.enum(["zamanlayici", "kullanici"]).default("kullanici"), tam: z.boolean().default(false) });
@@ -13,7 +19,8 @@ const Govde = z.object({ kaynak: z.enum(["google", "notion", "hepsi"]).default("
 export async function POST(req: Request) {
   try {
     const g = Govde.parse(await req.json().catch(() => ({})));
-    if (g.tetik === "zamanlayici" && req.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) return Response.json({ hata: "YETKISIZ" }, { status: 401 });
-    return ok(await senkronCalistir(prisma, { kaynak: g.kaynak, tetik: g.tetik, tam: g.tam }));
+    if (baglamOku() === "platform") return ok({ ofisler: await tumOfislerdeGoogleSenkron(prisma) });
+    yetkiGerek(ofisBaglami().rol, "ofis.entegrasyon");
+    return ok(await senkronCalistir(prisma, { kaynak: g.kaynak, tetik: "kullanici", tam: g.tam }));
   } catch (e) { return hata(e); }
 }

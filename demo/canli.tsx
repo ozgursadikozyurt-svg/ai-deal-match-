@@ -26,6 +26,16 @@ const davetTemizle = () => { try { localStorage.removeItem(DAVET_ANAHTAR); } cat
   history.replaceState(null, "", location.pathname + location.hash);
 })();
 
+// v3.21 — Google izin ekranından dönüş: /?google=ok (ya da iptal / hata / yetki). Sonuç saklanır, adres temizlenir;
+// uygulama açılınca Bağlantılar ekranı gelir ve ilk içe aktarma başlar (demo/app.tsx, demo/baglantilar.tsx).
+(() => {
+  const p = new URLSearchParams(location.search), g = p.get("google");
+  if (!g) return;
+  CANLI.googleDonus = g;
+  p.delete("google");
+  history.replaceState(null, "", location.pathname + (p.toString() ? "?" + p : "") + location.hash);
+})();
+
 type Faz = { ad: "aciliyor" } | { ad: "giris"; mesaj?: string } | { ad: "kurulum"; ayrinti: string } | { ad: "hata"; mesaj: string; yeniden: boolean } | { ad: "hazir" };
 
 function Cerceve({ children }: { children: React.ReactNode }) {
@@ -95,6 +105,7 @@ function Canli({ cfg }: { cfg: Yapilandirma }) {
       const k = kaydediciKur({ api, baslangic: durum, durum: setKaydet });
       kaydedici.current = k;
       CANLI.yuklu = durum; CANLI.kaydet = (d) => k.kuyrugaAl(d); CANLI.hemen = () => k.hemen(); CANLI.api = api;
+      CANLI.kisileriBirlestir = (d, sunucu) => k.kisileriBirlestir(d, sunucu); // v3.21
       const or = await api("/api/oturum");
       const bilgi = or.ok ? await or.json().catch(() => undefined) : undefined;
       CANLI.oturum = { eposta: o.eposta, cikis: () => { o.cikis(); location.reload(); }, bilgi };

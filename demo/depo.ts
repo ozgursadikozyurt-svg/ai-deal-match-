@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21 · 8 Ekim 2026 (v3.13'ten)
  * Demo veri deposu: örnek veriyi gerçek doğrulama + konum çözücüden geçirerek yükler,
  * kullanıcının değişikliklerini tarayıcıda (localStorage) saklar.
  */
@@ -31,6 +31,10 @@ export interface Kisi {
   kaynak?: "MANUEL" | "WHATSAPP" | "GOOGLE" | "NOTION"; ikincilTelefon?: string | null; ilanSahibiTipi?: string;
   googleResourceName?: string | null; googleSnapshot?: Record<string, unknown> | null; kaynaktaSilindi?: string | null;
   notionId?: string | null; notionSnapshot?: Record<string, unknown> | null;
+  /** v3.21 — çift yönlü Google: sunucudan gelen "Google'a gönderilecek" işareti (rozet) */
+  googleBekliyor?: string | null;
+  /** v3.21 — arayüzün koyduğu istek: kişi elle eklendi / "Google'a gönder" dendi. Sunucu, Google bağlı ve çift yönlü açıksa işarete çevirir. */
+  googleaGonder?: boolean;
 }
 
 /** İçe aktarma işinden çıkan tek kayıt adayı */
@@ -89,12 +93,25 @@ export interface DepoDurumu {
   roller?: import("../src/lib/domain/roller").RolTanim[];
   /** v3.19 — anahtar (favori) işaretleri: "t:<talepId>", "p:<portföyId>", "e:<talepId>~<portföyId>" */
   favoriler?: string[];
+  /** v3.21 demo — Anahtar'dan silindiği için Google'dan geri gelmeyecek kişiler (canlıda senkron_haric tablosu). Kişi Google'da DURUR. */
+  googleHaric?: { kimlik: string | null; tel: string | null; ad: string; tarih: string }[];
+  /** v3.21 demo — Anahtar'dan Google'a yazılanların günlüğü (canlıda Google rehberinin kendisi) */
+  googleGiden?: { ad: string; telefon: string | null; islem: "EKLENDI" | "GUNCELLENDI"; alanlar?: string[]; tarih: string }[];
+  /** v3.21 canlı — sunucudan okunan Google bağlantı özeti (arayüz durumunda saklanmaz) */
+  googleCanli?: GoogleCanliDurum | null;
+}
+/** v3.21 — GET /api/entegrasyon yanıtındaki Google satırı */
+export interface GoogleCanliDurum {
+  hazir: boolean; yetkili: boolean; durum: "BAGLI_DEGIL" | "BAGLI" | "HATA" | "YENIDEN_YETKI"; hesap: string | null; sonSenkron: string | null; sonHata: string | null;
+  bagliKisi: number; bekleyen: number; haric: number; devamEdiyor: boolean; acikCakisma: number;
+  ayarlar: { otomatik: boolean; aralikDk: number; googleYaz: boolean; sadeceEtiketler: string[]; yazmaIzni?: boolean };
 }
 export interface DemoBaglanti { durum: "BAGLI_DEGIL" | "BAGLI"; hesap: string | null; tur: number; sonSenkron: string | null; ayar: { otomatik: boolean; aralikDk: number; geriYaz: boolean; googleYaz: boolean; sadeceEtiketler: string[] } }
 export interface DemoCalisma { id: string; saglayici: "GOOGLE_KISILER" | "NOTION"; tarih: string; tetik: string; ozet: Record<string, number>; kontrol: { id: string | null; baslik: string; nedenler: string[] }[]; yeniEslesme: number; geriYazim: { id: string; baslik: string; deger: Record<string, unknown> }[]; atlanan: { ad: string; neden: string }[] }
 export interface DemoCakisma { id: string; saglayici: "GOOGLE_KISILER" | "NOTION"; hedefTip: "KISI" | "KAYIT"; hedefId: string; baslik: string; alan: string; onceki: unknown; yerel: unknown; uzak: unknown }
 export const bosBaglanti = (): DemoBaglanti => ({ durum: "BAGLI_DEGIL", hesap: null, tur: 0, sonSenkron: null, ayar: { otomatik: true, aralikDk: 15, geriYaz: true, googleYaz: false, sadeceEtiketler: [] } });
-export const bosGoogleBaglanti = (): DemoBaglanti => { const b = bosBaglanti(); b.ayar.aralikDk = 5; return b; };
+/** v3.21: Google varsayılanı çift yönlü (googleYaz açık) */
+export const bosGoogleBaglanti = (): DemoBaglanti => { const b = bosBaglanti(); b.ayar.aralikDk = 5; b.ayar.googleYaz = true; return b; };
 
 /**
  * v3.14 — Canlı ortam: sayfa `<div id="kok" data-canli="1">` ile açılır (dist/canli/index.html). Canlıda durum sunucudan gelir,
@@ -114,7 +131,11 @@ export const CANLI: {
   sample: { json: (istem: string, secenek?: Record<string, unknown>) => Promise<unknown> } | null;
   api: ((yol: string, init?: { method?: string; json?: unknown; form?: FormData }) => Promise<Response>) | null;
   oturum: { eposta?: string; cikis: () => void; bilgi?: OturumBilgi } | null;
-} = { acik: CANLI_ORTAM, yuklu: null, kaydet: null, hemen: null, sample: null, api: null, oturum: null };
+  /** v3.21 — Google eşitlemesinden sonra sunucudaki kişi listesini arayüz durumuyla birleştirir (kaydedilmemiş yerel değişiklik korunur) */
+  kisileriBirlestir: ((d: DepoDurumu, sunucu: Kisi[]) => DepoDurumu) | null;
+  /** v3.21 — Google izin ekranından dönüşte adresteki sonuç (?google=ok | iptal | hata | yetki | yenileme-anahtari-yok) */
+  googleDonus: string | null;
+} = { acik: CANLI_ORTAM, yuklu: null, kaydet: null, hemen: null, sample: null, api: null, oturum: null, kisileriBirlestir: null, googleDonus: null };
 
 export const BUGUN = CANLI_ORTAM ? new Date() : new Date(2026, 8, 30, 12, 0, 0); // demo "bugün" sabit (süre hesapları değişmesin); canlıda gerçek tarih
 const GUN = 86_400_000;
@@ -142,7 +163,9 @@ export function kisiRolleriOf(tip: string, ilanSahibi: string, islem: string): {
   if (tip === "PORTFOY") return { roller: [kira ? "KIRAYA_VEREN" : "SATICI", ...(ilanSahibi === "FIRMA" ? ["FIRMA"] : [])], kayitRol: ROL_ETIKET_SAHIP[ilanSahibi] ?? "SAHIP" };
   return { roller: [kira ? "KIRACI" : "ALICI", ...(ilanSahibi === "FIRMA" ? ["FIRMA"] : [])], kayitRol: "MUSTERI" };
 }
-export const yeniKisiId = () => "K" + Date.now().toString(36).slice(-5).toUpperCase() + Math.floor(Math.random() * 90 + 10);
+// v3.21: sayaç eklendi — Google'dan aynı anda gelen kişiler aynı milisaniyede üretildiğinde kimlik çakışabiliyordu (1/90 olasılık; çakışınca biri silinince öbürü de gidiyordu)
+let kisiSayaci = 0;
+export const yeniKisiId = () => "K" + Date.now().toString(36).slice(-5).toUpperCase() + Math.floor(Math.random() * 90 + 10) + (kisiSayaci++ % 1296).toString(36).toUpperCase().padStart(2, "0");
 
 export function ornekVeriyiKur(): { kayitlar: Kayit[]; hatalar: OrnekHata[]; adaylar: KonumAdayi[]; kisiler: Kisi[] } {
   const kisiler: Kisi[] = [];
@@ -187,7 +210,7 @@ export const calismaIli = (d: DepoDurumu): number => calismaIliNormalize(d.ayarl
 
 function bosDurum(): { durum: DepoDurumu; hatalar: OrnekHata[] } {
   const { kayitlar, hatalar, adaylar, kisiler } = ornekVeriyiKur();
-  return { durum: { veriSurumu: ORNEK_VERI_SURUMU, kayitlar, eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN }, ogrenilen: [], adaylar, aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [] }, hatalar };
+  return { durum: { veriSurumu: ORNEK_VERI_SURUMU, kayitlar, eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN }, ogrenilen: [], adaylar, aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleHaric: [], googleGiden: [] }, hatalar };
 }
 
 export function depoYukle(): { durum: DepoDurumu; hatalar: OrnekHata[]; yenilendi: boolean } {

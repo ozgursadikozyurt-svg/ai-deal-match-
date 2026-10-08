@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.14 · 3 Ekim 2026
+ * Anahtar CRM v3.21 · 8 Ekim 2026 (v3.14'ten)
  * AŞAMA 7 — Canlı sürümün veri köprüsü. Arayüz (demo ile aynı ekranlar) tüm durumu tek seferde okur
  * (`durumGetir`), değişiklikleri parça parça yazar (`degisiklikUygula`). Veritabanı ilişkisel kalır:
  * Notion/Google senkronu, toplu giriş, dışa aktarma ve eşleştirme servisleri aynı tablolarla çalışmaya devam eder.
@@ -12,6 +12,8 @@ import { ayarYaz } from "./ayar";
 import { varsayilanValidUntil as vu, TtlAyarSchema, TTL_VARSAYILAN } from "../domain/gecerlilik";
 import { AiAyarSchema, PaylasimAyarSchema, aiAyarNormalize, paylasimNormalize, calismaIliNormalize } from "../domain/ayarlar";
 import { RolTanimSchema, rolNormalize, ROL_SINIRI } from "../domain/roller";
+import { gonderimAlaniDegisti } from "../google/kisiler";
+import { googleSilinenleriIsaretle, googleGonderimAcik } from "./senkron";
 
 const KAYIT_ALANLARI = [...new Set([...Object.keys(KayitTemel.shape), "anaKategori"])].filter((k) => !["lokasyonlar", "kisiler", "ozellik", "kisiId"].includes(k)); // kisiId: kayıtta kisiler[0]'dan türetilir; arayüzdeki kişi kimlikleri cuid değildir
 const OZELLIK_ALANLARI = Object.keys((MulkOzellikObje as any).shape ?? (MulkOzellikObje as any)._def?.schema?.shape ?? {});
@@ -20,6 +22,12 @@ const ARAYUZ = "arayuz";
 const AYAR_ANAHTARLARI = ["ttl", "ai", "paylasim", "calismaIli", "roller", ARAYUZ];
 
 // ───────── Okuma ─────────
+/** Veritabanı kişisi → arayüz kişisi. v3.21: googleBekliyor = "Google'a gönderilecek" işareti (rozet için). */
+const kisiSatiri = (k: any) => ({ id: k.id, adSoyad: k.adSoyad, telefon: k.telefon, ikincilTelefon: k.ikincilTelefon, email: k.email, sirket: k.sirket, roller: k.roller, uzmanlikAileleri: k.uzmanlikAileleri, referans: k.referans, notlar: k.notlar, whatsappGruplari: k.whatsappGruplari, olusturma: k.createdAt.toISOString(), sonIletisim: k.sonIletisim?.toISOString() ?? null, kaynak: k.kaynak === "CSV" ? "MANUEL" : k.kaynak, ilanSahibiTipi: k.ilanSahibiTipi, googleResourceName: k.googleResourceName, kaynaktaSilindi: k.kaynaktaSilindi?.toISOString() ?? null, googleBekliyor: k.googleBekliyor?.toISOString() ?? null });
+/** v3.21 — yalnızca kişiler (Google eşitlemesinden sonra arayüzün yenilediği parça) */
+export async function kisileriGetir(prisma: PrismaClient) {
+  return (await prisma.kisi.findMany({ orderBy: { adSoyad: "asc" } })).map(kisiSatiri);
+}
 export async function durumGetir(prisma: PrismaClient) {
   const [kayitlar, kisiler, eslesmeler, ayarlar] = await Promise.all([
     prisma.kayit.findMany({ include: { lokasyonlar: { orderBy: { sira: "asc" } }, ozellik: true, kisiBaglari: { orderBy: { birincil: "desc" } }, gorusmeNotlari: { orderBy: { tarih: "desc" } }, fotolar: { orderBy: { sira: "asc" } } }, orderBy: { createdAt: "desc" } }),
@@ -35,7 +43,7 @@ export async function durumGetir(prisma: PrismaClient) {
       if (k.ozellik) veri.ozellik = Object.fromEntries(OZELLIK_ALANLARI.map((a) => [a, sade((k.ozellik as any)[a])]).filter(([, v]) => v != null && !(Array.isArray(v) && !v.length)));
       return { id: k.id, olusturma: k.createdAt.toISOString(), veri, notionId: k.notionId, fotolar: k.fotolar.map((f) => ({ id: f.id, ad: f.ad, en: f.en, boy: f.boy, boyut: f.boyut })), notlar: k.gorusmeNotlari.map((n) => ({ id: n.id, tarih: n.tarih.toISOString(), tur: n.tur, metin: n.metin, kisiId: n.kisiId })) };
     }),
-    kisiler: kisiler.map((k) => ({ id: k.id, adSoyad: k.adSoyad, telefon: k.telefon, ikincilTelefon: k.ikincilTelefon, email: k.email, sirket: k.sirket, roller: k.roller, uzmanlikAileleri: k.uzmanlikAileleri, referans: k.referans, notlar: k.notlar, whatsappGruplari: k.whatsappGruplari, olusturma: k.createdAt.toISOString(), sonIletisim: k.sonIletisim?.toISOString() ?? null, kaynak: k.kaynak === "CSV" ? "MANUEL" : k.kaynak, ilanSahibiTipi: k.ilanSahibiTipi, googleResourceName: k.googleResourceName, kaynaktaSilindi: k.kaynaktaSilindi?.toISOString() ?? null })),
+    kisiler: kisiler.map(kisiSatiri),
     eslesmeNotlari: Object.fromEntries(eslesmeler.map((m) => [`${m.talepId}~${m.portfoyId}`, { durum: m.durum === "BEKLIYOR" ? "YENI" : m.durum, not: m.operasyonNotu ?? "", ...(m.kopmaNedeni ? { neden: m.kopmaNedeni } : {}), ...(m.koparilma ? { tarih: m.koparilma.toISOString() } : {}) }])),
     ayarlar: { ttl: TtlAyarSchema.parse({ ...TTL_VARSAYILAN, ...((ayarlar.find((a) => a.anahtar === "ttl")?.deger as object) ?? {}) }), ai: aiAyarNormalize(ayarlar.find((a) => a.anahtar === "ai")?.deger), paylasim: paylasimNormalize(ayarlar.find((a) => a.anahtar === "paylasim")?.deger), calismaIli: calismaIliNormalize(ayarlar.find((a) => a.anahtar === "calismaIli")?.deger), roller: rolNormalize(ayarlar.find((a) => a.anahtar === "roller")?.deger) },
     arayuz: (ayarlar.find((a) => a.anahtar === ARAYUZ)?.deger ?? {}) as Record<string, unknown>,
@@ -49,6 +57,8 @@ const KisiZ = z.object({
   id: z.string().min(1).max(64), adSoyad: z.string().min(1).max(160), telefon: z.string().nullish(), ikincilTelefon: z.string().nullish(), email: z.string().nullish(), sirket: z.string().nullish(),
   roller: z.array(z.string()).default([]), uzmanlikAileleri: z.array(z.string()).default([]), referans: z.string().nullish(), notlar: z.string().nullish(), whatsappGruplari: z.array(z.string()).default([]),
   olusturma: z.string().optional(), sonIletisim: z.string().nullish(), kaynak: z.string().optional(), ilanSahibiTipi: z.string().optional(),
+  /** v3.21 — arayüz: "bu kişi elle eklendi / Google'a gönder dendi". Yalnızca Google bağlı ve çift yönlü açıkken dikkate alınır. */
+  googleaGonder: z.boolean().optional(),
 });
 const EsNotZ = z.object({ durum: z.string(), not: z.string().default(""), neden: z.string().optional(), tarih: z.string().optional() }).nullable();
 export const DegisiklikSchema = z.object({
@@ -64,8 +74,14 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
   const hatalar: { id: string; mesaj: string }[] = [];
   const ttl = await ttlAyarlari(prisma);
   // 1) Kişiler önce (kayıtlar kişilere bağlanır)
+  // v3.21 — çift yönlü Google: bağlantı açıksa (a) elle eklenen yeni kişi, (b) Google'a bağlı kişide ad / telefon / e-posta / şirket
+  // düzeltmesi "gönderilecek" diye işaretlenir; bir sonraki eşitleme Google'a yazar. Toplu içe aktarma işaretlenmez (arayüz işaret koymaz).
+  const gonder = g.kisiler.length ? await googleGonderimAcik(prisma) : false;
+  const eskiler = gonder ? new Map((await prisma.kisi.findMany({ where: { id: { in: g.kisiler.map((k) => k.id) } }, select: { id: true, adSoyad: true, telefon: true, ikincilTelefon: true, email: true, sirket: true, googleResourceName: true } })).map((k) => [k.id, k])) : new Map();
   for (const k of g.kisiler) {
-    const veri = { adSoyad: k.adSoyad, telefon: k.telefon || null, ikincilTelefon: k.ikincilTelefon || null, email: k.email || null, sirket: k.sirket || null, roller: k.roller as any, uzmanlikAileleri: k.uzmanlikAileleri, referans: k.referans ?? null, notlar: k.notlar ?? null, whatsappGruplari: k.whatsappGruplari, sonIletisim: k.sonIletisim ? new Date(k.sonIletisim) : null, ...(k.ilanSahibiTipi ? { ilanSahibiTipi: k.ilanSahibiTipi as any } : {}) };
+    const eski = eskiler.get(k.id);
+    const isaret = !gonder ? false : eski?.googleResourceName ? gonderimAlaniDegisti(eski, { adSoyad: k.adSoyad, telefon: k.telefon, ikincilTelefon: k.ikincilTelefon, email: k.email, sirket: k.sirket }) : !!k.googleaGonder && !!k.telefon;
+    const veri = { adSoyad: k.adSoyad, telefon: k.telefon || null, ikincilTelefon: k.ikincilTelefon || null, email: k.email || null, sirket: k.sirket || null, roller: k.roller as any, uzmanlikAileleri: k.uzmanlikAileleri, referans: k.referans ?? null, notlar: k.notlar ?? null, whatsappGruplari: k.whatsappGruplari, sonIletisim: k.sonIletisim ? new Date(k.sonIletisim) : null, ...(k.ilanSahibiTipi ? { ilanSahibiTipi: k.ilanSahibiTipi as any } : {}), ...(isaret ? { googleBekliyor: new Date() } : {}) };
     try { await prisma.kisi.upsert({ where: { id: k.id }, update: veri, create: { id: k.id, ...veri, kaynak: (["WHATSAPP", "GOOGLE", "NOTION", "MANUEL"].includes(k.kaynak ?? "") ? k.kaynak : "MANUEL") as any, ...(k.olusturma ? { createdAt: new Date(k.olusturma) } : {}) } }); }
     catch (e: any) { hatalar.push({ id: k.id, mesaj: e?.code === "P2002" ? "Bu telefon numarası başka bir kişide kayıtlı" : String(e?.message ?? e).slice(0, 200) }); }
   }
@@ -101,6 +117,8 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
   // 3) Silmeler
   if (g.kayitSil.length) await prisma.kayit.deleteMany({ where: { id: { in: g.kayitSil } } });
   if (g.kisiSil.length) {
+    // v3.21 — Anahtar'dan silinen kişi Google'dan SİLİNMEZ; yalnızca "geri gelmesin" listesine yazılır (Google bağlıysa)
+    await googleSilinenleriIsaretle(prisma, g.kisiSil);
     await prisma.kayit.updateMany({ where: { kisiId: { in: g.kisiSil } }, data: { kisiId: null } });
     await prisma.kayitKisi.deleteMany({ where: { kisiId: { in: g.kisiSil } } });
     await prisma.kisi.deleteMany({ where: { id: { in: g.kisiSil } } });

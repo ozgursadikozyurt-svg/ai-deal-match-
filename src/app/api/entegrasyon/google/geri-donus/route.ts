@@ -1,21 +1,35 @@
-// Anahtar CRM v3.13 · 3 Ekim 2026
-// GET /api/entegrasyon/google/geri-donus?code&state → anahtarı şifreleyip saklar, ilk tam senkronu başlatır, Bağlantılar ekranına döner
+// Anahtar CRM v3.21 · 8 Ekim 2026 (v3.13'ten)
+// GET /api/entegrasyon/google/geri-donus?code&state → Google izin ekranından dönüş. Anahtarı şifreleyip saklar, uygulamaya döner.
+//
+// Bu uç OTURUMSUZ çağrılır (tarayıcıyı Google yönlendirir, oturum başlığı olmaz). Güvenlik:
+//  1) `state` bizim imzamızı taşımalı ve 15 dakikadan eski olmamalı (src/lib/guvenlik/sifre.ts) → hangi ofis, hangi kullanıcı.
+//  2) O kullanıcı hâlâ o ofiste, etkin ve bağlantı kurmaya yetkili olmalı (veritabanından yeniden bakılır).
+//  3) İş o ofisin bağlamında çalışır; başka ofise yazılamaz.
+// İlk içe aktarma burada BAŞLATILMAZ (istek uzun sürer); arayüz dönüşte "?google=ok" görünce eşitlemeyi kendisi sürdürür ve ilerlemeyi gösterir.
 import { prisma } from "@/lib/db";
-import { kodTakasEt, yonlendirmeAdresi, idTokenEposta } from "@/lib/google/istemci";
+import { kiracilikIcinde, platformOlarak, type Rol } from "@/lib/kiracilik";
+import { yetkiVar } from "@/lib/guvenlik/yetki";
+import { kodTakasEt, yonlendirmeAdresi, uygulamaAdresi, idTokenEposta, yazmaIzniVar } from "@/lib/google/istemci";
 import { sifrele, durumDogrula } from "@/lib/guvenlik/sifre";
-import { entegrasyon, googleSenkronCalistir } from "@/lib/services/senkron";
+import { entegrasyon, ayarlarOf } from "@/lib/services/senkron";
 
 export async function GET(req: Request) {
   const u = new URL(req.url);
-  const geri = (q: string) => Response.redirect(`${(process.env.UYGULAMA_URL ?? u.origin).replace(/\/$/, "")}/baglantilar?google=${q}`, 302);
+  const kok = uygulamaAdresi(req);
+  const geri = (q: string) => Response.redirect(`${kok}/?google=${q}`, 302);
   try {
     if (u.searchParams.get("error")) return geri("iptal");
-    durumDogrula(u.searchParams.get("state") ?? "");
-    const t = await kodTakasEt(fetch, { code: u.searchParams.get("code") ?? "", clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET!, redirectUri: yonlendirmeAdresi() });
+    const st = durumDogrula<{ ofisId: string; kullaniciId: string; eposta: string }>(u.searchParams.get("state") ?? "");
+    if (!st.ofisId || !st.kullaniciId) return geri("hata");
+    const k = await platformOlarak(() => prisma.kullanici.findFirst({ where: { id: st.kullaniciId, ofisId: st.ofisId }, select: { id: true, rol: true, aktif: true, eposta: true, ofis: { select: { durum: true } } } }));
+    if (!k || !k.aktif || k.ofis.durum !== "AKTIF" || !yetkiVar(k.rol as Rol, "ofis.entegrasyon")) return geri("yetki");
+    const t = await kodTakasEt(fetch, { code: u.searchParams.get("code") ?? "", clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET!, redirectUri: yonlendirmeAdresi(kok) });
     if (!t.refresh_token) return geri("yenileme-anahtari-yok");
-    await entegrasyon(prisma, "GOOGLE_KISILER");
-    await prisma.entegrasyon.updateMany({ where: { saglayici: "GOOGLE_KISILER" }, data: { durum: "BAGLI", hesap: idTokenEposta(t.id_token), tokenSifreli: sifrele(t.refresh_token), syncToken: null, imlec: undefined, sonHata: null } });
-    await googleSenkronCalistir(prisma, { tetik: "ilk", tam: true }).catch(() => null); // kalanını zamanlayıcı tamamlar
+    await kiracilikIcinde({ ofisId: st.ofisId, kullaniciId: k.id, rol: k.rol as Rol, eposta: k.eposta }, async () => {
+      const e = await entegrasyon(prisma, "GOOGLE_KISILER");
+      const ayarlar = { ...ayarlarOf(e), baglayanKullaniciId: k.id, baglanti: new Date().toISOString(), yazmaIzni: yazmaIzniVar(t.scope) };
+      await prisma.entegrasyon.updateMany({ where: { saglayici: "GOOGLE_KISILER" }, data: { durum: "BAGLI", hesap: idTokenEposta(t.id_token), tokenSifreli: sifrele(t.refresh_token!), syncToken: null, imlec: null as any, sonHata: null, kilitBitis: null, ayarlar: ayarlar as any } });
+    });
     return geri("ok");
-  } catch (e) { console.error(e); return geri("hata"); }
+  } catch (e) { if (!/state/i.test(String((e as Error)?.message))) console.error(e); return geri("hata"); } // geçersiz / süresi dolmuş state beklenen bir durumdur, günlüğe yazılmaz
 }

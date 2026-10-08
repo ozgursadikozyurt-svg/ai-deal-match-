@@ -23,7 +23,7 @@ async function ac({ oturum, hash = "" }) {
 // A) oturumsuz → giriş ekranı
 { const a = await ac({}); const ok = await bekle(() => a.metin().includes("Giriş bağlantısı gönder"));
   tamam("oturumsuz açılış: giriş ekranı", ok, ok ? "" : a.metin().slice(0, 120));
-  tamam("giriş ekranı: sürüm etiketi v3.18", a.metin().includes("v3.18"));
+  tamam("giriş ekranı: sürüm etiketi v3.21", a.metin().includes("v3.21"));
   tamam("giriş ekranı: e-posta alanı var", !!a.w.document.getElementById("gi-eposta")); a.w.close(); }
 
 // B) izinsiz e-posta → 403 mesajı
@@ -34,7 +34,7 @@ async function ac({ oturum, hash = "" }) {
 { const t = await jwt("ozgur@test.com"); const a = await ac({ oturum: { access: t, refresh: "x", bitis: Date.now() + 3600e3, eposta: "ozgur@test.com" } });
   const ok = await bekle(() => a.metin().includes("Ana Sayfa"), 15000);
   tamam("izinli oturum: uygulama açıldı; açılışta 'Kaydedildi ✓' göstergesi ekranda kalmıyor (v3.15)", ok && !a.metin().includes("Kaydedildi"), ok ? "" : a.metin().slice(0, 200) + " | " + a.hatalar.slice(0, 2).join(" ; "));
-  tamam("canlıda 'Bağlantılar' menüsü gizli", !/Bağlantılar/.test(a.metin()));
+  tamam("canlıda 'Bağlantılar' menüsü platform yöneticisine görünür, Notion hiçbir yerde geçmez (v3.21)", /Bağlantılar/.test(a.metin()) && !/Notion/.test(a.metin()));
   const aday = [...a.w.document.querySelectorAll("#kok button, #kok a")].filter((b) => /Ayarlar/.test(b.textContent ?? "")); console.log("   Ayarlar adayları:", aday.map((b) => b.tagName + ":" + (b.textContent ?? "").trim().slice(0, 20)).join(" | ")); const nav = aday[0];
   tamam("menüde Ayarlar var", !!nav);
   nav?.click(); const ok2 = await bekle(() => a.metin().includes("Hesap ve veri"));
