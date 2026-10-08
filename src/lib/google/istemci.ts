@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21 · 8 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026 (v3.13'ten)
  * Google OAuth 2.0 + People API istemcisi (bağımlılıksız, fetch ile). Yalnızca sunucuda çalışır.
  *
  * v3.21 — çift yönlü: kişi okuma, oluşturma ve güncelleme. Bu dosyada Google'dan kişi SİLEN bir çağrı yoktur

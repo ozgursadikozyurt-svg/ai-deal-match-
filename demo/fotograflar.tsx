@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Demo — portföy detayındaki "Fotoğraflar" bölümü: ekle (küçültülerek), kapak seç, sil, tek tek ya da toplu indir, paylaş.
  */
 import { useEffect, useRef, useState } from "react";

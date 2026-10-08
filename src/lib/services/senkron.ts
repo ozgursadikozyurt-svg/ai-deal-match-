@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21 · 8 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026 (v3.13'ten)
  * Ekosistem senkron işi — Google Kişiler (v3.21: çift yönlü, çok ofisli) ve Notion (v3.21: gizli, kod yerinde). Planlama saf modüllerde (google/kisiler.ts, notion/plan.ts),
  * bu dosya planı veritabanına uygular, çalışma geçmişini ve çakışmaları yazar.
  *
@@ -30,7 +30,7 @@ type Saglayici = "GOOGLE_KISILER" | "NOTION";
 type Fetch = typeof fetch;
 /** Bir çağrıda dışarıya yapılan istek sayacı — Cloudflare Workers ücretsiz planda çağrı başına 50 dış istek sınırı vardır */
 export interface IstekSayaci { n: number; sinir: number }
-export interface SenkronSecenek { tetik?: string; tam?: boolean; butceMs?: number; f?: Fetch; simdi?: () => Date; sayac?: IstekSayaci }
+export interface SenkronSecenek { tetik?: string; tam?: boolean; butceMs?: number; sayfaSiniri?: number; f?: Fetch; simdi?: () => Date; sayac?: IstekSayaci }
 export interface EntegrasyonAyarlari {
   otomatik: boolean; aralikDk: number; geriYaz: boolean;
   /** v3.21 — çift yönlü: Anahtar'da elle eklenen / düzeltilen kişi Google'a da yazılır (varsayılan açık) */
@@ -87,7 +87,10 @@ export function kayitVeri(k: any): Record<string, any> {
 
 // ───────────────────────────── GOOGLE KİŞİLER (v3.21 — çift yönlü) ─────────────────────────────
 /** Bir turda Google'dan istenen kişi sayısı. Küçük tutulur: her sayfa ayrı işlenip ilerleme saklanır (Worker süre sınırı). */
-export const GOOGLE_SAYFA_BOYU = 200;
+export const GOOGLE_SAYFA_BOYU = 100;
+/** v3.21.1 — Bir turda (tek istekte) işlenen en çok sayfa. Worker'ın istek başına işlemci süresi sınırına takılmamak için
+ *  büyük rehberler (ör. 8.000 kişi) çok sayıda kısa turda alınır; arayüz `devamEdecek` oldukça turu yineler. */
+export const GOOGLE_TUR_SAYFA_SINIRI = 2;
 /** Bir turda Google'a gönderilen en çok kişi (oluşturma + güncelleme). Kalanı sonraki tura kalır. */
 export const GOOGLE_GONDERIM_SINIRI = 20;
 type GoogleOzet = { gelen: number; yeni: number; guncellenen: number; baglanan: number; degismeyen: number; cakisma: number; silinen: number; atlanan: number; birlesen: number; haric: number; gonderilenYeni: number; gonderilenGuncel: number; gonderimHata: number; gonderimKalan: number };
@@ -167,8 +170,10 @@ export async function googleSenkronCalistir(prisma: PrismaClient, o: SenkronSece
     const mevcut: MevcutKisi[] = (await prisma.kisi.findMany({ select: kisiSec })).map((k) => ({ ...k, googleSnapshot: k.googleSnapshot as any }));
 
     // ───── 1) ÇEK: Google → Anahtar ─────
-    let sayfaSifirlandi = false;
-    while (!bitti && Date.now() - bas < butce && yer()) {
+    let sayfaSifirlandi = false, islenenSayfa = 0;
+    const sayfaSiniri = o.sayfaSiniri ?? GOOGLE_TUR_SAYFA_SINIRI;
+    while (!bitti && Date.now() - bas < butce && yer() && islenenSayfa < sayfaSiniri) {
+      islenenSayfa++;
       let r;
       try { r = await kisiSayfasi(f, tok.access_token, { sayfaToken: sayfa, syncToken, sayfaBoyu: GOOGLE_SAYFA_BOYU }); }
       catch (x) {

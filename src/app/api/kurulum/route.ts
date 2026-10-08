@@ -1,4 +1,4 @@
-// Anahtar CRM v3.14 · 3 Ekim 2026
+// Anahtar CRM v3.21.1 · 8 Ekim 2026
 // GET  /api/kurulum → veritabanı hazır mı? (bekleyen migration, konum verisi yüklü mü)
 // POST /api/kurulum → bekleyen migration'ları uygular + Antalya konum verisini yükler (idempotent; tekrar basılabilir)
 // Komut satırı gerekmez: canlı uygulamada ilk açılışta "Kurulumu tamamla" düğmesi bunu çağırır.

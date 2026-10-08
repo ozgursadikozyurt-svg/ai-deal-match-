@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21 · 8 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Canlı — Google Kişiler bağlantısının arayüz tarafı (ağ çağrıları). Ekran: demo/baglantilar.tsx.
  *
  *  googleDurumYenile  → GET /api/entegrasyon (+ açık çakışmalar): bağlı mı, hangi hesap, son eşitleme, sayılar
@@ -66,11 +66,21 @@ export function googleEsitle(guncelle: Guncelle, o: { tam?: boolean; ilerleme?: 
   suruyor = (async () => {
     try {
       await CANLI.hemen?.();
-      let ozet: GoogleOzet | null = null;
-      for (let tur = 1; tur <= 120; tur++) {
-        const j = await googleApi("/api/senkron/calistir", { method: "POST", json: { kaynak: "google", tetik: "kullanici", tam: !!o.tam && tur === 1 } });
-        const g = j.google;
-        if (g?.hata) throw new Error(g.hata);
+      let ozet: GoogleOzet | null = null, hataSayisi = 0;
+      for (let tur = 1; tur <= 200; tur++) {
+        // v3.21.1 — büyük rehberlerde tek bir turun geçici hatası (503, kopan bağlantı) tüm içe aktarmayı durdurmasın:
+        // ilerleme her sayfadan sonra saklandığı için aynı tur birkaç saniye sonra kaldığı yerden yinelenir.
+        let j: any, g: any;
+        try {
+          j = await googleApi("/api/senkron/calistir", { method: "POST", json: { kaynak: "google", tetik: "kullanici", tam: !!o.tam && tur === 1 } });
+          g = j.google;
+          if (g?.hata) throw new Error(g.hata);
+          hataSayisi = 0;
+        } catch (x) {
+          if (++hataSayisi > 3) throw x;
+          await bekle(3000 * hataSayisi);
+          continue;
+        }
         if (g?.atlandi) { if (/sürüyor/.test(g.atlandi) && tur < 10) { await bekle(4000); continue; } break; }
         ozet = g?.ozet ?? ozet;
         if (ozet) o.ilerleme?.(ozet, tur);

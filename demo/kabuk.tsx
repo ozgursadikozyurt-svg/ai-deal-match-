@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Demo — uygulama kabuğu: logo, simgeler, gezinme (masaüstünde sol menü, telefonda alt çubuk + menü sayfası).
  */
 import React from "react";

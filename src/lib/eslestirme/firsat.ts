@@ -1,4 +1,5 @@
 /**
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Anahtar CRM v3.19 — Fırsat önceliği.
  * Eşleşmenin KİMİN arasında olduğu kazancı belirler: komisyon iki taraftan da alınabiliyorsa fırsat değerlidir.
  *  · mülk sahibi (sahibinden) portföyü ↔ doğrudan müşteri talebi  → ÖNCELİKLİ (iki taraf da komisyon)

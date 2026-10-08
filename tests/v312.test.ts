@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * v3.12 — metin ayrıştırma düzeltmeleri (kullanıcının WhatsApp sohbetinden gelen örnekler), içe aktarma kural geçişi, sürüm.
  */
 import { test } from "node:test";
@@ -64,7 +64,7 @@ test("güven puanı ve sıralama alanları: kural okuması her parçaya güven v
 test("sürüm 3.12 kayıtlı", () => {
   const k = SURUM_GECMISI.find((x) => x.surum === "3.12");
   assert.ok(k && (k.testEt ?? []).length >= 3);
-  assert.ok(Number(SURUM) >= 3.12);
+  assert.ok(parseFloat(SURUM) >= 3.12);
 });
 
 import { kuralAdaylari } from "../demo/ice-aktarma";

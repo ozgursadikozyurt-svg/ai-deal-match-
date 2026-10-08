@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.21 · 8 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.21";
+export const SURUM = "3.21.1";
 export const TARIH = "8 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.21_8Ekim2026";
+export const DOSYA_EKI = "v3.21.1_8Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,16 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.21.1",
+    tarih: "8 Ekim 2026",
+    baslik: "Büyük Google rehberleri (binlerce kişi) için ilk içe aktarma düzeltmesi; Google yayını için gizlilik ve koşullar sayfaları",
+    degisenler: [
+      "Binlerce kişilik rehberde ilk eşitleme \"Sunucu 503 / Connection terminated unexpectedly\" ile duruyordu: tek istekte çok iş yapılıyordu. Artık rehber 100'erli sayfalarla, her istekte en çok 2 sayfa olmak üzere kısa turlarda alınır; ilerleme her sayfadan sonra saklanır.",
+      "Bir tur geçici olarak hata verirse (503, kopan bağlantı) eşitleme durmaz; birkaç saniye sonra kaldığı yerden 3 kez yeniden dener.",
+      "Herkese açık /gizlilik.html ve /kosullar.html sayfaları eklendi (Google'da uygulamayı yayınlamak ve doğrulama başvurusu için gerekli).",
+    ],
+  },
   {
     surum: "3.21",
     tarih: "8 Ekim 2026",

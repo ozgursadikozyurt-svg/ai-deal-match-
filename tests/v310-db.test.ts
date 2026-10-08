@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * v3.10 — veritabanlı: kayit_foto tablosu ve fotoğraf rotası (depo taklit edilir), Türkiye geneli konum çözümü,
  * diğer illerin başlangıç alt bölgeleri, ayarlar rotası (ai / paylasim / calismaIli).
  */

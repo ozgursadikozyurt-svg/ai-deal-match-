@@ -1,4 +1,4 @@
-// Anahtar CRM v3.14 · 3 Ekim 2026
+// Anahtar CRM v3.21.1 · 8 Ekim 2026
 // GET  /api/durum[?yalniz=kisiler] → arayüzün tüm verisi (kayıtlar, kişiler, eşleşme takibi, ayarlar, arayüz durumu)
 // POST /api/durum { kayitlar, kayitSil, kisiler, kisiSil, eslesmeNotlari, ayarlar, arayuz } → değişiklikleri yazar
 //   Demo yedeğini (JSON) canlıya taşımak da bu uçla yapılır (tüm kayıt ve kişiler "değişiklik" olarak gönderilir).

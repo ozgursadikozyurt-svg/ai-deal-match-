@@ -1,4 +1,4 @@
-// Anahtar CRM v3.13 · 3 Ekim 2026
+// Anahtar CRM v3.21.1 · 8 Ekim 2026
 // POST /api/ingest/whatsapp  (multipart: files[] = .txt dışa aktarımlar; sonGun=7)
 // 1. adım: ayrıştır + ön filtre + tekrar ayıkla (yapay zekâ YOK). Dönen ADAY mesajlar paketler hâlinde
 // yapay zekâya gönderilir (AŞAMA 4: /api/ingest/ayristir), sonuçlar güvene göre ayrılıp toplu onaya sunulur.

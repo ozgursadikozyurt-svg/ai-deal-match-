@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Demo örnek verisi — ticari kayıtlar Notion CRM'den, konut kayıtları WhatsApp grup örneklerinden türetildi (v3.3). Kişi adları ve telefonlar KURGUSALDIR.
  * Her kayıt yüklenirken gerçek doğrulamadan (KayitCreateSchema) ve gerçek konum çözücüden geçer;
  * geçemeyen kayıt ekranda "örnek veri hatası" olarak görünür (şema değişince erken uyarı).

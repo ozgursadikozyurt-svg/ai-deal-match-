@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * v3.10 — para simgeleri, güven kuralı, telefon standardı, çoklu mülk tipi, Türkiye geneli konum,
  * yapay zekâ ayarları + sağlayıcı istemcisi, portföy föyü (metin + PDF), fotoğraf kuralları ve depo istemcisi.
  */
@@ -250,6 +250,6 @@ test("ekranlar: Ayarlar'da yapay zekâ / imza / çalışma ili; AI kutusunda 'G�
 test("sürüm 3.10: günlükte ve test listesinde", () => {
   // v3.11'den itibaren güncel sürüm testi tests/v311.test.ts'te; burada 3.10 kaydının günlükte durduğu doğrulanır
   const k = SURUM_GECMISI.findIndex((x) => x.surum === "3.10");
-  assert.ok(k >= 0 && Number(SURUM) >= 3.1); assert.ok((SURUM_GECMISI[k].testEt ?? []).length >= 8);
+  assert.ok(k >= 0 && parseFloat(SURUM) >= 3.1); assert.ok((SURUM_GECMISI[k].testEt ?? []).length >= 8);
   assert.equal(SURUM_GECMISI[k + 1].surum, "3.9");
 });

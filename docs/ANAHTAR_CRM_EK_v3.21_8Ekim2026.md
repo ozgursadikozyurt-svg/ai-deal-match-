@@ -116,3 +116,10 @@ Migration `20261008100000_v321_google_cift_yonlu` — yalnızca ekleme:
 ## Sonraki sürümler (değişmedi + ek)
 - v3.22: plan sınırlarının zorlanması (Google eşitlemesi Pro'ya bağlanacaksa burada), kullanım ölçümü.
 - Aday: kişi başı Google bağlantısı (her danışman kendi rehberi), Google'a gönderilen kişilere "Anahtar CRM" etiketi.
+
+## v3.21.1 düzeltmesi (8 Ekim 2026, akşam)
+
+- **Belirti:** ~8.000 kişilik gerçek rehberde ilk eşitleme "Sunucu 503 / Connection terminated unexpectedly" ile duruyordu. Supabase günlüğünde "Client socket closed while state was busy" görüldü: Worker, tek istekte fazla iş yaparken platform tarafından kesiliyordu.
+- **Düzeltme:** `GOOGLE_SAYFA_BOYU` 200 → 100; yeni `GOOGLE_TUR_SAYFA_SINIRI = 2` (bir istekte en çok 2 sayfa). İlerleme her sayfadan sonra saklanmaya devam eder; arayüz turu `devamEdecek` oldukça yineler (en çok 200 tur), geçici hatada 3 kez bekleyip yeniden dener.
+- **Google yayını:** `public/gizlilik.html` ve `public/kosullar.html` (Branding sayfasında home page / privacy policy / terms alanları için).
+- Testler: 265 geçti, 0 kaldı.

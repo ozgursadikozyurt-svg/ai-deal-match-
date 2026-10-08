@@ -1,4 +1,4 @@
-// Anahtar CRM v3.15 · 5 Ekim 2026 — canlı arayüz sınaması (sanal tarayıcı: jsdom). Hazırlık: bkz. README › Canlı sürümü yerelde sınama
+// Anahtar CRM v3.21.1 · 8 Ekim 2026 — canlı arayüz sınaması (sanal tarayıcı: jsdom). Hazırlık: bkz. README › Canlı sürümü yerelde sınama
 import { JSDOM, VirtualConsole } from "jsdom";
 import fs from "node:fs";
 import { SignJWT } from "jose";

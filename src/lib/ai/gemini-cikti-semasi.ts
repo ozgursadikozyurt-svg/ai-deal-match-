@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Gemini "structured output" şeması — Zod şemalarından OTOMATİK üretilir.
  * Gemini'ye `generationConfig: { responseMimeType: "application/json", responseSchema }` verilir;
  * model enum dışı değer veya tanımsız alan üretemez. Dönen JSON yine de Zod'dan geçirilir (çift kilit).

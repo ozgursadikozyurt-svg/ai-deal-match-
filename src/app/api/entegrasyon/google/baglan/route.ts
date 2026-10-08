@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21 · 8 Ekim 2026 (v3.13'ten)
+// Anahtar CRM v3.21.1 · 8 Ekim 2026 (v3.13'ten)
 // POST /api/entegrasyon/google/baglan → { url }: arayüz bu adrese gider, kullanıcı Google'da "İzin ver" der.
 //
 // v3.21 — "Google ile bağlan" tek düğme:

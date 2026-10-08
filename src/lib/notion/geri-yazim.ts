@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Anahtar → Notion geri yazım: yalnızca uygulamanın kendi beş alanı (yapilandirma.ts → GERI_YAZIM_ALANLARI).
  * Değer değişmediyse istek atılmaz (Notion'un 3 istek/sn sınırı için).
  */

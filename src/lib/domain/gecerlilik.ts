@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Geçerlilik süresi (TTL) kuralları — sunucu ve demo aynı kodu kullanır.
  * v3.4: satılık ve kiralık ayrı (kiralık ilan/talep çabuk eskir: varsayılan portföy 45, talep 30 gün).
  * Acil talep: işlem süresinden kısa olan uygulanır.

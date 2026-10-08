@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * HIZLI AYRIŞTIRICI — yapay zekâdan ÖNCE çalışan kural tabanlı (regex + sözlük) çözümleyici. Ücretsizdir.
  * Amaç: yapıştırılan WhatsApp mesajı / portal ilanı ya da doğal dil sorusunun çoğunu yapay zekâ
  * çağırmadan anlamak; yapay zekâ yalnızca kural tabanlı sonuç "yeterli" değilse çağrılır.

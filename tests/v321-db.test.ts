@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21 · 8 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * v3.21 — VERİTABANLI KANIT: çift yönlü Google Kişiler (PGlite + sahte Google, tests/sahte-google.ts).
  * Kuralların her biri bir testtir:
  *   Google'a eklenen Anahtar'a düşer · Anahtar'a elle eklenen Google'a gider · Anahtar'daki düzeltme Google'a yazılır
@@ -38,7 +38,7 @@ async function bagla(b: Baglam, ek: object = {}) {
 /** Eşitleme bitene kadar turları sürdürür (arayüzün yaptığı gibi); tur sayısını döner */
 async function esitle(b: Baglam, f: typeof fetch, o: object | (() => object) = {}) {
   let tur = 0, son: any;
-  do { son = await icinde(b, () => googleSenkronCalistir(prisma, { f, tetik: "kullanici", ...(typeof o === "function" ? o() : o) })); tur++; assert.ok(!son.atlandi, String(son.atlandi)); assert.ok(tur < 30, "eşitleme bitmiyor"); } while (son.devamEdecek);
+  do { const ek: any = typeof o === "function" ? o() : { ...o }; if (tur > 0) delete ek.tam; /* arayüz gibi: "tam" yalnızca ilk turda */ son = await icinde(b, () => googleSenkronCalistir(prisma, { f, tetik: "kullanici", ...ek })); tur++; assert.ok(!son.atlandi, String(son.atlandi)); assert.ok(tur < 30, "eşitleme bitmiyor"); } while (son.devamEdecek);
   return { tur, son };
 }
 const kisi = (b: Baglam, where: object) => icinde(b, () => prisma.kisi.findFirst({ where }));
@@ -62,7 +62,7 @@ test("ilk içe aktarma büyük rehberde SAYFA SAYFA ilerler: yarıda kalır, kal
   await bagla(B);
   // Her tura en çok 3 dış istek (anahtar + etiketler + 1 sayfa) → Workers'ın çağrı sınırı benzetimi
   const { tur } = await esitle(B, G.f, () => ({ sayac: { n: 0, sinir: 3 } }));
-  assert.equal(tur, Math.ceil(451 / GOOGLE_SAYFA_BOYU), "451 kişi 200'lük sayfalarla 3 turda biter");
+  assert.equal(tur, Math.ceil(451 / GOOGLE_SAYFA_BOYU), "451 kişi sayfa sayfa, her turda bir sayfa");
   assert.equal(await icinde(B, () => prisma.kisi.count({ where: { googleResourceName: { not: null } } })), 450, "telefonu olan 450 kişi geldi; telefonsuz alınmadı");
   const calismalar = await icinde(B, () => prisma.senkronCalisma.findMany({ where: { saglayici: "GOOGLE_KISILER" } }));
   assert.equal(calismalar.length, 1, "üç tur tek geçmiş satırında toplandı");

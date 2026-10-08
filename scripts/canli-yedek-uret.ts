@@ -1,3 +1,4 @@
+// Anahtar CRM v3.21.1 · 8 Ekim 2026
 import fs from "node:fs";
 import { ornekVeriyiKur } from "../demo/depo";
 const o = ornekVeriyiKur();

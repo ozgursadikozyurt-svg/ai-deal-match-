@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21 · 8 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * v3.21 — veritabanısız testler: çift yönlü Google planlayıcıları (çekme + gönderme + silinenler), güncelleme gövdesi,
  * "Google'dan silme yok" güvencesi, bağlanma adresi, şifreleme anahtarı, arayüz (Notion gizli, kurallar görünür),
  * canlı kayıt kuyruğunun sunucudan gelen kişilerle birleşmesi, demo benzetimi.

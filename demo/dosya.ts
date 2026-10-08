@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Demo — üretilen dosyayı kullanıcıya verme: indirme (yayın sayfasında `downloads` yeteneği, yoksa tarayıcı indirmesi)
  * ve telefonun paylaşım menüsü (WhatsApp, e-posta…).
  */

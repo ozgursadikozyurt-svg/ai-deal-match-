@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Anahtar CRM v3.13 · 3 Ekim 2026
+# Anahtar CRM v3.21.1 · 8 Ekim 2026
 # Temiz bir PGlite (bellek-içi Postgres) başlatır, migration + seed uygular, testleri koşar.
 set -e
 PORT=${PGPORT:-55432}

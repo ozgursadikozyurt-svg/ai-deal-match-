@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html

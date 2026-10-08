@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.15 · 5 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Ayarlar › Kişi rolleri: koda dokunmadan yeni rol ekle, adını değiştir, kullanılmayan özel rolü kaldır.
  * Sistem rolleri (11) kaldırılamaz ama yeniden adlandırılabilir. Tanımlar DepoDurumu.roller'da durur (canlıda Ayar tablosu, "roller" anahtarı).
  */

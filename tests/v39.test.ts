@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.13 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * v3.9 — akıllı metin yorumlayıcı (önce anla, sonra ayır), çekirdek düzeltmeleri ve yeni demo ekranları.
  */
 import { test } from "node:test";

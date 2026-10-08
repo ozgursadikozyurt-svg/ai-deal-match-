@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.14 · 3 Ekim 2026
+ * Anahtar CRM v3.21.1 · 8 Ekim 2026
  * Canlı — arayüz durumu (DepoDurumu) ile sunucu durumu (/api/durum) arasındaki eşleme ve fark hesabı. Saf işlevler (ağ yok): testlenebilir.
  *  sunucudanDurum: GET /api/durum cevabı → arayüzün beklediği durum
  *  imzaAl / planla: son kaydedilenle şimdiki durumu karşılaştırır, yalnızca değişenleri POST /api/durum parçalarına böler
