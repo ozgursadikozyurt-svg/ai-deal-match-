@@ -5,6 +5,12 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.21.1 · 8 Ekim 2026 — Büyük Google rehberleri (binlerce kişi) için ilk içe aktarma düzeltmesi; Google yayını için gizlilik ve koşullar sayfaları
+
+- Binlerce kişilik rehberde ilk eşitleme "Sunucu 503 / Connection terminated unexpectedly" ile duruyordu: tek istekte çok iş yapılıyordu. Artık rehber 100'erli sayfalarla, her istekte en çok 2 sayfa olmak üzere kısa turlarda alınır; ilerleme her sayfadan sonra saklanır.
+- Bir tur geçici olarak hata verirse (503, kopan bağlantı) eşitleme durmaz; birkaç saniye sonra kaldığı yerden 3 kez yeniden dener.
+- Herkese açık /gizlilik.html ve /kosullar.html sayfaları eklendi (Google'da uygulamayı yayınlamak ve doğrulama başvurusu için gerekli).
+
 ## v3.21 · 8 Ekim 2026 — Google ile bağlan: çift yönlü Google Kişiler eşitlemesi (canlıda çalışır), Notion bağlantısı gizlendi
 
 - "Google ile bağlan" tek düğme: Bağlantılar ya da Kişiler ekranında düğmeye basın, Google'ın kendi izin ekranında hesabınızı seçip "İzin ver" deyin. Uygulamaya dönünce rehberiniz kendiliğinden içe aktarılır (ilerleme ekranda görünür). Anahtar kopyalama, ayar girme yok. Bu özellik canlıda ilk kez çalışıyor (önceki sürümlerde yalnızca demoda benzetimdi).
