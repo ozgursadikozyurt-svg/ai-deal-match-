@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Bağımlılıksız tablo okuyucu: .xlsx (fflate ile zip açılır, XML düz okunur), .csv / .tsv / .txt (ayraç otomatik).
  * Tarayıcıda (demo) ve sunucuda aynı kod çalışır. Biçimlendirme, formül ve birleşik hücre yok sayılır; değerler okunur.
  */

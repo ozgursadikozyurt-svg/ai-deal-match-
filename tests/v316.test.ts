@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * v3.16 — her ekranda geri, kişi rolüne göre filtre, eşleşmelerde işlem tipi, kaynak otomasyonu, geri sayımın kayıt gününden başlaması.
  */
 import { test } from "node:test";
@@ -12,6 +12,7 @@ import { ornekVeriyiKur, bosBaglanti, bosGoogleBaglanti, type DepoDurumu, type V
 import { filtreUygula, bosFiltre } from "../demo/filtre";
 import { Eslesmeler, Liste } from "../demo/app";
 import { taslakYap } from "../demo/ai-kutusu";
+import { ac } from "./yardimci-arayuz";
 import { hizliAyristir } from "../src/lib/ai/hizli-ayristirici";
 import { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } from "../src/lib/kiracilik";
 // v3.20 — çok ofisli: testler varsayılan ofisin bağlamında çalışır (göçte açılan Özyurtlar Gayrimenkul)
@@ -32,11 +33,16 @@ test("kişi rolü filtresi: kayda bağlı kişinin rolüne göre süzer", () => 
   assert.equal(filtreUygula(emlakci.veri, bosFiltre(), undefined, rolu), true, "rol seçilmemişse süzmez");
 });
 
-test("eşleşmeler ekranı: işlem tipi hızlı filtresi var, 'Filtre neye uygulansın' ve 'Kişi' bölümü kaldırıldı", () => {
+test("eşleşmeler ekranı: işlem tipi seçicisi var (v3.21.2: tek satırlık açılır seçici), 'Filtre neye uygulansın' ve 'Kişi' bölümü kaldırıldı", async () => {
   const h = ciz(React.createElement(Eslesmeler));
-  for (const x of ["Satılık", "Kiralık", "Devren"]) assert.ok(h.includes(x), x);
+  assert.match(h, /<small>İşlem<\/small>/);
   assert.ok(!h.includes("Filtre neye uygulansın"));
   assert.ok(!h.includes("Portföy tarafı"));
+  const a = await ac(React.createElement(Eslesmeler), ctx());
+  await a.tikla(a.qa(".hs-btn")[0]); // İşlem seçicisini aç
+  const secenekler = a.qa(".hs-menu .hs-oge").map((x) => x.textContent ?? "").join("|");
+  for (const x of ["Tümü", "Satılık", "Kiralık", "Devren"]) assert.ok(secenekler.includes(x), x);
+  await a.kapat();
 });
 
 test("listelerde 'Listeyi paylaş' düğmesi var", () => {

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Demo uygulamasını tek HTML dosyası olarak derler ve SURUMLER.md'yi üretir.
  * Çalıştır: npm run demo
  * Çıktılar:

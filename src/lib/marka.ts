@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Marka — ürün adı tek yerden değişir (ekran başlığı, logo yazısı, sayfa başlığı).
  * v3.9 kararı: "Anahtar CRM". Önceki adlar: Anakey (v3.7), Keylot (v3.6 önerisi), Anahtar.ai.
  * Kod, veritabanı ve dosya adları "anahtar" olarak kalır.

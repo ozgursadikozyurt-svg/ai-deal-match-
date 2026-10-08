@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Yapay zekâ sağlayıcı istemcisi — tek bir "OpenAI uyumlu" sohbet çağrısı. Gemini, Groq, Cerebras, Mistral, OpenRouter ve OpenAI
  * aynı biçimi kabul ettiği için sağlayıcı değiştirmek kod değişikliği gerektirmez (Ayarlar › Yapay zekâ + AI_API_KEY).
  * Yanıt her zaman JSON nesnesi olarak istenir; doğrulamayı çağıran yapar (AiParseCiktiSchema).

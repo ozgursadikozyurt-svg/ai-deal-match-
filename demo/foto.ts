@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Demo — portföy fotoğrafları: tarayıcıda küçültme + bu cihazda saklama (IndexedDB) + indirme / paylaşma.
  * Canlı kurulumda aynı küçültülmüş dosya /api/kayitlar/:id/fotolar ile Supabase Storage'a gider (src/lib/depolama/supabase.ts).
  * Kayıtta yalnızca künye durur (FotoMeta: id, ad, ölçü); görüntünün kendisi burada tutulur.

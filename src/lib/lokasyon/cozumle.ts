@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Serbest metin → yapılandırılmış lokasyon (il / ilçe / mahalle / alt bölge ID'leri).
  * Sıra: alias tablosu → alt bölge → ilçe → mahalle → bulanık eşleşme (yazım hatası).
  * AI lokasyon ID'si UYDURMAZ: Gemini sadece ham ifadeyi çıkarır, çözümleme burada yapılır.

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.1 · 8 Ekim 2026 (v3.13'ten)
+// Anahtar CRM v3.21.2 · 8 Ekim 2026 (v3.13'ten)
 // POST /api/senkron/calistir { kaynak?: "google"|"notion"|"hepsi", tetik?: "zamanlayici"|"kullanici", tam?: boolean }
 //
 // İki çağıran var:

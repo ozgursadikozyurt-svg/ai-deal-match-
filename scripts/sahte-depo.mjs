@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.1 · 8 Ekim 2026 — Supabase Storage uçlarını taklit eden küçük sunucu (yalnızca yerel deneme için)
+// Anahtar CRM v3.21.2 · 8 Ekim 2026 — Supabase Storage uçlarını taklit eden küçük sunucu (yalnızca yerel deneme için)
 import http from "node:http";
 const dosyalar = new Map(); // "kova/yol" → Buffer
 const gunluk = [];

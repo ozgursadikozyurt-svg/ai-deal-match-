@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.21.1";
+export const SURUM = "3.21.2";
 export const TARIH = "8 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.21.1_8Ekim2026";
+export const DOSYA_EKI = "v3.21.2_8Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,27 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.21.2",
+    tarih: "8 Ekim 2026",
+    baslik: "Eşleşmeler: kompakt süzgeçler ve yandan açılan skor çubuğu; filtre ve kaydırma konumu karta girip dönünce korunur; Konumlar, Bağlantılar, Yönetim Ayarlar içinde",
+    degisenler: [
+      "Eşleşmeler ekranında \"tahmini komisyon ≈ …\" toplam rakamı kaldırıldı (toplam tuhaf duruyordu). Komisyon her kartta rozetin yanında ve \"Tahmini komisyon\" sıralamasında duruyor.",
+      "Filtre ve konum artık kaybolmuyor: bir eşleşme kartına (ya da talep / portföy / kişi kartına) girip \"← Geri\" deyince liste aynı süzgeçlerle, aynı sıralamayla ve ayrıldığınız kaydırma konumunda açılır — uzun listelerde kaldığınız yerden devam edersiniz. Eşleşmeler, Talepler, Portföyler, Kişiler ve İzleme ekranlarında geçerli. Süzgeçler \"Temizle\"ye ya da uygulamayı yenilemeye kadar durur; Talepler ve Portföyler birbirinin süzgecini görmez.",
+      "Eşleşmeler ekranında süzgeçler çok daha az yer kaplıyor: İşlem (Tümü / Satılık / Kiralık / Devren) ve Fırsat önceliği (Öncelikli / Normal / Düşük) iki küçük açılır seçici olarak tek satırda; büyük \"Fırsat önceliği\" kartı ve ayrı işlem çip satırı kalktı. \"Seç\" ve \"Listedekilerin tümünü kopar\" ⋯ menüsüne alındı. Uygunluk çipleri (Uygun / Sunulabilir / Koşullu…) tek tıkla geçilsin diye tek satırlık ince çipler olarak yerinde duruyor.",
+      "Skor süzgeci doğrudan ekranda: sağ kenarda ince bir \"Skor\" tutamağı durur; dokunun ya da sola kaydırın, dikey skor çubuğu açılır (parmakla yukarı-aşağı, 5'er puan; Sıfırla düğmesi; altında kaç eşleşme kaldığı). Dışına dokunarak ya da sağa kaydırarak gizlenir. Süzgeç açıkken tutamak renkli olur ve \"Skor ≥ 70\" yazar. Seçili skor, fırsat ve takip süzgeçleri aktif çip satırında da görünür; \"Temizle\" hepsini sıfırlar.",
+      "Konumlar, Bağlantılar ve Yönetim ana menüden kalktı; Ayarlar'ın en üstündeki \"Yönetim ve bağlantılar\" bölümünde. Ayarlar menüde vurgulu kalır; eşitleme çakışması rozeti Ayarlar'da görünür. Google izin ekranından dönüş, Ana Sayfa daveti gibi mevcut yönlendirmeler aynen çalışır.",
+      "Veritabanı ve sunucu değişikliği yok; yalnızca arayüz. \"Kurulumu tamamla\" gerekmez.",
+    ],
+    testEt: [
+      "Eşleşmeler: üstte \"tahmini komisyon ≈ …\" toplamı olmamalı; kartlardaki komisyon rozeti durmalı.",
+      "Eşleşmeler: Filtrele'den Satılık seçin, \"Sunulabilir\"e basın, skor çubuğuyla ≥ 70 yapın, listede aşağı inip bir kartı açın, \"← Geri\": aynı süzgeçler ve aynı satırda olmalısınız.",
+      "Eşleşmeler: sağ kenardaki \"Skor\" tutamağına dokunun (ya da sola kaydırın): çubuk açılır; parmağınızı yukarı-aşağı sürükleyin, kart sayısı değişsin; dışına dokunun, kapansın.",
+      "Eşleşmeler: \"İşlem\" ve \"Fırsat önceliği\" seçicilerini deneyin; ⋯ menüsünden \"Seç\" ve toplu kopar çalışsın.",
+      "Talepler / Portföyler / Kişiler / İzleme: süzgeç ya da arama yapıp bir karta girin, \"← Geri\": süzgeç ve konum korunmalı.",
+      "Menü: Konumlar, Bağlantılar, Yönetim ana menüde yok; Ayarlar › en üstte \"Yönetim ve bağlantılar\" bölümünden açılıyor ve \"← Geri\" Ayarlar'a döndürüyor.",
+    ],
+  },
   {
     surum: "3.21.1",
     tarih: "8 Ekim 2026",

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Yapay zekânın yorum yanıtını doğrular — sunucu (/api/ai/yorumla) ve demo aynı işlevi kullanır.
  * Her kayıt enum-kilitli şemadan (AiParseCiktiSchema) tek tek geçer; geçmeyen atılır, diğerleri kalır.
  */

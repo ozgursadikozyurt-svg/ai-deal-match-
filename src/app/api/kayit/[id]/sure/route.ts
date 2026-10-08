@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.1 · 8 Ekim 2026
+// Anahtar CRM v3.21.2 · 8 Ekim 2026
 // POST /api/kayit/:id/sure { gun: 30 }  → geçerliliği uzatır (süresi dolmuşsa bugünden itibaren; EXPIRED → ACTIVE)
 // Belirli bir tarih için PATCH /api/kayit/:id { validUntil } kullanılır.
 import { z } from "zod";

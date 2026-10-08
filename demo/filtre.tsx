@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Demo — ortak filtre paneli (Talepler, Portföyler, Eşleşmeler, talep içi portföy çekmecesi).
  * Her alan çoklu seçim. Mülk türü seçilince o türe özel filtreler çıkar (ONEMLI_ALANLAR).
  * v3.5 — Kompakt: ekranda tek satır (arama · Acil · Filtrele rozeti) + tek satır kayan aktif çipler.
@@ -108,7 +108,9 @@ const sayiYap = (s: string) => (s.trim() === "" ? null : Number(s.replace(/\./g,
  * @param gizle gösterilmeyecek bölümler
  */
 export interface EkBolum { k: string; baslik: string; ozet: string; icerik: React.ReactNode; aktif: number }
-export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: başlık, bölge, kişi, mesaj…", acikBaslat = false, ek = [], sonucEtiketi, sirala }: { f: Filtre; set: (f: Filtre) => void; ogeler: Veri[]; gizle?: string[]; yerTutucu?: string; acikBaslat?: boolean; ek?: EkBolum[]; sonucEtiketi?: string; sirala?: React.ReactNode }) {
+/** v3.21.2 — ekran kendi süzgeçlerini (skor, fırsat, takip…) aktif çip satırına katabilir; "Temizle" onları da sıfırlar */
+export interface EkCip { etiket: string; kaldir: () => void }
+export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: başlık, bölge, kişi, mesaj…", acikBaslat = false, ek = [], sonucEtiketi, sirala, ekCipler = [], ekTemizle }: { f: Filtre; set: (f: Filtre) => void; ogeler: Veri[]; gizle?: string[]; yerTutucu?: string; acikBaslat?: boolean; ek?: EkBolum[]; sonucEtiketi?: string; sirala?: React.ReactNode; ekCipler?: EkCip[]; ekTemizle?: () => void }) {
   const { d } = useDepo();
   const [acik, setAcik] = useState(acikBaslat);
   const [acikBolum, setAcikBolum] = useState<string | null>("aile");
@@ -127,6 +129,7 @@ export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: ba�
 
   // Aktif filtre çipleri (kaldırılabilir)
   const cipler: { etiket: string; kaldir: () => void }[] = [
+    ...ekCipler,
     ...f.aileler.map((a) => ({ etiket: MULK_AILELERI.find((x) => x.kod === a)?.etiket ?? a, kaldir: () => set({ ...f, aileler: f.aileler.filter((x) => x !== a) }) })),
     ...f.islemler.map((a) => ({ etiket: etiket(a), kaldir: () => set({ ...f, islemler: f.islemler.filter((x) => x !== a) }) })),
     ...f.konumlar.map((k) => ({ etiket: k.etiket, kaldir: () => set({ ...f, konumlar: f.konumlar.filter((x) => x.anahtar !== k.anahtar) }) })),
@@ -188,7 +191,7 @@ export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: ba�
       <button type="button" className={cx("fc-btn", n > 0 && "on")} onClick={() => setAcik(true)} aria-haspopup="dialog">Filtrele{n ? <span className="fc-rozet">{n}</span> : null}</button>
       {sirala}
     </div>
-    {cipler.length > 0 && <div className="aktif-filtreler">{cipler.map((c, i) => <button type="button" key={i} className="cip aktif" onClick={c.kaldir}>{c.etiket} <span aria-hidden="true">×</span></button>)}<button type="button" className="fc-temizle" onClick={() => set(bosFiltre({ ara: f.ara }))}>Temizle</button></div>}
+    {cipler.length > 0 && <div className="aktif-filtreler">{cipler.map((c, i) => <button type="button" key={i} className="cip aktif" onClick={c.kaldir}>{c.etiket} <span aria-hidden="true">×</span></button>)}<button type="button" className="fc-temizle" onClick={() => { set(bosFiltre({ ara: f.ara })); ekTemizle?.(); }}>Temizle</button></div>}
     {acik && <div className="fs-perde" onClick={() => setAcik(false)}>
       <div className="fs-sayfa" role="dialog" aria-label="Filtreler" onClick={(e) => e.stopPropagation()}>
         <div className="fs-bas"><b>Filtreler</b><button type="button" className="btn kucuk" onClick={() => setAcik(false)}>Kapat</button></div>
@@ -201,7 +204,7 @@ export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: ba�
           </div>)}
           {!f.aileler.length && !gizle.includes("aile") && <p className="ipucu fs-not">Mülk türü seçince ona özel filtreler (yükseklik, araç erişimi, cephe…) eklenir.</p>}
         </div>
-        <div className="fs-ayak"><button type="button" className="btn" onClick={() => set(bosFiltre({ ara: f.ara }))}>Temizle</button><button type="button" className="btn birincil genis-btn" onClick={() => setAcik(false)}>{sonucEtiketi ?? `${sonucSayisi} sonucu göster`}</button></div>
+        <div className="fs-ayak"><button type="button" className="btn" onClick={() => { set(bosFiltre({ ara: f.ara })); ekTemizle?.(); }}>Temizle</button><button type="button" className="btn birincil genis-btn" onClick={() => setAcik(false)}>{sonucEtiketi ?? `${sonucSayisi} sonucu göster`}</button></div>
       </div>
     </div>}
   </div>;

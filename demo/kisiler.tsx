@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026 (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026 (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
  * v3.21 — çift yönlü Google: elle eklenen kişi ve bağlı kişideki düzeltme "Google'a gönderilecek" olur; silinen kişi Google'dan silinmez.
  * Demo — Kişiler: kişi seçici (yazdıkça arama, çoklu seçim, rol, + ile anında ekleme), kişi listesi ve kişi kartı.
  * Alanlar Notion "Müşteri-Yatırımcılar-Kişiler" tablosuna göre (ROL, Phone, Açıklama, Referans, ilişkili talep/portföy).
@@ -7,6 +7,7 @@
 import { TelGirdisi } from "./girdi";
 import { telUyarisi } from "../src/lib/iletisim";
 import React, { useMemo, useRef, useState } from "react";
+import { useKalici } from "./kalici";
 import { MULK_AILELERI } from "../src/lib/domain/kategori";
 import { etiket } from "./etiketler";
 import { rolListesi, type RolTanim } from "../src/lib/domain/roller";
@@ -120,11 +121,12 @@ export const kisininKayitlari = (kayitlar: Kayit[], kisiId: string) => kayitlar.
 
 export function Kisiler() {
   const { d, git, guncelle, bildir } = useDepo();
-  const [q, setQ] = useState("");
-  const [roller, setRoller] = useState<string[]>([]);
-  const [kaynaklar, setKaynaklar] = useState<string[]>([]);
-  const [bag, setBag] = useState<"" | "TALEP" | "PORTFOY" | "YOK">("");   // v3.15: bağlı kayıt türü
-  const [tel, setTel] = useState<"" | "VAR" | "YOK">("");                  // v3.15: telefonu var / yok
+  // v3.21.2 — arama, süzgeçler ve sıralama kişi kartından Geri dönünce korunur (useKalici)
+  const [q, setQ] = useKalici("kisiler.q", "");
+  const [roller, setRoller] = useKalici<string[]>("kisiler.roller", []);
+  const [kaynaklar, setKaynaklar] = useKalici<string[]>("kisiler.kaynaklar", []);
+  const [bag, setBag] = useKalici<"" | "TALEP" | "PORTFOY" | "YOK">("kisiler.bag", "");   // v3.15: bağlı kayıt türü
+  const [tel, setTel] = useKalici<"" | "VAR" | "YOK">("kisiler.tel", "");                  // v3.15: telefonu var / yok
   const [yeniAcik, setYeniAcik] = useState(false);
   const [yeni, setYeni] = useState({ adSoyad: "", telefon: "", rol: "" });
   const [secili, setSecili] = useState<Set<string>>(new Set());            // v3.15: toplu işlem seçimi
@@ -149,7 +151,7 @@ export function Kisiler() {
     if ((tel === "VAR" && !k.telefon) || (tel === "YOK" && k.telefon)) return false;
     return true;
   });
-  const [sr, setSr] = useState<Siralama>({ alan: "ad", yon: "artan" });
+  const [sr, setSr] = useKalici<Siralama>("kisiler.sr", { alan: "ad", yon: "artan" });
   const sirali = siralaUygula(liste, sr, kisiSiralama(kSay));
   const gorunenSecili = sirali.filter((k) => secili.has(k.id)); // yalnızca ekranda görünen ve seçili olanlar işlenir (filtre değişince gizli seçimler silinmez)
   const filtreSayisi = roller.length + kaynaklar.length + (bag ? 1 : 0) + (tel ? 1 : 0);

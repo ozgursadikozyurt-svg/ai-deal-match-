@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Demo — Talep / portföy içinde görüşme ve not akışı. Tür (görüşme, arama, WhatsApp, gösterim, not), kim ile, ne konuşuldu.
  * Not eklenince bağlı kişinin "son iletişim" tarihi güncellenir. Sunucuda: KayitNot tablosu, /api/kayit/:id/notlar.
  */

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Fotoğraf (Supabase Storage) ve zamanlanmış işler (günlük uyanık tutma, haftalık yedek + 12'li saklama) sınaması.
  * Hazırlık: node scripts/sahte-depo.mjs &  ·  .dev.vars: SUPABASE_URL=http://127.0.0.1:9001, SUPABASE_SERVICE_ROLE_KEY=svc-test  ·  npx wrangler dev --port 8799 --local --test-scheduled
  */

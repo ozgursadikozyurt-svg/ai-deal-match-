@@ -1,6 +1,6 @@
 {
   "name": "anahtarcrm",
-  "version": "3.21.1",
+  "version": "3.21.2",
   "description": "Anahtar CRM — yapay zekâ destekli talep / portföy eşleştirme (canlı sürüm: Cloudflare Workers + Supabase)",
   "scripts": {
     "db:generate": "prisma generate",

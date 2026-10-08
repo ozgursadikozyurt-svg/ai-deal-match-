@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Kartlarda "kim" etiketi: talep/portföy kimden geldi — emlakçı mı, doğrudan müşteri / mülk sahibi mi, web ilanı mı.
  * Kaynak sırası: yetkili portföy → havuz (web ilanı) → bağlı kişinin kayıttaki rolü → kişinin rolleri → ilan sahibi tipi.
  */

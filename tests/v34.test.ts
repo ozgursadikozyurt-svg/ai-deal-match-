@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * v3.4 — veritabanısız testler: geçerlilik süresi (satılık/kiralık), tekrar yükleme koruması,
  * portal arama bağlantıları, kayıt ↔ kişi doğrulaması, demo filtreleri.
  */

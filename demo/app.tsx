@@ -1,11 +1,11 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
  * Dosyalar: ortak.tsx (ortak parçalar) · form.tsx · ice-aktarma.tsx · konumlar.tsx · bu dosya (ekranlar + kabuk)
  */
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Yonetim, yonetimGorunur } from "./yonetim";
 import { createRoot } from "react-dom/client";
 import { MULK_OZELLIK_META, SIRALAMA, katYaz } from "../src/lib/domain/teknik-alanlar";
@@ -29,6 +29,8 @@ import { kopmaEtiket } from "../src/lib/eslestirme/kopar";
 import { IletisimDugmeleri } from "./kisiler";
 import { selamMetni } from "../src/lib/iletisim";
 import { FiltrePaneli, bosFiltre, filtreUygula, SiralaDugmesi, kayitSiralama, siralaUygula, type Filtre, type Siralama } from "./filtre";
+import { useKalici, kaliciSil } from "./kalici";
+import { HizliSecici, HizliMenu, SkorYanBar } from "./hizli-filtre";
 import { Kisiler, KisiKarti, KisiSecici, KAYIT_ROLLERI, rolleriUygula } from "./kisiler";
 import { RolYonetimi } from "./roller";
 import { EslesmeCekmecesi } from "./cekmece";
@@ -150,11 +152,12 @@ function ListePaylas({ tip, kayitlar }: { tip: "TALEP" | "PORTFOY"; kayitlar: Ka
 
 function Liste({ tip, baslangic }: { tip: "TALEP" | "PORTFOY"; baslangic?: Filtre }) {
   const { d, git } = useDepo();
-  const [f, setF] = useState<Filtre>(() => baslangic ?? bosFiltre({ durumlar: ["ACTIVE"] }));
+  // v3.21.2 — filtre ve sıralama ekran sökülse de korunur (karta girip Geri deyince liste aynı süzgeçle açılır)
+  const [f, setF] = useKalici<Filtre>(`liste.${tip}.f`, () => baslangic ?? bosFiltre({ durumlar: ["ACTIVE"] }));
   const hepsi = d.kayitlar.filter((k) => k.veri.tip === tip);
   const kisiAd = (id: string) => d.kisiler.find((k) => k.id === id)?.adSoyad ?? "";
   const kisiRol = (id: string) => d.kisiler.find((k) => k.id === id)?.roller ?? [];
-  const [sr, setSr] = useState<Siralama>({ alan: "giris", yon: "azalan" });
+  const [sr, setSr] = useKalici<Siralama>(`liste.${tip}.sr`, { alan: "giris", yon: "azalan" });
   const [paylasAcik, setPaylasAcik] = useState(false); // v3.16 — seçili/tüm kayıtları metin olarak paylaş
   const secenek = kayitSiralama(tip);
   const liste = siralaUygula(hepsi.filter((k) => filtreUygula(k.veri, f, kisiAd, kisiRol)), sr, secenek);
@@ -305,12 +308,14 @@ function Detay({ id }: { id: string }) {
 function Eslesmeler() {
   const { d } = useDepo();
   const hepsi = useEslesmeler(true);
-  const [u, setU] = useState<"UYGUN" | Uygunluk | "TUMU" | "KOPUK">("UYGUN");
+  // v3.21.2 — tüm süzgeçler ekran sökülse de korunur (karta girip Geri deyince aynı liste, aynı yerde açılır)
+  const [u, setU] = useKalici<"UYGUN" | Uygunluk | "TUMU" | "KOPUK">("eslesmeler.u", "UYGUN");
   const kopukMu = (e: Eslesme) => d.eslesmeNotlari[eKey(e.t.id, e.p.id)]?.durum === "REDDEDILDI";
-  const [f, setF] = useState<Filtre>(() => bosFiltre());
-  const [minSkor, setMinSkor] = useState(0);
-  const [takip, setTakip] = useState<string[]>([]);
-  const [fk, setFk] = useState<FirsatKademe | "">("");          // v3.19 — fırsat kademesi filtresi
+  const [f, setF] = useKalici<Filtre>("eslesmeler.f", () => bosFiltre());
+  const [minSkor, setMinSkor] = useKalici<number>("eslesmeler.skor", 0);
+  const [takip, setTakip] = useKalici<string[]>("eslesmeler.takip", []);
+  const [fk, setFk] = useKalici<FirsatKademe | "">("eslesmeler.fk", "");          // v3.19 — fırsat kademesi filtresi
+  const [sr, setSr] = useKalici<Siralama>("eslesmeler.sr", { alan: "firsat", yon: "azalan" });
   const [secimModu, setSecimModu] = useState(false);            // v3.19 — toplu işlem için seçim
   const [secili, setSecili] = useState<Set<string>>(() => new Set());
   const [topluAcik, setTopluAcik] = useState<null | "KOPAR" | "GERI">(null);
@@ -327,9 +332,7 @@ function Eslesmeler() {
   });
   const say = (x: Uygunluk) => es.filter((e) => !kopukMu(e) && e.s.uygunluk === x).length;
   const firsatSay = (k: FirsatKademe) => es.filter((e) => !kopukMu(e) && e.s.uygunluk !== "UYGUN_DEGIL" && e.f.kademe === k).length;
-  const oncelikliKomisyon = es.filter((e) => !kopukMu(e) && e.s.uygunluk !== "UYGUN_DEGIL" && e.f.kademe === "ONCELIKLI").reduce((a, e) => a + (e.f.tahminiKomisyon ?? 0), 0);
   const kopukSay = es.filter(kopukMu).length;
-  const [sr, setSr] = useState<Siralama>({ alan: "firsat", yon: "azalan" });
   const tn = (x?: unknown) => (x ? new Date(x as any).getTime() || null : null);
   const esSecenek: import("../src/lib/siralama").SiralamaSecenegi<Eslesme>[] = [
     // v3.19 — varsayılan: uygunluk → fırsat kademesi (sahibinden ↔ müşteri önde) → skor
@@ -343,52 +346,57 @@ function Eslesmeler() {
     { alan: "sure", etiket: "Talebin kalan süresi", deger: (e) => tn(e.t.veri.validUntil), varsayilanYon: "artan" },
   ];
   const liste = siralaUygula(es.filter((e) => (!fk || e.f.kademe === fk) && (u === "KOPUK" ? kopukMu(e) : !kopukMu(e) && (u === "TUMU" || (u === "UYGUN" ? e.s.uygunluk !== "UYGUN_DEGIL" : e.s.uygunluk === u)))), sr, esSecenek);
+  // v3.21.2 — İşlem ve Fırsat seçicileri (eski üç satır + büyük "Fırsat önceliği" kartı yerine tek satır)
+  const islemSay = (k: string) => (k ? es.filter((e) => String(e.p.veri.islemTipi).includes(k)).length : es.length);
+  const islemDeger = f.islemler.length === 1 ? f.islemler[0] : "";
+  const firsatToplam = es.filter((e) => !kopukMu(e) && e.s.uygunluk !== "UYGUN_DEGIL").length;
+  const FIRSAT_ALT = { ONCELIKLI: "Mülk sahibi ↔ doğrudan müşteri", NORMAL: "Bir taraf emlakçı — komisyon paylaşılır", DUSUK: "Emlakçı ↔ emlakçı — ikinci plan" } as const;
+  const ekCipler = [
+    ...(minSkor ? [{ etiket: `Skor ≥ ${minSkor}`, kaldir: () => setMinSkor(0) }] : []),
+    ...(fk ? [{ etiket: `Fırsat: ${FIRSAT_KADEME_ETIKET[fk]}`, kaldir: () => setFk("") }] : []),
+    ...takip.map((k) => ({ etiket: `Takip: ${PIPELINE.find((p) => p[0] === k)?.[1] ?? k}`, kaldir: () => setTakip(takip.filter((x) => x !== k)) })),
+  ];
   return <div className="yigin">
-    <h2>Eşleşmeler</h2>
+    <div className="satir-ara"><h2>Eşleşmeler</h2><span className="ipucu">{liste.length} eşleşme</span></div>
     <FiltrePaneli f={f} set={setF} ogeler={[...new Map(hepsi.flatMap((e) => [[e.p.id, e.p.veri], [e.t.id, e.t.veri]] as [string, typeof e.p.veri][])).values()]} gizle={["durum", "kisi"]} yerTutucu="Ara: talep, portföy, kişi, bölge…" sonucEtiketi={`${liste.length} eşleşmeyi göster`} sirala={<SiralaDugmesi secenekler={esSecenek} s={sr} set={setSr} />}
+      ekCipler={ekCipler} ekTemizle={() => { setMinSkor(0); setFk(""); setTakip([]); }}
       ek={[
-                { k: "skor", baslik: "En az skor", ozet: minSkor ? `≥ ${minSkor}` : "Tümü", aktif: minSkor ? 1 : 0, icerik: <label className="skor-filtre"><b>{minSkor}</b><input type="range" min={0} max={100} step={5} value={minSkor} onChange={(ev) => setMinSkor(Number(ev.target.value))} /></label> },
         { k: "takip", baslik: "Takip durumu", ozet: takip.map((k) => PIPELINE.find((p) => p[0] === k)?.[1]).join(", ") || "Tümü", aktif: takip.length, icerik: <div className="cip-satir">{PIPELINE.map(([k, l]) => { const on = takip.includes(k); return <button key={k} className={cx("cip secilir", on && "on")} onClick={() => setTakip(on ? takip.filter((x) => x !== k) : [...takip, k])}>{l}</button>; })}</div> },
       ]} />
-    {/* v3.16 — eşleşmeler ana ekranında işlem tipi hızlı filtresi (Tümü / Satılık / Kiralık / Devren) */}
-    <div className="filtre">
-      {([["", "Tümü"], ["SATILIK", "Satılık"], ["KIRALIK", "Kiralık"], ["DEVREN", "Devren"]] as const).map(([k, l]) => {
-        const n = k ? es.filter((e) => String(e.p.veri.islemTipi).includes(k)).length : es.length;
-        const on = k ? f.islemler.length === 1 && f.islemler[0] === k : !f.islemler.length;
-        return <button key={k || "hepsi"} className={cx("fb", on && "on")} onClick={() => setF({ ...f, islemler: k ? [k] : [] })}>{l} ({n})</button>;
-      })}
-    </div>
-    <div className="filtre">
+    {/* v3.21.2 — uygunluk: tek tıkla geçilen, tek satırlık kompakt çipler */}
+    <div className="filtre filtre-ince">
       <button className={cx("fb", u === "UYGUN" && "on")} onClick={() => setU("UYGUN")}>Uygun ({say("SUNULABILIR") + say("KOSULLU")})</button>
       <button className={cx("fb", u === "SUNULABILIR" && "on")} onClick={() => setU("SUNULABILIR")}>Sunulabilir ({say("SUNULABILIR")})</button>
       <button className={cx("fb", u === "KOSULLU" && "on")} onClick={() => setU("KOSULLU")}>Koşullu ({say("KOSULLU")})</button>
       <button className={cx("fb", u === "UYGUN_DEGIL" && "on")} onClick={() => setU("UYGUN_DEGIL")}>Uygun değil ({say("UYGUN_DEGIL")})</button>
       {kopukSay > 0 && <button className={cx("fb", u === "KOPUK" && "on")} onClick={() => setU("KOPUK")}>Koparılan ({kopukSay})</button>}
     </div>
-    {/* v3.19 — fırsat önceliği: mülk sahibi ↔ doğrudan müşteri en kazançlı; emlakçı ↔ emlakçı ikinci planda */}
-    <section className="kart firsat-kart" aria-label="Fırsat önceliği">
-      <div className="firsat-ust"><b>Fırsat önceliği</b><span className="ipucu">{firsatSay("ONCELIKLI") ? `${firsatSay("ONCELIKLI")} öncelikli eşleşme${oncelikliKomisyon ? ` · tahmini komisyon ≈ ${oncelikliKomisyon.toLocaleString("tr-TR")} ₺` : ""}` : "Öncelikli (sahibinden ↔ müşteri) eşleşme yok"}</span></div>
-      <div className="filtre">
-        <button className={cx("fb", !fk && "on")} onClick={() => setFk("")}>Tümü</button>
-        {(["ONCELIKLI", "NORMAL", "DUSUK"] as const).map((k) => <button key={k} className={cx("fb firsat-fb", "f-" + k.toLowerCase(), fk === k && "on")} onClick={() => setFk(fk === k ? "" : k)} title={{ ONCELIKLI: "Mülk sahibi ↔ doğrudan müşteri", NORMAL: "Bir taraf emlakçı — komisyon paylaşılır", DUSUK: "Emlakçı ↔ emlakçı — ikinci plan" }[k]}><i aria-hidden="true" />{FIRSAT_KADEME_ETIKET[k]} ({firsatSay(k)})</button>)}
-      </div>
-    </section>
-    {/* v3.19 — toplu işlem çubuğu */}
-    <div className="toplu-bar">
-      {!secimModu ? <>
-        <button className="btn kucuk" onClick={() => setSecimModu(true)} disabled={!liste.length}>Seç</button>
-        {u !== "KOPUK" && <button className="btn kucuk" onClick={() => setTopluAcik("KOPAR")} disabled={!liste.length}>Listedekilerin tümünü kopar ({liste.length})</button>}
-        {u === "KOPUK" && <button className="btn kucuk" onClick={() => setTopluAcik("GERI")} disabled={!liste.length}>Tümünü geri al ({liste.length})</button>}
-      </> : <>
-        <button className="btn kucuk" onClick={() => setSecili(new Set(liste.map((e) => eKey(e.t.id, e.p.id))))}>Tümünü seç ({liste.length})</button>
-        <button className="btn kucuk" onClick={() => setSecili(new Set())} disabled={!secili.size}>Seçimi temizle</button>
-        <button className={cx("btn kucuk", u === "KOPUK" ? "birincil" : "tehlike")} onClick={() => setTopluAcik(u === "KOPUK" ? "GERI" : "KOPAR")} disabled={!secili.size}>{u === "KOPUK" ? "Seçilenleri geri al" : "Seçilenleri kopar"} ({secili.size})</button>
-        <button className="btn kucuk" onClick={() => { setSecimModu(false); setSecili(new Set()); }}>Bitti</button>
-      </>}
-    </div>
+    {/* v3.21.2 — İşlem · Fırsat önceliği · ⋯ tek satırda. Fırsat önceliği: mülk sahibi ↔ doğrudan müşteri en kazançlı; emlakçı ↔ emlakçı ikinci planda.
+        (Eski kartın "tahmini komisyon ≈ …" toplamı kaldırıldı; komisyon her kartta ve "Tahmini komisyon" sıralamasında duruyor.) */}
+    {!secimModu && <div className="hs-satir">
+      <HizliSecici ad="İşlem" deger={islemDeger} bos="" gosterim={f.islemler.length > 1 ? `${f.islemler.length} seçili` : undefined}
+        secenekler={[{ k: "", l: "Tümü", n: islemSay("") }, { k: "SATILIK", l: "Satılık", n: islemSay("SATILIK") }, { k: "KIRALIK", l: "Kiralık", n: islemSay("KIRALIK") }, { k: "DEVREN", l: "Devren", n: islemSay("DEVREN") }]}
+        set={(k) => setF({ ...f, islemler: k ? [k] : [] })} />
+      <HizliSecici ad="Fırsat önceliği" deger={fk} bos="" hiza="sag"
+        secenekler={[{ k: "", l: "Tümü", n: firsatToplam }, ...(["ONCELIKLI", "NORMAL", "DUSUK"] as const).map((k) => ({ k: k as FirsatKademe | "", l: FIRSAT_KADEME_ETIKET[k], n: firsatSay(k), alt: FIRSAT_ALT[k], nokta: "f-" + k.toLowerCase() }))]}
+        set={setFk} />
+      <HizliMenu ad="Toplu işlemler" ogeler={[
+        { l: "Seç", alt: "Birkaç eşleşmeyi seçip birlikte işlem yap", pasif: !liste.length, tikla: () => setSecimModu(true) },
+        ...(u !== "KOPUK" ? [{ l: `Listedekilerin tümünü kopar (${liste.length})`, tehlike: true, pasif: !liste.length, tikla: () => setTopluAcik("KOPAR") }] : [{ l: `Tümünü geri al (${liste.length})`, pasif: !liste.length, tikla: () => setTopluAcik("GERI") }]),
+      ]} />
+    </div>}
+    {/* v3.19 — toplu işlem çubuğu (yalnızca seçim modunda) */}
+    {secimModu && <div className="toplu-bar">
+      <button className="btn kucuk" onClick={() => setSecili(new Set(liste.map((e) => eKey(e.t.id, e.p.id))))}>Tümünü seç ({liste.length})</button>
+      <button className="btn kucuk" onClick={() => setSecili(new Set())} disabled={!secili.size}>Seçimi temizle</button>
+      <button className={cx("btn kucuk", u === "KOPUK" ? "birincil" : "tehlike")} onClick={() => setTopluAcik(u === "KOPUK" ? "GERI" : "KOPAR")} disabled={!secili.size}>{u === "KOPUK" ? "Seçilenleri geri al" : "Seçilenleri kopar"} ({secili.size})</button>
+      <button className="btn kucuk" onClick={() => { setSecimModu(false); setSecili(new Set()); }}>Bitti</button>
+    </div>}
     {liste.map((e) => { const a = eKey(e.t.id, e.p.id); return <EslesmeKarti key={a} e={e} sec={secimModu ? { acik: secili.has(a), degis: () => setSecili((x) => { const y = new Set(x); if (y.has(a)) y.delete(a); else y.add(a); return y; }) } : undefined} />; })}
     {!liste.length && <p className="bos">Bu filtrede eşleşme yok.</p>}
     {topluAcik && <TopluKoparPenceresi geriAl={topluAcik === "GERI"} ciftler={(secimModu ? liste.filter((e) => secili.has(eKey(e.t.id, e.p.id))) : liste).map((e) => ({ tid: e.t.id, pid: e.p.id }))} onKapat={() => setTopluAcik(null)} onBitti={() => { setTopluAcik(null); setSecimModu(false); setSecili(new Set()); }} />}
+    {/* v3.21.2 — skor filtresi doğrudan ekranda: sağ kenarda gizlenen, sola kaydırınca / dokununca açılan dikey çubuk */}
+    <SkorYanBar deger={minSkor} set={setMinSkor} sayi={liste.length} />
   </div>;
 }
 function Taraf({ k, rol }: { k: Kayit; rol: string }) {
@@ -443,8 +451,24 @@ function Ayarlar() {
   const [ttl, setTtl] = useState(d.ayarlar.ttl);
   const [onay, setOnay] = useState(false);
   const toplam = d.kayitlar.length;
+  // v3.21.2 — Konumlar, Bağlantılar ve Yönetim ana menüden buraya taşındı
+  const cakisma = (d.cakismalar ?? []).filter((c) => notionAcik() || c.saglayici !== "NOTION").length;
+  const gecisler: { k: string; ad: string; ikon: string; acik: string; rozet?: number; git: () => void }[] = [
+    { k: "konumlar", ad: "Konumlar", ikon: "konum", acik: "İlçe, mahalle ve bölge sözlüğü; öğrenilen konumlar", git: () => git({ ad: "konumlar" }) },
+    ...(baglantilarGorunurMu(d) ? [{ k: "baglantilar", ad: "Bağlantılar", ikon: "baglanti", acik: cakisma ? `${cakisma} eşitleme çakışması seçiminizi bekliyor` : "Google Kişiler ile çift yönlü eşitleme", rozet: cakisma || undefined, git: () => git({ ad: "baglantilar" }) }] : []),
+    ...(yonetimGorunur() ? [{ k: "yonetim", ad: "Yönetim", ikon: "kisi", acik: "Kullanıcılar, davet bağlantıları, ofisler ve planlar", git: () => git({ ad: "yonetim" }) }] : []),
+  ];
   return <div className="yigin">
     <h2>Ayarlar</h2>
+    <section className="kart ayar-gecis" aria-label="Yönetim ve bağlantılar">
+      <h3>Yönetim ve bağlantılar</h3>
+      {gecisler.map((g) => <button key={g.k} type="button" className="ayar-gecis-oge" onClick={g.git}>
+        <span className="ayar-gecis-ikon"><Ikon ad={g.ikon} /></span>
+        <span className="ayar-gecis-metin"><b>{g.ad}</b><small>{g.acik}</small></span>
+        {!!g.rozet && <b className="menu-rozet">{g.rozet}</b>}
+        <span className="ayar-gecis-ok" aria-hidden="true">›</span>
+      </button>)}
+    </section>
     <AiAyarlari />
     <PaylasimAyarlari />
     <CalismaIliAyari />
@@ -503,20 +527,32 @@ function sekmeOf(e: Ekran, d: DepoDurumu): string {
   if (e.ad === "detay") return d.kayitlar.find((k) => k.id === e.id)?.veri.tip === "TALEP" ? "liste-T" : "liste-P";
   if (e.ad === "eslesme") return "eslesmeler";
   if (e.ad === "kisi") return "kisiler";
+  if (e.ad === "konumlar" || e.ad === "baglantilar" || e.ad === "yonetim") return "ayarlar"; // v3.21.2 — Ayarlar menüsünün altına alındı
   return e.ad;
 }
+
+/** v3.21 — Bağlantılar canlıda da var: Google bu kurulumda açıksa herkese, açık değilse yalnızca platform yöneticisine (kurulum adımları için) */
+export const baglantilarGorunurMu = (d: DepoDurumu) => !CANLI.acik || !!d.googleCanli?.hazir || CANLI.oturum?.bilgi?.kullanici.rol === "PLATFORM_YONETICISI";
 
 export function Uygulama() {
   const [yuk] = useState(depoYukle);
   const [d, setD] = useState<DepoDurumu>(yuk.durum);
   const [ekran, setEkran] = useState<Ekran>(CANLI.acik && CANLI.googleDonus ? { ad: "baglantilar" } : { ad: "ana" }); // v3.21: Google izin ekranından dönüşte doğrudan Bağlantılar
-  const [gecmis, setGecmis] = useState<Ekran[]>([]); // v3.16 — ekran geçmişi: her ekranda "← Geri"
+  const [gecmis, setGecmis] = useState<{ ekran: Ekran; y: number }[]>([]); // v3.16 — ekran geçmişi: her ekranda "← Geri"; v3.21.2: ayrıldığı kaydırma konumu da saklanır
+  const bekleyenY = useRef<number | null>(null);                          // v3.21.2 — "Geri" ile dönülen ekranda yeniden gidilecek kaydırma konumu
   const [mesaj, setMesaj] = useState<string | null>(yuk.yenilendi ? `v${SURUM}: örnek veri yenilendi` : null);
   const [surumAcik, setSurumAcik] = useState(false);
   const [sample, setSample] = useState<any>(undefined);
   ogrenilenleriYukle(d.ogrenilen, calismaIli(d)); // öğrenilen konumlar çözücüye (render'dan önce, eşzamanlı)
   rolleriUygula(d.roller);                         // v3.15: özel roller + yeniden adlandırmalar (render'dan önce, eşzamanlı)
   useEffect(() => klavyeIzle(), []);
+  useLayoutEffect(() => { // v3.21.2 — "Geri" ile dönülünce kaydırma konumunu yükle (içerik geç uzarsa birkaç kare daha dene)
+    const y = bekleyenY.current; if (y == null) return; bekleyenY.current = null;
+    const git = () => window.scrollTo({ top: y }); git();
+    if (typeof requestAnimationFrame !== "function") return;
+    let n = 0; const dene = () => { if (Math.abs(window.scrollY - y) > 2 && n++ < 8) { git(); requestAnimationFrame(dene); } };
+    requestAnimationFrame(dene);
+  }, [ekran]);
   useEffect(() => { depoKaydet(d); }, [d]);
   useEffect(() => { let iptal = false; (async () => { try { const s = CANLI.acik ? CANLI.sample : await (window as any).claude?.use("sample"); if (!iptal) setSample(() => s ?? null); /* fonksiyon doğrudan verilirse React onu güncelleyici sanıp çağırıyordu → v3.3 hatası "n.json is not a function" */ } catch { if (!iptal) setSample(null); } })(); return () => { iptal = true; }; }, []);
   useEffect(() => { if (!mesaj) return; const t = setTimeout(() => setMesaj(null), 2600); return () => clearTimeout(t); }, [mesaj]);
@@ -524,16 +560,24 @@ export function Uygulama() {
   const ctx: Ctx = {
     d, guncelle: (f) => setD((x) => f(x)), bildir: setMesaj, ornekHatalari: yuk.hatalar, sample,
     kayitKaydet: (k) => setD((x) => ({ ...x, kayitlar: x.kayitlar.some((y) => y.id === k.id) ? x.kayitlar.map((y) => (y.id === k.id ? k : y)) : [k, ...x.kayitlar] })),
-    git: (e) => { setGecmis((g) => (ekran.ad === e.ad && JSON.stringify(ekran) === JSON.stringify(e) ? g : [...g.slice(-40), ekran])); setEkran(e); window.scrollTo({ top: 0 }); },
-    geri: () => { setGecmis((g) => { setEkran(g[g.length - 1] ?? { ad: "ana" }); return g.slice(0, -1); }); window.scrollTo({ top: 0 }); },
+    git: (e) => {
+      const y = window.scrollY; // ayrılırken konum (kaydırmadan ÖNCE okunur)
+      if (e.ad === "liste" && e.filtre) kaliciSil(`liste.${e.tip}.`); // Ana Sayfa'dan hazır filtreyle gelince eski süzgeç karışmasın
+      setGecmis((g) => (ekran.ad === e.ad && JSON.stringify(ekran) === JSON.stringify(e) ? g : [...g.slice(-40), { ekran, y }]));
+      setEkran(e); window.scrollTo({ top: 0 });
+    },
+    // v3.21.2 — Geri: önceki ekran süzgeçleriyle (useKalici) ve ayrıldığın kaydırma konumunda açılır
+    geri: () => {
+      const son = gecmis[gecmis.length - 1];
+      bekleyenY.current = son?.y ?? 0;
+      setGecmis(gecmis.slice(0, -1)); setEkran(son?.ekran ?? { ad: "ana" });
+    },
     geriVar: gecmis.length > 0,
   };
   const aktifSekme = sekmeOf(ekran, d);
   const [menuAcik, setMenuAcik] = useState(false);
   const git = (e: Ekran) => { setMenuAcik(false); ctx.git(e); };
   const cakisma = (d.cakismalar ?? []).filter((c) => notionAcik() || c.saglayici !== "NOTION").length;
-  // v3.21 — Bağlantılar canlıda da var: Google bu kurulumda açıksa herkese, açık değilse yalnızca platform yöneticisine (kurulum adımları için)
-  const baglantilarGorunur = !CANLI.acik || !!d.googleCanli?.hazir || CANLI.oturum?.bilgi?.kullanici.rol === "PLATFORM_YONETICISI";
   const nav: NavOge[] = [
     { k: "ana", etiket: "Ana Sayfa", ikon: "ana", git: () => git({ ad: "ana" }) },
     { k: "liste-T", etiket: "Talepler", ikon: "talep", git: () => git({ ad: "liste", tip: "TALEP" }) },
@@ -541,11 +585,9 @@ export function Uygulama() {
     { k: "eslesmeler", etiket: "Eşleşmeler", ikon: "eslesme", git: () => git({ ad: "eslesmeler" }) },
     { k: "izleme", etiket: "İzleme", ikon: "anahtar", git: () => git({ ad: "izleme" }), rozet: (d.favoriler ?? []).length || undefined },
     { k: "kisiler", etiket: "Kişiler", ikon: "kisi", git: () => git({ ad: "kisiler" }) },
-    ...(baglantilarGorunur ? [{ k: "baglantilar", etiket: "Bağlantılar", ikon: "baglanti", git: () => git({ ad: "baglantilar" }), rozet: cakisma, alt: true } as NavOge] : []),
+    // v3.21.2 — Konumlar, Bağlantılar ve Yönetim ana menüden kalktı; Ayarlar'ın içinde ("Yönetim ve bağlantılar")
     { k: "veri", etiket: "Veri Girişi", ikon: "veri", git: () => git({ ad: "veri" }), alt: true },
-    { k: "konumlar", etiket: "Konumlar", ikon: "konum", git: () => git({ ad: "konumlar" }), alt: true },
-    ...(yonetimGorunur() ? [{ k: "yonetim", etiket: "Yönetim", ikon: "kisi", git: () => git({ ad: "yonetim" }), alt: true } as NavOge] : []), // v3.20
-    { k: "ayarlar", etiket: "Ayarlar", ikon: "ayar", git: () => git({ ad: "ayarlar" }), alt: true },
+    { k: "ayarlar", etiket: "Ayarlar", ikon: "ayar", git: () => git({ ad: "ayarlar" }), rozet: cakisma, alt: true },
   ];
   const surumCip = <button className="surum-cip" onClick={() => setSurumAcik(true)} title="Bu sürümde neler var">v{SURUM} · {TARIH}</button>;
   return <C.Provider value={ctx}>

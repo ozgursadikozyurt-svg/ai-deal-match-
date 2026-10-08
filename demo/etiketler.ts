@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Ekranda gösterilen Türkçe etiketler. Ana kategori / mülk tipi / işlem / ilan sahibi etiketleri
  * src/lib/domain/kategori.ts'den gelir; burada sadece teknik enum değerleri var.
  * Burada olmayan bir değer eklenirse ekran onu otomatik "Büyük Harf" biçimiyle gösterir.

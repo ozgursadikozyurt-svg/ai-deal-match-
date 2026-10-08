@@ -1,10 +1,11 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Anahtar CRM v3.19 — Anahtar (favori) işareti ve İzleme ekranı.
  * Talep, portföy ve eşleşme kartlarında 🔑 ile işaretlenen kayıtlar "İzleme" ekranında toplanır.
  * Saklama: DepoDurumu.favoriler (canlıda `arayuz` Ayar kaydı — veritabanı değişikliği gerekmez).
  */
 import React, { useMemo, useState } from "react";
+import { useKalici } from "./kalici";
 import { useDepo, useEslesmeler, cx, eKey, baslikOf, fiyatOf, m2Of, lokEtiket, Pill, IslemPill } from "./ortak";
 import { EslesmeKarti } from "./kartlar";
 import { KimPill } from "./kopar";
@@ -39,7 +40,7 @@ type Sekme = "TUMU" | "TALEP" | "PORTFOY" | "ESLESME";
 export function Izleme() {
   const { d, git } = useDepo();
   const hepsi = useEslesmeler(true);
-  const [sekme, setSekme] = useState<Sekme>("TUMU");
+  const [sekme, setSekme] = useKalici<Sekme>("izleme.sekme", "TUMU"); // v3.21.2 — karttan Geri dönünce seçili sekme korunur
   const fav = d.favoriler ?? [];
   const kayit = (id: string) => d.kayitlar.find((k) => k.id === id);
   const talepler = fav.filter((x) => x.startsWith("t:")).map((x) => kayit(x.slice(2))).filter(Boolean) as NonNullable<ReturnType<typeof kayit>>[];

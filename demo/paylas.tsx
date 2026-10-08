@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Demo — "Portföy paylaş": portföyü danışmanın kendi ilanı gibi gösteren föy. PDF (her cihazda açılır), görsel (JPG) ve WhatsApp metni.
  * Föyde mülk sahibinin / mesajı gönderenin bilgisi YOKTUR; alttaki imza Ayarlar › Portföy paylaşım imzası'ndan gelir, burada değiştirilebilir.
  * İçerik ve PDF yazıcısı: src/lib/paylasim/foy.ts · çizim: tuval (canvas).

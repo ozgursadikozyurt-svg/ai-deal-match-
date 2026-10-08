@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.1 · 8 Ekim 2026 — canlı arayüz sınaması (sanal tarayıcı: jsdom). Hazırlık: bkz. README › Canlı sürümü yerelde sınama
+// Anahtar CRM v3.21.2 · 8 Ekim 2026 — canlı arayüz sınaması (sanal tarayıcı: jsdom). Hazırlık: bkz. README › Canlı sürümü yerelde sınama
 import { JSDOM, VirtualConsole } from "jsdom";
 import fs from "node:fs";
 import { SignJWT } from "jose";
@@ -34,11 +34,12 @@ async function ac({ oturum, hash = "" }) {
 { const t = await jwt("ozgur@test.com"); const a = await ac({ oturum: { access: t, refresh: "x", bitis: Date.now() + 3600e3, eposta: "ozgur@test.com" } });
   const ok = await bekle(() => a.metin().includes("Ana Sayfa"), 15000);
   tamam("izinli oturum: uygulama açıldı; açılışta 'Kaydedildi ✓' göstergesi ekranda kalmıyor (v3.15)", ok && !a.metin().includes("Kaydedildi"), ok ? "" : a.metin().slice(0, 200) + " | " + a.hatalar.slice(0, 2).join(" ; "));
-  tamam("canlıda 'Bağlantılar' menüsü platform yöneticisine görünür, Notion hiçbir yerde geçmez (v3.21)", /Bağlantılar/.test(a.metin()) && !/Notion/.test(a.metin()));
+  tamam("ana menüde Konumlar / Bağlantılar / Yönetim yok (v3.21.2: Ayarlar'ın içine alındı), Notion hiçbir yerde geçmez (v3.21)", !/Konumlar|Bağlantılar|Yönetim/.test(a.metin()) && !/Notion/.test(a.metin()));
   const aday = [...a.w.document.querySelectorAll("#kok button, #kok a")].filter((b) => /Ayarlar/.test(b.textContent ?? "")); console.log("   Ayarlar adayları:", aday.map((b) => b.tagName + ":" + (b.textContent ?? "").trim().slice(0, 20)).join(" | ")); const nav = aday[0];
   tamam("menüde Ayarlar var", !!nav);
   nav?.click(); const ok2 = await bekle(() => a.metin().includes("Hesap ve veri"));
   tamam("Ayarlar: 'Hesap ve veri' kartı (yedek yükleme, çıkış) görünür", ok2);
+  tamam("Ayarlar: 'Yönetim ve bağlantılar' bölümünde Konumlar, Bağlantılar (platform yöneticisine) ve Yönetim var (v3.21.2)", /Yönetim ve bağlantılar/.test(a.metin()) && /Konumlar/.test(a.metin()) && /Bağlantılar/.test(a.metin()) && /Yönetim/.test(a.metin()) && !/Notion/.test(a.metin()));
   tamam("Ayarlar: demo'ya özgü 'Örnek veriyi sıfırla' gizli", !a.metin().includes("Örnek veriyi sıfırla"));
   tamam("Ayarlar: giriş yapılan hesap gösteriliyor", a.metin().includes("ozgur@test.com"));
   const ok3 = await bekle(() => a.metin().includes("tanımlı değil") || a.metin().includes("tanımlı"), 5000); tamam("Ayarlar: yapay zekâ anahtarı durumu sunucudan geliyor", ok3);

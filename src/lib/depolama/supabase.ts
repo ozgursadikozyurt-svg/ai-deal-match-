@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Portföy fotoğrafları için dosya deposu — Supabase Storage (veritabanıyla aynı proje; ek hesap / ek anahtar gerekmez).
  * Kova ÖZELDİR (herkese açık değil): fotoğraflar yalnızca süreli, imzalı bağlantıyla görüntülenir / indirilir.
  * Ortam değişkenleri: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (yalnızca sunucuda), FOTO_KOVA (varsayılan "portfoy").

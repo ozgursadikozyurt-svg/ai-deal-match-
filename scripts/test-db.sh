@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Anahtar CRM v3.21.1 · 8 Ekim 2026
+# Anahtar CRM v3.21.2 · 8 Ekim 2026
 # Temiz bir PGlite (bellek-içi Postgres) başlatır, migration + seed uygular, testleri koşar.
 set -e
 PORT=${PGPORT:-55432}
@@ -13,4 +13,4 @@ sed -i 's#new PrismaPg({ connectionString: process.env.DIRECT_URL ?? process.env
 npx tsx prisma/seed/index.ts
 npx tsx prisma/seed/index.ts | sed 's/^/[2. çalıştırma — idempotent] /'
 [ -n "$SADECE_HAZIRLA" ] && exit 0
-npx tsx --test --test-concurrency=1 tests/asama2.test.ts tests/v32-demo.test.ts tests/v33.test.ts tests/v33-db.test.ts tests/v34.test.ts tests/v35.test.ts tests/v36.test.ts tests/v36-db.test.ts tests/v37.test.ts tests/v37-ui.test.ts tests/v37-db.test.ts tests/v38.test.ts tests/v38-db.test.ts tests/v39.test.ts tests/v39-db.test.ts tests/v310.test.ts tests/v310-db.test.ts tests/v311.test.ts tests/v311-db.test.ts tests/v312.test.ts tests/v315.test.ts tests/v315-db.test.ts tests/v316.test.ts tests/v317.test.ts tests/v318.test.ts tests/v319.test.ts tests/v320.test.ts tests/v320-db.test.ts tests/v321.test.ts tests/v321-db.test.ts
+npx tsx --test --test-concurrency=1 tests/asama2.test.ts tests/v32-demo.test.ts tests/v33.test.ts tests/v33-db.test.ts tests/v34.test.ts tests/v35.test.ts tests/v36.test.ts tests/v36-db.test.ts tests/v37.test.ts tests/v37-ui.test.ts tests/v37-db.test.ts tests/v38.test.ts tests/v38-db.test.ts tests/v39.test.ts tests/v39-db.test.ts tests/v310.test.ts tests/v310-db.test.ts tests/v311.test.ts tests/v311-db.test.ts tests/v312.test.ts tests/v315.test.ts tests/v315-db.test.ts tests/v316.test.ts tests/v317.test.ts tests/v318.test.ts tests/v319.test.ts tests/v320.test.ts tests/v320-db.test.ts tests/v321.test.ts tests/v321-db.test.ts tests/v3212.test.ts

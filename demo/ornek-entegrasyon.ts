@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Demo ve testler için örnek dış veri — Notion API (2025-09-03) sayfa biçiminde ve Google People API yanıt biçiminde.
  * Alan adları Özgür'ün gerçek Notion tablolarıyla birebir (yapilandirma.ts). Kişi adları ve telefonlar KURGUSALDIR.
  * 1. tur = ilk bağlantı; 2. tur = "dış tarafta değişiklik oldu" senaryosu (artımlı senkron).

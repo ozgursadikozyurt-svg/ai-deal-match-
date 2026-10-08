@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.1 · 8 Ekim 2026
+// Anahtar CRM v3.21.2 · 8 Ekim 2026
 // POST /api/ai/ara { metin }  — Ana sayfa AI arama ve sohbet kutusunun sunucu tarafı (1. adım: yapay zekâsız).
 //   SORU  → kural tabanlı soru → filtre + konum çözümü; sonuçları KOD sorgular (veritabanı modele gitmez)
 //   ILAN  → kural tabanlı hızlı ayrıştırma + konum; { aiGerekli } true ise istemci / sonraki adım Gemini'yi

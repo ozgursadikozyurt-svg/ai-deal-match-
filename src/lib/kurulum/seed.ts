@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Konum verisi kurulumu (il / ilçe / mahalle + Antalya alt bölge, komşuluk, alias) — hem komut satırı seed'i
  * (prisma/seed/index.ts) hem canlıdaki "Kurulumu tamamla" ucu (/api/kurulum) bu fonksiyonları kullanır.
  * İdempotent: tekrar çalıştırılabilir.

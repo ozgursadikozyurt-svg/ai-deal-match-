@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * Emlak jargonu sözlüğü — WhatsApp / ilan metinlerindeki kısaltma ve deyimleri teknik alanlara çevirir.
  * Sözlüğün insan tarafından okunur hali: docs/emlak_jargon.md (ikisi birlikte güncellenir, tests/v317.test.ts ikisini de denetler).
  * Buradaki kurallar yapay zekâdan ÖNCE çalışır: ne kadar çok jargon kuralla çözülürse o kadar az yapay zekâ çağrısı yapılır.

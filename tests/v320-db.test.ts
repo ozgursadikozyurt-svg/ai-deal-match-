@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026
  * v3.20 — VERİTABANLI KANIT: iki ofis aynı veritabanında yan yana durur ve birbirinin verisini
  * HİÇBİR yoldan göremez. Bu dosya ürünün satılabilirliğinin temel güvencesidir:
  * emlak ofisleri birbirinin rakibidir, bir ofisin portföyü ötekine sızarsa ürün biter.

@@ -1,6 +1,7 @@
 /**
- * Anahtar CRM v3.21.1 · 8 Ekim 2026 Anahtar CRM v3.19 — puanlama (eksik veri) ve fırsat önceliği */
+ * Anahtar CRM v3.21.2 · 8 Ekim 2026 Anahtar CRM v3.19 — puanlama (eksik veri) ve fırsat önceliği */
 import { test } from "node:test";
+import { ac } from "./yardimci-arayuz";
 import assert from "node:assert/strict";
 import { eslesmeOnizle, type OnizlemeKayit } from "../src/lib/eslestirme/onizleme";
 import { firsatDegerlendir } from "../src/lib/eslestirme/firsat";
@@ -118,11 +119,22 @@ const ornek = ornekVeriyiKur();
 const durum = (favoriler: string[] = []): DepoDurumu => ({ veriSurumu: "t", kayitlar: ornek.kayitlar, eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN }, ogrenilen: [], adaylar: [], aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler: ornek.kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleBekleyen: [], favoriler } as DepoDurumu);
 const cizUI = (el: React.ReactElement, d = durum()) => renderToStaticMarkup(React.createElement(C.Provider, { value: { d, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, geri: () => {}, geriVar: false, sample: null } as Ctx }, el));
 
-test("eşleşmeler ekranı: fırsat kartı + kademe filtresi + toplu kopar düğmesi; kartlarda fırsat rozeti ve anahtar", () => {
+test("eşleşmeler ekranı: fırsat seçici + kademe filtresi + toplu kopar menüsü; kartlarda fırsat rozeti ve anahtar", async () => {
   const h = cizUI(React.createElement(Eslesmeler));
-  assert.match(h, /Fırsat önceliği/); assert.match(h, /Öncelikli \(\d+\)/); assert.match(h, /Düşük \(\d+\)/);
-  assert.match(h, /Listedekilerin tümünü kopar/); assert.match(h, /class="btn kucuk"[^>]*>Seç</);
+  assert.match(h, /<small>Fırsat önceliği<\/small>/);
   assert.match(h, /pill firsat/); assert.match(h, /anahtar-btn/);
+  // v3.21.2 — kademeler ve toplu işlemler artık açılır menülerde
+  const a = await ac(React.createElement(Eslesmeler), { d: durum(), guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, geri: () => {}, geriVar: false, sample: null } as Ctx);
+  await a.tikla(a.qa(".hs-btn")[1]);
+  const kademeler = a.qa(".hs-menu .hs-oge").map((x) => x.textContent ?? "").join("|");
+  assert.match(kademeler, /Öncelikli/); assert.match(kademeler, /Normal/); assert.match(kademeler, /Düşük/);
+  assert.ok(a.qa(".hs-menu .hs-oge .hs-n").length >= 4, "her kademenin adedi görünür");
+  await a.tikla(a.qa(".hs-btn")[1]); // kapat
+  await a.tikla(a.q(".hs-btn.ikon"));
+  assert.match(a.metin(), /Listedekilerin tümünü kopar \(\d+\)/);
+  await a.tikla(a.dugme("Seç"));
+  assert.ok(a.q(".toplu-bar"), "Seç modunda toplu işlem çubuğu açılır"); assert.match(a.metin(), /Seçilenleri kopar \(0\)/);
+  await a.kapat();
 });
 test("izleme ekranı: boşken yönlendirir; anahtarlı talep / portföy listelenir", () => {
   assert.match(cizUI(React.createElement(Izleme)), /Henüz izlemede bir şey yok/);

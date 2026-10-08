@@ -123,3 +123,43 @@ Migration `20261008100000_v321_google_cift_yonlu` — yalnızca ekleme:
 - **Düzeltme:** `GOOGLE_SAYFA_BOYU` 200 → 100; yeni `GOOGLE_TUR_SAYFA_SINIRI = 2` (bir istekte en çok 2 sayfa). İlerleme her sayfadan sonra saklanmaya devam eder; arayüz turu `devamEdecek` oldukça yineler (en çok 200 tur), geçici hatada 3 kez bekleyip yeniden dener.
 - **Google yayını:** `public/gizlilik.html` ve `public/kosullar.html` (Branding sayfasında home page / privacy policy / terms alanları için).
 - Testler: 265 geçti, 0 kaldı.
+
+## v3.21.2 düzeltmesi / iyileştirmesi (8 Ekim 2026, gece) — yalnızca arayüz
+
+Veritabanı, API ve sunucu kodu değişmedi; "Kurulumu tamamla" gerekmez. Canlıya almak: dal `main`'e girince Cloudflare kendiliğinden yayınlar.
+
+### 1. Filtre ve konum karta girip dönünce korunur
+- **Neden kayboluyordu:** `Uygulama` ekranı `ekran.ad`'a göre koşullu çizer. Karta girilince Liste / Eşleşmeler / Kişiler bileşeni sökülüyor, `useState` ile tutulan süzgeçler ve kaydırma konumu gidiyordu.
+- **Süzgeç / sıralama / sekme:** yeni `demo/kalici.ts › useKalici(anahtar, ilk)` — `useState` gibi, ama değer modül belleğinde (`Map`) durur; ekran yeniden çizilince geri gelir. Bilerek **diske yazılmaz** (eski bir süzgeç günler sonra listeyi "boş" göstermesin; uygulama yenilenince sıfırlanır).
+  Kullanan ekranlar ve anahtarlar: Eşleşmeler (`eslesmeler.u | f | skor | takip | fk | sr`), Talepler / Portföyler (`liste.TALEP.f | sr`, `liste.PORTFOY.f | sr` — birbirinden bağımsız), Kişiler (`kisiler.q | roller | kaynaklar | bag | tel | sr`), İzleme (`izleme.sekme`).
+- **Hazır filtreyle açma:** Ana Sayfa ya da Anahtar AI "Listede aç" ile `git({ ad: "liste", filtre })` çağrılınca `kaliciSil("liste.<tip>.")` eski süzgeci siler; liste verilen filtreyle açılır. "Geri" ile dönüşte silinmez (kullanıcının sonradan yaptığı değişiklik korunur).
+- **Kaydırma konumu:** `Uygulama` geçmişi artık `{ ekran, y }` tutar (`y = window.scrollY`, ayrılırken, kaydırılmadan önce okunur). `geri()` hedef konumu `bekleyenY`'ye yazar; `useLayoutEffect([ekran])` konuma gider ve içerik geç uzarsa 8 kareye kadar yeniden dener. Sekmeden (alt çubuk / menü) girişte konum başa döner — yalnızca "← Geri" konumu geri yükler.
+- **Kapsam dışı (bilerek):** Veri Girişi zaten kendi belleğini (`demo/hafiza.ts`) kullanıyor; Konumlar / Bağlantılar / Yönetim süzgeç içermiyor.
+
+### 2. Eşleşmeler ekranı — komisyon toplamı ve kompakt düzen
+- **Komisyon toplamı kaldırıldı:** "N öncelikli eşleşme · tahmini komisyon ≈ … ₺" satırı (ve onu üreten `oncelikliKomisyon`) silindi. Kart başına komisyon (`FirsatRozeti komisyon`) ve "Tahmini komisyon" sıralaması duruyor.
+- **Eski düzen (≈ 1.100 px):** işlem çipleri satırı + uygunluk çipleri satırı + "Fırsat önceliği" kartı (başlık, 3 satır özet, kademe çipleri) + toplu işlem çubuğu.
+- **Yeni düzen** (`demo/hizli-filtre.tsx`, `demo/app.tsx › Eslesmeler`):
+  1. Başlık + `N eşleşme` aynı satırda
+  2. Arama · Acil · Filtrele · Sırala (değişmedi)
+  3. Aktif süzgeç çipleri — artık **Skor ≥ N**, **Fırsat: …**, **Takip: …** çipleri de burada; `Temizle` hepsini sıfırlar (`FiltrePaneli › ekCipler / ekTemizle`)
+  4. Uygunluk çipleri — tek tıkla geçiş için duruyor, tek satır ince çip (`.filtre-ince`)
+  5. `HizliSecici` × 2 (**İşlem**, **Fırsat önceliği**; kademe açıklamaları menüde) + `HizliMenu ⋯` (**Seç**, **Listedekilerin tümünü kopar** / **Tümünü geri al**). Seçim modunda bu satırın yerine eski toplu işlem çubuğu çıkar.
+- "Takip durumu" Filtrele sayfasında kaldı; "En az skor" oradan çıkarıldı (artık yan çubukta).
+
+### 3. Yandan açılan skor çubuğu (`SkorYanBar`)
+- Sağ kenarda sabit (`position: fixed`) 24 px'lik "Skor" tutamağı. Kapalıyken yalnızca o görünür; süzgeç açıkken tutamak vurgulu renkte ve `Skor ≥ 70` yazar (gizliyken de etkin olduğu belli).
+- Aç / kapat: tutamağa dokun · sola kaydır (aç) / sağa kaydır (kapat) · çubuğun dışına dokun (kapat). Dikey çubukta parmak sürüklenir (`pointer` olayları, `touch-action: none`), 0–100 arası 5'er puan; klavye: ↑ ↓ Home End. `Sıfırla` düğmesi ve altta "N eşleşme" sayacı. Erişilebilirlik: `role="slider"`, `aria-valuenow`.
+- Telefonda klavye açılınca (`html.klavye`) ve yazdırmada gizlenir. Çubuk dikey olduğu için parmak sağ kenarda kalır, liste solda görünür kalır.
+
+### 4. Menü
+- `nav` artık: Ana Sayfa · Talepler · Portföyler · Eşleşmeler · İzleme (alt çubuk) + Kişiler · Veri Girişi · Ayarlar (menü sayfası). **Konumlar, Bağlantılar, Yönetim** buradan çıktı.
+- **Ayarlar** sayfasının en üstünde "Yönetim ve bağlantılar" bölümü: Konumlar, Bağlantılar (`baglantilarGorunurMu(d)`: demoda hep, canlıda Google açıksa ya da platform yöneticisine), Yönetim (`yonetimGorunur()`: canlıda `ofis.kullanicilar` yetkisi). Eşitleme çakışması rozeti Ayarlar menü öğesinde ve Bağlantılar satırında.
+- Ekranlar ayrı `ekran.ad` olarak durur (`konumlar`, `baglantilar`, `yonetim`) → Google izin dönüşü (`/?google=ok`), Ana Sayfa daveti, "Geri" geçmişi aynen çalışır. `sekmeOf` bu üç ekranı `ayarlar` sekmesine eşler: menüde Ayarlar vurgulu kalır.
+
+### Testler
+- Yeni: `tests/v3212.test.ts` (9 test) + JSDOM yardımcısı `tests/yardimci-arayuz.ts` (düğmeye basma, yan çubuğu kullanma, Uygulama'da "karta gir → Geri" ve kaydırma konumu). `scripts/test-db.sh` listesine eklendi.
+- Güncellenen: `v316` (işlem seçicisi), `v319` (fırsat seçicisi + ⋯ menüsü), `scripts/canli-arayuz-testi.mjs` (Konumlar / Bağlantılar / Yönetim artık Ayarlar içinde).
+
+### Sınanamayan
+- Gerçek telefonda görsel kontrol yapılamadı (bu ortamda tarayıcı yok); düzen JSDOM testleri ve CSS gözden geçirmesiyle doğrulandı. İlk bakışta özellikle: yan çubuk tutamağının kartların sağ kenarına binmesi (dikey konum `top: clamp(110px, 30vh, 320px)`), seçicilerin 360 px genişlikte sığması.
