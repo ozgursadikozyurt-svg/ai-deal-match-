@@ -639,7 +639,8 @@ export type Rol = (typeof Rol)[keyof typeof Rol]
 
 export const Plan = {
   UCRETSIZ: 'UCRETSIZ',
-  PRO: 'PRO'
+  PRO: 'PRO',
+  PRO_PLUS: 'PRO_PLUS'
 } as const
 
 export type Plan = (typeof Plan)[keyof typeof Plan]

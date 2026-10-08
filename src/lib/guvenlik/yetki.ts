@@ -90,7 +90,7 @@ export function yetkiGerek(rol: Rol, y: Yetki): void {
 //  PLANLAR — sınırların tek kaynağı. Rakamlar v3.22'de ekrandan yönetilecek.
 // ---------------------------------------------------------------------------
 
-export type Plan = "UCRETSIZ" | "PRO";
+export type Plan = "UCRETSIZ" | "PRO" | "PRO_PLUS";
 
 export interface PlanSinirlari {
   etiket: string;
@@ -104,11 +104,18 @@ export interface PlanSinirlari {
   entegrasyon: boolean;
   /** PDF / JPG portföy föyü */
   paylasimFoyu: boolean;
+  /**
+   * v3.20 — Ofisler arası ORTAK HAVUZ (Pro+): ofis, seçtiği portföy / talepleri ortak havuza koyar ve
+   * başka ofislerin havuza koyduklarıyla eşleşir. Hak burada tanımlı; özelliğin kendisi sonraki sürümde
+   * (kapsam henüz netleşmedi — bkz. docs/ANAHTAR_CRM_EK_v3.20_8Ekim2026.md › Pro+ yol haritası).
+   */
+  ortakHavuz: boolean;
 }
 
 export const PLANLAR: Record<Plan, PlanSinirlari> = {
-  UCRETSIZ: { etiket: "Ücretsiz", fotoBasinaKayit: 0, kullanici: 1, gunlukAi: 25, entegrasyon: false, paylasimFoyu: false },
-  PRO: { etiket: "Pro", fotoBasinaKayit: 8, kullanici: 25, gunlukAi: 500, entegrasyon: true, paylasimFoyu: true },
+  UCRETSIZ: { etiket: "Ücretsiz", fotoBasinaKayit: 0, kullanici: 1, gunlukAi: 25, entegrasyon: false, paylasimFoyu: false, ortakHavuz: false },
+  PRO: { etiket: "Pro", fotoBasinaKayit: 8, kullanici: 25, gunlukAi: 500, entegrasyon: true, paylasimFoyu: true, ortakHavuz: false },
+  PRO_PLUS: { etiket: "Pro+", fotoBasinaKayit: 15, kullanici: 100, gunlukAi: 2000, entegrasyon: true, paylasimFoyu: true, ortakHavuz: true },
 };
 
 /** Sınırsız ofis (Özyurtlar Gayrimenkul): plan PRO + sinirsiz işareti → sınır denetimi uygulanmaz. */
@@ -119,6 +126,7 @@ export const SINIRSIZ: PlanSinirlari = {
   gunlukAi: 100_000,
   entegrasyon: true,
   paylasimFoyu: true,
+  ortakHavuz: true,
 };
 
 export const planSinirlari = (plan: Plan, sinirsiz = false): PlanSinirlari => (sinirsiz ? SINIRSIZ : PLANLAR[plan]);

@@ -45,6 +45,10 @@ Tek kaynak: `src/lib/guvenlik/yetki.ts`. Platform yöneticisi ⊃ Ofis yönetici
 4. `npm run canli:yayinla`, ardından kendi e-postanızla giriş → Yönetim ekranı görünmeli.
 5. Başka ofis davet etmeden önce: yapay zekâ için ücretli API katmanı ve KVKK metinleri (kullanım şartları, aydınlatma).
 
+## Pro+ yol haritası (taslak — kapsam Özgür ile netleşecek)
+- **Ortak havuz:** Pro+ ofis bir portföy / talebi "ortak havuza koy" ile işaretler. Havuzdaki kayıtlar başka Pro+ ofislerin kayıtlarıyla eşleştirilir; karşı tarafa yalnızca anonim özet (tip, bölge, m², fiyat aralığı) görünür. İletişim bilgisi ancak kayıt sahibi "bağlantı ver" deyince açılır (komisyon paylaşımı ve KVKK için).
+- Hak `PlanSinirlari.ortakHavuz` olarak tanımlı (yalnızca PRO_PLUS ve sınırsız ofis). Tasarım kararları: havuz kaydı ofis verisinin kopyası değil işaretidir; eşleşme sunucuda platform bağlamında çalışır, sonuç her ofise kendi bağlamında döner.
+
 ## Sonraki sürümler
 - v3.21: davetli ilk girişte ad-soyad / telefon, kayıtlarda "ofise aç / bana özel" düğmesi, bekleme listesi formu.
 - v3.22: plan sınırlarının zorlanması, kullanım ölçümü ve platform panosu.

@@ -15,7 +15,7 @@
 -- 1) Enum'lar
 -- ---------------------------------------------------------------------------
 CREATE TYPE "Rol" AS ENUM ('PLATFORM_YONETICISI', 'OFIS_YONETICISI', 'DANISMAN');
-CREATE TYPE "Plan" AS ENUM ('UCRETSIZ', 'PRO');
+CREATE TYPE "Plan" AS ENUM ('UCRETSIZ', 'PRO', 'PRO_PLUS');
 CREATE TYPE "OfisDurumu" AS ENUM ('AKTIF', 'ASKIDA');
 CREATE TYPE "Gorunurluk" AS ENUM ('OFIS', 'OZEL');
 CREATE TYPE "DavetDurumu" AS ENUM ('BEKLIYOR', 'KULLANILDI', 'IPTAL');

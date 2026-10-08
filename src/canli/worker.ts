@@ -9,7 +9,7 @@
  *    tutma + süresi dolanları pasife alma; pazar 04:00 haftalık yedek
  */
 import { ROTALAR } from "./rotalar.generated";
-import { kimlikDogrula } from "./kimlik";
+import { kimlikDogrula, izinliMi } from "./kimlik";
 import { oturumCoz } from "./oturum";
 import { davetBaglamiIcinde } from "./davet-baglam";
 import { istekIcinde, prisma } from "../lib/db";
@@ -58,6 +58,13 @@ export async function apiIsle(req: Request, env: Env): Promise<Response> {
   // 2) Oturum anahtarı (JWT) → e-posta
   const k = await kimlikDogrula(req, env);
   if ("hata" in k) return json({ hata: "KIMLIK", mesaj: k.hata }, k.durum);
+
+  // 3a) v3.20 — Kurulum (migration uygulama): kullanıcı tablosu henüz yokken de çalışmalı (tavuk-yumurta).
+  //     Yalnızca acil durum listesindeki (IZINLI_EPOSTALAR) e-postalar, platform bağlamında.
+  if (url.pathname === "/api/kurulum") {
+    if (!izinliMi(k.eposta, env.IZINLI_EPOSTALAR)) return json({ hata: "YETKI", mesaj: "Kurulum yalnızca platform yöneticisi içindir" }, 403);
+    return istekIcinde(env.DATABASE_URL, () => platformOlarak(() => isle(req, { params })).catch(hataYaniti));
+  }
 
   // 3) Davet kabul: giriş yeter, ofis gerekmez (kişi henüz bir ofiste değil)
   if (url.pathname === "/api/davet/kabul") {

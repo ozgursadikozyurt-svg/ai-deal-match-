@@ -129,7 +129,7 @@ export function Yonetim() {
       <p className="ipucu">Canlıda bu seçim yoktur; girişteki e-postanın rolü kullanılır. Burada her rolün ne gördüğünü deneyin.</p>
       <div className="satir sar">{(["PLATFORM_YONETICISI", "OFIS_YONETICISI", "DANISMAN"] as Rol[]).map((r) =>
         <button key={r} className={"btn kucuk" + (demoRol === r ? " birincil" : "")} onClick={() => { DEMO_YONETIM.rol = r; setDemoRol(r); }}>{ROL_ETIKETLERI[r]}</button>)}</div>
-      <div className="satir sar">{(["UCRETSIZ", "PRO"] as Plan[]).map((p) =>
+      <div className="satir sar">{(["UCRETSIZ", "PRO", "PRO_PLUS"] as Plan[]).map((p) =>
         <button key={p} className={"btn kucuk" + (demoPlan === p ? " birincil" : "")} onClick={() => { DEMO_YONETIM.plan = p; setDemoPlan(p); }}>Plan: {PLANLAR[p].etiket}</button>)}</div>
     </section>}
 
@@ -140,6 +140,7 @@ export function Yonetim() {
         <li>Kullanıcı: en çok {sinir.kullanici}</li>
         <li>Günlük yapay zekâ yorumu: {sinir.gunlukAi}</li>
         <li>Notion / Google senkronu: {sinir.entegrasyon ? "açık" : "kapalı"} · Portföy föyü (PDF/JPG): {sinir.paylasimFoyu ? "açık" : "kapalı"}</li>
+        <li>Ofisler arası ortak havuz: {sinir.ortakHavuz ? "hak tanımlı (özellik yakında)" : "Pro+ ile"}</li>
       </ul>
     </section>
 
@@ -157,7 +158,9 @@ export function Yonetim() {
             <span className="ipucu">{o._count.kullanicilar} kullanıcı · {o._count.kayitlar} kayıt{o.sehir ? ` · ${o.sehir}` : ""}</span>
             {!o.sinirsiz && <div className="satir sar">
               <button className="btn kucuk" onClick={() => ofisDegis(o, { denemeGun: 30 }, `${o.ad}: 30 gün Pro deneme verildi`)}>30 gün Pro deneme</button>
-              <button className="btn kucuk" onClick={() => ofisDegis(o, { plan: o.plan === "PRO" ? "UCRETSIZ" : "PRO", denemeGun: 0 }, `${o.ad}: plan değişti`)}>{o.plan === "PRO" ? "Ücretsize indir" : "Pro yap"}</button>
+              <select aria-label={`${o.ad} planı`} value={o.plan} onChange={(e) => ofisDegis(o, { plan: e.target.value as Plan, denemeGun: 0 }, `${o.ad}: plan ${PLANLAR[e.target.value as Plan].etiket}`)}>
+                {(["UCRETSIZ", "PRO", "PRO_PLUS"] as Plan[]).map((p) => <option key={p} value={p}>{PLANLAR[p].etiket}</option>)}
+              </select>
               <button className="btn kucuk" onClick={() => ofisDegis(o, { durum: o.durum === "AKTIF" ? "ASKIDA" : "AKTIF" }, o.durum === "AKTIF" ? `${o.ad} askıya alındı` : `${o.ad} yeniden açıldı`)}>{o.durum === "AKTIF" ? "Askıya al" : "Yeniden aç"}</button>
               <button className="btn kucuk" onClick={() => { setDOfis(o.id); setDRol("OFIS_YONETICISI"); document.getElementById("yon-davet")?.scrollIntoView({ behavior: "smooth" }); }}>Bu ofise davet</button>
             </div>}

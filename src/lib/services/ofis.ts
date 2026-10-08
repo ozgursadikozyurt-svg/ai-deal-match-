@@ -20,7 +20,7 @@ export const OfisSchema = z.object({
   ad: z.string().min(2).max(120),
   telefon: z.string().max(32).optional(),
   sehir: z.string().max(60).optional(),
-  plan: z.enum(["UCRETSIZ", "PRO"]).default("UCRETSIZ"),
+  plan: z.enum(["UCRETSIZ", "PRO", "PRO_PLUS"]).default("UCRETSIZ"),
   denemeGun: z.number().int().min(0).max(365).optional(),
 });
 
@@ -104,7 +104,7 @@ export async function ofisListesi(prisma: PrismaClient) {
 /** Etkin plan: deneme süresi dolmamışsa PRO sayılır */
 export function etkinPlan(o: { plan: string; denemeBitis: Date | null; sinirsiz: boolean }) {
   const denemeAktif = !!o.denemeBitis && o.denemeBitis > new Date();
-  const kod = (denemeAktif ? "PRO" : o.plan) as keyof typeof PLANLAR;
+  const kod = (denemeAktif && o.plan === "UCRETSIZ" ? "PRO" : o.plan) as keyof typeof PLANLAR; // deneme Pro+ ofisi düşürmez
   return { kod, denemeAktif, sinirlar: planSinirlari(kod, o.sinirsiz) };
 }
 
@@ -212,7 +212,7 @@ export async function kullaniciGuncelle(prisma: PrismaClient, id: string, veri: 
 
 /** Platform yöneticisi: plan, deneme süresi, askıya alma */
 export const OfisGuncelleSchema = z.object({
-  plan: z.enum(["UCRETSIZ", "PRO"]).optional(),
+  plan: z.enum(["UCRETSIZ", "PRO", "PRO_PLUS"]).optional(),
   denemeGun: z.number().int().min(0).max(365).optional(), // 0 = denemeyi bitir
   durum: z.enum(["AKTIF", "ASKIDA"]).optional(),
   notlar: z.string().max(2000).optional(),

@@ -594,6 +594,7 @@ enum Rol {
 enum Plan {
   UCRETSIZ
   PRO
+  PRO_PLUS
 }
 
 enum OfisDurumu {

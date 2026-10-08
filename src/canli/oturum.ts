@@ -75,12 +75,12 @@ export async function oturumOzeti(prisma: PrismaClient, b: Baglam) {
     select: { id: true, ad: true, plan: true, sinirsiz: true, denemeBitis: true, durum: true },
   });
   const denemeAktif = !!ofis?.denemeBitis && ofis.denemeBitis > new Date();
-  const etkinPlan = denemeAktif ? "PRO" : (ofis?.plan ?? "UCRETSIZ");
+  const etkinPlan = denemeAktif && (ofis?.plan ?? "UCRETSIZ") === "UCRETSIZ" ? "PRO" : (ofis?.plan ?? "UCRETSIZ");
   return {
     kullanici: { id: b.kullaniciId, eposta: b.eposta, rol: b.rol, rolEtiketi: ROL_ETIKETLERI[b.rol] },
     ofis: ofis ? { id: ofis.id, ad: ofis.ad, durum: ofis.durum } : null,
     plan: { kod: etkinPlan, denemeBitis: ofis?.denemeBitis ?? null, denemeAktif },
-    sinirlar: planSinirlari(etkinPlan as "UCRETSIZ" | "PRO", ofis?.sinirsiz ?? false),
+    sinirlar: planSinirlari(etkinPlan as "UCRETSIZ" | "PRO" | "PRO_PLUS", ofis?.sinirsiz ?? false),
     yetkiler: YETKILER[b.rol],
   };
 }
