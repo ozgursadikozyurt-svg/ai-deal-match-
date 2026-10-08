@@ -1,5 +1,6 @@
 /**
- * Anahtar CRM v3.14 · 3 Ekim 2026
+ * Anahtar CRM v3.20 · 8 Ekim 2026 (v3.14'ten)
+ * v3.20: davet bağlantısıyla katılma (?davet=KOD), açılışta /api/oturum (rol, plan, yetkiler), hesabı olmayana anlaşılır mesaj.
  * Canlı giriş noktası (dist/canli/index.html): giriş → ilk kurulum denetimi → sunucudan durum → aynı demo ekranları, veri sunucuda.
  */
 import React, { useEffect, useRef, useState } from "react";
@@ -13,6 +14,17 @@ import { kaydediciKur, type KaydetDurumu } from "./canli-kaydet";
 import { KaydetGostergesi } from "./canli-gosterge";
 import { MARKA } from "../src/lib/marka";
 import { SURUM, TARIH } from "../src/lib/surum";
+
+// v3.20 — davet kodu adresten alınır ve giriş bağlantısı dönene kadar bu tarayıcıda saklanır
+const DAVET_ANAHTAR = "anahtarcrm-davet";
+const davetKodu = (): string | null => { try { return localStorage.getItem(DAVET_ANAHTAR); } catch { return null; } };
+const davetTemizle = () => { try { localStorage.removeItem(DAVET_ANAHTAR); } catch { /* gizli pencere */ } };
+(() => {
+  const k = new URLSearchParams(location.search).get("davet");
+  if (!k) return;
+  try { localStorage.setItem(DAVET_ANAHTAR, k); } catch { /* gizli pencere */ }
+  history.replaceState(null, "", location.pathname + location.hash);
+})();
 
 type Faz = { ad: "aciliyor" } | { ad: "giris"; mesaj?: string } | { ad: "kurulum"; ayrinti: string } | { ad: "hata"; mesaj: string; yeniden: boolean } | { ad: "hazir" };
 
@@ -28,14 +40,16 @@ function Giris({ o, mesaj, bitti }: { o: OturumYoneticisi; mesaj?: string; bitti
   const [eposta, setEposta] = useState(""), [kod, setKod] = useState("");
   const [adim, setAdim] = useState<"eposta" | "gonderildi">("eposta");
   const [hata, setHata] = useState<string | undefined>(mesaj), [mesgul, setMesgul] = useState(false);
+  const davet = !!davetKodu();
   const calis = async (is: () => Promise<void>) => { setMesgul(true); setHata(undefined); try { await is(); } catch (e: any) { setHata(e?.message ?? "Bir sorun oluştu"); } finally { setMesgul(false); } };
   return <Cerceve>
     <section className="kart yigin">
-      <h3>Giriş</h3>
+      <h3>{davet ? "Davetle katılın" : "Giriş"}</h3>
       {adim === "eposta" ? <>
+        {davet && <p>Bir ofise davet edildiniz. E-posta adresinizi yazın; gelen bağlantıya dokununca hesabınız açılır.</p>}
         <p className="ipucu">E-posta adresinize tek kullanımlık bir giriş bağlantısı göndereceğiz. Şifre gerekmez.</p>
         <div className="alan"><label htmlFor="gi-eposta">E-posta</label><input id="gi-eposta" type="email" autoComplete="email" inputMode="email" value={eposta} onChange={(e) => setEposta(e.target.value)} placeholder="ornek@eposta.com" /></div>
-        <button className="btn birincil" disabled={mesgul || !/.+@.+\..+/.test(eposta)} onClick={() => calis(async () => { await o.baglantiIste(eposta, location.origin + "/"); setAdim("gonderildi"); })}>{mesgul ? "Gönderiliyor…" : "Giriş bağlantısı gönder"}</button>
+        <button className="btn birincil" disabled={mesgul || !/.+@.+\..+/.test(eposta)} onClick={() => calis(async () => { await o.baglantiIste(eposta, location.origin + "/", davet); setAdim("gonderildi"); })}>{mesgul ? "Gönderiliyor…" : "Giriş bağlantısı gönder"}</button>
       </> : <>
         <p>Bağlantıyı <b>{eposta}</b> adresine gönderdik. E-postadaki bağlantıya bu cihazda dokunmanız yeterli.</p>
         <p className="ipucu">E-postanızda altı haneli bir kod da varsa buraya yazabilirsiniz:</p>
@@ -60,10 +74,18 @@ function Canli({ cfg }: { cfg: Yapilandirma }) {
     setFaz({ ad: "aciliyor" });
     try {
       const api = (yol: string, init?: any) => o.api(yol, init);
+      // v3.20 — davet bağlantısıyla geldiyse önce daveti kabul et (hesap o ofiste açılır)
+      const kod = davetKodu();
+      if (kod) {
+        const dr = await api("/api/davet/kabul", { method: "POST", json: { kod } });
+        const dj: any = await dr.json().catch(() => ({}));
+        davetTemizle();
+        if (!dr.ok && dr.status !== 409) { o.cikis(); return setFaz({ ad: "giris", mesaj: dj?.mesaj ?? "Davet kabul edilemedi" }); }
+      }
       let r = await api("/api/durum");
       if (r.status === 401 || r.status === 403) {
         const j: any = await r.json().catch(() => ({}));
-        if (r.status === 403) { o.cikis(); return setFaz({ ad: "giris", mesaj: "Bu e-posta adresinin erişim izni yok. Cloudflare › IZINLI_EPOSTALAR listesine eklenmelidir." }); }
+        if (r.status === 403) { o.cikis(); return setFaz({ ad: "giris", mesaj: j?.mesaj ?? "Bu e-posta için hesap yok. Yöneticinizden davet bağlantısı isteyin." }); }
         o.cikis(); return setFaz({ ad: "giris", mesaj: j?.mesaj && j.mesaj !== "Giriş gerekli" ? j.mesaj : undefined });
       }
       if (!r.ok) { const j: any = await r.json().catch(() => ({})); throw new Error(j?.mesaj ?? `Sunucu ${r.status}`); }
@@ -73,7 +95,9 @@ function Canli({ cfg }: { cfg: Yapilandirma }) {
       const k = kaydediciKur({ api, baslangic: durum, durum: setKaydet });
       kaydedici.current = k;
       CANLI.yuklu = durum; CANLI.kaydet = (d) => k.kuyrugaAl(d); CANLI.hemen = () => k.hemen(); CANLI.api = api;
-      CANLI.oturum = { eposta: o.eposta, cikis: () => { o.cikis(); location.reload(); } };
+      const or = await api("/api/oturum");
+      const bilgi = or.ok ? await or.json().catch(() => undefined) : undefined;
+      CANLI.oturum = { eposta: o.eposta, cikis: () => { o.cikis(); location.reload(); }, bilgi };
       CANLI.sample = {
         json: async (istem, secenek) => {
           await k.hemen(); // kaydedilmemiş yapay zekâ ayarı varsa sunucu önce onu görsün

@@ -4,10 +4,10 @@
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.19";
-export const TARIH = "7 Ekim 2026";
+export const SURUM = "3.20";
+export const TARIH = "8 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.19_7Ekim2026";
+export const DOSYA_EKI = "v3.20_8Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,29 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.20",
+    tarih: "8 Ekim 2026",
+    baslik: "Çok ofisli altyapı: ofisler, kullanıcılar, roller, davetle katılma ve Yönetim ekranı",
+    degisenler: [
+      "Uygulama artık birden çok emlak ofisini barındırabilir. Her talep, portföy, kişi, eşleşme, ayar ve fotoğraf bir ofise aittir; bir ofis başka ofisin verisini hiçbir ekrandan göremez, değiştiremez, silemez (sunucuda zorunlu, otomatik testlerle kanıtlı).",
+      "Mevcut veriniz kaybolmaz: göçte \"Özyurtlar Gayrimenkul\" ofisi açılır, bugüne kadarki tüm kayıtlar ona bağlanır; siz platform yöneticisi olursunuz ve ofisiniz sınırsızdır.",
+      "Üç rol: Platform yöneticisi (tüm ofisler, plan, deneme, askıya alma) · Ofis yöneticisi (kendi ofisinin kullanıcıları, ayarları, tüm kayıtları) · Danışman (kendi kayıtları + ofisin ortak portföyü). Yetkiler tek dosyada: src/lib/guvenlik/yetki.ts.",
+      "Görünürlük: portföyler varsayılan olarak ofis ortak havuzunda; talepler ve kişiler kaydı girene özel, ofis yöneticisi hepsini görür.",
+      "Giriş izni artık veritabanında: IZINLI_EPOSTALAR yalnızca acil durum anahtarı olarak kalır. Hesabı olmayan e-posta \"Davet isteyin\" mesajı görür.",
+      "Davetle katılma: Yönetim ekranında üretilen bağlantı (14 gün geçerli, tek kullanımlık, isteğe bağlı e-postaya kilitli) açılınca kişi e-postasını doğrular ve doğrudan o ofise girer.",
+      "Yönetim ekranı (menü › Yönetim): kullanıcılar (rol değiştir, kapat/aç), davet bağlantısı üret / iptal et, WhatsApp'ta gönder; platform yöneticisi için Ofisler: yeni ofis, 30 gün Pro deneme, Pro / Ücretsiz, askıya al.",
+      "Plan sınırları tanımlandı (Ücretsiz: fotoğraf kapalı, 1 kullanıcı, günde 25 yapay zekâ yorumu, senkron ve föy kapalı · Pro: portföy başına 8 fotoğraf, 25 kullanıcı, günde 500 yorum). Sınırların uygulamada zorlanması v3.22'de.",
+      "Ayarlar (geçerlilik süreleri, yapay zekâ, imza, roller) ofis başına ayrı; aynı telefon ya da ilan iki ayrı ofiste tutulabilir.",
+      "Veritabanı: migration 20261007100000_v320_cok_ofis (ofis, kullanici, davet tabloları; ofisId sütunları; ofis içi benzersizlik). Canlıya almadan önce Supabase'de \"Allow new users to sign up\" açık olmalı (davetli yeni kişiler için); asıl kapı uygulamanın kullanıcı tablosudur.",
+    ],
+    testEt: [
+      "Menü › Yönetim: \"Rol olarak görüntüle\" ile Platform yöneticisi, Ofis yöneticisi ve Danışman görünümlerini karşılaştırın; danışman yönetim bölümlerini görmemeli.",
+      "Ofisler › yeni ofis açın (ör. \"Lara Emlak\"), \"30 gün Pro deneme\" verin, sonra \"Askıya al\" deyin.",
+      "Davet bağlantısı üretin: bağlantı ve \"WhatsApp'ta gönder\" düğmesi çıkmalı; Davetler listesinde görünmeli, İptal ile kapanmalı.",
+      "Kullanıcılar listesinde asistanın rolünü Ofis yöneticisi yapın, sonra hesabını Kapat deyin.",
+    ],
+  },
   {
     surum: "3.19",
     tarih: "7 Ekim 2026",

@@ -30,8 +30,8 @@ export class OturumYoneticisi {
     this.kaydet({ access: a, refresh: r, bitis: Date.now() + (Number(p.get("expires_in")) || 3600) * 1000, eposta: jwtEposta(a) });
     return { tamam: true };
   }
-  async baglantiIste(eposta: string, yonlendir: string) {
-    const r = await this.f(`${this.cfg.supabaseUrl}/auth/v1/otp?redirect_to=${encodeURIComponent(yonlendir)}`, { method: "POST", headers: { apikey: this.cfg.supabaseAnonKey, "content-type": "application/json" }, body: JSON.stringify({ email: eposta.trim(), create_user: false }) });
+  async baglantiIste(eposta: string, yonlendir: string, yeniHesap = false) {
+    const r = await this.f(`${this.cfg.supabaseUrl}/auth/v1/otp?redirect_to=${encodeURIComponent(yonlendir)}`, { method: "POST", headers: { apikey: this.cfg.supabaseAnonKey, "content-type": "application/json" }, body: JSON.stringify({ email: eposta.trim(), create_user: yeniHesap }) }); // v3.20: yalnızca davet bağlantısıyla gelen yeni hesap açabilir; asıl kapı sunucudaki kullanici tablosu
     if (!r.ok) throw new Error(await hataMetni(r));
   }
   async kodDogrula(eposta: string, kod: string) {

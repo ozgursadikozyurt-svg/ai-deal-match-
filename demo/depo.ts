@@ -101,11 +101,19 @@ export const bosGoogleBaglanti = (): DemoBaglanti => { const b = bosBaglanti(); 
  * değişiklikler sunucuya yazılır (demo/canli*.ts); demoda localStorage kullanılır.
  */
 export const CANLI_ORTAM = typeof document !== "undefined" && !!document.getElementById("kok")?.dataset.canli;
+/** v3.20 — /api/oturum yanıtı: kim, hangi ofis, hangi rol, hangi plan ve yetkiler */
+export interface OturumBilgi {
+  kullanici: { id: string; eposta: string; rol: string; rolEtiketi: string };
+  ofis: { id: string; ad: string; durum: string } | null;
+  plan: { kod: string; denemeBitis: string | null; denemeAktif: boolean };
+  sinirlar: { etiket: string; fotoBasinaKayit: number; kullanici: number; gunlukAi: number; entegrasyon: boolean; paylasimFoyu: boolean };
+  yetkiler: string[];
+}
 export const CANLI: {
   acik: boolean; yuklu: DepoDurumu | null; kaydet: ((d: DepoDurumu) => void) | null; hemen: (() => Promise<void>) | null;
   sample: { json: (istem: string, secenek?: Record<string, unknown>) => Promise<unknown> } | null;
   api: ((yol: string, init?: { method?: string; json?: unknown; form?: FormData }) => Promise<Response>) | null;
-  oturum: { eposta?: string; cikis: () => void } | null;
+  oturum: { eposta?: string; cikis: () => void; bilgi?: OturumBilgi } | null;
 } = { acik: CANLI_ORTAM, yuklu: null, kaydet: null, hemen: null, sample: null, api: null, oturum: null };
 
 export const BUGUN = CANLI_ORTAM ? new Date() : new Date(2026, 8, 30, 12, 0, 0); // demo "bugün" sabit (süre hesapları değişmesin); canlıda gerçek tarih

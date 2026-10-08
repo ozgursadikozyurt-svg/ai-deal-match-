@@ -6,6 +6,7 @@
  * Dosyalar: ortak.tsx (ortak parçalar) · form.tsx · ice-aktarma.tsx · konumlar.tsx · bu dosya (ekranlar + kabuk)
  */
 import React, { useEffect, useMemo, useState } from "react";
+import { Yonetim, yonetimGorunur } from "./yonetim";
 import { createRoot } from "react-dom/client";
 import { MULK_OZELLIK_META, SIRALAMA, katYaz } from "../src/lib/domain/teknik-alanlar";
 import { MULK_AILELERI, aileOf } from "../src/lib/domain/kategori";
@@ -533,6 +534,7 @@ export function Uygulama() {
     ...(CANLI.acik ? [] : [{ k: "baglantilar", etiket: "Bağlantılar", ikon: "baglanti", git: () => git({ ad: "baglantilar" }), rozet: cakisma, alt: true } as NavOge]), // canlıda Notion/Google bağlantıları sonraki aşama
     { k: "veri", etiket: "Veri Girişi", ikon: "veri", git: () => git({ ad: "veri" }), alt: true },
     { k: "konumlar", etiket: "Konumlar", ikon: "konum", git: () => git({ ad: "konumlar" }), alt: true },
+    ...(yonetimGorunur() ? [{ k: "yonetim", etiket: "Yönetim", ikon: "kisi", git: () => git({ ad: "yonetim" }), alt: true } as NavOge] : []), // v3.20
     { k: "ayarlar", etiket: "Ayarlar", ikon: "ayar", git: () => git({ ad: "ayarlar" }), alt: true },
   ];
   const surumCip = <button className="surum-cip" onClick={() => setSurumAcik(true)} title="Bu sürümde neler var">v{SURUM} · {TARIH}</button>;
@@ -560,6 +562,7 @@ export function Uygulama() {
       {ekran.ad === "konumlar" && <Konumlar />}
       {ekran.ad === "ayarlar" && <Ayarlar />}
       {ekran.ad === "baglantilar" && <Baglantilar />}
+      {ekran.ad === "yonetim" && <Yonetim />}
     </main>
     <footer className="ayak">{MARKA.ad} v{SURUM} · {TARIH} — Demo: veriler yalnızca bu tarayıcıda saklanır; kişi adları ve telefonlar kurgusaldır</footer>
     </div>

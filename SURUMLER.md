@@ -5,6 +5,26 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.20 · 8 Ekim 2026 — Çok ofisli altyapı: ofisler, kullanıcılar, roller, davetle katılma ve Yönetim ekranı
+
+- Uygulama artık birden çok emlak ofisini barındırabilir. Her talep, portföy, kişi, eşleşme, ayar ve fotoğraf bir ofise aittir; bir ofis başka ofisin verisini hiçbir ekrandan göremez, değiştiremez, silemez (sunucuda zorunlu, otomatik testlerle kanıtlı).
+- Mevcut veriniz kaybolmaz: göçte "Özyurtlar Gayrimenkul" ofisi açılır, bugüne kadarki tüm kayıtlar ona bağlanır; siz platform yöneticisi olursunuz ve ofisiniz sınırsızdır.
+- Üç rol: Platform yöneticisi (tüm ofisler, plan, deneme, askıya alma) · Ofis yöneticisi (kendi ofisinin kullanıcıları, ayarları, tüm kayıtları) · Danışman (kendi kayıtları + ofisin ortak portföyü). Yetkiler tek dosyada: src/lib/guvenlik/yetki.ts.
+- Görünürlük: portföyler varsayılan olarak ofis ortak havuzunda; talepler ve kişiler kaydı girene özel, ofis yöneticisi hepsini görür.
+- Giriş izni artık veritabanında: IZINLI_EPOSTALAR yalnızca acil durum anahtarı olarak kalır. Hesabı olmayan e-posta "Davet isteyin" mesajı görür.
+- Davetle katılma: Yönetim ekranında üretilen bağlantı (14 gün geçerli, tek kullanımlık, isteğe bağlı e-postaya kilitli) açılınca kişi e-postasını doğrular ve doğrudan o ofise girer.
+- Yönetim ekranı (menü › Yönetim): kullanıcılar (rol değiştir, kapat/aç), davet bağlantısı üret / iptal et, WhatsApp'ta gönder; platform yöneticisi için Ofisler: yeni ofis, 30 gün Pro deneme, Pro / Ücretsiz, askıya al.
+- Plan sınırları tanımlandı (Ücretsiz: fotoğraf kapalı, 1 kullanıcı, günde 25 yapay zekâ yorumu, senkron ve föy kapalı · Pro: portföy başına 8 fotoğraf, 25 kullanıcı, günde 500 yorum). Sınırların uygulamada zorlanması v3.22'de.
+- Ayarlar (geçerlilik süreleri, yapay zekâ, imza, roller) ofis başına ayrı; aynı telefon ya da ilan iki ayrı ofiste tutulabilir.
+- Veritabanı: migration 20261007100000_v320_cok_ofis (ofis, kullanici, davet tabloları; ofisId sütunları; ofis içi benzersizlik). Canlıya almadan önce Supabase'de "Allow new users to sign up" açık olmalı (davetli yeni kişiler için); asıl kapı uygulamanın kullanıcı tablosudur.
+
+**Demo'da test edilecekler**
+
+- [ ] Menü › Yönetim: "Rol olarak görüntüle" ile Platform yöneticisi, Ofis yöneticisi ve Danışman görünümlerini karşılaştırın; danışman yönetim bölümlerini görmemeli.
+- [ ] Ofisler › yeni ofis açın (ör. "Lara Emlak"), "30 gün Pro deneme" verin, sonra "Askıya al" deyin.
+- [ ] Davet bağlantısı üretin: bağlantı ve "WhatsApp'ta gönder" düğmesi çıkmalı; Davetler listesinde görünmeli, İptal ile kapanmalı.
+- [ ] Kullanıcılar listesinde asistanın rolünü Ofis yöneticisi yapın, sonra hesabını Kapat deyin.
+
 ## v3.19 · 7 Ekim 2026 — Eşleşme puanı eksik veriyi cezalandırıyor, fırsat önceliği (sahibinden ↔ müşteri), anahtar / İzleme, toplu kopar, çoklu oda, Veri Girişi'nde yapay zekâ
 
 - Puanlama düzeltildi: m², oda sayısı ya da fiyat/bütçe karşılaştırılamıyorsa o bileşen artık "yok sayılıp" ağırlığı diğerlerine dağıtılmıyor; kararsız (0,4) puan alıyor. Eskiden yalnızca konum + tip eşleşince 86–91 puan "Sunulabilir" çıkıyordu. Fiyat karşılaştırılamıyorsa ya da iki çekirdek bilgi eksikse en fazla "Koşullu". Kartta "Eksik: …" olarak görünür; oda uyarısı yalnızca konutta çıkar.

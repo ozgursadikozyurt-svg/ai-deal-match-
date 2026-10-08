@@ -16,7 +16,7 @@ export type Ekran = (
   | { ad: "ana" } | { ad: "liste"; tip: "TALEP" | "PORTFOY"; filtre?: any } | { ad: "detay"; id: string }
   | { ad: "form"; tip: "TALEP" | "PORTFOY"; id?: string; taslak?: Partial<Veri>; adayId?: string; geri?: Ekran }
   | { ad: "eslesmeler" } | { ad: "eslesme"; tid: string; pid: string } | { ad: "izleme" }
-  | { ad: "veri"; alt?: "metin" | "dosya" | "mesaj" | "wa" | "el"; metin?: string } | { ad: "konumlar" } | { ad: "kisiler" } | { ad: "kisi"; id: string } | { ad: "ayarlar" } | { ad: "baglantilar" }
+  | { ad: "veri"; alt?: "metin" | "dosya" | "mesaj" | "wa" | "el"; metin?: string } | { ad: "konumlar" } | { ad: "kisiler" } | { ad: "kisi"; id: string } | { ad: "ayarlar" } | { ad: "baglantilar" } | { ad: "yonetim" }
 ) & { donus?: boolean };
 export interface Ctx {
   d: DepoDurumu;
