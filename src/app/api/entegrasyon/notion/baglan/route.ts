@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.2 · 8 Ekim 2026
+// Anahtar CRM v3.22 · 9 Ekim 2026
 // POST /api/entegrasyon/notion/baglan → NOTION_TOKEN ile üç tabloyu doğrular; tamamsa bağlar ve ilk içe aktarmayı başlatır.
 // Yanıt: alan eşleme raporu (eşleşen / bilerek okunmayan / tanınmayan alanlar)
 import { prisma } from "@/lib/db";

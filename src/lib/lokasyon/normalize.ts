@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Türkçe lokasyon metni normalizasyonu.
  * "Murtpaşa", "MURATPAŞA", "Düden Mh.", "Altınova Sinan Mahallesi" → karşılaştırılabilir anahtar.
  */

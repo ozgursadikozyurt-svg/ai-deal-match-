@@ -849,7 +849,7 @@ input[type=range]{padding:0;accent-color:var(--acc)}
 .izleme-baslik{margin:12px 0 2px;font-size:.95rem;color:var(--mut)}
 .bos-izleme{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:28px 16px;color:var(--mut)}
 
-/* v3.21.2 — Eşleşmeler: kompakt hızlı süzgeçler, yandan açılan skor çubuğu; Ayarlar'da yönetim geçişleri */
+/* v3.21.2 — Eşleşmeler: kompakt hızlı süzgeçler; Ayarlar'da yönetim geçişleri */
 .filtre-ince .fb{min-height:32px;padding:.2rem .7rem;font-size:.8rem}
 .hs-satir{display:flex;gap:6px;align-items:stretch;min-width:0}
 .hs{position:relative;flex:1 1 0;min-width:0}
@@ -870,23 +870,53 @@ input[type=range]{padding:0;accent-color:var(--acc)}
 .hs-nokta{width:9px;height:9px;border-radius:50%;background:var(--mut);flex:none}.hs-nokta.f-oncelikli{background:var(--iyi)}.hs-nokta.f-normal{background:var(--mavi)}
 .hs-n{color:var(--mut);font-size:.82rem}.hs-tik{width:1rem;text-align:center;color:var(--acc)}
 
-.skor-perde{position:fixed;inset:0;z-index:37;background:transparent;border:0;padding:0;cursor:default}
-.skor-cekmece{position:fixed;right:0;top:clamp(110px,30vh,320px);z-index:38;display:flex;align-items:stretch;transform:translateX(calc(100% - 24px));transition:transform .22s ease;filter:drop-shadow(0 6px 16px rgba(16,24,40,.22))}
-.skor-cekmece.acik{transform:none}
-.skor-tutac{width:24px;min-height:96px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 0;border:1px solid var(--line);border-right:0;background:var(--panel);color:var(--mut);border-radius:12px 0 0 12px;cursor:pointer;font:inherit}
-.skor-ok{font-size:1rem;line-height:1}
-.skor-et{writing-mode:vertical-rl;transform:rotate(180deg);font-size:.72rem;font-weight:650;letter-spacing:.04em;white-space:nowrap}
-.skor-cekmece.dolu .skor-tutac{background:var(--acc);border-color:var(--acc);color:var(--acc-fg,#fff)}
-.skor-govde{width:72px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0 0 0 12px}
-.skor-deger{font-size:.95rem;color:var(--fg)}.skor-cekmece.dolu .skor-deger{color:var(--acc)}
-.skor-iz{position:relative;width:34px;height:clamp(130px,26vh,230px);border-radius:17px;background:var(--panel2);border:1px solid var(--line);overflow:hidden;touch-action:none;cursor:pointer}
-.skor-iz:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.skor-dolgu{position:absolute;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--acc) 30%,transparent)}
-.skor-top{position:absolute;left:3px;right:3px;height:22px;border-radius:11px;background:var(--acc);box-shadow:0 1px 4px rgba(0,0,0,.3)}
-.skor-say{font-size:.68rem;color:var(--mut);text-align:center;line-height:1.2}
-.skor-sifirla{font:inherit;font-size:.76rem;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:8px;padding:4px 8px;cursor:pointer}.skor-sifirla:disabled{opacity:.4;cursor:default}
-html.klavye .skor-cekmece{display:none}
-@media print{.skor-cekmece,.skor-perde{display:none}}
+/* v3.22 — skor: seçici satırında dar düğme; dokununca satırın üstünde yatay şerit (listeyi ve süzgeçleri örtmez) */
+.hs-satir{position:relative}
+.hs.skor-hs{position:static}
+.skor-serit{position:absolute;inset:0;z-index:41;display:flex;align-items:center;gap:10px;padding:0 6px 0 12px;background:var(--panel);border:1px solid var(--acc);border-radius:10px;box-shadow:0 10px 28px rgba(16,24,40,.16);transform-origin:right center;animation:skorAc .18s ease-out}
+@keyframes skorAc{from{transform:scaleX(.25);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.skor-serit{animation:none}}
+.skor-serit-deger{min-width:3.4em;font-size:.9rem;color:var(--acc);white-space:nowrap}
+.skor-aralik{flex:1 1 auto;min-width:80px;height:28px;margin:0;accent-color:var(--acc);background:transparent;cursor:pointer}
+.skor-hazir{display:flex;gap:4px;flex:none}
+.skor-hazir button{font:inherit;font-size:.76rem;min-width:30px;height:28px;padding:0 4px;border:1px solid var(--line);border-radius:7px;background:var(--panel2);color:var(--fg);cursor:pointer}
+.skor-hazir button.on{background:var(--acc);border-color:var(--acc);color:var(--acc-fg)}
+.skor-say{flex:none;font-size:.76rem;color:var(--mut);font-variant-numeric:tabular-nums;min-width:2.2em;text-align:right}
+.skor-kapat{flex:none;width:34px;height:34px;border:0;background:none;color:var(--mut);font-size:1rem;cursor:pointer;border-radius:8px}
+.skor-kapat:hover{background:var(--panel2)}
+@media (max-width:520px){.skor-hazir{display:none}.skor-serit{gap:8px}}
+/* dar telefon: 4 seçici tek satıra sığsın — adet menüde görünür, düğmede gizlenir */
+@media (max-width:480px){.hs-satir .hs-btn b i{display:none}.hs-btn{padding:3px 18px 3px 8px}.hs-btn::after{right:6px}}
+.es-baslik .hs{flex:none}.es-baslik .hs-btn.ikon{min-height:36px;width:40px}
+/* v3.22 — Benim / Ofisim */
+.sahip-rozet{display:inline-flex;align-items:center;gap:3px;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;text-transform:none;letter-spacing:0}
+.sahip-rozet.benim{background:var(--acc);color:var(--acc-fg)}
+.sahip-rozet.ofis{background:var(--mavi-bg);color:var(--mavi);border:1px solid color-mix(in srgb,var(--mavi) 35%,transparent)}
+.kayit-kart.benim{border-left:3px solid var(--acc)}.kayit-kart.ofisim{border-left:3px solid var(--mavi)}
+.sahip-secici{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:4px 0 10px}
+.sahip-seg{display:flex;flex:1 1 100%;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+.sahip-seg button{flex:1 1 0;min-width:0;min-height:36px;border:0;border-left:1px solid var(--line);background:none;color:var(--fg);font:inherit;font-size:.8rem;padding:6px 4px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sahip-seg button:first-child{border-left:0;flex-grow:1.4}
+.sahip-seg button.on{background:var(--acc);color:var(--acc-fg);font-weight:650}
+.sahip-liste{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.benim-kisayol .bk-izgara{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
+@media (max-width:520px){.benim-kisayol .bk-izgara{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bk-oge{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);font:inherit;cursor:pointer;text-align:left}
+.bk-oge b{font-size:1.25rem;font-variant-numeric:tabular-nums}.bk-oge span{font-size:.78rem;color:var(--mut)}
+.bk-oge.benim b{color:var(--acc)}.bk-oge.ofis b{color:var(--mavi)}
+.cip.c-haric{text-decoration:line-through;text-decoration-thickness:1px;color:var(--kotu);border-color:color-mix(in srgb,var(--kotu) 40%,transparent)}
+.cip.c-haric .birincil-sec{text-decoration:none}
+/* v3.22 — portföy kartında tek küçük fotoğraf (kapak) */
+.kapak-kucuk{position:relative;flex:none;border-radius:10px;overflow:hidden;background:var(--panel2);border:1px solid var(--line);display:inline-grid;place-items:center}
+.kapak-kucuk img{width:100%;height:100%;object-fit:cover;display:block}
+.kapak-bos{color:var(--mut);font-size:1.1rem}
+.kapak-say{position:absolute;right:3px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;font-size:.62rem;font-weight:700;line-height:1;padding:2px 4px;border-radius:5px}
+.kk-govde.fotolu{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start}
+@media(max-width:480px){.kk-govde.fotolu{grid-template-columns:auto minmax(0,1fr)}.kk-govde.fotolu .kk-sag{grid-column:2}}
+.es2-bas.fotolu{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:12px;row-gap:2px;align-items:center}
+.es2-bas.fotolu .kapak-kucuk{grid-row:span 2;align-self:start}
+.es2-bas.fotolu .es2-rakam{grid-column:2}
+.taraf-bas{display:flex;gap:10px;align-items:center}
 
 .ayar-gecis{padding-bottom:4px}
 .ayar-gecis h3{margin-bottom:4px}

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Demo lokasyon indeksi — veritabanı seed'iyle aynı kaynaklardan (PTT verisi + antalya.ts) üretilir.
  * v3.10: Türkiye'nin tamamı. Çalışma ili (varsayılan Antalya) tam sözlükle; diğer 80 il gömülü sıkıştırılmış veriden
  * ilk ihtiyaçta açılır (~72 bin mahalle/köy). Kimlikler: Antalya mahalleleri 1…N (eski kayıtlarla uyumlu),
@@ -144,8 +144,22 @@ export interface KayitLok { ilId: number; ilceId: number | null; mahalleId: numb
 export function cozulenToKayitLok(ls: CozulenLokasyon[], portfoy: boolean): KayitLok[] {
   return ls.map((l, i) => ({ ilId: l.ilId, ilceId: l.ilceId, mahalleId: l.mahalleId, altBolgeId: l.altBolgeId, birincil: portfoy && i === 0, etiket: l.etiket, seviye: l.seviye }));
 }
-/** Görünen ad. Çalışma ili dışındaki konumlara il adı eklenir: "Bornova · İzmir". */
-export function lokEtiket(l: { ilId?: number | null; ilceId?: number | null; mahalleId?: number | null; altBolgeId?: number | null }): string {
+/** Görünen ad. Çalışma ili dışındaki konumlara il adı eklenir: "Bornova · İzmir". v3.22: hariç satırı "Konyaaltı / Hurma hariç". */
+export function lokEtiket(l: { ilId?: number | null; ilceId?: number | null; mahalleId?: number | null; altBolgeId?: number | null; haric?: boolean }): string {
+  return l.haric ? `${lokEtiketYalin(l)} hariç` : lokEtiketYalin(l);
+}
+/**
+ * v3.22 — başlık / kart için kısa konum özeti. Hariç varsa gruplanır: "Konyaaltı (Hurma, Sarısu hariç)".
+ */
+export function konumOzeti(ls: { ilId?: number | null; ilceId?: number | null; mahalleId?: number | null; altBolgeId?: number | null; haric?: boolean }[], enCok = 3): string {
+  const kisa = (l: (typeof ls)[number]) => String(lokEtiketYalin(l)).split(" / ").pop()!;
+  const ar = [...new Set(ls.filter((l) => !l.haric).map(kisa))];
+  const ha = [...new Set(ls.filter((l) => l.haric).map(kisa))];
+  const bas = ar.slice(0, enCok).join(", ") + (ar.length > enCok ? ` +${ar.length - enCok}` : "");
+  if (!ha.length) return bas;
+  return `${bas || ilAdiOf(calismaIliId)} (${ha.join(", ")} hariç)`;
+}
+function lokEtiketYalin(l: { ilId?: number | null; ilceId?: number | null; mahalleId?: number | null; altBolgeId?: number | null }): string {
   const il = ilceIli(l.ilceId) ?? l.ilId ?? calismaIliId;
   const ek = il !== calismaIliId ? ` · ${ilAdiOf(il)}` : "";
   if (l.altBolgeId) {

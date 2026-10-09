@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026 (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
+ * Anahtar CRM v3.22 · 9 Ekim 2026 (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
  * v3.21 — çift yönlü Google: elle eklenen kişi ve bağlı kişideki düzeltme "Google'a gönderilecek" olur; silinen kişi Google'dan silinmez.
  * Demo — Kişiler: kişi seçici (yazdıkça arama, çoklu seçim, rol, + ile anında ekleme), kişi listesi ve kişi kartı.
  * Alanlar Notion "Müşteri-Yatırımcılar-Kişiler" tablosuna göre (ROL, Phone, Açıklama, Referans, ilişkili talep/portföy).

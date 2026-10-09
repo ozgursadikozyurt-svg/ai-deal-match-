@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * API giriş modelleri (Zod) — Kayit + MulkOzellik + Lokasyon.
  * AI çıktısı da, manuel form da, Notion importu da AYNI şemadan geçer.
  * Enum dışı değer, serbest paragraf veya birim hatası DB'ye ulaşamaz.
@@ -125,6 +125,8 @@ export const KayitLokasyonSchema = z
     mahalleId: z.number().int().positive().nullish(),
     altBolgeId: z.number().int().positive().nullish(),
     birincil: z.boolean().default(false),
+    /** v3.22 — talepte hariç tutulan bölge ("Hurma, Sarısu HARİÇ"). Yalnızca true yazılır; yoksa alan hiç oluşmaz. */
+    haric: z.literal(true).optional(),
   })
   .refine((l) => !l.mahalleId || l.ilceId, { message: "Mahalle verildiyse ilçe de verilmeli", path: ["ilceId"] });
 
@@ -185,6 +187,9 @@ export const KayitTemel = z.object({
 
   validUntil: z.coerce.date().optional(), // verilmezse TTL kuralı (servis katmanı)
   ozellik: MulkOzellikSchema.optional(),
+  /** v3.22 — elle konan sahiplik işareti: BENIM (benim talebim / portföyüm) · OFIS (ofisimin) · DIS (başkasının).
+   *  Boşsa sahiplik Ayarlar › "Benim ve ofisim"deki telefon / ad / firma listesinden kendiliğinden bulunur. */
+  isaret: z.enum(["BENIM", "OFIS", "DIS"]).nullish(),
 });
 
 function kurallar(k: z.infer<typeof KayitTemel>, ctx: z.RefinementCtx) {

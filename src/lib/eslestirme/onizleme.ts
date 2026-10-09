@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * EŞLEŞTİRME MOTORU v3 (v3.11; v2 = v3.5) — veritabanı ve yapay zekâ gerektirmeyen saf fonksiyon.
  * Metin benzerliği değil, ticari gayrimenkulün katı kuralları (Killer Criteria):
  *  1. Talep DNA'sı (talep-dna.ts): öldürücü kriterler = talepte "şart" denenler + kullanım amacının doğası
@@ -32,6 +32,14 @@ export const VERI_YETERLI = 6;
 export const EKSIK_VERI_CEZASI = 7;
 /** v3.19 — ölçülemeyen çekirdek bileşenin (alan/oda/fiyat) puanı: 1'e değil, kararsız 0,4'e sayılır */
 export const BILINMEYEN_PUAN = 0.4;
+/**
+ * v3.22 — fiyat karşılaştırılamayan eşleşmenin (talepte bütçe ya da portföyde fiyat yok) skor çarpanı.
+ * Ölçüm (v3.21): bütçesiz ama bölge / oda / m² tutan konut talebi 84, depo talebi 85 alıyordu; aynı talep bütçeyle 100.
+ * Fiyatı hiç bilinmeyen bir eşleşme, bütçesi doğrulanmış çoğu eşleşmenin önüne geçiyordu.
+ * Çarpan 0,75: en iyi bütçesiz eşleşme ~63–69'da kalır ("Skor ≥ 70" süzgecinin ve portföy edinme eşiği 80'in altı);
+ * düz tavan yerine çarpan, bütçesizler arasındaki sırayı korur (m²'si de eksik olan daha aşağıda kalır).
+ */
+export const FIYATSIZ_CARPAN = 0.75;
 
 /** v3.17 — iki kayıtta da boş olan ve skoru şüpheli kılan temel alanlar (kullanıcıya "tamamlayın" denir) */
 export function eksikVeriUyarilari(t: OnizlemeKayit, p: OnizlemeKayit): string[] {
@@ -42,7 +50,7 @@ export function eksikVeriUyarilari(t: OnizlemeKayit, p: OnizlemeKayit): string[]
   if (matrisOf(t.mulkTipi) === "KONUT" && !t.odaSayisi && !p.odaSayisi) u.push("oda sayısı yok");
   if (t.maxFiyat == null && t.minFiyat == null) u.push("talepte bütçe yok");
   if (p.fiyat == null) u.push("portföyde fiyat yok");
-  const mahalle = (x: OnizlemeKayit) => x.lokasyonlar.some((l) => l.mahalleId != null || l.altBolgeId != null);
+  const mahalle = (x: OnizlemeKayit) => arananLok(x.lokasyonlar).some((l) => l.mahalleId != null || l.altBolgeId != null);
   if (!mahalle(t) && !mahalle(p)) u.push("konum yalnızca ilçe düzeyinde");
   const oz = (x: OnizlemeKayit) => Object.keys(x.ozellik ?? {}).length;
   if (oz(t) + oz(p) === 0) u.push("teknik özellik girilmemiş");
@@ -51,6 +59,7 @@ export function eksikVeriUyarilari(t: OnizlemeKayit, p: OnizlemeKayit): string[]
 import { MULK_TIPI_META as TIP_META } from "../domain/kategori";
 import { talepDnasi, type TalepDna } from "./talep-dna";
 import type { KomsulukIndeksi, MahalleYakinligi } from "../lokasyon/komsuluk";
+import { arananLok, haricLok, haricteMi } from "../lokasyon/haric";
 
 /** v3.11 — puanlama modeli. Değerler etiketli senaryo deneyinde seçildi (scripts/deney/model-karsilastir.ts). */
 export interface ModelAyar {
@@ -87,6 +96,8 @@ export interface OnizlemeLokasyon {
   mahalleId?: number | null;
   altBolgeId?: number | null;
   birincil?: boolean;
+  /** v3.22 — talepte hariç tutulan bölge ("Hurma, Sarısu HARİÇ"): portföy burada ise eşleşme kesin engellenir */
+  haric?: boolean;
 }
 
 export interface OnizlemeKayit {
@@ -206,17 +217,24 @@ export function temelUyum(t: OnizlemeKayit, p: OnizlemeKayit): boolean {
   return (tip?.oran ?? 0) >= 0.4 && islemler.has(p.islemTipi);
 }
 
-interface LokSonuc { puan: number | null; oran: number; kademe: LokasyonKademe; mesafeM: number | null; aciklama: string; /** portföyün mahallesi bilinmiyor → sunmadan önce sor */ belirsiz?: boolean }
+interface LokSonuc { puan: number | null; oran: number; kademe: LokasyonKademe; mesafeM: number | null; aciklama: string; /** portföyün mahallesi bilinmiyor → sunmadan önce sor */ belirsiz?: boolean; /** v3.22 — portföy talebin hariç tuttuğu yerde */ haric?: boolean }
 const kmYaz = (m: number) => (m < 950 ? `${Math.max(100, Math.round(m / 100) * 100)} m` : `${(m / 1000).toFixed(1).replace(".", ",")} km`);
 
 /**
  * v3.11 — konum uyumu. Talebin her bölgesi için portföyün (birincil) konumuna bakılır, en iyisi alınır.
  * Sıra: tam istenen yer → mahalle komşuluğu / mesafesi (sınır verisi varsa) → eski ilçe kuralı (veri yoksa).
  */
-function lokasyonPuani(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBaglami, A: ModelAyar, esnek: boolean): LokSonuc {
+function lokasyonPuani(t0: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBaglami, A: ModelAyar, esnek: boolean): LokSonuc {
   const L = A.lok;
   const pl = p.lokasyonlar.find((l) => l.birincil) ?? p.lokasyonlar[0];
   if (!pl) return { puan: 0, oran: L.ilGeneli, kademe: "BILINMIYOR", mesafeM: null, aciklama: "Portföyün konumu girilmemiş" };
+  // v3.22 — hariç tutulan bölge: "Hurma, Sarısu HARİÇ" → Hurma'daki portföy "bölge esnek" denmiş olsa da elenir
+  const h = haricteMi(pl, haricLok(t0.lokasyonlar), b.altBolgeMahalleleri);
+  if (h) {
+    const ad = (h.mahalleId && b.mahalleAdi?.(h.mahalleId)) || null;
+    return { puan: null, oran: 0, kademe: "DISINDA", mesafeM: null, aciklama: `Talepte hariç tutulan bölge${ad ? ` · ${ad}` : ""}`, haric: true };
+  }
+  const t = { ...t0, lokasyonlar: arananLok(t0.lokasyonlar) };
   if (!t.lokasyonlar.length) return { puan: 0, oran: L.ilGeneli, kademe: "IL_GENELI", mesafeM: null, aciklama: "Talepte bölge sınırı yok (il geneli)" };
   // v3.10 — Türkiye geneli: talep başka bir ilde arıyorsa o ilin dışındaki portföy "bölge dışı"dır
   const tIller = new Set(t.lokasyonlar.map((l) => l.ilId).filter(Boolean));
@@ -382,7 +400,8 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   const lokKritik = !esnek.has("LOKASYON");
   const lok = lokasyonPuani(t, p, b, A, !lokKritik);
   const kritikEngeller = satirlar.filter((s) => s.kritik && s.sonuc === "SAGLANMADI").map((s) => s.etiket);
-  if (lok.puan == null && lokKritik) kritikEngeller.push("Lokasyon");
+  if (lok.haric) kritikEngeller.push("Hariç tutulan bölge");
+  else if (lok.puan == null && lokKritik) kritikEngeller.push("Lokasyon");
   const bilinmeyenKritikler = satirlar.filter((s) => s.kritik && s.sonuc === "BILINMIYOR").map((s) => s.etiket);
   const talepEksikleri = dna.eksik.filter((e) => e.oldurucu && e.kriter !== "LOKASYON").map((e) => e.etiket);
 
@@ -410,10 +429,14 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   // Yalnızca ilçe + fiyat gibi çok az alan karşılaştırıldıysa skor yine de kesin görünmesin (eski v3.17 tavanı, çifte sayım olmadan)
   const olculen = bilesenler.filter((x) => x.puan != null && !eksikCekirdek.includes(x)).length;
   if (veriEksikleri.length && olculen < 3) skor = Math.min(skor, 100 - EKSIK_VERI_CEZASI * (3 - olculen) * 2);
+  const fiyatSatiri = satirlar.find((s) => s.anahtar === "fiyat");
   const fiyatKarsilastirilamadi = eksikCekirdek.some((x) => x.kod === "FIYAT");
+  // v3.22 — bütçe / fiyat bilinmiyorsa skor tavanı (bkz. FIYATSIZ_CARPAN)
+  const fiyatBilinmiyor = fiyatKarsilastirilamadi || fiyatSatiri?.sonuc === "BILINMIYOR";
   const cekirdekKosullu = fiyatKarsilastirilamadi || eksikCekirdek.length >= 2;
 
   skor -= 5 * talepEksikleri.length; // talepte öldürücü bilgi eksikse skor "kesin" görünmesin
+  if (fiyatBilinmiyor) skor = Math.round(skor * FIYATSIZ_CARPAN);
   skor = Math.max(0, Math.min(100, skor));
 
   const uygunluk: Uygunluk = kritikEngeller.length ? "UYGUN_DEGIL"

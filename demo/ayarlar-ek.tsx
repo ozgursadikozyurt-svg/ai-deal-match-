@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Demo — Ayarlar ekranının v3.10 bölümleri: Yapay zekâ, Portföy paylaşım imzası, Çalışma ili.
  * Sunucu karşılığı: GET/PUT /api/ayarlar, POST /api/ai/dene. API anahtarı ekrana yazılmaz (sunucuda AI_API_KEY).
  */

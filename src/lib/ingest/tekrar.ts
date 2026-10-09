@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Toplu girişte "Zaten var" kontrolü — talepler dahil.
  *  - Portal ilanı: ilan no / bağlantı (en güçlü kanıt).
  *  - Talep (ve bağlantısız portföy): aynı kişi + tip + mülk tipi + işlem + oda + bütçe/fiyat + m² + konum anahtarı.
@@ -12,7 +12,7 @@ const oda = (o?: string | null) => (o ?? "").toLowerCase().replace(/\s+/g, "");
 export interface TekrarVeri {
   tip: string; mulkTipi: string; islemTipi: string; odaSayisi?: string | null;
   fiyat?: number | null; minFiyat?: number | null; maxFiyat?: number | null; m2?: number | null; minM2?: number | null; maxM2?: number | null;
-  lokasyonlar: { ilceId?: number | null; mahalleId?: number | null; altBolgeId?: number | null }[];
+  lokasyonlar: { ilceId?: number | null; mahalleId?: number | null; altBolgeId?: number | null; haric?: boolean }[];
   portalIlanNo?: string | null; portalUrl?: string | null; gondeTelefon?: string | null; hamMetin?: string | null;
 }
 /**
@@ -25,7 +25,7 @@ export function tekrarAnahtarlari(v: TekrarVeri, kisiAdi?: string | null, komsu 
   if (v.portalUrl) a.push("url:" + v.portalUrl.replace(/^https?:\/\/(www\.)?/, "").replace(/[?#].*$/, "").replace(/\/$/, ""));
   const ad = n(kisiAdi);
   const tel = (v.gondeTelefon ?? "").replace(/\D/g, "").slice(-10);
-  const lok = [...new Set(v.lokasyonlar.map((l) => (l.altBolgeId ? "a" + l.altBolgeId : l.mahalleId ? "m" + l.mahalleId : l.ilceId ? "i" + l.ilceId : "il")))].sort().join(",");
+  const lok = [...new Set(v.lokasyonlar.map((l) => (l.haric ? "x" : "") + (l.altBolgeId ? "a" + l.altBolgeId : l.mahalleId ? "m" + l.mahalleId : l.ilceId ? "i" + l.ilceId : "il")))].sort().join(",");
   const fiyatlar = komsu ? [-1, 0, 1] : [0];
   const govdeler = fiyatlar.map((k) => [v.tip, v.mulkTipi, v.islemTipi, oda(v.odaSayisi), kova(v.fiyat ?? v.maxFiyat, 1.03, k), kova(v.minFiyat, 1.03), kova(v.m2 ?? v.minM2, 1.05), kova(v.maxM2, 1.05), lok].join("|"));
   // Kişi kimliği: ad VE telefon ayrı ayrı anahtar olur (aynı kişi farklı yazılmış adla / aynı ad farklı telefonla da bulunur)

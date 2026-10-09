@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * v3.2 — veritabanı gerektirmeyen testler: konum çözücü düzeltmeleri, eşleştirme önizlemesi, demo örnek verisi.
  * Çalıştır: npx tsx --test tests/v32-demo.test.ts
  */

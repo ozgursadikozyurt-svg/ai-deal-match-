@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Bağlantı anahtarlarının (Google yenileme anahtarı) veritabanında şifreli saklanması — AES-256-GCM.
  * Anahtar: ENTEGRASYON_SIFRE_ANAHTARI (32 bayt, base64; `openssl rand -base64 32`). v3.21: tanımlı değilse
  * SUPABASE_SERVICE_ROLE_KEY (yoksa DATABASE_URL) üzerinden türetilir — ayrı bir değişken girmek zorunlu değildir.

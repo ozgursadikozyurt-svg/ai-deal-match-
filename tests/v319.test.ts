@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026 Anahtar CRM v3.19 — puanlama (eksik veri) ve fırsat önceliği */
+ * Anahtar CRM v3.22 · 9 Ekim 2026 Anahtar CRM v3.19 — puanlama (eksik veri) ve fırsat önceliği */
 import { test } from "node:test";
 import { ac } from "./yardimci-arayuz";
 import assert from "node:assert/strict";
@@ -121,15 +121,15 @@ const cizUI = (el: React.ReactElement, d = durum()) => renderToStaticMarkup(Reac
 
 test("eşleşmeler ekranı: fırsat seçici + kademe filtresi + toplu kopar menüsü; kartlarda fırsat rozeti ve anahtar", async () => {
   const h = cizUI(React.createElement(Eslesmeler));
-  assert.match(h, /<small>Fırsat önceliği<\/small>/);
+  assert.match(h, /<small>Fırsat<\/small>/); // v3.22: dört seçici tek satıra sığsın diye kısa ad
   assert.match(h, /pill firsat/); assert.match(h, /anahtar-btn/);
   // v3.21.2 — kademeler ve toplu işlemler artık açılır menülerde
   const a = await ac(React.createElement(Eslesmeler), { d: durum(), guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, geri: () => {}, geriVar: false, sample: null } as Ctx);
-  await a.tikla(a.qa(".hs-btn")[1]);
+  await a.tikla(a.qa(".hs-satir .hs-btn")[1]);
   const kademeler = a.qa(".hs-menu .hs-oge").map((x) => x.textContent ?? "").join("|");
   assert.match(kademeler, /Öncelikli/); assert.match(kademeler, /Normal/); assert.match(kademeler, /Düşük/);
   assert.ok(a.qa(".hs-menu .hs-oge .hs-n").length >= 4, "her kademenin adedi görünür");
-  await a.tikla(a.qa(".hs-btn")[1]); // kapat
+  await a.tikla(a.qa(".hs-satir .hs-btn")[1]); // kapat
   await a.tikla(a.q(".hs-btn.ikon"));
   assert.match(a.metin(), /Listedekilerin tümünü kopar \(\d+\)/);
   await a.tikla(a.dugme("Seç"));

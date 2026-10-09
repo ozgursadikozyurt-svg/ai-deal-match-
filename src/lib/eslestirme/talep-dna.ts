@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * TALEP DNA'SI — bir talebin eşleştirmeden önce çıkarılan "genetiği":
  *  - Aciliyet
  *  - Kritik (öldürücü) kriterler: karşılanmazsa portföy UYGUN_DEGIL
@@ -74,7 +74,7 @@ export interface DnaGirdi {
   m2ToleransYuzde?: number | null;
   odaSayisi?: string | null;
   krediyeUygun?: boolean | null;
-  lokasyonlar: { ilceId?: number | null; mahalleId?: number | null; altBolgeId?: number | null }[];
+  lokasyonlar: { ilceId?: number | null; mahalleId?: number | null; altBolgeId?: number | null; haric?: boolean }[];
   ozellik?: Record<string, unknown> & { kritikKriterler?: string[]; esnekKriterler?: string[]; eksikBilgiler?: string[]; kullanimAmaclari?: string[] };
 }
 
@@ -103,7 +103,7 @@ export function kriterDegeri(t: DnaGirdi, k: Kriter): string | null {
   const o = (t.ozellik ?? {}) as Record<string, unknown>;
   if (k === "ALAN") return t.minM2 != null || t.maxM2 != null ? `${t.minM2 != null ? fmt(t.minM2) : "…"}–${t.maxM2 != null ? fmt(t.maxM2) : "…"} m²` : null;
   if (k === "FIYAT") return t.maxFiyat != null ? `≤ ${fmt(t.maxFiyat)}` : null;
-  if (k === "LOKASYON") { const n = t.lokasyonlar.filter((l) => l.ilceId || l.altBolgeId || l.mahalleId).length; return n ? `${n} bölge` : null; }
+  if (k === "LOKASYON") { const n = t.lokasyonlar.filter((l) => !l.haric && (l.ilceId || l.altBolgeId || l.mahalleId)).length; return n ? `${n} bölge` : null; }
   if (k === "ODA_SAYISI") return t.odaSayisi ?? null;
   if (k === "KREDI") return t.krediyeUygun ? "İstiyor" : null;
   if (k === "MULK_TIPI") return t.mulkTipi;

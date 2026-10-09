@@ -1,14 +1,14 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Demo örnek verisi — ticari kayıtlar Notion CRM'den, konut kayıtları WhatsApp grup örneklerinden türetildi (v3.3). Kişi adları ve telefonlar KURGUSALDIR.
  * Her kayıt yüklenirken gerçek doğrulamadan (KayitCreateSchema) ve gerçek konum çözücüden geçer;
  * geçemeyen kayıt ekranda "örnek veri hatası" olarak görünür (şema değişince erken uyarı).
  */
 import type { KayitCreateInput } from "../src/lib/validation/kayit";
 
-export type OrnekKayit = Omit<KayitCreateInput, "lokasyonlar"> & { oid: string; gunOnce: number };
+export type OrnekKayit = Omit<KayitCreateInput, "lokasyonlar"> & { oid: string; gunOnce: number; /** v3.22 — talepte hariç tutulan yerler */ haricHam?: string };
 
-export const ORNEK_VERI_SURUMU = "3.6-1";
+export const ORNEK_VERI_SURUMU = "3.22-1";
 
 export const ORNEK_PORTFOYLER: OrnekKayit[] = [
   {
@@ -91,6 +91,19 @@ export const ORNEK_PORTFOYLER: OrnekKayit[] = [
     lokasyonHam: "Döşemealtı", veriKanali: "MANUEL", ilanSahibiTipi: "MUTEAHHIT", gondeAdi: "Örnek İnşaat (örnek)", gondeTelefon: "+905550000113",
     baslik: "Döşemealtı müstakil havuzlu villa", hamMetin: "Döşemealtı'nda 700 m2 arsa içinde 320 m2 5+2 müstakil villa, özel havuz, yerden ısıtma, sıfır. 24.5 milyon",
     ozellik: { arsaAlanM2: 700, banyoSayisi: 4, binaYasi: 0, isinmaTipi: "YERDEN_ISITMA", havuz: true, bahce: true, otoparkDurumu: "KAPALI", dubleks: true, iskan: true },
+  },
+  // ── v3.22: danışmanın KENDİ portföyü (imzadaki telefonla gruptan gelmiş) ve ofis arkadaşının portföyü ──
+  {
+    oid: "P14", kayitGrubu: "EMLAK BORSASI", gunOnce: 2, tip: "PORTFOY", mulkTipi: "DAIRE", islemTipi: "SATILIK", fiyat: 8200000, m2: 150, netM2: 130, odaSayisi: "3+1", krediyeUygun: true,
+    lokasyonHam: "Konyaaltı / Liman", veriKanali: "WHATSAPP", ilanSahibiTipi: "EMLAKCI", gondeAdi: "Özgür Özyurt", gondeTelefon: "+905309365427", gondeSirket: "Özyurtlar Gayrimenkul",
+    baslik: "Liman 3+1 denize yürüme mesafesinde", hamMetin: "Konyaaltı Liman'da denize 5 dk, 3+1, 150 m2 brüt, site içinde, krediye uygun, 3. kat. 8.2 milyon. Yetkili portföyümüzdür.",
+    ozellik: { banyoSayisi: 2, bulunduguKat: 3, katSayisi: 5, binaYasi: 4, isinmaTipi: "DOGALGAZ_KOMBI", siteIcinde: true, asansor: true, balkon: true, iskan: true },
+  },
+  {
+    oid: "P15", gunOnce: 6, tip: "PORTFOY", mulkTipi: "DUKKAN_MAGAZA", islemTipi: "KIRALIK", fiyat: 55000, fiyatPeriyodu: "AYLIK", m2: 120,
+    lokasyonHam: "Muratpaşa / Fener", veriKanali: "WHATSAPP", ilanSahibiTipi: "EMLAKCI", gondeAdi: "Selin Y. (örnek)", gondeTelefon: "+905550000115", gondeSirket: "Özyurtlar Gayrimenkul",
+    baslik: "Fener cadde üstü kiralık dükkan", hamMetin: "Fener'de cadde üstü 120 m2 kiralık dükkan, vitrinli, zemin kat. Aylık 55.000",
+    ozellik: { vitrin: true },
   },
 ];
 
@@ -176,5 +189,17 @@ export const ORNEK_TALEPLER: OrnekKayit[] = [
     ilanSahibiTipi: "EMLAKCI", musteriKaynagi: "WHATSAPP_GRUBU", lokasyonHam: "Aksu, Kepez", gondeAdi: "Emlak danışmanı Burak (örnek)", gondeTelefon: "+905550000213",
     baslik: "E-ticaret deposu 2500–4000 m²", hamMetin: "E-ticaret firması için Aksu veya Kepez'de 2500-4000 m2 kiralık depo, TIR girmeli, en az 150 kW elektrik. 500 bine kadar",
     ozellik: { aracErisimi: "TIR", elektrikGucuKw: 150, kullanimAmaclari: ["E_TICARET"], kritikKriterler: ["ARAC_ERISIMI"] },
+  },
+  // ── v3.22: "HARİÇ" — Hurma ve Sarısu istenmiyor; Konyaaltı'nın geri kalanı olur. P11 (Hurma) elenir, P14 (Liman) gelir. ──
+  {
+    oid: "T14", kayitGrubu: "EMLAK BORSASI", gunOnce: 1, tip: "TALEP", mulkTipi: "DAIRE", islemTipi: "SATILIK", maxFiyat: 8500000, minM2: 130, odaSayisi: "3+1",
+    ilanSahibiTipi: "BILINMIYOR", musteriKaynagi: "WHATSAPP_GRUBU", lokasyonHam: "Konyaaltı", haricHam: "Hurma, Sarısu", gondeAdi: "Doğrudan müşteri (örnek)", gondeTelefon: "+905550000214",
+    baslik: "Konyaaltı (Hurma, Sarısu hariç) 3+1 daire — satılık talebi", hamMetin: "Hurma, Sarısu HARİÇ Konyaaltı'nda 3+1 en az 130 m2 satılık daire arıyorum, 8.5 milyona kadar",
+  },
+  // ── v3.22: bütçesi yazılmamış talep — skor en fazla ~65 (fiyat karşılaştırılamaz) ──
+  {
+    oid: "T15", gunOnce: 2, tip: "TALEP", mulkTipi: "DAIRE", islemTipi: "SATILIK", minM2: 120, odaSayisi: "3+1",
+    ilanSahibiTipi: "BILINMIYOR", musteriKaynagi: "REFERANS", lokasyonHam: "Konyaaltı", gondeAdi: "Referans müşteri (örnek)", gondeTelefon: "+905550000215",
+    baslik: "Konyaaltı 3+1 daire — bütçe yazmamış", hamMetin: "Konyaaltı'nda 3+1 en az 120 m2 daire bakıyoruz",
   },
 ];

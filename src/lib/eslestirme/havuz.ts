@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * HAVUZ AKIŞI — bir talep için portföyler hangi sırayla aranır / sunulur:
  *   1. Yetkili portföy   — yetki belgeli kendi portföyünüz (komisyon garantili, hemen sunulur)
  *   2. CRM portföyü      — sizin kaydınız, malike doğrudan ulaşırsınız ama yetki yok (önce yetki alın)

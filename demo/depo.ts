@@ -1,10 +1,12 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.22 · 9 Ekim 2026 (v3.13'ten)
  * Demo veri deposu: örnek veriyi gerçek doğrulama + konum çözücüden geçirerek yükler,
  * kullanıcının değişikliklerini tarayıcıda (localStorage) saklar.
  */
 import type { FotoMeta } from "../src/lib/domain/foto";
 import { aiAyarNormalize, paylasimNormalize, calismaIliNormalize, type AiAyar, type PaylasimAyar } from "../src/lib/domain/ayarlar";
+import { sahiplikNormalize, type SahiplikAyar } from "../src/lib/domain/sahiplik";
+import { haricBirlestir } from "../src/lib/lokasyon/haric";
 import { KayitCreateSchema, type KayitCreateData } from "../src/lib/validation/kayit";
 import { adaylariGuncelle, type KonumAdayi } from "../src/lib/lokasyon/ogrenme";
 import type { WaMesaj, GrupOzeti } from "../src/lib/ingest/whatsapp";
@@ -73,7 +75,7 @@ export interface DepoDurumu {
   testler: Record<string, boolean>;
   geriBildirim: string;
   /** v3.10: ai (sağlayıcı, eşik…), paylasim (föy imzası), calismaIli — eski kayıtlarda yoksa varsayılan okunur (ayarOf) */
-  ayarlar: { ttl: TtlAyar; ai?: AiAyar; paylasim?: PaylasimAyar; calismaIli?: number };
+  ayarlar: { ttl: TtlAyar; ai?: AiAyar; paylasim?: PaylasimAyar; calismaIli?: number; /** v3.22 — Benim ve ofisim */ sahiplik?: SahiplikAyar };
   ogrenilen: Alias[];
   adaylar: KonumAdayi[];
   aktifIceAktarma: IceAktarma | null;
@@ -173,9 +175,11 @@ export function ornekVeriyiKur(): { kayitlar: Kayit[]; hatalar: OrnekHata[]; ada
   const hatalar: OrnekHata[] = [];
   let adaylar: KonumAdayi[] = [];
   for (const o of [...ORNEK_PORTFOYLER, ...ORNEK_TALEPLER]) {
-    const { oid, gunOnce, ...girdi } = o;
+    const { oid, gunOnce, haricHam, ...girdi } = o;
     const r = coz(girdi.lokasyonHam ?? "");
-    const lok = cozulenToKayitLok(r.lokasyonlar, girdi.tip === "PORTFOY").map(({ etiket, seviye, ...l }) => l);
+    const lok0 = cozulenToKayitLok(r.lokasyonlar, girdi.tip === "PORTFOY").map(({ etiket, seviye, ...l }) => l);
+    // v3.22 — "Hurma, Sarısu HARİÇ": hariç satırları
+    const lok = haricHam ? haricBirlestir(lok0, cozulenToKayitLok(coz(haricHam).lokasyonlar, false).map(({ etiket, seviye, ...l }) => l)) : lok0;
     const olusturma = new Date(BUGUN.getTime() - gunOnce * GUN);
     const whatsapp = girdi.veriKanali === "WHATSAPP" || !!girdi.kayitGrubu;
     // Gönderen → Kişiler (telefonla tekil)
@@ -202,15 +206,18 @@ export function ornekVeriyiKur(): { kayitlar: Kayit[]; hatalar: OrnekHata[]; ada
 
 const ANAHTAR = "anahtar-ai-demo";
 
-const ayarlariOku = (a: any): DepoDurumu["ayarlar"] => ({ ttl: ttlNormalize(a?.ttl), ai: aiAyarNormalize(a?.ai), paylasim: paylasimNormalize(a?.paylasim), calismaIli: calismaIliNormalize(a?.calismaIli) });
+/** v3.22 — demoda ofis örneği: "Özyurtlar Gayrimenkul" adıyla gelen kayıtlar "Ofisim" sayılır (canlıda boş başlar) */
+export const DEMO_SAHIPLIK = { ofisAdlar: ["Özyurtlar Gayrimenkul"] };
+const ayarlariOku = (a: any): DepoDurumu["ayarlar"] => ({ ttl: ttlNormalize(a?.ttl), ai: aiAyarNormalize(a?.ai), paylasim: paylasimNormalize(a?.paylasim), calismaIli: calismaIliNormalize(a?.calismaIli), sahiplik: sahiplikNormalize(a?.sahiplik ?? DEMO_SAHIPLIK) });
 /** Ayarları varsayılanlarıyla okur (testlerde ve eski kayıtlarda alanlar eksik olabilir) */
 export const aiAyari = (d: DepoDurumu): AiAyar => aiAyarNormalize(d.ayarlar.ai);
 export const paylasimAyari = (d: DepoDurumu): PaylasimAyar => paylasimNormalize(d.ayarlar.paylasim);
 export const calismaIli = (d: DepoDurumu): number => calismaIliNormalize(d.ayarlar.calismaIli);
+export const sahiplikAyari = (d: DepoDurumu): SahiplikAyar => sahiplikNormalize(d.ayarlar.sahiplik);
 
 function bosDurum(): { durum: DepoDurumu; hatalar: OrnekHata[] } {
   const { kayitlar, hatalar, adaylar, kisiler } = ornekVeriyiKur();
-  return { durum: { veriSurumu: ORNEK_VERI_SURUMU, kayitlar, eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN }, ogrenilen: [], adaylar, aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleHaric: [], googleGiden: [] }, hatalar };
+  return { durum: { veriSurumu: ORNEK_VERI_SURUMU, kayitlar, eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN, sahiplik: sahiplikNormalize(DEMO_SAHIPLIK) }, ogrenilen: [], adaylar, aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleHaric: [], googleGiden: [] }, hatalar };
 }
 
 export function depoYukle(): { durum: DepoDurumu; hatalar: OrnekHata[]; yenilendi: boolean } {

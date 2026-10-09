@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Demo — eşleşme kartı, eşleştirme tercihleri (eski "Talep DNA" kartı), kapatılabilir bilgi kutusu.
  */
 import React, { useState } from "react";
@@ -7,6 +7,9 @@ import { talepDnasi } from "../src/lib/eslestirme/talep-dna";
 import { kopmaEtiket } from "../src/lib/eslestirme/kopar";
 import { etiket } from "./etiketler";
 import { useDepo, Pill, IslemPill, UYGUNLUK, baslikOf, fiyatOf, m2Of, lokEtiket, eKey, type Eslesme } from "./ortak";
+import { konumOzeti } from "./lokasyon";
+import { useSahiplik, SahiplikRozeti } from "./sahiplik";
+import { KapakKucuk } from "./fotograflar";
 import { EksikUyarisi } from "./motor-ui";
 import { AnahtarDugmesi, favEslesme } from "./favori";
 import { KimPill, KoparDugmesi } from "./kopar";
@@ -58,12 +61,14 @@ export function EslesmeKarti({ e, sec }: { e: Eslesme; sec?: { acik: boolean; de
   const not = d.eslesmeNotlari[eKey(e.t.id, e.p.id)];
   const u = UYGUNLUK[e.s.uygunluk as keyof typeof UYGUNLUK];
   const kopuk = not?.durum === "REDDEDILDI";
+  const sahip = useSahiplik(); // v3.22 — ★ Benim / ◆ Ofisim
   const ac = () => git({ ad: "eslesme", tid: e.t.id, pid: e.p.id });
-  const konum = (v: any) => (v.lokasyonlar ?? []).slice(0, 2).map(lokEtiket).map((s: string) => s.split(" / ").pop()).join(", ") + ((v.lokasyonlar ?? []).length > 2 ? ` +${v.lokasyonlar.length - 2}` : "");
+  const konum = (v: any) => konumOzeti(v.lokasyonlar ?? [], 2); // v3.22: "Konyaaltı (Hurma, Sarısu hariç)"
   const Taraf = ({ k, ad }: { k: any; ad: "Talep" | "Portföy" }) => (
     <div className={"es2-taraf " + (ad === "Talep" ? "t" : "p")}>
-      <div className="es2-et"><span>{ad}</span><KimPill v={k.veri} />{ad === "Portföy" && e.s.tipUyumu.oran < 0.9 && <span className="benzer-rozet">benzer tip</span>}</div>
-      <div className="es2-bas">
+      <div className="es2-et"><span>{ad}</span><SahiplikRozeti s={sahip(k.veri).tur} /><KimPill v={k.veri} />{ad === "Portföy" && e.s.tipUyumu.oran < 0.9 && <span className="benzer-rozet">benzer tip</span>}</div>
+      <div className={"es2-bas" + (ad === "Portföy" && (k.fotolar?.length ?? 0) > 0 ? " fotolu" : "")}>
+        {ad === "Portföy" && <KapakKucuk k={k} boyut={52} />}
         <b>{baslikOf(k.veri)}</b>
         <span className="es2-rakam">{fiyatOf(k.veri)}</span>
       </div>

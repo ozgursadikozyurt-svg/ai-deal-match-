@@ -2801,7 +2801,8 @@ export const KayitLokasyonScalarFieldEnum = {
   mahalleId: 'mahalleId',
   altBolgeId: 'altBolgeId',
   birincil: 'birincil',
-  sira: 'sira'
+  sira: 'sira',
+  haric: 'haric'
 } as const
 
 export type KayitLokasyonScalarFieldEnum = (typeof KayitLokasyonScalarFieldEnum)[keyof typeof KayitLokasyonScalarFieldEnum]
@@ -2812,6 +2813,7 @@ export const KayitScalarFieldEnum = {
   ofisId: 'ofisId',
   sahipKullaniciId: 'sahipKullaniciId',
   gorunurluk: 'gorunurluk',
+  isaret: 'isaret',
   tip: 'tip',
   durum: 'durum',
   aciliyet: 'aciliyet',

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.2 · 8 Ekim 2026
+// Anahtar CRM v3.22 · 9 Ekim 2026
 // GET  /api/kayit?tip=TALEP&mulkTipi=DEPO_ANTREPO&minElektrikKw=50&ilceId=12,15  → filtreli liste
 // POST /api/kayit                                                                → yeni portföy/talep
 import { prisma } from "@/lib/db";

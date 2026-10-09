@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.2 · 8 Ekim 2026
+// Anahtar CRM v3.22 · 9 Ekim 2026
 // POST /api/davet/kabul { kod } → daveti kabul eder, kullanıcıyı o ofiste açar.
 // Bu rota ofis bağlamı GEREKTİRMEZ (kişinin henüz bir ofisi yoktur) ama giriş yapmış olmak şarttır:
 // e-posta doğrulanmış oturum anahtarından gelir, istekten değil. Akış src/canli/worker.ts'te.

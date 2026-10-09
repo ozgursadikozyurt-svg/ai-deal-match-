@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Demo — Akıllı giriş kutusu ("Anahtar AI"). Ana sayfanın en üstünde ve Veri girişi › Yapıştır'da aynı bileşen.
  *   1) Metin önce yorumlanır (src/lib/ai/yorumlayici.ts): portal ilan sayfası, WhatsApp sohbet dökümü, toplu liste,
  *      tek talep / ilan, yalnızca bağlantı, kişi / telefon ya da soru.
@@ -19,7 +19,8 @@ import { eslesmeOnizle, temelUyum, type OnizlemeSonucu } from "../src/lib/eslest
 import { havuzKatmani, portfoyEdinmeFirsati } from "../src/lib/eslestirme/havuz";
 import { metinParmakIzi } from "../src/lib/ingest/whatsapp";
 import { etiket, VERI_KANALI_ETIKET } from "./etiketler";
-import { BAGLAM, INDEKS, coz, cozulenToKayitLok, calismaIliOku, ilAdiOf, type KonumOnerisi } from "./lokasyon";
+import { BAGLAM, INDEKS, coz, cozulenToKayitLok, calismaIliOku, ilAdiOf, konumOzeti, type KonumOnerisi } from "./lokasyon";
+import { haricBirlestir } from "../src/lib/lokasyon/haric";
 import { BUGUN, varsayilanValidUntil, yeniId, kayitliMetinIzleri, kisiRolleriOf, aiAyari, type Kayit, type Veri } from "./depo";
 import { useDepo, cx, Pill, IslemPill, Skor, UYGUNLUK, baslikOf, fiyatOf, m2Of, oneCikanlar, lokEtiket, aiJson, telYaz, type Ekran } from "./ortak";
 import { hafizaBaslat, useKalici } from "./hafiza";
@@ -39,11 +40,21 @@ export function konumOnerileri(ifadeler: string[]): KonumOnerisi[] {
 }
 
 /** Hızlı ayrıştırıcı + (varsa) yapay zekâ kaydı → form taslağı */
-export function taslakYap(metin: string, h: HizliSonuc, ai: any | null): { taslak: any; cozulemeyen: string[] } {
-  const ifadeler = ai?.lokasyonIfadeleri?.length ? ai.lokasyonIfadeleri : konumBul(metin, INDEKS);
-  const r = coz(ifadeler);
+export function taslakYap(metin: string, h: HizliSonuc, ai: any | null, haricIfadeler?: string[]): { taslak: any; cozulemeyen: string[] } {
   const tip = ai?.tip ?? h.tip ?? "PORTFOY";
   const talep = tip === "TALEP";
+  // v3.22 — "Hurma, Sarısu HARİÇ": hariç denilen yerler aranan bölge olmaz; talepte hariç satırı olarak yazılır ve
+  // ilçesi (Konyaaltı) aranan bölge olarak eklenir. Eskiden konum kalmayınca metindeki tüm yer adları yeniden okunup
+  // Hurma ARANAN bölge yapılıyordu.
+  const haricIf: string[] = (haricIfadeler ?? ai?.haricKonumlar ?? []).filter(Boolean);
+  const rh = haricIf.length ? coz(haricIf) : { lokasyonlar: [], cozulemeyen: [] };
+  const haricAnahtar = new Set(rh.lokasyonlar.map((l) => `${l.ilceId}|${l.mahalleId}|${l.altBolgeId}`));
+  const ifadeler: string[] = ai?.lokasyonIfadeleri?.length ? ai.lokasyonIfadeleri : konumBul(metin, INDEKS).filter((x) => !haricIf.some((hh) => hh.toLocaleLowerCase("tr") === x.toLocaleLowerCase("tr")));
+  const r0 = coz(ifadeler);
+  const r = { ...r0, lokasyonlar: r0.lokasyonlar.filter((l) => !haricAnahtar.has(`${l.ilceId}|${l.mahalleId}|${l.altBolgeId}`)) };
+  const lokasyonlar = (talep && rh.lokasyonlar.length
+    ? haricBirlestir(cozulenToKayitLok(r.lokasyonlar, false), cozulenToKayitLok(rh.lokasyonlar, false))
+    : cozulenToKayitLok(r.lokasyonlar, !talep)).map(({ etiket, seviye, ...l }: any) => l);
   const ozellik = { ...h.ozellik, ...(ai?.ozellik ?? {}) } as any;
   if (talep && h.m2Esnek) ozellik.esnekKriterler = [...new Set([...(ozellik.esnekKriterler ?? []), "ALAN"])];
   const { lokasyonIfadeleri, kisiAdi, telefon, firma, mesajNo, ozet, ...aiGeri } = ai ?? {};
@@ -53,7 +64,7 @@ export function taslakYap(metin: string, h: HizliSonuc, ai: any | null): { tasla
     ...(talep ? { maxFiyat: h.maxFiyat ?? h.fiyat, minM2: h.minM2 ?? h.m2, maxM2: h.maxM2, m2ToleransYuzde: h.m2Esnek ? 20 : undefined } : { fiyat: h.fiyat, m2: h.m2 ?? h.minM2 }),
     fiyatPeriyodu: h.fiyatPeriyodu ?? "TOPLAM", odaSayisi: h.odaSayisi ?? undefined,
     ...aiGeri, ozellik,
-    lokasyonlar: cozulenToKayitLok(r.lokasyonlar, !talep).map(({ etiket, seviye, ...l }) => l), lokasyonHam: ifadeler.join(", "),
+    lokasyonlar, lokasyonHam: [ifadeler.join(", "), haricIf.length && talep ? `${haricIf.join(", ")} hariç` : ""].filter(Boolean).join(" · "),
     gondeAdi: kisiAdi ?? h.kisiAdi ?? null, gondeTelefon: telefon ?? h.telefon, gondeSirket: firma ?? h.sirket,
     ilanSahibiTipi: ai?.ilanSahibiTipi && ai.ilanSahibiTipi !== "BILINMIYOR" ? ai.ilanSahibiTipi : h.ilanSahibiTipi ?? "BILINMIYOR",
     veriKanali: kanal,
@@ -61,7 +72,7 @@ export function taslakYap(metin: string, h: HizliSonuc, ai: any | null): { tasla
     // WhatsApp / emlakçı kaynaklı ya da sahibi belli olmayan kayıtlar partner havuzuna düşer, kullanıcı isterse formda değiştirir.
     havuz: talep ? "KENDI_PORTFOY" : h.portal ? "DIS_ILAN" : (ai?.ilanSahibiTipi ?? h.ilanSahibiTipi) === "MALIK" ? "KENDI_PORTFOY" : kanal === "MANUEL" ? "KENDI_PORTFOY" : "PARTNER",
     portalUrl: h.portalUrl ?? undefined, portalIlanNo: h.ilanNo ?? undefined,
-    hamMetin: metin, baslik: (ozet ? String(ozet) : ozetYaz(h, r.lokasyonlar.map((l) => l.etiket), talep)).slice(0, 160),
+    hamMetin: metin, baslik: (ozet ? String(ozet) : ozetYaz(h, talep && rh.lokasyonlar.length ? [konumOzeti(lokasyonlar)] : r.lokasyonlar.map((l) => l.etiket), talep)).slice(0, 160),
     // v3.17 — jargon sözlüğünden çıkan kayıt alanları (krediye uygun, takasa açık) ve karşılığı olmayan jargon notları
     ...(h.kayitAlanlari ?? {}),
     ...(h.jargonNotlari?.length ? { operasyonNotu: [aiGeri?.operasyonNotu, ...h.jargonNotlari].filter(Boolean).join(" · ").slice(0, 2000) } : {}),
@@ -94,7 +105,7 @@ export function satirKur(p: YorumParca, y: Yorum, secim: TipSecimi, d: any, izle
   const h = { ...p.h };
   h.tip = secim !== "OTO" ? secim : aiKayit?.tip ?? (p.altTur === "TOPLU_LISTE" && y.tipIpucu ? y.tipIpucu : h.tip);
   const ai = aiKayit ? { ...aiKayit, tip: h.tip } : { lokasyonIfadeleri: p.konumlar, ...p.ek, ozellik: h.ozellik };
-  const { taslak, cozulemeyen } = taslakYap(p.metin, h, ai);
+  const { taslak, cozulemeyen } = taslakYap(p.metin, h, ai, p.haricKonumlar);
   const talep = taslak.tip === "TALEP";
   if (talep) { taslak.maxFiyat ??= taslak.fiyat; taslak.minM2 ??= taslak.m2; delete taslak.fiyat; delete taslak.m2; }
   else { taslak.fiyat ??= taslak.maxFiyat; taslak.m2 ??= taslak.minM2; delete taslak.maxFiyat; delete taslak.minM2; delete taslak.maxM2; delete taslak.m2ToleransYuzde; }
@@ -129,7 +140,7 @@ export function satirKur(p: YorumParca, y: Yorum, secim: TipSecimi, d: any, izle
 
 /** Kısa, okunur başlık: "Kızıltoprak, Yenigün 3+1 daire — satılık talebi" / "Altıntaş 1+1 daire, satılık". */
 function baslikKur(t: any): string {
-  const yerler = [...new Set((t.lokasyonlar ?? []).map((l: any) => String(lokEtiket(l)).split(" / ").pop()))].slice(0, 3) as string[];
+  const yerler = (t.lokasyonlar ?? []).some((l: any) => l.haric) ? [konumOzeti(t.lokasyonlar)] : [...new Set((t.lokasyonlar ?? []).map((l: any) => String(lokEtiket(l)).split(" / ").pop()))].slice(0, 3) as string[];
   const tr = (n: number) => n.toLocaleString("tr-TR");
   const tip = t.mulkTipi && t.mulkTipi !== "DIGER" ? String(etiket(t.mulkTipi)).toLocaleLowerCase("tr") : "";
   const islem = t.islemTipi ? String(etiket(t.islemTipi)).toLocaleLowerCase("tr") : "";

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.2 · 8 Ekim 2026
+// Anahtar CRM v3.22 · 9 Ekim 2026
 // POST /api/ingest/islenmis { ingestionId, mesajlar: [{ metin, grup, tarih }], kayitSayisi? }
 // Yapay zekâya gönderilen mesajları işaretler; aynı mesaj bir daha gönderilmez.
 import { z } from "zod";

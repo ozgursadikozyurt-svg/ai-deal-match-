@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * v3.16 — her ekranda geri, kişi rolüne göre filtre, eşleşmelerde işlem tipi, kaynak otomasyonu, geri sayımın kayıt gününden başlaması.
  */
 import { test } from "node:test";
@@ -39,7 +39,7 @@ test("eşleşmeler ekranı: işlem tipi seçicisi var (v3.21.2: tek satırlık a
   assert.ok(!h.includes("Filtre neye uygulansın"));
   assert.ok(!h.includes("Portföy tarafı"));
   const a = await ac(React.createElement(Eslesmeler), ctx());
-  await a.tikla(a.qa(".hs-btn")[0]); // İşlem seçicisini aç
+  await a.tikla(a.qa(".hs-satir .hs-btn")[0]); // İşlem seçicisini aç (v3.22: ⋯ başlıkta, seçiciler satırda)
   const secenekler = a.qa(".hs-menu .hs-oge").map((x) => x.textContent ?? "").join("|");
   for (const x of ["Tümü", "Satılık", "Kiralık", "Devren"]) assert.ok(secenekler.includes(x), x);
   await a.kapat();

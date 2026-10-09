@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * "Portföy paylaş" — müşteriye / meslektaşa gönderilen föyün içeriği, WhatsApp metni ve PDF yazıcısı.
  * Föy, portföyü paylaşan danışmanın kendi ilanı gibi görünür: imza Ayarlar › Paylaşım imzası'ndan gelir;
  * mülk sahibinin / mesajı gönderenin adı, telefonu, firması ve grup adı föye HİÇ girmez.

@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.21.2";
-export const TARIH = "8 Ekim 2026";
+export const SURUM = "3.22";
+export const TARIH = "9 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.21.2_8Ekim2026";
+export const DOSYA_EKI = "v3.22_9Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,29 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.22",
+    tarih: "9 Ekim 2026",
+    baslik: "Benim / Ofisim işareti ve süzgeci; \"HARİÇ\" bölge eşleştirmede; bütçesiz talebin puanı düzeltildi; portföy kartında küçük fotoğraf; skor süzgeci yatay şerit",
+    degisenler: [
+      "Benim / Ofisim: kendi talep ve portföyleriniz ★ Benim, ofis arkadaşlarınızınki ◆ Ofisim rozetiyle görünür. Tanıma kendiliğinden: gönderen telefonu ya da kayda bağlı kişinin telefonu sizin telefonunuzsa (portföy paylaşım imzasındaki telefon zaten sayılır), adınız ya da ofis / firma adı geçiyorsa. Ayarlar › en üstte \"Benim ve ofisim\": başka telefonlarınızı, ofis arkadaşlarınızın telefonlarını ve firma adını ekleyin — telefon yazın ya da kişi adını yazıp Kişiler'den seçin (ad + telefon birlikte gelir). Her kaydın sayfasında \"Kimin?\" seçicisiyle elle de işaretlenir (Benim · Ofisim · Başkası · Otomatik).",
+      "Hızlı ulaşım: Ana Sayfa'da \"★ Benim ve ofisim\" kutusu (Talebim · Portföyüm · Ofisin talepleri · Ofisin portföyleri, sayılarıyla; dokununca liste o süzgeçle açılır). Talepler ve Portföyler'de tek satır çip: Tümü · ★ Benim · ◆ Ofisim · Diğer. Eşleşmeler'de \"Kimin\" seçicisi: Benim · Ofisim · Portföyüm (alıcı / kiracı arıyorum) · Talebim (mülk arıyorum).",
+      "\"HARİÇ\" artık doğru anlaşılıyor: \"Hurma, Sarısu HARİÇ\" yazan talep Konyaaltı'nın geri kalanını arar, Hurma ve Sarısu'daki portföyler kesin elenir (\"bölge esnek\" denmiş olsa da). Eskiden hariç yerler konumdan çıkınca talep \"il geneli\"ne düşüyor, hatta metindeki yer adları yeniden okunup Hurma ARANAN bölge yapılıyordu (ekran görüntüsündeki 92 puanlı Hurma eşleşmesi). Talep başlığı \"Konyaaltı (Hurma, Sarısu hariç) …\" olur; hariç konum çipi üstü çizili görünür. \"Kepez hariç\", \"… dışında\", \"… olmasın\" da aynı kural. Formda her talep konumunda \"hariç tut / dahil et\" düğmesi var; \"bölge listesini yapıştır\" alanına \"Hurma, Sarısu hariç\" yazmak da çalışır.",
+      "Bütçesiz talebin puanı: talepte bütçe (ya da portföyde fiyat) yokken bölge, oda ve m² tutunca puan 84–87'ye çıkıyordu — aynı talep bütçeyle 100 alıyordu, yani fiyatı hiç bilinmeyen eşleşme, bütçesi doğrulanmış çoğu eşleşmenin önüne geçiyordu. Artık fiyat karşılaştırılamayan eşleşmenin puanı 0,75 ile çarpılır: en iyisi 63–69'da kalır (\"Skor ≥ 70\" süzgecinin ve portföy edinme eşiği 80'in altında), Koşullu görünür, kartta \"Eksik: talepte bütçe yok\" yazar. Çarpan sırayı korur: m²'si de eksik olan daha aşağıda.",
+      "Portföy kartında küçük fotoğraf: yüklü fotoğraf varsa kartın solunda tek küçük kapak görseli (birden çoksa köşesinde adet). Talepler / Portföyler listesinde, eşleşme kartının portföy tarafında ve eşleşme ayrıntısında. Kart ekrana girince yüklenir (uzun listede yüzlerce fotoğraf birden inmez).",
+      "Skor süzgeci yeniden tasarlandı: sağ kenardaki dikey çekmece telefonda kartların ve süzgeç çiplerinin üstüne biniyordu. Artık seçici satırında dar bir \"Skor\" düğmesi var (İşlem · Fırsat · Kimin · Skor); dokununca aynı satırın üstünde sağa doğru yatay bir şerit açılır: kaydırıcı, geniş ekranda 50 · 60 · 70 · 80 · 90 hazır eşikleri, kalan eşleşme sayısı ve ✕. Listeyi örtmez, satır yüksekliği değişmez. Toplu işlemler (⋯) başlık satırına taşındı.",
+      "Veritabanı: migration 20261009100000_v322_sahiplik_haric — yalnızca ekleme (kayit.isaret, kayit_lokasyon.haric); mevcut veriye dokunmaz. Yayından sonra \"Kurulumu tamamla\" düğmesi çıkar, bir kez basılır. Örnek veri yenilendi (yeni: T14 HARİÇ talebi, T15 bütçesiz talep, P14 benim portföyüm, P15 ofis portföyü).",
+    ],
+    testEt: [
+      "Ayarlar › \"Benim ve ofisim\": kaç kaydın sizin / ofisinizin olduğu yazar. Bir kişi adı yazıp önerilerden seçin; o kişinin kayıtları ◆ Ofisim olsun.",
+      "Portföyler: üstteki \"★ Benim\" çipine basın — yalnızca sizinkiler (örnekte P14 Liman 3+1). \"◆ Ofisim\" sizinkiler + ofisinkiler (P15 Fener dükkan). Bir karta girip \"Kimin?\"den \"Başkası\" seçin, rozet kalksın; \"Otomatik\"e dönün.",
+      "Ana Sayfa: \"★ Benim ve ofisim\" kutusundan Portföyüm'e dokunun, liste Benim süzgeciyle açılsın.",
+      "Veri Girişi: \"Hurma, Sarısu HARİÇ 3+1 satılık daire arıyorum 8 milyon\" yapıştırın: başlık \"Konyaaltı (Hurma, Sarısu hariç)\", konumlarda Hurma ve Sarısu üstü çizili. Kaydedin; Hurma'daki portföy (P11) Uygun değil'e düşsün, Liman'daki (P14) gelsin. Örnek T14 talebinde de görebilirsiniz.",
+      "Bütçesiz örnek T15 talebinin eşleşmeleri 70'in altında ve Koşullu olmalı; kartta \"Eksik: talepte bütçe yok\".",
+      "Bir portföye fotoğraf ekleyin: Portföyler listesinde ve eşleşme kartında solda küçük kapak görünsün.",
+      "Eşleşmeler (telefonda): \"Skor\" düğmesine dokunun, şerit satırın üstünde yatay açılsın, kartları örtmesin; kaydırın, sayı değişsin; ✕ ile kapatın. \"Kimin\" › Portföyüm deneyin.",
+    ],
+  },
   {
     surum: "3.21.2",
     tarih: "8 Ekim 2026",

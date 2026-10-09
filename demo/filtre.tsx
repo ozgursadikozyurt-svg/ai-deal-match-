@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Demo — ortak filtre paneli (Talepler, Portföyler, Eşleşmeler, talep içi portföy çekmecesi).
  * Her alan çoklu seçim. Mülk türü seçilince o türe özel filtreler çıkar (ONEMLI_ALANLAR).
  * v3.5 — Kompakt: ekranda tek satır (arama · Acil · Filtrele rozeti) + tek satır kayan aktif çipler.
@@ -16,6 +16,8 @@ import { kalanGun, type Veri } from "./depo";
 import { useDepo, cx, KonumSecici, islemTonu, baslikOf } from "./ortak";
 import { alanTuru } from "./form";
 import { KISI_ROLLERI } from "./kisiler";
+import { sahiplikUyar, type Sahiplik, type SahiplikSuzgeci } from "../src/lib/domain/sahiplik";
+import { useSahiplik } from "./sahiplik";
 
 export interface Filtre {
   ara: string;
@@ -34,6 +36,8 @@ export interface Filtre {
   /** v3.16 — kayda bağlı kişilerin rolüne göre (Alıcı, Yatırımcı, Emlakçı…) */
   roller: string[];
   ozellik: Record<string, any>;
+  /** v3.22 — Benim · Ofisim (benim + ofis) · Diğer */
+  sahiplik?: SahiplikSuzgeci | null;
 }
 export const bosFiltre = (x: Partial<Filtre> = {}): Filtre => ({ ara: "", aileler: [], islemler: [], konumlar: [], durumlar: [], kisiler: [], kanallar: [], odalar: [], roller: [], ozellik: {}, ...x });
 const ODALAR = ["1+0", "1+1", "2+1", "3+1", "4+1", "5+"];
@@ -42,13 +46,15 @@ const DURUMLAR: [string, string][] = [["ACTIVE", "Aktif"], ["PASSIVE", "Pasif"],
 /** Konum eşleşmesi: seçilen ilçe / mahalle / alt bölge ile kaydın konumlarından biri örtüşüyor mu */
 function konumTutar(v: Veri, secim: KonumOnerisi[]): boolean {
   return secim.some((s) => v.lokasyonlar.some((l) => {
+    if (l.haric) return false; // v3.22 — hariç tutulan bölge aranan bölge sayılmaz
     if (s.lok.mahalleId) return l.mahalleId === s.lok.mahalleId || (!!l.altBolgeId && !!BAGLAM.altBolgeMahalleleri.get(l.altBolgeId)?.has(s.lok.mahalleId)) || (!l.mahalleId && !l.altBolgeId && l.ilceId === s.lok.ilceId);
     if (s.lok.altBolgeId) return l.altBolgeId === s.lok.altBolgeId || (!!l.mahalleId && !!BAGLAM.altBolgeMahalleleri.get(s.lok.altBolgeId)?.has(l.mahalleId));
     return l.ilceId === s.lok.ilceId;
   }));
 }
-export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string, kisiRol?: (id: string) => string[]): boolean {
+export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string, kisiRol?: (id: string) => string[], sahip?: (v: Veri) => Sahiplik | null): boolean {
   const o = (v.ozellik ?? {}) as any, talep = v.tip === "TALEP";
+  if (f.sahiplik && sahip && !sahiplikUyar(sahip(v), f.sahiplik)) return false; // v3.22
   if (f.ara) {
     const q = f.ara.toLocaleLowerCase("tr");
     const kisi = (v.kisiler ?? []).map((b) => kisiAd?.(b.kisiId) ?? "").join(" ");
@@ -96,7 +102,7 @@ export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string
   }
   return true;
 }
-export const aktifFiltreSayisi = (f: Filtre) => f.aileler.length + f.islemler.length + f.konumlar.length + f.durumlar.length + f.kisiler.length + f.kanallar.length + f.odalar.length + (f.fiyatMin != null ? 1 : 0) + (f.fiyatMax != null ? 1 : 0) + (f.m2Min != null ? 1 : 0) + (f.m2Max != null ? 1 : 0) + (f.acil ? 1 : 0) + (f.takas ? 1 : 0) + (f.roller ?? []).length + Object.values(f.ozellik).filter((v) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).length;
+export const aktifFiltreSayisi = (f: Filtre) => f.aileler.length + f.islemler.length + f.konumlar.length + f.durumlar.length + f.kisiler.length + f.kanallar.length + f.odalar.length + (f.fiyatMin != null ? 1 : 0) + (f.fiyatMax != null ? 1 : 0) + (f.m2Min != null ? 1 : 0) + (f.m2Max != null ? 1 : 0) + (f.acil ? 1 : 0) + (f.takas ? 1 : 0) + (f.roller ?? []).length + (f.sahiplik ? 1 : 0) + Object.values(f.ozellik).filter((v) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).length;
 
 function CokluCip({ secenekler, secili, degis, ton }: { secenekler: [string, string, number?][]; secili: string[]; degis: (x: string[]) => void; ton?: (k: string) => string }) {
   return <div className="cip-satir">{secenekler.map(([k, l, n]) => { const on = secili.includes(k); return <button type="button" key={k} className={cx("cip secilir", on && "on", on && ton && "t-" + ton(k))} onClick={() => degis(on ? secili.filter((x) => x !== k) : [...secili, k])}>{l}{n != null && <small> {n}</small>}</button>; })}</div>;
@@ -130,6 +136,7 @@ export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: ba�
   // Aktif filtre çipleri (kaldırılabilir)
   const cipler: { etiket: string; kaldir: () => void }[] = [
     ...ekCipler,
+    ...(f.sahiplik ? [{ etiket: f.sahiplik === "BENIM" ? "★ Benim" : f.sahiplik === "OFISIM" ? "◆ Ofisim" : "Benim / ofisim değil", kaldir: () => set({ ...f, sahiplik: null }) }] : []),
     ...f.aileler.map((a) => ({ etiket: MULK_AILELERI.find((x) => x.kod === a)?.etiket ?? a, kaldir: () => set({ ...f, aileler: f.aileler.filter((x) => x !== a) }) })),
     ...f.islemler.map((a) => ({ etiket: etiket(a), kaldir: () => set({ ...f, islemler: f.islemler.filter((x) => x !== a) }) })),
     ...f.konumlar.map((k) => ({ etiket: k.etiket, kaldir: () => set({ ...f, konumlar: f.konumlar.filter((x) => x.anahtar !== k.anahtar) }) })),
@@ -148,7 +155,8 @@ export function FiltrePaneli({ f, set, ogeler, gizle = [], yerTutucu = "Ara: ba�
   ];
 
   const kisiRol = (id: string) => d.kisiler.find((k) => k.id === id)?.roller ?? [];
-  const sonucSayisi = ogeler.filter((v) => filtreUygula(v, f, kisiAd, kisiRol)).length;
+  const sahipCoz = useSahiplik();
+  const sonucSayisi = ogeler.filter((v) => filtreUygula(v, f, kisiAd, kisiRol, (x) => sahipCoz(x).tur)).length;
   const aileOzet = f.aileler.length ? MULK_AILELERI.filter((a) => f.aileler.includes(a.kod)).map((a) => a.etiket.split(" /")[0]).join(", ") : "Tüm mülkler";
   const aralikOzet = (a?: number | null, b?: number | null, birim = "") => a == null && b == null ? "Tümü" : `${a != null ? a.toLocaleString("tr-TR") : "…"} – ${b != null ? b.toLocaleString("tr-TR") : "…"}${birim}`;
   const turSayisi = Object.values(f.ozellik).filter((v) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).length;

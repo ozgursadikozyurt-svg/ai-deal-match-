@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Demo — kayıt formu. Şemadan üretilir; mülk grubuna göre yalnızca anlamlı alanlar,
  * önce "önemli alanlar", gerisi "Tüm alanlar" altında. Bölümler varsayılan kapalı.
  */
@@ -13,6 +13,7 @@ import { MULK_OZELLIK_META, alanGruptaMi, KAT_SECENEKLERI, odaListesi, odaYaz, t
 import { anaKategoriOf, islemKategoriUyumlu, MULK_AILELERI, aileOf, benzerAileler } from "../src/lib/domain/kategori";
 import { ONEMLI_ALANLAR, TEMEL_EKSTRA } from "../src/lib/domain/form-alanlari";
 import { adaylariGuncelle } from "../src/lib/lokasyon/ogrenme";
+import { haricBirlestir } from "../src/lib/lokasyon/haric";
 import { etiket, KRITER_ETIKET, ISLEM_TIPI_ETIKET, ILAN_SAHIBI_ETIKET, VERI_KANALI_ETIKET, MULK_TIPI_META, HAVUZ_ETIKET } from "./etiketler";
 import { coz, cozulenToKayitLok, lokEtiket, ilAdiOf, calismaIliOku } from "./lokasyon";
 import { BUGUN, varsayilanValidUntil, yeniId, sureUzat, type Kayit, type Veri } from "./depo";
@@ -84,6 +85,13 @@ function MulkTipiSecici({ f, set, talep }: { f: any; set: (k: string, v: any) =>
 }
 
 // ───────── Lokasyon: yazdıkça öneri + serbest metin çözme + tanınmayanı öğretme ─────────
+/** v3.22 — talepte bir konumu hariç tut / yeniden dahil et (hariç tutulunca ilçesi aranan bölgeye eklenir) */
+export function haricDegistir(lok: Veri["lokasyonlar"], i: number): Veri["lokasyonlar"] {
+  const l = lok[i];
+  if (l.haric) { const { haric: _h, ...x } = l; return lok.map((y, j) => (j === i ? (x as typeof l) : y)); }
+  const kalan = lok.filter((_, j) => j !== i);
+  return haricBirlestir(kalan.filter((x) => !x.haric), [...kalan.filter((x) => x.haric), l]) as Veri["lokasyonlar"];
+}
 function LokasyonDuzenle({ lok, setLok, portfoy }: { lok: Veri["lokasyonlar"]; setLok: (l: Veri["lokasyonlar"]) => void; portfoy: boolean }) {
   const { guncelle, bildir } = useDepo();
   const [metin, setMetin] = useState("");
@@ -95,6 +103,14 @@ function LokasyonDuzenle({ lok, setLok, portfoy }: { lok: Veri["lokasyonlar"]; s
     setLok(hepsi);
   };
   const metniCoz = (m: string) => {
+    // v3.22 — "Hurma, Sarısu hariç" yazılırsa hariç satırı olarak eklenir; ilçesi aranan bölgeye girer
+    const hm = !portfoy ? m.match(/^(.*?)\s*(?:hariç|harici|haricinde|dışında)\s*(.*)$/iu) : null;
+    if (hm) {
+      const rh = coz(hm[1]), ra = coz(hm[2] ?? "");
+      const yeni = haricBirlestir([...lok, ...cozulenToKayitLok(ra.lokasyonlar, false).map(({ etiket, seviye, ...l }) => l)], cozulenToKayitLok(rh.lokasyonlar, false).map(({ etiket, seviye, ...l }) => l));
+      setLok(yeni as Veri["lokasyonlar"]); setCozulemedi([...rh.cozulemeyen, ...ra.cozulemeyen]); if (!rh.cozulemeyen.length && !ra.cozulemeyen.length) setMetin("");
+      return;
+    }
     const r = coz(m);
     ekle(cozulenToKayitLok(r.lokasyonlar, false).map(({ etiket, seviye, ...l }) => l));
     setCozulemedi(r.cozulemeyen);
@@ -103,7 +119,7 @@ function LokasyonDuzenle({ lok, setLok, portfoy }: { lok: Veri["lokasyonlar"]; s
   };
   return <div className="lokasyon-ed">
     <div className="cip-satir">
-      {lok.map((l, i) => <span key={i} className="cip buyuk">{lokEtiket(l)}{portfoy && lok.length > 1 && <button type="button" className={cx("birincil-sec", l.birincil && "on")} onClick={() => setLok(lok.map((x, j) => ({ ...x, birincil: j === i })))}>{l.birincil ? "birincil" : "birincil yap"}</button>}<button type="button" className="sil" aria-label="Kaldır" onClick={() => setLok(lok.filter((_, j) => j !== i))}>×</button></span>)}
+      {lok.map((l, i) => <span key={i} className={cx("cip buyuk", l.haric && "c-haric")}>{lokEtiket(l)}{!portfoy && (l.mahalleId || l.altBolgeId || l.ilceId) && <button type="button" className={cx("birincil-sec", l.haric && "on")} title="Hariç tutulan bölgede portföy önerilmez" onClick={() => setLok(haricDegistir(lok, i))}>{l.haric ? "dahil et" : "hariç tut"}</button>}{portfoy && lok.length > 1 && <button type="button" className={cx("birincil-sec", l.birincil && "on")} onClick={() => setLok(lok.map((x, j) => ({ ...x, birincil: j === i })))}>{l.birincil ? "birincil" : "birincil yap"}</button>}<button type="button" className="sil" aria-label="Kaldır" onClick={() => setLok(lok.filter((_, j) => j !== i))}>×</button></span>)}
       {!lok.length && <span className="ipucu">{portfoy ? "Mülkün konumu" : `Aranan bölgeler (boş = ${ilAdiOf(calismaIliOku())} geneli)`}</span>}
     </div>
     <KonumSecici id="lok-ara" placeholder={portfoy ? "Konum yazın: Hurma, Gençlik, Kundu…" : "Bölge yazın ve listeden seçin: Konyaaltı, Lara, Işıklar…"} onSec={(o) => ekle([{ ...o.lok, birincil: false }])} onEnterMetin={metniCoz} />

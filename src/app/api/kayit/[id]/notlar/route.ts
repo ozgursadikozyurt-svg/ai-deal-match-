@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.2 · 8 Ekim 2026
+// Anahtar CRM v3.22 · 9 Ekim 2026
 // GET    /api/kayit/:id/notlar                          → görüşme / not akışı (yeniden eskiye)
 // POST   /api/kayit/:id/notlar { tur, metin, kisiId? }  → not ekler; kişi seçildiyse kişinin "son iletişim"i güncellenir
 // DELETE /api/kayit/:id/notlar?notId=…                  → notu siler

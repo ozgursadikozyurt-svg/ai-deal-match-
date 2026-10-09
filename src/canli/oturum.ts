@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * OTURUM ÇÖZÜMÜ — "bu e-posta kim, hangi ofiste, neler yapabilir?"
  *
  * Giriş akışı:

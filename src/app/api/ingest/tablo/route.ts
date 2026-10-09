@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.2 · 8 Ekim 2026
+// Anahtar CRM v3.22 · 9 Ekim 2026
 // POST /api/ingest/tablo (multipart: dosya=<.xlsx|.csv|.txt>, secenek=<JSON>) → önizleme: sütun eşleme, satır başına
 //   Hazır / Kontrol / Tekrar / Hatalı, doğrulanmış kayıt verisi ve kişi. Yapay zekâ çağrılmaz. Ekleme: POST /api/ingest/toplu-ekle
 import { prisma } from "@/lib/db";

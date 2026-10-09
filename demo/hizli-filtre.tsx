@@ -1,14 +1,15 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Demo — Eşleşmeler ekranının kompakt hızlı süzgeçleri.
  *
  * Eskiden İşlem (Tümü/Satılık/Kiralık/Devren), Uygunluk ve "Fırsat önceliği" kartı üç ayrı satır + büyük bir kart
  * olarak ekranın yarısını kaplıyordu. Şimdi:
  *  - HizliSecici : tek satıra sığan, dokununca açılan küçük seçici (İşlem · Fırsat)
  *  - HizliMenu   : "⋯" menüsü (Seç / toplu kopar)
- *  - SkorYanBar  : ekranın sağ kenarında duran ince tutamak; dokunun ya da sola kaydırın, dikey skor çubuğu açılır
+ *  - SkorSecici  : v3.22 — seçici satırındaki dar "Skor" düğmesi; dokununca satırın üstünde yatay şerit açılır
+ *                  (v3.21.2'deki sağ kenar çekmecesi telefonda kartların ve süzgeçlerin üstüne biniyordu)
  */
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { cx } from "./ortak";
 
 export interface HizliSecenek<T extends string> { k: T; l: string; n?: number; alt?: string; nokta?: string }
@@ -58,54 +59,28 @@ export function HizliMenu({ ad, ogeler }: { ad: string; ogeler: HizliMenuOge[] }
 }
 
 /**
- * Sağ kenarda duran, gizlenen skor çubuğu.
- * Kapalıyken yalnızca ince bir tutamak görünür ("Skor" ya da seçiliyken "Skor ≥ 70" ve vurgulu renk).
- * Açmak: tutamağa dokunun ya da sola kaydırın · kapatmak: dışına dokunun, sağa kaydırın ya da tutamağa yine dokunun.
- * Çubuk dikeydir: parmak sağ kenarda kalır; üstte 100, altta 0; 5'er puan adım.
+ * v3.22 — skor süzgeci: seçici satırında dar bir "Skor" düğmesi; dokununca aynı satırın üstünde YATAY bir şerit
+ * olarak sağa doğru açılır (kaydırıcı + hazır eşikler + sonuç sayısı). Listeyi ve diğer süzgeçleri örtmez,
+ * satırın yüksekliğini değiştirmez. Kapatmak: ✕, Esc ya da şeridin dışına dokunmak.
+ * (v3.21.2'deki sağ kenar çekmecesi telefonda kartların ve süzgeçlerin üstüne biniyordu.)
  */
-export function SkorYanBar({ deger, set, sayi }: { deger: number; set: (n: number) => void; sayi: number }) {
+export const SKOR_HAZIR = [50, 60, 70, 80, 90] as const;
+export function SkorSecici({ deger, set, sayi }: { deger: number; set: (n: number) => void; sayi: number }) {
   const [acik, setAcik] = useState(false);
-  const iz = useRef<HTMLDivElement>(null);
-  const basili = useRef(false);
-  const dokunma = useRef<{ x: number; y: number } | null>(null);
-  const yazY = (clientY: number) => {
-    const r = iz.current?.getBoundingClientRect();
-    if (!r || r.height <= 0) return;
-    const t = 1 - (clientY - r.top) / r.height; // üst = 100
-    set(Math.round(Math.max(0, Math.min(1, t)) * 20) * 5);
-  };
-  const tus = (e: React.KeyboardEvent) => {
-    const adim = e.key === "ArrowUp" || e.key === "ArrowRight" ? 5 : e.key === "ArrowDown" || e.key === "ArrowLeft" ? -5 : e.key === "Home" ? -100 : e.key === "End" ? 100 : 0;
-    if (!adim) return;
-    e.preventDefault(); set(Math.max(0, Math.min(100, deger + adim)));
-  };
-  return <>
-    {acik && <button type="button" className="skor-perde" aria-label="Skor çubuğunu kapat" onClick={() => setAcik(false)} />}
-    <aside className={cx("skor-cekmece", acik && "acik", deger > 0 && "dolu")} aria-label="Skor filtresi"
-      onTouchStart={(e) => { const t = e.touches[0]; dokunma.current = { x: t.clientX, y: t.clientY }; }}
-      onTouchEnd={(e) => {
-        const b = dokunma.current, t = e.changedTouches[0]; dokunma.current = null;
-        if (!b || !t) return;
-        const dx = t.clientX - b.x, dy = t.clientY - b.y;
-        if (Math.abs(dx) > 36 && Math.abs(dx) > Math.abs(dy) * 1.4) setAcik(dx < 0); // sola kaydır = aç, sağa = kapat
-      }}>
-      <button type="button" className="skor-tutac" aria-expanded={acik} aria-controls="skor-govde" title="Skor filtresi" onClick={() => setAcik(!acik)}>
-        <span className="skor-ok" aria-hidden="true">{acik ? "›" : "‹"}</span>
-        <span className="skor-et">{deger > 0 ? `Skor ≥ ${deger}` : "Skor"}</span>
-      </button>
-      <div className="skor-govde" id="skor-govde">
-        <b className="skor-deger">{deger > 0 ? `≥ ${deger}` : "Tümü"}</b>
-        <div ref={iz} className="skor-iz" role="slider" aria-orientation="vertical" aria-label="En az skor" aria-valuemin={0} aria-valuemax={100} aria-valuenow={deger} tabIndex={acik ? 0 : -1}
-          onKeyDown={tus}
-          onPointerDown={(e) => { basili.current = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* eski tarayıcı */ } yazY(e.clientY); }}
-          onPointerMove={(e) => { if (basili.current) yazY(e.clientY); }}
-          onPointerUp={() => { basili.current = false; }} onPointerCancel={() => { basili.current = false; }}>
-          <div className="skor-dolgu" style={{ height: `calc((100% - 22px) * ${deger / 100} + 11px)` }} />
-          <div className="skor-top" style={{ bottom: `calc((100% - 22px) * ${deger / 100})` }} />
-        </div>
-        <small className="skor-say">{sayi} eşleşme</small>
-        <button type="button" className="skor-sifirla" disabled={!deger} tabIndex={acik ? 0 : -1} onClick={() => set(0)}>Sıfırla</button>
+  return <div className={cx("hs skor-hs", acik && "acik")}>
+    <button type="button" className={cx("hs-btn", deger > 0 && "on")} aria-expanded={acik} aria-controls="skor-serit" onClick={() => setAcik(!acik)}>
+      <small>Skor</small><b>{deger > 0 ? `≥ ${deger}` : "Tümü"}</b>
+    </button>
+    {acik && <>
+      <div className="sirala-perde" onClick={() => setAcik(false)} />
+      <div className="skor-serit" id="skor-serit" role="group" aria-label="Skor süzgeci" onKeyDown={(e) => { if (e.key === "Escape") setAcik(false); }}>
+        <b className="skor-serit-deger">{deger > 0 ? `≥ ${deger}` : "Tümü"}</b>
+        <input type="range" className="skor-aralik" min={0} max={100} step={5} value={deger} aria-label="En az skor" aria-valuetext={deger > 0 ? `en az ${deger}` : "tümü"}
+          style={{ ["--dolu" as any]: `${deger}%` }} onChange={(e) => set(Number(e.target.value))} />
+        <div className="skor-hazir">{SKOR_HAZIR.map((n) => <button key={n} type="button" className={cx(deger === n && "on")} onClick={() => set(deger === n ? 0 : n)}>{n}</button>)}</div>
+        <small className="skor-say">{sayi}</small>
+        <button type="button" className="skor-kapat" aria-label="Skor süzgecini kapat" onClick={() => setAcik(false)}>✕</button>
       </div>
-    </aside>
-  </>;
+    </>}
+  </div>;
 }

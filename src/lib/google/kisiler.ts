@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.22 · 9 Ekim 2026 (v3.13'ten)
  * Google Kişiler (People API) ⇄ Anahtar Kişiler. Veritabanısız, saf fonksiyonlar:
  * demo uygulama ve sunucu senkron işi AYNI dönüştürücüyü ve AYNI planlayıcıları kullanır.
  *

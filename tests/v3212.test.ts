@@ -1,7 +1,8 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * v3.21.2 — Eşleşmeler: tahmini komisyon toplamı kalktı · filtre/konum karta girip Geri dönünce korunur ·
- * kompakt süzgeçler + yandan açılan skor çubuğu · Konumlar, Bağlantılar, Yönetim Ayarlar içinde.
+ * kompakt süzgeçler + skor süzgeci · Konumlar, Bağlantılar, Yönetim Ayarlar içinde.
+ * v3.22: yan çekmece yerine seçici satırında yatay açılan skor şeridi (testler ona göre güncellendi; ⋯ başlık satırında).
  */
 import { test as nodeTest } from "node:test";
 import assert from "node:assert/strict";
@@ -26,6 +27,8 @@ const ciz = (el: React.ReactElement) => renderToStaticMarkup(React.createElement
 
 // Her testten önce saklanan ekran durumu temizlenir (hook yerine sarmalayıcı: testler birbirinin süzgecini görmesin)
 const test = (ad: string, f: () => unknown | Promise<unknown>) => nodeTest(ad, async () => { kaliciHepsiniSil(); await f(); });
+/** v3.22 — skor şeridini açar (kapalıysa) ve en az skoru yazar */
+const skorYaz = async (a: Awaited<ReturnType<typeof ac>>, n: number) => { if (!a.q(".skor-aralik")) await a.tikla(a.q(".skor-hs .hs-btn")); await a.yaz(a.q(".skor-aralik"), String(n)); };
 
 // ───── 1) komisyon toplamı ─────
 test("Eşleşmeler: 'tahmini komisyon ≈ …' toplam satırı ve eski Fırsat önceliği kartı kalktı; kart başına komisyon durur", () => {
@@ -41,16 +44,17 @@ test("Eşleşmeler: 'tahmini komisyon ≈ …' toplam satırı ve eski Fırsat �
 test("Eşleşmeler: karta girip Geri dönünce uygunluk, fırsat, skor süzgeçleri ve çipleri korunur; Temizle hepsini sıfırlar", async () => {
   let a = await ac(React.createElement(Eslesmeler), ctx());
   await a.tikla(a.dugme(/^Sunulabilir \(/));
-  for (let i = 0; i < 4; i++) await a.tus(a.q(".skor-iz"), "ArrowUp");                  // skor ≥ 20
-  await a.tikla(a.qa(".hs-btn")[1]);                                                    // Fırsat seçicisi
+  await skorYaz(a, 20);                                                                 // skor ≥ 20
+  await a.tikla(a.q(".skor-kapat"));
+  await a.tikla(a.qa(".hs-satir .hs-btn")[1]);                                          // Fırsat seçicisi
   await a.tikla(a.qa(".hs-menu .hs-oge").find((x) => /^Öncelikli/.test(x.textContent ?? "")));
   assert.deepEqual([kaliciOku("eslesmeler.u"), kaliciOku("eslesmeler.skor"), kaliciOku("eslesmeler.fk")], ["SUNULABILIR", 20, "ONCELIKLI"]);
   await a.kapat();                                                                      // ekran sökülür (karta girildi)
 
   a = await ac(React.createElement(Eslesmeler), ctx());                                  // Geri: ekran yeniden çizilir
   assert.ok(a.dugme(/^Sunulabilir \(/)!.className.includes("on"), "Sunulabilir seçili kaldı");
-  assert.match(a.q(".skor-tutac")!.textContent ?? "", /Skor ≥ 20/);
-  assert.ok(a.q(".skor-cekmece")!.className.includes("dolu"));
+  assert.match(a.q(".skor-hs .hs-btn")!.textContent ?? "", /Skor≥ 20/);
+  assert.ok(a.q(".skor-hs .hs-btn")!.className.includes("on"));
   const cipler = a.qa(".aktif-filtreler .cip").map((x) => x.textContent ?? "");
   assert.ok(cipler.some((x) => x.includes("Skor ≥ 20")) && cipler.some((x) => x.includes("Fırsat: Öncelikli")), cipler.join("|"));
   await a.tikla(a.q(".fc-temizle"));
@@ -84,35 +88,37 @@ test("Kişiler: arama metni ve İzleme: seçili sekme korunur", async () => {
   assert.ok(a.dugme(/^Portföyler/)!.className.includes("on"), "İzleme: Portföyler sekmesi korundu"); await a.kapat();
 });
 
-// ───── 3) kompakt süzgeçler + yan çubuk ─────
-test("Eşleşmeler: İşlem · Fırsat · ⋯ tek satırda; eski üç satır ve büyük kart yok", () => {
+// ───── 3) kompakt süzgeçler + skor şeridi ─────
+test("Eşleşmeler: İşlem · Fırsat · Kimin · Skor tek satırda; ⋯ başlıkta; eski üç satır ve büyük kart yok", () => {
   const h = ciz(React.createElement(Eslesmeler));
   assert.equal((h.match(/class="hs-satir"/g) ?? []).length, 1);
-  assert.equal((h.match(/class="hs-btn/g) ?? []).length, 3, "İşlem, Fırsat, ⋯");
+  const satir = h.slice(h.indexOf('class="hs-satir"'));
+  assert.equal((satir.match(/class="hs-btn/g) ?? []).length, 4, "İşlem, Fırsat, Kimin, Skor");
+  assert.match(h, /es-baslik[\s\S]*hs-btn ikon/, "⋯ başlık satırında");
   assert.ok(!/Tümü \(\d+\)/.test(h), "eski 'Tümü (n) · Satılık (n)' çip satırı kalktı");
+  assert.ok(!h.includes("skor-cekmece"), "v3.21.2 yan çekmecesi kalktı (telefonda kartların üstüne biniyordu)");
   assert.match(h, /filtre filtre-ince/);
 });
-test("Skor çubuğu: kapalıyken yalnızca tutamak; dokununca açılır, çubuk ve tuşlarla ayarlanır, Sıfırla temizler", async () => {
+test("Skor şeridi: kapalıyken dar düğme; dokununca satırın üstünde yatay açılır, kaydırıcı ve hazır eşiklerle ayarlanır, ✕ kapatır", async () => {
   const a = await ac(React.createElement(Eslesmeler), ctx());
-  const cekmece = a.q(".skor-cekmece")!;
-  assert.ok(!cekmece.className.includes("acik")); assert.equal(a.q(".skor-tutac")!.getAttribute("aria-expanded"), "false");
-  assert.match(a.q(".skor-tutac")!.textContent ?? "", /Skor/);
-  await a.tikla(a.q(".skor-tutac"));
-  assert.ok(a.q(".skor-cekmece")!.className.includes("acik")); assert.ok(a.q(".skor-perde"), "dışına dokununca kapanır");
-  const iz = a.q(".skor-iz")!;
-  await a.tus(iz, "End"); assert.equal(iz.getAttribute("aria-valuenow"), "100");
-  await a.tus(iz, "ArrowDown"); await a.tus(iz, "ArrowDown"); assert.equal(iz.getAttribute("aria-valuenow"), "90");
-  assert.ok(a.q(".skor-cekmece")!.className.includes("dolu")); assert.match(a.q(".skor-tutac")!.textContent ?? "", /Skor ≥ 90/);
-  const sayi = (a.q(".skor-say")!.textContent ?? "");
-  assert.match(sayi, /\d+ eşleşme/);
-  await a.tikla(a.q(".skor-sifirla")); assert.equal(iz.getAttribute("aria-valuenow"), "0");
-  await a.tikla(a.q(".skor-perde")); assert.ok(!a.q(".skor-cekmece")!.className.includes("acik"));
+  const dugme = () => a.q(".skor-hs .hs-btn")!;
+  assert.equal(dugme().getAttribute("aria-expanded"), "false"); assert.ok(!a.q(".skor-serit"));
+  assert.match(dugme().textContent ?? "", /SkorTümü/);
+  await a.tikla(dugme());
+  assert.ok(a.q(".skor-serit"), "şerit açıldı"); assert.ok(a.q(".hs-satir .skor-serit"), "şerit seçici satırının içinde (listeyi örtmez)");
+  assert.ok(a.q(".sirala-perde"), "dışına dokununca kapanır");
+  await a.yaz(a.q(".skor-aralik"), "90"); assert.equal((a.q(".skor-aralik") as HTMLInputElement).value, "90");
+  assert.match(dugme().textContent ?? "", /≥ 90/); assert.ok(dugme().className.includes("on"));
+  assert.match(a.q(".skor-say")!.textContent ?? "", /^\d+$/);
+  await a.tikla([...a.qa(".skor-hazir button")].find((b) => b.textContent === "70")); assert.equal(kaliciOku("eslesmeler.skor"), 70);
+  await a.tikla([...a.qa(".skor-hazir button")].find((b) => b.textContent === "70")); assert.equal(kaliciOku("eslesmeler.skor"), 0, "aynı eşiğe yeniden dokununca sıfırlanır");
+  await a.tikla(a.q(".skor-kapat")); assert.ok(!a.q(".skor-serit"));
   await a.kapat();
 });
 test("Skor filtresi listeyi gerçekten süzer (yüksek skor → daha az kart)", async () => {
   const a = await ac(React.createElement(Eslesmeler), ctx());
   await a.tikla(a.dugme(/^Koşullu \(/)); const once = a.qa(".es2").length;
-  await a.tus(a.q(".skor-iz"), "End");                                                  // ≥ 100
+  await skorYaz(a, 100);
   assert.ok(a.qa(".es2").length < once || once === 0, `${a.qa(".es2").length} < ${once}`);
   await a.kapat();
 });
@@ -139,14 +145,15 @@ test("Eşleşme kartına girip Geri dönünce: süzgeçler ve kaydırma konumu a
   const a = await ac(React.createElement(Uygulama));
   await a.tikla(a.qa(".sol-menu .menu-oge").find((b) => (b.textContent ?? "").startsWith("Eşleşmeler")));
   await a.tikla(a.dugme(/^Koşullu \(/));
-  await a.tus(a.q(".skor-iz"), "ArrowUp");                                              // skor ≥ 5
+  await skorYaz(a, 5);                                                                  // skor ≥ 5
+  await a.tikla(a.q(".skor-kapat"));
   a.kaydirmaDegeri(1234);                                                               // kullanıcı listede aşağı inmiş
   await a.tikla(a.q(".es2"));                                                           // karta gir
-  assert.ok(!a.q(".skor-iz"), "eşleşme detayındayız");
+  assert.ok(!a.q(".skor-hs"), "eşleşme detayındayız");
   a.kaydirmaDegeri(0);
   await a.tikla(a.dugme("← Geri"));
   assert.ok(a.dugme(/^Koşullu \(/)!.className.includes("on"), "Koşullu süzgeci duruyor");
-  assert.equal(a.q(".skor-iz")!.getAttribute("aria-valuenow"), "5", "skor süzgeci duruyor");
+  assert.match(a.q(".skor-hs .hs-btn")!.textContent ?? "", /≥ 5/, "skor süzgeci duruyor");
   assert.equal(a.kaydirmalar[a.kaydirmalar.length - 1], 1234, `kaydırma 1234'e döndü: ${a.kaydirmalar.join(",")}`);
   await a.kapat();
 });

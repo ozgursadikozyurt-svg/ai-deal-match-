@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Demo — ekranların ortak parçaları: depo bağlamı, küçük bileşenler, eşleşme hesabı, konum öneri kutusu.
  */
 import React, { createContext, useContext, useMemo, useRef, useState } from "react";

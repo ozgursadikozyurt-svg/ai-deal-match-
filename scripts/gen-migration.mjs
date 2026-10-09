@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.2 · 8 Ekim 2026
+// Anahtar CRM v3.22 · 9 Ekim 2026
 // Prisma schema-engine (WASM) ile boş DB → şema SQL migration'ı üretir (binary engine gerektirmez)
 import fs from "node:fs";
 import { SchemaEngine } from "@prisma/schema-engine-wasm";

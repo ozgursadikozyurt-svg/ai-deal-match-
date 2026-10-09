@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * v3.15 — veritabanlı: takasa açık, çoklu kat, özel roller sunucuya yazılır / geri okunur; eski enum rolleri korunur.
  */
 import { test } from "node:test";

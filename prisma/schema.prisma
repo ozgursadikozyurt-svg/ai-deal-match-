@@ -1,4 +1,4 @@
-// Anahtar CRM v3.21.2 · 8 Ekim 2026
+// Anahtar CRM v3.22 · 9 Ekim 2026
 // ============================================================================
 //  Anahtar.ai — Prisma Şeması (AŞAMA 2 v3.1; v3.3: konut, kaynak, konum öğrenme, ayarlar; v3.4: kişi bağları, işlenmiş mesaj; v3.5: yetkili portföy)
 //  Tarih: 30 Eylül 2026  |  Önceki: v2.0 (14–18 Eylül 2026)
@@ -884,6 +884,8 @@ model KayitLokasyon {
   altBolgeId Int?
   birincil   Boolean @default(false)
   sira       Int     @default(0)
+  /// v3.22 — talepte hariç tutulan bölge ("Hurma, Sarısu HARİÇ"): eşleştirmede kesin engel
+  haric      Boolean @default(false)
 
   kayit    Kayit     @relation(fields: [kayitId], references: [id], onDelete: Cascade)
   il       Il        @relation(fields: [ilId], references: [id])
@@ -912,6 +914,8 @@ model Kayit {
   sahipKullanici   Kullanici? @relation("KayitSahibi", fields: [sahipKullaniciId], references: [id], onDelete: SetNull)
   /// v3.20 — OFIS: ofisin tamamı görür · OZEL: yalnızca sahibi ve ofis yöneticisi görür
   gorunurluk    Gorunurluk   @default(OFIS)
+  /// v3.22 — elle konan sahiplik işareti: BENIM · OFIS · DIS (boş = Ayarlar'daki telefon / ad listesinden otomatik)
+  isaret        String?
   tip           KayitTipi
   durum         Durum        @default(ACTIVE)
   aciliyet      Aciliyet     @default(NORMAL)

@@ -52,6 +52,7 @@ export type KayitLokasyonMinAggregateOutputType = {
   altBolgeId: number | null
   birincil: boolean | null
   sira: number | null
+  haric: boolean | null
 }
 
 export type KayitLokasyonMaxAggregateOutputType = {
@@ -63,6 +64,7 @@ export type KayitLokasyonMaxAggregateOutputType = {
   altBolgeId: number | null
   birincil: boolean | null
   sira: number | null
+  haric: boolean | null
 }
 
 export type KayitLokasyonCountAggregateOutputType = {
@@ -74,6 +76,7 @@ export type KayitLokasyonCountAggregateOutputType = {
   altBolgeId: number
   birincil: number
   sira: number
+  haric: number
   _all: number
 }
 
@@ -103,6 +106,7 @@ export type KayitLokasyonMinAggregateInputType = {
   altBolgeId?: true
   birincil?: true
   sira?: true
+  haric?: true
 }
 
 export type KayitLokasyonMaxAggregateInputType = {
@@ -114,6 +118,7 @@ export type KayitLokasyonMaxAggregateInputType = {
   altBolgeId?: true
   birincil?: true
   sira?: true
+  haric?: true
 }
 
 export type KayitLokasyonCountAggregateInputType = {
@@ -125,6 +130,7 @@ export type KayitLokasyonCountAggregateInputType = {
   altBolgeId?: true
   birincil?: true
   sira?: true
+  haric?: true
   _all?: true
 }
 
@@ -223,6 +229,7 @@ export type KayitLokasyonGroupByOutputType = {
   altBolgeId: number | null
   birincil: boolean
   sira: number
+  haric: boolean
   _count: KayitLokasyonCountAggregateOutputType | null
   _avg: KayitLokasyonAvgAggregateOutputType | null
   _sum: KayitLokasyonSumAggregateOutputType | null
@@ -257,6 +264,7 @@ export type KayitLokasyonWhereInput = {
   altBolgeId?: Prisma.IntNullableFilter<"KayitLokasyon"> | number | null
   birincil?: Prisma.BoolFilter<"KayitLokasyon"> | boolean
   sira?: Prisma.IntFilter<"KayitLokasyon"> | number
+  haric?: Prisma.BoolFilter<"KayitLokasyon"> | boolean
   kayit?: Prisma.XOR<Prisma.KayitScalarRelationFilter, Prisma.KayitWhereInput>
   il?: Prisma.XOR<Prisma.IlScalarRelationFilter, Prisma.IlWhereInput>
   ilce?: Prisma.XOR<Prisma.IlceNullableScalarRelationFilter, Prisma.IlceWhereInput> | null
@@ -273,6 +281,7 @@ export type KayitLokasyonOrderByWithRelationInput = {
   altBolgeId?: Prisma.SortOrderInput | Prisma.SortOrder
   birincil?: Prisma.SortOrder
   sira?: Prisma.SortOrder
+  haric?: Prisma.SortOrder
   kayit?: Prisma.KayitOrderByWithRelationInput
   il?: Prisma.IlOrderByWithRelationInput
   ilce?: Prisma.IlceOrderByWithRelationInput
@@ -292,6 +301,7 @@ export type KayitLokasyonWhereUniqueInput = Prisma.AtLeast<{
   altBolgeId?: Prisma.IntNullableFilter<"KayitLokasyon"> | number | null
   birincil?: Prisma.BoolFilter<"KayitLokasyon"> | boolean
   sira?: Prisma.IntFilter<"KayitLokasyon"> | number
+  haric?: Prisma.BoolFilter<"KayitLokasyon"> | boolean
   kayit?: Prisma.XOR<Prisma.KayitScalarRelationFilter, Prisma.KayitWhereInput>
   il?: Prisma.XOR<Prisma.IlScalarRelationFilter, Prisma.IlWhereInput>
   ilce?: Prisma.XOR<Prisma.IlceNullableScalarRelationFilter, Prisma.IlceWhereInput> | null
@@ -308,6 +318,7 @@ export type KayitLokasyonOrderByWithAggregationInput = {
   altBolgeId?: Prisma.SortOrderInput | Prisma.SortOrder
   birincil?: Prisma.SortOrder
   sira?: Prisma.SortOrder
+  haric?: Prisma.SortOrder
   _count?: Prisma.KayitLokasyonCountOrderByAggregateInput
   _avg?: Prisma.KayitLokasyonAvgOrderByAggregateInput
   _max?: Prisma.KayitLokasyonMaxOrderByAggregateInput
@@ -327,12 +338,14 @@ export type KayitLokasyonScalarWhereWithAggregatesInput = {
   altBolgeId?: Prisma.IntNullableWithAggregatesFilter<"KayitLokasyon"> | number | null
   birincil?: Prisma.BoolWithAggregatesFilter<"KayitLokasyon"> | boolean
   sira?: Prisma.IntWithAggregatesFilter<"KayitLokasyon"> | number
+  haric?: Prisma.BoolWithAggregatesFilter<"KayitLokasyon"> | boolean
 }
 
 export type KayitLokasyonCreateInput = {
   id?: string
   birincil?: boolean
   sira?: number
+  haric?: boolean
   kayit: Prisma.KayitCreateNestedOneWithoutLokasyonlarInput
   il: Prisma.IlCreateNestedOneWithoutKayitLokasyonlariInput
   ilce?: Prisma.IlceCreateNestedOneWithoutKayitLokasyonlariInput
@@ -349,12 +362,14 @@ export type KayitLokasyonUncheckedCreateInput = {
   altBolgeId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
   kayit?: Prisma.KayitUpdateOneRequiredWithoutLokasyonlarNestedInput
   il?: Prisma.IlUpdateOneRequiredWithoutKayitLokasyonlariNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutKayitLokasyonlariNestedInput
@@ -371,6 +386,7 @@ export type KayitLokasyonUncheckedUpdateInput = {
   altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonCreateManyInput = {
@@ -382,12 +398,14 @@ export type KayitLokasyonCreateManyInput = {
   altBolgeId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonUncheckedUpdateManyInput = {
@@ -399,6 +417,7 @@ export type KayitLokasyonUncheckedUpdateManyInput = {
   altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonListRelationFilter = {
@@ -420,6 +439,7 @@ export type KayitLokasyonCountOrderByAggregateInput = {
   altBolgeId?: Prisma.SortOrder
   birincil?: Prisma.SortOrder
   sira?: Prisma.SortOrder
+  haric?: Prisma.SortOrder
 }
 
 export type KayitLokasyonAvgOrderByAggregateInput = {
@@ -439,6 +459,7 @@ export type KayitLokasyonMaxOrderByAggregateInput = {
   altBolgeId?: Prisma.SortOrder
   birincil?: Prisma.SortOrder
   sira?: Prisma.SortOrder
+  haric?: Prisma.SortOrder
 }
 
 export type KayitLokasyonMinOrderByAggregateInput = {
@@ -450,6 +471,7 @@ export type KayitLokasyonMinOrderByAggregateInput = {
   altBolgeId?: Prisma.SortOrder
   birincil?: Prisma.SortOrder
   sira?: Prisma.SortOrder
+  haric?: Prisma.SortOrder
 }
 
 export type KayitLokasyonSumOrderByAggregateInput = {
@@ -674,6 +696,7 @@ export type KayitLokasyonCreateWithoutIlInput = {
   id?: string
   birincil?: boolean
   sira?: number
+  haric?: boolean
   kayit: Prisma.KayitCreateNestedOneWithoutLokasyonlarInput
   ilce?: Prisma.IlceCreateNestedOneWithoutKayitLokasyonlariInput
   mahalle?: Prisma.MahalleCreateNestedOneWithoutKayitLokasyonlariInput
@@ -688,6 +711,7 @@ export type KayitLokasyonUncheckedCreateWithoutIlInput = {
   altBolgeId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonCreateOrConnectWithoutIlInput = {
@@ -728,12 +752,14 @@ export type KayitLokasyonScalarWhereInput = {
   altBolgeId?: Prisma.IntNullableFilter<"KayitLokasyon"> | number | null
   birincil?: Prisma.BoolFilter<"KayitLokasyon"> | boolean
   sira?: Prisma.IntFilter<"KayitLokasyon"> | number
+  haric?: Prisma.BoolFilter<"KayitLokasyon"> | boolean
 }
 
 export type KayitLokasyonCreateWithoutIlceInput = {
   id?: string
   birincil?: boolean
   sira?: number
+  haric?: boolean
   kayit: Prisma.KayitCreateNestedOneWithoutLokasyonlarInput
   il: Prisma.IlCreateNestedOneWithoutKayitLokasyonlariInput
   mahalle?: Prisma.MahalleCreateNestedOneWithoutKayitLokasyonlariInput
@@ -748,6 +774,7 @@ export type KayitLokasyonUncheckedCreateWithoutIlceInput = {
   altBolgeId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonCreateOrConnectWithoutIlceInput = {
@@ -780,6 +807,7 @@ export type KayitLokasyonCreateWithoutMahalleInput = {
   id?: string
   birincil?: boolean
   sira?: number
+  haric?: boolean
   kayit: Prisma.KayitCreateNestedOneWithoutLokasyonlarInput
   il: Prisma.IlCreateNestedOneWithoutKayitLokasyonlariInput
   ilce?: Prisma.IlceCreateNestedOneWithoutKayitLokasyonlariInput
@@ -794,6 +822,7 @@ export type KayitLokasyonUncheckedCreateWithoutMahalleInput = {
   altBolgeId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonCreateOrConnectWithoutMahalleInput = {
@@ -826,6 +855,7 @@ export type KayitLokasyonCreateWithoutAltBolgeInput = {
   id?: string
   birincil?: boolean
   sira?: number
+  haric?: boolean
   kayit: Prisma.KayitCreateNestedOneWithoutLokasyonlarInput
   il: Prisma.IlCreateNestedOneWithoutKayitLokasyonlariInput
   ilce?: Prisma.IlceCreateNestedOneWithoutKayitLokasyonlariInput
@@ -840,6 +870,7 @@ export type KayitLokasyonUncheckedCreateWithoutAltBolgeInput = {
   mahalleId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonCreateOrConnectWithoutAltBolgeInput = {
@@ -872,6 +903,7 @@ export type KayitLokasyonCreateWithoutKayitInput = {
   id?: string
   birincil?: boolean
   sira?: number
+  haric?: boolean
   il: Prisma.IlCreateNestedOneWithoutKayitLokasyonlariInput
   ilce?: Prisma.IlceCreateNestedOneWithoutKayitLokasyonlariInput
   mahalle?: Prisma.MahalleCreateNestedOneWithoutKayitLokasyonlariInput
@@ -886,6 +918,7 @@ export type KayitLokasyonUncheckedCreateWithoutKayitInput = {
   altBolgeId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonCreateOrConnectWithoutKayitInput = {
@@ -922,12 +955,14 @@ export type KayitLokasyonCreateManyIlInput = {
   altBolgeId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonUpdateWithoutIlInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
   kayit?: Prisma.KayitUpdateOneRequiredWithoutLokasyonlarNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutKayitLokasyonlariNestedInput
   mahalle?: Prisma.MahalleUpdateOneWithoutKayitLokasyonlariNestedInput
@@ -942,6 +977,7 @@ export type KayitLokasyonUncheckedUpdateWithoutIlInput = {
   altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonUncheckedUpdateManyWithoutIlInput = {
@@ -952,6 +988,7 @@ export type KayitLokasyonUncheckedUpdateManyWithoutIlInput = {
   altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonCreateManyIlceInput = {
@@ -962,12 +999,14 @@ export type KayitLokasyonCreateManyIlceInput = {
   altBolgeId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonUpdateWithoutIlceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
   kayit?: Prisma.KayitUpdateOneRequiredWithoutLokasyonlarNestedInput
   il?: Prisma.IlUpdateOneRequiredWithoutKayitLokasyonlariNestedInput
   mahalle?: Prisma.MahalleUpdateOneWithoutKayitLokasyonlariNestedInput
@@ -982,6 +1021,7 @@ export type KayitLokasyonUncheckedUpdateWithoutIlceInput = {
   altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonUncheckedUpdateManyWithoutIlceInput = {
@@ -992,6 +1032,7 @@ export type KayitLokasyonUncheckedUpdateManyWithoutIlceInput = {
   altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonCreateManyMahalleInput = {
@@ -1002,12 +1043,14 @@ export type KayitLokasyonCreateManyMahalleInput = {
   altBolgeId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonUpdateWithoutMahalleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
   kayit?: Prisma.KayitUpdateOneRequiredWithoutLokasyonlarNestedInput
   il?: Prisma.IlUpdateOneRequiredWithoutKayitLokasyonlariNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutKayitLokasyonlariNestedInput
@@ -1022,6 +1065,7 @@ export type KayitLokasyonUncheckedUpdateWithoutMahalleInput = {
   altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonUncheckedUpdateManyWithoutMahalleInput = {
@@ -1032,6 +1076,7 @@ export type KayitLokasyonUncheckedUpdateManyWithoutMahalleInput = {
   altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonCreateManyAltBolgeInput = {
@@ -1042,12 +1087,14 @@ export type KayitLokasyonCreateManyAltBolgeInput = {
   mahalleId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonUpdateWithoutAltBolgeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
   kayit?: Prisma.KayitUpdateOneRequiredWithoutLokasyonlarNestedInput
   il?: Prisma.IlUpdateOneRequiredWithoutKayitLokasyonlariNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutKayitLokasyonlariNestedInput
@@ -1062,6 +1109,7 @@ export type KayitLokasyonUncheckedUpdateWithoutAltBolgeInput = {
   mahalleId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonUncheckedUpdateManyWithoutAltBolgeInput = {
@@ -1072,6 +1120,7 @@ export type KayitLokasyonUncheckedUpdateManyWithoutAltBolgeInput = {
   mahalleId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonCreateManyKayitInput = {
@@ -1082,12 +1131,14 @@ export type KayitLokasyonCreateManyKayitInput = {
   altBolgeId?: number | null
   birincil?: boolean
   sira?: number
+  haric?: boolean
 }
 
 export type KayitLokasyonUpdateWithoutKayitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
   il?: Prisma.IlUpdateOneRequiredWithoutKayitLokasyonlariNestedInput
   ilce?: Prisma.IlceUpdateOneWithoutKayitLokasyonlariNestedInput
   mahalle?: Prisma.MahalleUpdateOneWithoutKayitLokasyonlariNestedInput
@@ -1102,6 +1153,7 @@ export type KayitLokasyonUncheckedUpdateWithoutKayitInput = {
   altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KayitLokasyonUncheckedUpdateManyWithoutKayitInput = {
@@ -1112,6 +1164,7 @@ export type KayitLokasyonUncheckedUpdateManyWithoutKayitInput = {
   altBolgeId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   birincil?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sira?: Prisma.IntFieldUpdateOperationsInput | number
+  haric?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -1125,6 +1178,7 @@ export type KayitLokasyonSelect<ExtArgs extends runtime.Types.Extensions.Interna
   altBolgeId?: boolean
   birincil?: boolean
   sira?: boolean
+  haric?: boolean
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   il?: boolean | Prisma.IlDefaultArgs<ExtArgs>
   ilce?: boolean | Prisma.KayitLokasyon$ilceArgs<ExtArgs>
@@ -1141,6 +1195,7 @@ export type KayitLokasyonSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   altBolgeId?: boolean
   birincil?: boolean
   sira?: boolean
+  haric?: boolean
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   il?: boolean | Prisma.IlDefaultArgs<ExtArgs>
   ilce?: boolean | Prisma.KayitLokasyon$ilceArgs<ExtArgs>
@@ -1157,6 +1212,7 @@ export type KayitLokasyonSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   altBolgeId?: boolean
   birincil?: boolean
   sira?: boolean
+  haric?: boolean
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   il?: boolean | Prisma.IlDefaultArgs<ExtArgs>
   ilce?: boolean | Prisma.KayitLokasyon$ilceArgs<ExtArgs>
@@ -1173,9 +1229,10 @@ export type KayitLokasyonSelectScalar = {
   altBolgeId?: boolean
   birincil?: boolean
   sira?: boolean
+  haric?: boolean
 }
 
-export type KayitLokasyonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kayitId" | "ilId" | "ilceId" | "mahalleId" | "altBolgeId" | "birincil" | "sira", ExtArgs["result"]["kayitLokasyon"]>
+export type KayitLokasyonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kayitId" | "ilId" | "ilceId" | "mahalleId" | "altBolgeId" | "birincil" | "sira" | "haric", ExtArgs["result"]["kayitLokasyon"]>
 export type KayitLokasyonInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   kayit?: boolean | Prisma.KayitDefaultArgs<ExtArgs>
   il?: boolean | Prisma.IlDefaultArgs<ExtArgs>
@@ -1216,6 +1273,10 @@ export type $KayitLokasyonPayload<ExtArgs extends runtime.Types.Extensions.Inter
     altBolgeId: number | null
     birincil: boolean
     sira: number
+    /**
+     * v3.22 — talepte hariç tutulan bölge ("Hurma, Sarısu HARİÇ"): eşleştirmede kesin engel
+     */
+    haric: boolean
   }, ExtArgs["result"]["kayitLokasyon"]>
   composites: {}
 }
@@ -1652,6 +1713,7 @@ export interface KayitLokasyonFieldRefs {
   readonly altBolgeId: Prisma.FieldRef<"KayitLokasyon", 'Int'>
   readonly birincil: Prisma.FieldRef<"KayitLokasyon", 'Boolean'>
   readonly sira: Prisma.FieldRef<"KayitLokasyon", 'Int'>
+  readonly haric: Prisma.FieldRef<"KayitLokasyon", 'Boolean'>
 }
     
 

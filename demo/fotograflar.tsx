@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Demo — portföy detayındaki "Fotoğraflar" bölümü: ekle (küçültülerek), kapak seç, sil, tek tek ya da toplu indir, paylaş.
  */
 import { useEffect, useRef, useState } from "react";
@@ -121,4 +121,29 @@ export function Fotograflar({ k }: { k: Kayit }) {
       </div>
     </div>}
   </section>;
+}
+/**
+ * v3.22 — portföy kartındaki tek küçük fotoğraf (kapak = ilk sıradaki).
+ * Kart ekrana girince yüklenir (uzun listede yüzlerce fotoğraf birden indirilmesin); fotoğraf yoksa hiçbir şey çizmez.
+ */
+export function KapakKucuk({ k, boyut = 56 }: { k: Kayit; boyut?: number }) {
+  const fotolar = k.fotolar ?? [];
+  const kapak = fotolar[0];
+  const kutu = useRef<HTMLSpanElement>(null);
+  const [gorundu, setGorundu] = useState(false);
+  useEffect(() => {
+    if (!kapak || gorundu) return;
+    const el = kutu.current;
+    if (!el || typeof IntersectionObserver === "undefined") { setGorundu(true); return; }
+    const io = new IntersectionObserver((xs) => { if (xs.some((x) => x.isIntersecting)) { setGorundu(true); io.disconnect(); } }, { rootMargin: "200px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [kapak?.id, gorundu]);
+  const adres = useFotoAdresleri(gorundu && kapak ? [kapak] : []);
+  if (!kapak) return null;
+  const u = adres[kapak.id];
+  return <span ref={kutu} className="kapak-kucuk" style={{ width: boyut, height: boyut }} aria-label={`${fotolar.length} fotoğraf`}>
+    {u ? <img src={u} alt="" loading="lazy" decoding="async" /> : <span className="kapak-bos" aria-hidden="true">▣</span>}
+    {fotolar.length > 1 && <small className="kapak-say">{fotolar.length}</small>}
+  </span>;
 }

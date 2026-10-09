@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.21.2 · 8 Ekim 2026
+ * Anahtar CRM v3.22 · 9 Ekim 2026
  * Test yardımcısı — bir ekranı JSDOM içinde gerçekten çizer; düğmelere basıp sonucu inceleyebilirsiniz
  * (renderToStaticMarkup'ta açılır menüler, "Geri" ile dönüş gibi etkileşimler görünmez).
  */
