@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Tek mesajda birden çok talep / portföy (haftalık talep toplantısı notu, meslektaşın liste mesajı) → ayrı kayıtlar.
  * Yapay zekâsız: satır / madde işareti / numara ile bölünür; "Ad Soyad –" ya da "Ad Soyad:" ile başlayan satırdan
  * kişi alınır; yalnız ad yazan satır, altındaki satırların kişisi olur; aynı satırda "2+1 3,5 milyon / 1+1 3 milyon"

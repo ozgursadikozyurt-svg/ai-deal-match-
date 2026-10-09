@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22 · 9 Ekim 2026
+// Anahtar CRM v3.22.1 · 9 Ekim 2026
 // GET /api/disa-aktar?tablo=talepler|portfoyler|kisiler|eslesmeler|notlar&bicim=csv   → Excel'de açılan CSV
 // GET /api/disa-aktar?bicim=json                                                      → tam yedek (tüm tablolar, her alan)
 // Arşiv, yedek ya da başka bir CRM'e taşıma için. Tam veritabanı yedeği için ayrıca: Supabase → Database → Backups / pg_dump.

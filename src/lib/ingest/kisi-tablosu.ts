@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Kişi tablosu içe aktarma (Google Contacts / Outlook CSV, ofis kişi listesi).
  * Önceden CSV yalnızca ilan tablosu sanılıyordu; kişi dosyalarında yalnız ad ve telefon alınıyordu.
  * Burada e-posta, şirket, not, etiket/rol ve ikinci telefon da ayrıştırılır; telefonlar doğrulanıp uyarıya dönüşür.

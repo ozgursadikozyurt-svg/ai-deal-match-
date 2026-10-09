@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026 (v3.13'ten)
  * Demo: Google Kişiler (v3.21: çift yönlü) ve Notion senkronu — sunucudaki planlayıcıların AYNISI (google/kisiler.ts, notion/plan.ts)
  * tarayıcı deposuna uygulanır. Dış veri: demo/ornek-entegrasyon.ts (1. tur ilk bağlantı, 2. tur dış değişiklik).
  */

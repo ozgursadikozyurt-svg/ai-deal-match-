@@ -1,10 +1,11 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Demo — portföy fotoğrafları: tarayıcıda küçültme + bu cihazda saklama (IndexedDB) + indirme / paylaşma.
  * Canlı kurulumda aynı küçültülmüş dosya /api/kayitlar/:id/fotolar ile Supabase Storage'a gider (src/lib/depolama/supabase.ts).
  * Kayıtta yalnızca künye durur (FotoMeta: id, ad, ölçü); görüntünün kendisi burada tutulur.
  */
-import { FOTO_UZUN_KENAR, FOTO_KALITE, FOTO_KUCUK_KENAR, fotoBoyutu, type FotoMeta } from "../src/lib/domain/foto";
+import { FOTO_UZUN_KENAR, FOTO_KALITE, FOTO_KUCUK_KENAR, FOTO_EN_BUYUK_BAYT, fotoBoyutu, type FotoMeta } from "../src/lib/domain/foto";
+const FOTO_HEDEF_BAYT = Math.floor(FOTO_EN_BUYUK_BAYT * 0.95);
 import { CANLI } from "./depo";
 
 interface FotoKaydi { id: string; kayitId: string; blob: Blob; kucuk: Blob }
@@ -56,7 +57,10 @@ export async function fotoEkle(kayitId: string, dosya: File): Promise<FotoMeta> 
   const g = await coz(dosya);
   try {
     const b = fotoBoyutu(g.en, g.boy, FOTO_UZUN_KENAR), k = fotoBoyutu(g.en, g.boy, FOTO_KUCUK_KENAR);
-    const blob = await tuvaldenBlob(ciz(g.kaynak, b.en, b.boy), FOTO_KALITE);
+    // v3.22.1 — sunucu 1,5 MB üstünü reddeder; ayrıntılı fotoğraflarda kalite kademeli düşürülür
+    const tuval = ciz(g.kaynak, b.en, b.boy);
+    let blob = await tuvaldenBlob(tuval, FOTO_KALITE);
+    for (const q of [0.72, 0.6, 0.5]) { if (blob.size <= FOTO_HEDEF_BAYT) break; blob = await tuvaldenBlob(tuval, q); }
     const kucuk = await tuvaldenBlob(ciz(g.kaynak, k.en, k.boy), 0.72);
     if (CANLI.acik) return canliYukle(kayitId, dosya, blob, b.en, b.boy);
     const id = "f" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -82,13 +86,22 @@ const fotoBlob = new Map<string, Blob>();           // oturum önbelleği
 /** Sunucudan gelen durumdaki künyelerden fotoğraf → kayıt eşlemesini kurar (açılışta çağrılır) */
 export function fotoEsle(kayitlar: { id: string; fotolar?: { id: string }[] }[]) { for (const k of kayitlar) for (const f of k.fotolar ?? []) fotoKayit.set(f.id, k.id); }
 async function canliYukle(kayitId: string, dosya: File, blob: Blob, en: number, boy: number): Promise<FotoMeta> {
-  await CANLI.hemen?.(); // kayıt sunucuda yoksa fotoğraf yüklenemez: bekleyen kaydı önce gönder
-  const form = new FormData();
-  form.append("dosya", new File([blob], dosya.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" }));
-  form.append("en", String(en)); form.append("boy", String(boy));
-  const r = await CANLI.api!(`/api/kayit/${encodeURIComponent(kayitId)}/fotolar`, { method: "POST", form });
+  // Kayıt sunucuda yoksa fotoğraf yüklenemez: bekleyen kaydı önce gönder (v3.22.1: reddedilmiş kayıt da yeniden denenir)
+  await CANLI.hemen?.();
+  const gonder = async () => {
+    const form = new FormData();
+    form.append("dosya", new File([blob], dosya.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" }));
+    form.append("en", String(en)); form.append("boy", String(boy));
+    return CANLI.api!(`/api/kayit/${encodeURIComponent(kayitId)}/fotolar`, { method: "POST", form });
+  };
+  let r = await gonder();
+  if (r.status === 404) { await new Promise((t) => setTimeout(t, 1200)); await CANLI.hemen?.(); r = await gonder(); } // kayıt o anda yazılıyor olabilir
   const j: any = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j?.mesaj ?? (j?.hata === "DEPO_KAPALI" ? "Fotoğraf deposu kapalı (Supabase anahtarı tanımlı değil)" : `Fotoğraf yüklenemedi (${r.status})`));
+  if (!r.ok) {
+    // v3.22.1 — "bazen fotoğraf eklenmiyor": nedeni artık söylenir (önceden yalnızca "dosya açılamadı" yazıyordu)
+    if (r.status === 404) { const neden = CANLI.kayitHatasi?.(kayitId); throw new Error(`Portföy henüz sunucuya kaydedilmedi${neden ? `: ${neden}` : ""}. Üstteki kayıt uyarısına bakın, düzelince fotoğrafı yeniden ekleyin.`); }
+    throw new Error(j?.mesaj ?? (j?.hata === "DEPO_KAPALI" ? "Fotoğraf deposu kapalı (Supabase anahtarı tanımlı değil)" : `Fotoğraf yüklenemedi (${r.status})`));
+  }
   fotoKayit.set(j.id, kayitId); if (j.url) fotoUrl.set(j.id, j.url); fotoBlob.set(j.id, blob);
   return { id: j.id, ad: j.ad, en: j.en, boy: j.boy, boyut: j.boyut };
 }

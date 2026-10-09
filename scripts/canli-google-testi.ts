@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Canlı hattın Google sınaması — GERÇEK Worker (wrangler dev, workerd) + yerel Postgres (PGlite) + SAHTE Google (bu betik :9002'de açar).
  * "Google ile bağlan" akışının tamamı Worker'ın içinden geçer: bağlan → izin ekranından dönüş (oturumsuz kapı, imzalı state) →
  * ilk içe aktarma (turlar hâlinde) → çift yönlü eşitleme → silinen kişinin Google'da kalması → zamanlayıcı → bağlantıyı kaldırma.

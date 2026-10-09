@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * v3.15 — çoklu kat, takasa açık, dinamik roller, kişiler toplu işlemler, kayıt göstergesi, geri dönüş hafızası.
  */
 import { test } from "node:test";

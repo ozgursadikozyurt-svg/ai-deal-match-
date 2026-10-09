@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Demo — kayıt formu. Şemadan üretilir; mülk grubuna göre yalnızca anlamlı alanlar,
  * önce "önemli alanlar", gerisi "Tüm alanlar" altında. Bölümler varsayılan kapalı.
  */
@@ -14,6 +14,7 @@ import { anaKategoriOf, islemKategoriUyumlu, MULK_AILELERI, aileOf, benzerAilele
 import { ONEMLI_ALANLAR, TEMEL_EKSTRA } from "../src/lib/domain/form-alanlari";
 import { adaylariGuncelle } from "../src/lib/lokasyon/ogrenme";
 import { haricBirlestir } from "../src/lib/lokasyon/haric";
+import { SATIS_ISLEMLERI } from "../src/lib/eslestirme/onizleme";
 import { etiket, KRITER_ETIKET, ISLEM_TIPI_ETIKET, ILAN_SAHIBI_ETIKET, VERI_KANALI_ETIKET, MULK_TIPI_META, HAVUZ_ETIKET } from "./etiketler";
 import { coz, cozulenToKayitLok, lokEtiket, ilAdiOf, calismaIliOku } from "./lokasyon";
 import { BUGUN, varsayilanValidUntil, yeniId, sureUzat, type Kayit, type Veri } from "./depo";
@@ -43,6 +44,12 @@ export const alanTuru = (a: Alan) => turOf(SEKIL[a]);
 const UST_ETIKET: Record<string, string> = { mulkTipi: "Mülk tipi", islemTipi: "İşlem tipi", fiyat: "Fiyat", minFiyat: "En az bütçe", maxFiyat: "Bütçe (en fazla)", m2: "Alan", netM2: "Net alan", minM2: "En az alan", maxM2: "En fazla alan", lokasyonlar: "Lokasyon", gondeTelefon: "Telefon", gondeAdi: "Ad", anaKategori: "Ana kategori", validUntil: "Geçerlilik", baslik: "Başlık", odaSayisi: "Oda sayısı", alternatifMulkTipleri: "Alternatif mülk tipleri", mesajTarihi: "Mesaj tarihi" };
 export const hataEtiketi = (path: (string | number)[]) => path[0] === "ozellik" ? ((MULK_OZELLIK_META as any)[path[1]]?.etiket ?? KRITER_ETIKET[String(path[1])] ?? String(path[1])) : UST_ETIKET[String(path[0])] ?? path.join(".");
 /** v3.10: eksik ya da hatalı numara null döner (önceden ham metni döndürüp kaydı doğrulamada takılıyordu). */
+/** v3.22.1 — işlem tipine göre fiyat periyodu: satış → Toplam; kira → Aylık (Yıllık / Günlük seçilmişse korunur) */
+export function periyotOnerisi(islem: string, mevcut?: string | null): string {
+  if (SATIS_ISLEMLERI.has(islem)) return "TOPLAM";
+  if (islem === "GUNLUK_KIRALIK") return "GUNLUK";
+  return mevcut && mevcut !== "TOPLAM" ? mevcut : "AYLIK";
+}
 export const telNormalize = (s?: string | null): string | null => telStandart(s);
 const tarihInput = (v: any) => (v ? new Date(v).toISOString().slice(0, 10) : "");
 
@@ -201,7 +208,10 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
   const ekstra = TEMEL_EKSTRA[grup] ?? [];
   const ana = anaKategoriOf(f.mulkTipi);
   const islemler = Object.keys(ISLEM_TIPI_ETIKET).filter((i) => islemKategoriUyumlu(ana, i as any));
-  useEffect(() => { if (!islemler.includes(f.islemTipi)) set("islemTipi", islemler[0]); }, [f.mulkTipi]);
+  // v3.22.1 — işlem değişince fiyat periyodu da uyar: satışta Toplam, kirada Aylık (eskiden yeni kayıt "Aylık" açılıyor,
+  // satılığa çevrilen talep "Aylık 12.000.000" kalıyor ve eşleşmede fiyat "bilinmiyor" çıkıyordu)
+  const islemSec = (i: string) => setF((x: any) => ({ ...x, islemTipi: i, fiyatPeriyodu: periyotOnerisi(i, x.fiyatPeriyodu) }));
+  useEffect(() => { if (!islemler.includes(f.islemTipi)) islemSec(islemler[0]); }, [f.mulkTipi]);
   const vu = f.validUntil ? new Date(f.validUntil) : varsayilanValidUntil(tip, f.islemTipi, f.aciliyet, BUGUN, d.ayarlar.ttl);
   const dna = (x: string) => (f.ozellik.kritikKriterler ?? []).includes(x) ? "kritik" : (f.ozellik.esnekKriterler ?? []).includes(x) ? "esnek" : (f.ozellik.eksikBilgiler ?? []).includes(x) ? "eksik" : "";
   const dnaDon = (x: string) => {
@@ -228,6 +238,7 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
     if (!ekstra.includes("krediyeUygun" as never)) delete temiz.krediyeUygun;
     temiz.alternatifMulkTipleri = (temiz.alternatifMulkTipleri ?? []).filter((t: string) => t !== temiz.mulkTipi).slice(0, 5);
     delete temiz.anaKategori; // her zaman mülk tipinden türetilir
+    if (SATIS_ISLEMLERI.has(temiz.islemTipi)) temiz.fiyatPeriyodu = "TOPLAM"; // v3.22.1 — satışta periyot her zaman toplam
     const p = KayitCreateSchema.safeParse(temiz);
     if (!p.success) { setHatalar(p.error.issues.map((i) => ({ yer: hataEtiketi(i.path as any), mesaj: i.message }))); ust.current?.scrollIntoView({ behavior: "smooth" }); return; }
     const kayit: Kayit = { id: mevcut?.id ?? yeniId(tip), olusturma: mevcut?.olusturma ?? BUGUN.toISOString(), veri: p.data };
@@ -249,7 +260,7 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
     <Bolum baslik="Temel bilgiler" acik>
       <MulkTipiSecici f={f} set={set} talep={talep} />
       <div className="alanlar">
-        <div className="alan"><label htmlFor="f-islem">İşlem</label><select id="f-islem" value={f.islemTipi} onChange={(e) => set("islemTipi", e.target.value)}>{islemler.map((i) => <option key={i} value={i}>{(ISLEM_TIPI_ETIKET as any)[i]}</option>)}</select></div>
+        <div className="alan"><label htmlFor="f-islem">İşlem</label><select id="f-islem" value={f.islemTipi} onChange={(e) => islemSec(e.target.value)}>{islemler.map((i) => <option key={i} value={i}>{(ISLEM_TIPI_ETIKET as any)[i]}</option>)}</select></div>
         {talep && <div className="alan"><label htmlFor="f-acil">Aciliyet</label><select id="f-acil" value={f.aciliyet} onChange={(e) => set("aciliyet", e.target.value)}>{["DUSUK", "NORMAL", "YUKSEK", "ACIL"].map((x) => <option key={x} value={x}>{etiket(x)}</option>)}</select></div>}
         {ekstra.includes("odaSayisi") && (() => {
           // v3.19 — talepte çoklu seçim ("2+1, 3+1"); portföyde tek seçim

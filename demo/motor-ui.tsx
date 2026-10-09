@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Demo — eşleştirme motoru v2 görselleri: Talep DNA kartı, eksik bilgi uyarısı + müşteriye soru mesajı,
  * Anahtar Uyum Matrisi dökümü, havuz katmanı rozeti, portföy edinme fırsatı bandı.
  */

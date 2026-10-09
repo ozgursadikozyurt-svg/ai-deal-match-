@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026 (v3.14'ten)
  * v3.20: davet bağlantısıyla katılma (?davet=KOD), açılışta /api/oturum (rol, plan, yetkiler), hesabı olmayana anlaşılır mesaj.
  * Canlı giriş noktası (dist/canli/index.html): giriş → ilk kurulum denetimi → sunucudan durum → aynı demo ekranları, veri sunucuda.
  */
@@ -11,6 +11,7 @@ import { fotoEsle } from "./foto";
 import { OturumYoneticisi, type Yapilandirma } from "./canli-oturum";
 import { sunucudanDurum } from "./canli-esle";
 import { kaydediciKur, type KaydetDurumu } from "./canli-kaydet";
+import { kayitlariOnar } from "./onarim";
 import { KaydetGostergesi } from "./canli-gosterge";
 import { MARKA } from "../src/lib/marka";
 import { SURUM, TARIH } from "../src/lib/surum";
@@ -102,9 +103,16 @@ function Canli({ cfg }: { cfg: Yapilandirma }) {
       const sunucu = await r.json();
       const durum = sunucudanDurum(sunucu);
       fotoEsle(durum.kayitlar as any);
-      const k = kaydediciKur({ api, baslangic: durum, durum: setKaydet });
+      const k = kaydediciKur({ api, baslangic: durum, durum: setKaydet, yedekAnahtari: `anahtar.canli.bekleyen.${o.eposta ?? "?"}` });
       kaydedici.current = k;
-      CANLI.yuklu = durum; CANLI.kaydet = (d) => k.kuyrugaAl(d); CANLI.hemen = () => k.hemen(); CANLI.api = api;
+      // v3.22.1 — açılışta onarım (demo/onarim.ts) + önceki oturumda sunucuya ulaşamamış yeni kayıtlar (yerel yedek):
+      // ikisi de sunucudaki hâlden farklı olduğu için kayıt kuyruğu onları kendiliğinden sunucuya yazar
+      const geri = k.yedektenGeriAl(durum);
+      const onar = kayitlariOnar(geri.kayitlar);
+      const ilk = onar.sayi || geri !== durum ? { ...geri, kayitlar: onar.kayitlar } : durum;
+      CANLI.yuklu = ilk; CANLI.kaydet = (d) => k.kuyrugaAl(d); CANLI.hemen = () => k.hemen(); CANLI.api = api;
+      CANLI.sunucudaMi = (id) => k.sunucudaMi(id); CANLI.kayitHatasi = (id) => k.hataOf(id);
+      if (ilk !== durum) k.kuyrugaAl(ilk);
       CANLI.kisileriBirlestir = (d, sunucu) => k.kisileriBirlestir(d, sunucu); // v3.21
       const or = await api("/api/oturum");
       const bilgi = or.ok ? await or.json().catch(() => undefined) : undefined;

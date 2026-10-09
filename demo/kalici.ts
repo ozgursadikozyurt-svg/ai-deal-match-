@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Demo — ekran durumunu (filtre, sıralama, sekme) ekran sökülse de koruyan kancalar.
  *
  * Sorun: uygulama ekranları `ekran.ad`'a göre koşullu çizer; bir karta girince Liste / Eşleşmeler / Kişiler

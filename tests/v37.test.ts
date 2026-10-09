@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * v3.7 — toplu veri girişi (xlsx/csv okuyucu, başlık bulma, sütun eşleme, satır dönüşümü), toplu mesaj bölücü,
  * vCard, sıralama, arama/WhatsApp bağlantıları, ilan geçerliliği (DIS_ILAN 90 gün). Veritabanısız.
  */

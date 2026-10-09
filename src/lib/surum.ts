@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.22";
+export const SURUM = "3.22.1";
 export const TARIH = "9 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.22_9Ekim2026";
+export const DOSYA_EKI = "v3.22.1_9Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,26 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.22.1",
+    tarih: "9 Ekim 2026",
+    baslik: "Eşleşme denetimi düzeltmeleri: satış talebinde fiyat \"bilinmiyor\" hatası, tireli HARİÇ, \"site içi olmayan\", 7.5 M bütçe; Benim = Öncelikli fırsat; fotoğraf ve kaydetme güvenliği",
+    degisenler: [
+      "Fiyat \"bilinmiyor\" hatası: formda yeni kayıt \"Aylık\" periyotla açılıyordu; satılığa çevrilen talepte \"Aylık 12.000.000\" kalıyor, 11.750.000'lik satılık daire \"? Bilinmiyor\" ve ~60 puan çıkıyordu. Artık satışta (satılık, devren satılık, kat karşılığı, takas) fiyat her zaman toplam sayılır; formda işlem değişince periyot da değişir (satış → Toplam, kira → Aylık); kirada aylık ↔ yıllık 12 ile çevrilir. Aynı talep artık 100 puan, Sunulabilir.",
+      "Canlı veritabanındaki 46 talep × 281 portföy (3.683 çift) motorla tek tek denetlendi; bulunanlar düzeltildi: (1) \"( Hurma-Sarısu-Liman hariç)\" tireli yazımda hariç hiç görülmüyordu → üçü de hariç, Konyaaltı aranır; (2) \"Site içi olmayan\" \"site içinde istiyor\" diye okunuyordu → istemiyor (site içi portföy Koşullu olur); (3) \"Bütçe - 7.5 M\", \"max 7 m\" okunmuyordu → 7,5 / 7 milyon; (4) \"2.000-3.000 M2\" alan aralığı bütçe sanılıyordu; (5) oda ya da m² bilgisi portföyde olmayan 10 eşleşme \"Sunulabilir\" görünüyordu → Koşullu (sunmadan önce sor).",
+      "Eski kayıtlar açılışta kendiliğinden onarılır ve sunucuya yazılır: \"hariç\" yazan eski talepler (örn. Konyaaltı (Hurma, Sarısu, Liman hariç) talebinde Hurma'daki 92 puanlı eşleşmeler artık elenir), \"site içi olmayan\", mesajında yazdığı hâlde bütçesi boş kalmış talepler, satışta yanlış \"Aylık\" periyot. Yalnızca kaydın kendi mesajında kanıt varsa değişir.",
+      "★ Benim olan portföy ya da talep (WhatsApp grubundan \"emlakçı / web ilanı\" olarak gelse de) artık Öncelikli fırsat: komisyon bende kalır. ◆ Ofisim olan taraf aracısız sayılır. Tahmini komisyon da buna göre hesaplanır.",
+      "Fotoğraf eklenemiyordu (bazen): portföy o anda sunucuya kaydedilmemişse yükleme 404 ile düşüyor, ekranda yalnızca \"dosya açılamadı\" yazıyordu. Artık yüklemeden önce kayıt gönderilir, gerekirse bir kez daha denenir; olmazsa gerçek neden yazılır. Ayrıntılı fotoğraf 1,5 MB'ı aşarsa kalite kendiliğinden düşürülür.",
+      "Kaydetme güvenliği: sunucunun bir kez reddettiği kayıt (örn. yayın ile \"Kurulumu tamamla\" arasındaki dakikalarda) içeriği değişmedikçe bir daha gönderilmiyordu — sayfa yenilenince kayboluyordu. Artık 1 dakika sonra kendiliğinden yeniden denenir (5 kereye kadar; fotoğraf eklerken hemen). Sunucuya hiç ulaşmamış YENİ kayıt ve kişiler tarayıcıda yedeklenir, sayfa yenilense de geri gelip gönderilir.",
+      "Veritabanı değişikliği yok; \"Kurulumu tamamla\" gerekmez.",
+    ],
+    testEt: [
+      "Yeni talep (formdan): işlemi Satılık seçin — Fiyat periyodu kendiliğinden Toplam olur. ≤ 12.000.000 bütçeli 3+1 talep, 11.750.000'lik 3+1 portföyle Kriter dökümünde Fiyat \"✓ Uygun\" görünmeli.",
+      "Konyaaltı (Hurma, Sarısu, Liman hariç) talebini açın: başlık ve konumlar hariçli olmalı; Hurma / Liman portföyleri Uygun değil'e düşmüş olmalı.",
+      "★ Benim işaretli bir portföyün eşleşmeleri Eşleşmeler'de \"Öncelikli fırsat\" rozetiyle görünmeli (Fırsat › Öncelikli süzgecinde).",
+      "Bir portföye fotoğraf ekleyin; eklenemezse çıkan mesaj nedenini söylemeli.",
+    ],
+  },
   {
     surum: "3.22",
     tarih: "9 Ekim 2026",

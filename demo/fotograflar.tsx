@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Demo — portföy detayındaki "Fotoğraflar" bölümü: ekle (küçültülerek), kapak seç, sil, tek tek ya da toplu indir, paylaş.
  */
 import { useEffect, useRef, useState } from "react";
@@ -51,13 +51,14 @@ export function Fotograflar({ k }: { k: Kayit }) {
     const bos = FOTO_SINIR - fotolar.length;
     const secilen = [...dosyalar].filter((f) => f.type.startsWith("image/") || /\.(jpe?g|png|webp|heic)$/i.test(f.name)).slice(0, bos);
     if (!secilen.length) { bildir(bos <= 0 ? `En fazla ${FOTO_SINIR} fotoğraf eklenebilir` : "Fotoğraf dosyası seçin"); return; }
-    const yeni = [...fotolar]; let hata = 0;
+    const yeni = [...fotolar]; let hata = 0; let neden = "";
     for (const [n, f] of secilen.entries()) {
-      setMesgul(`Küçültülüyor ${n + 1}/${secilen.length}…`);
-      try { yeni.push(await fotoEkle(k.id, f)); } catch { hata++; }
+      setMesgul(`Yükleniyor ${n + 1}/${secilen.length}…`);
+      try { yeni.push(await fotoEkle(k.id, f)); } catch (e: any) { hata++; neden ||= String(e?.message ?? e); }
     }
-    setMesgul(null); yaz(yeni);
-    bildir(`${secilen.length - hata} fotoğraf eklendi${hata ? `, ${hata} dosya açılamadı` : ""}${dosyalar.length > secilen.length ? ` (sınır ${FOTO_SINIR})` : ""}`);
+    setMesgul(null); if (yeni.length !== fotolar.length) yaz(yeni);
+    // v3.22.1 — yüklenemeyenin NEDENİ yazılır (önceden her hata "dosya açılamadı" görünüyordu)
+    bildir(hata === secilen.length ? `Fotoğraf eklenemedi: ${neden}` : `${secilen.length - hata} fotoğraf eklendi${hata ? `, ${hata} eklenemedi: ${neden}` : ""}${dosyalar.length > secilen.length ? ` (sınır ${FOTO_SINIR})` : ""}`);
     if (girdi.current) girdi.current.value = "";
   };
   const sil = async (i: number) => { const f = fotolar[i]; yaz(fotolar.filter((_, j) => j !== i)); setAcik(null); await fotoSil(f.id); bildir("Fotoğraf silindi"); };

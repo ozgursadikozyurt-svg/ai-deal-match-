@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Demo — ortak filtre paneli (Talepler, Portföyler, Eşleşmeler, talep içi portföy çekmecesi).
  * Her alan çoklu seçim. Mülk türü seçilince o türe özel filtreler çıkar (ONEMLI_ALANLAR).
  * v3.5 — Kompakt: ekranda tek satır (arama · Acil · Filtrele rozeti) + tek satır kayan aktif çipler.

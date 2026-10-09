@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * v3.21.2 — Eşleşmeler: tahmini komisyon toplamı kalktı · filtre/konum karta girip Geri dönünce korunur ·
  * kompakt süzgeçler + skor süzgeci · Konumlar, Bağlantılar, Yönetim Ayarlar içinde.
  * v3.22: yan çekmece yerine seçici satırında yatay açılan skor şeridi (testler ona göre güncellendi; ⋯ başlık satırında).

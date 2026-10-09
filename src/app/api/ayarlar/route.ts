@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22 · 9 Ekim 2026
+// Anahtar CRM v3.22.1 · 9 Ekim 2026
 // GET /api/ayarlar → { ttl, ai, paylasim, calismaIli, aiAnahtarVar }
 // PUT /api/ayarlar { ttl?, ai?, paylasim?, calismaIli? } → yalnızca gönderilenler güncellenir.
 //   ttl: varsayılan geçerlilik süreleri (yeni kayıtlara uygulanır; mevcutlar değişmez)

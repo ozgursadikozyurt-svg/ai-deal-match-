@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Demo — Konumlar ekranı: konum öğrenme (tanınmayan ifadeler → öneri → onay → sözlük), öğrenilenler, canlı çözücü.
  * Çekirdek mantık src/lib/lokasyon/ogrenme.ts'te; bu dosya yalnızca ekran.
  */

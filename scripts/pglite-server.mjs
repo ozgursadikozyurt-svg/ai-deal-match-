@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22 · 9 Ekim 2026
+// Anahtar CRM v3.22.1 · 9 Ekim 2026
 // Yerel test için bellek-içi Postgres (PGlite) — gerçek Supabase gerekmeden şema/seed doğrulaması
 import { PGlite } from "@electric-sql/pglite";
 import { PGLiteSocketServer } from "@electric-sql/pglite-socket";

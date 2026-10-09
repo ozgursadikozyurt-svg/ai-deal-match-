@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * ROLLER VE YETKİLER — tek kaynak.
  *
  * Üç rol var:

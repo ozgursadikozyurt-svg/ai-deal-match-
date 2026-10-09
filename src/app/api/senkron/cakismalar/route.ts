@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22 · 9 Ekim 2026 (v3.13'ten)
+// Anahtar CRM v3.22.1 · 9 Ekim 2026 (v3.13'ten)
 // GET  /api/senkron/cakismalar            → açık çakışmalar (aynı alan iki tarafta farklı değişmiş)
 // POST /api/senkron/cakismalar { id | ids[] | tumu: true, secim: "YEREL"|"UZAK" } → Anahtar'daki kalsın / dış kaynaktakini al
 //   v3.7: toplu seçim — seçilenler ya da tüm açık çakışmalar tek istekle

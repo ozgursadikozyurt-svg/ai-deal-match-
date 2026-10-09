@@ -5,6 +5,23 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.22.1 · 9 Ekim 2026 — Eşleşme denetimi düzeltmeleri: satış talebinde fiyat "bilinmiyor" hatası, tireli HARİÇ, "site içi olmayan", 7.5 M bütçe; Benim = Öncelikli fırsat; fotoğraf ve kaydetme güvenliği
+
+- Fiyat "bilinmiyor" hatası: formda yeni kayıt "Aylık" periyotla açılıyordu; satılığa çevrilen talepte "Aylık 12.000.000" kalıyor, 11.750.000'lik satılık daire "? Bilinmiyor" ve ~60 puan çıkıyordu. Artık satışta (satılık, devren satılık, kat karşılığı, takas) fiyat her zaman toplam sayılır; formda işlem değişince periyot da değişir (satış → Toplam, kira → Aylık); kirada aylık ↔ yıllık 12 ile çevrilir. Aynı talep artık 100 puan, Sunulabilir.
+- Canlı veritabanındaki 46 talep × 281 portföy (3.683 çift) motorla tek tek denetlendi; bulunanlar düzeltildi: (1) "( Hurma-Sarısu-Liman hariç)" tireli yazımda hariç hiç görülmüyordu → üçü de hariç, Konyaaltı aranır; (2) "Site içi olmayan" "site içinde istiyor" diye okunuyordu → istemiyor (site içi portföy Koşullu olur); (3) "Bütçe - 7.5 M", "max 7 m" okunmuyordu → 7,5 / 7 milyon; (4) "2.000-3.000 M2" alan aralığı bütçe sanılıyordu; (5) oda ya da m² bilgisi portföyde olmayan 10 eşleşme "Sunulabilir" görünüyordu → Koşullu (sunmadan önce sor).
+- Eski kayıtlar açılışta kendiliğinden onarılır ve sunucuya yazılır: "hariç" yazan eski talepler (örn. Konyaaltı (Hurma, Sarısu, Liman hariç) talebinde Hurma'daki 92 puanlı eşleşmeler artık elenir), "site içi olmayan", mesajında yazdığı hâlde bütçesi boş kalmış talepler, satışta yanlış "Aylık" periyot. Yalnızca kaydın kendi mesajında kanıt varsa değişir.
+- ★ Benim olan portföy ya da talep (WhatsApp grubundan "emlakçı / web ilanı" olarak gelse de) artık Öncelikli fırsat: komisyon bende kalır. ◆ Ofisim olan taraf aracısız sayılır. Tahmini komisyon da buna göre hesaplanır.
+- Fotoğraf eklenemiyordu (bazen): portföy o anda sunucuya kaydedilmemişse yükleme 404 ile düşüyor, ekranda yalnızca "dosya açılamadı" yazıyordu. Artık yüklemeden önce kayıt gönderilir, gerekirse bir kez daha denenir; olmazsa gerçek neden yazılır. Ayrıntılı fotoğraf 1,5 MB'ı aşarsa kalite kendiliğinden düşürülür.
+- Kaydetme güvenliği: sunucunun bir kez reddettiği kayıt (örn. yayın ile "Kurulumu tamamla" arasındaki dakikalarda) içeriği değişmedikçe bir daha gönderilmiyordu — sayfa yenilenince kayboluyordu. Artık 1 dakika sonra kendiliğinden yeniden denenir (5 kereye kadar; fotoğraf eklerken hemen). Sunucuya hiç ulaşmamış YENİ kayıt ve kişiler tarayıcıda yedeklenir, sayfa yenilense de geri gelip gönderilir.
+- Veritabanı değişikliği yok; "Kurulumu tamamla" gerekmez.
+
+**Demo'da test edilecekler**
+
+- [ ] Yeni talep (formdan): işlemi Satılık seçin — Fiyat periyodu kendiliğinden Toplam olur. ≤ 12.000.000 bütçeli 3+1 talep, 11.750.000'lik 3+1 portföyle Kriter dökümünde Fiyat "✓ Uygun" görünmeli.
+- [ ] Konyaaltı (Hurma, Sarısu, Liman hariç) talebini açın: başlık ve konumlar hariçli olmalı; Hurma / Liman portföyleri Uygun değil'e düşmüş olmalı.
+- [ ] ★ Benim işaretli bir portföyün eşleşmeleri Eşleşmeler'de "Öncelikli fırsat" rozetiyle görünmeli (Fırsat › Öncelikli süzgecinde).
+- [ ] Bir portföye fotoğraf ekleyin; eklenemezse çıkan mesaj nedenini söylemeli.
+
 ## v3.22 · 9 Ekim 2026 — Benim / Ofisim işareti ve süzgeci; "HARİÇ" bölge eşleştirmede; bütçesiz talebin puanı düzeltildi; portföy kartında küçük fotoğraf; skor süzgeci yatay şerit
 
 - Benim / Ofisim: kendi talep ve portföyleriniz ★ Benim, ofis arkadaşlarınızınki ◆ Ofisim rozetiyle görünür. Tanıma kendiliğinden: gönderen telefonu ya da kayda bağlı kişinin telefonu sizin telefonunuzsa (portföy paylaşım imzasındaki telefon zaten sayılır), adınız ya da ofis / firma adı geçiyorsa. Ayarlar › en üstte "Benim ve ofisim": başka telefonlarınızı, ofis arkadaşlarınızın telefonlarını ve firma adını ekleyin — telefon yazın ya da kişi adını yazıp Kişiler'den seçin (ad + telefon birlikte gelir). Her kaydın sayfasında "Kimin?" seçicisiyle elle de işaretlenir (Benim · Ofisim · Başkası · Otomatik).

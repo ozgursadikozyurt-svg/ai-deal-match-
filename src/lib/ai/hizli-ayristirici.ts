@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * HIZLI AYRIŞTIRICI — yapay zekâdan ÖNCE çalışan kural tabanlı (regex + sözlük) çözümleyici. Ücretsizdir.
  * Amaç: yapıştırılan WhatsApp mesajı / portal ilanı ya da doğal dil sorusunun çoğunu yapay zekâ
  * çağırmadan anlamak; yapay zekâ yalnızca kural tabanlı sonuç "yeterli" değilse çağrılır.
@@ -118,6 +118,7 @@ function paralar(m: string): { deger: number; acik: boolean; kadar: boolean; ayl
     const once = m.slice(Math.max(0, x.index - 14), x.index);
     if (/^\s*(m2|m²|mt2|metre|m\b|metrekare|kw|kva|ton|d[öo]n[üu]m|oda|kat|ya[şs]|y[ıi]l|\+|adet|ki[şs]i|yatak|dk|km|derece|°)/.test(sonra) && !birim) continue;
     if (/\+\s*$/.test(once) || /\d\s*\+$/.test(sayi)) continue;
+    if (!birim && /^\s*[-–]\s*\d[\d.,]*\s*(m2|m²|mt2|metre|metrekare)/.test(sonra)) continue; // v3.22.1 — "2.000-3.000 M2" alan aralığıdır, bütçe değil
     if (/(\d{3})[\s-]?(\d{2})[\s-]?(\d{2})/.test(m.slice(x.index, x.index + 14)) && /^0?5/.test(sayi)) continue; // telefon
     if (/^\d{7,}$/.test(sayi)) continue; // ilan no / ayraçsız uzun sayı
     const n = sayiOku(sayi);
@@ -146,7 +147,10 @@ export function paraNormalize(metin: string): string {
     .replace(/(\d)\s*([₺€£])/gu, (_, n: string, s: string) => `${n} ${kod[s]}`)
     .replace(/(\d)\s*\$(?!\d)/g, "$1 USD")
     .replace(/(\d)[.,]-\s*(tl\b)?/gi, "$1 TL")
-    .replace(/(\d[\d.,]*)\s*m\s*(?=(tl|try|usd|eur|euro|dolar|gbp)\b)/gi, (_, n: string) => `${n.replace(".", ",")} milyon `);
+    .replace(/(\d[\d.,]*)\s*m\s*(?=(tl|try|usd|eur|euro|dolar|gbp)\b)/gi, (_, n: string) => `${n.replace(".", ",")} milyon `)
+    // v3.22.1 — para birimi yazılmadan "Bütçe - 7.5 M", "Bütçe : max 7 m", "max 10M": bütçe / fiyat bağlamında M = milyon
+    // (m², metre ile karışmasın diye yalnızca bu sözcüklerden sonra ve arkasında harf / 2 / ² yoksa)
+    .replace(/((?:b[üu]t[çc]e|fiyat|fiyat[ıi]|max\.?|maks\p{L}*|en\s*fazla)[^\d\n]{0,12})(\d{1,3}(?:[.,]\d{1,2})?)\s*m(?![\p{L}²2\d])/giu, (_, on: string, n: string) => `${on}${n.replace(".", ",")} milyon`);
 }
 
 export function hizliAyristir(metin0: string): HizliSonuc {
@@ -259,9 +263,16 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   if (cephe) ozellik.cepheUzunluguM = sayiOku(cephe[1]);
   if (/ana\s*cadde/.test(m)) ozellik.anaCaddeUzeri = true;
   if (/e[şs]yas[ıi]z/.test(m)) ozellik.esyaDurumu = "ESYASIZ"; else if (/e[şs]yal[ıi]/.test(m)) ozellik.esyaDurumu = "ESYALI";
-  if (/asans[öo]r/.test(m)) ozellik.asansor = true;
-  if (/site\s*i[çc]i/.test(m)) ozellik.siteIcinde = true;
-  if (/havuz/.test(m)) ozellik.havuz = true;
+  // v3.22.1 — olumsuz: "Site içi olmayan", "havuz istemiyor", "asansörsüz" → false (talepte "istemiyor")
+  const evetHayir = (re: RegExp, olumsuzEk?: RegExp): boolean | undefined => {
+    const x = m.match(re); if (!x) return undefined;
+    if (olumsuzEk?.test(m)) return false;
+    const sonra = m.slice((x.index ?? 0) + x[0].length, (x.index ?? 0) + x[0].length + 28);
+    return /^[\s\p{L}]{0,12}?\b(olmayan|olmas[ıi]n|olmamal[ıi]|olmayacak|istemiyor|istenmiyor|hari[çc]|de[ğg]il)/u.test(sonra) ? false : true;
+  };
+  const asans = evetHayir(/asans[öo]r(?!s[üu]z)/, /asans[öo]rs[üu]z/); if (asans != null) ozellik.asansor = asans; else if (/asans[öo]rs[üu]z/.test(m)) ozellik.asansor = false;
+  const site = evetHayir(/site\s*i[çc]i|site\s*i[çc]erisinde|sitede/); if (site != null) ozellik.siteIcinde = site;
+  const hv = evetHayir(/havuz(?!s[uü]z)/); if (hv != null) ozellik.havuz = hv; else if (/havuzsuz/.test(m)) ozellik.havuz = false;
   if (/deniz\s*manzara/.test(m)) ozellik.denizManzarasi = true;
   const amac = tip === "TALEP" ? AMAC_SOZLUK.filter(([re]) => re.test(m)).map(([, a]) => a) : [];
   if (amac.length) ozellik.kullanimAmaclari = [...new Set(amac)];

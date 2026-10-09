@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026 (v3.13'ten)
  * Demo veri deposu: örnek veriyi gerçek doğrulama + konum çözücüden geçirerek yükler,
  * kullanıcının değişikliklerini tarayıcıda (localStorage) saklar.
  */
@@ -7,6 +7,7 @@ import type { FotoMeta } from "../src/lib/domain/foto";
 import { aiAyarNormalize, paylasimNormalize, calismaIliNormalize, type AiAyar, type PaylasimAyar } from "../src/lib/domain/ayarlar";
 import { sahiplikNormalize, type SahiplikAyar } from "../src/lib/domain/sahiplik";
 import { haricBirlestir } from "../src/lib/lokasyon/haric";
+import { kayitlariOnar } from "./onarim";
 import { KayitCreateSchema, type KayitCreateData } from "../src/lib/validation/kayit";
 import { adaylariGuncelle, type KonumAdayi } from "../src/lib/lokasyon/ogrenme";
 import type { WaMesaj, GrupOzeti } from "../src/lib/ingest/whatsapp";
@@ -137,6 +138,9 @@ export const CANLI: {
   kisileriBirlestir: ((d: DepoDurumu, sunucu: Kisi[]) => DepoDurumu) | null;
   /** v3.21 — Google izin ekranından dönüşte adresteki sonuç (?google=ok | iptal | hata | yetki | yenileme-anahtari-yok) */
   googleDonus: string | null;
+  /** v3.22.1 — kayıt sunucuya yazıldı mı / son reddedilme nedeni (fotoğraf yükleme hatasını anlaşılır göstermek için) */
+  sunucudaMi?: ((id: string) => boolean) | null;
+  kayitHatasi?: ((id: string) => string | undefined) | null;
 } = { acik: CANLI_ORTAM, yuklu: null, kaydet: null, hemen: null, sample: null, api: null, oturum: null, kisileriBirlestir: null, googleDonus: null };
 
 export const BUGUN = CANLI_ORTAM ? new Date() : new Date(2026, 8, 30, 12, 0, 0); // demo "bugün" sabit (süre hesapları değişmesin); canlıda gerçek tarih
@@ -232,6 +236,8 @@ export function depoYukle(): { durum: DepoDurumu; hatalar: OrnekHata[]; yenilend
       return { durum: { ...bos, testler: d.testler ?? {}, geriBildirim: d.geriBildirim ?? "", ayarlar: ayarlariOku(d.ayarlar), ogrenilen: d.ogrenilen ?? [], roller: d.roller ?? [] }, hatalar, yenilendi: true };
     // v3.11 — v3.10'da yanlış ilçeye yazılmış aynı adlı mahalleleri onar ("Fener, Çağlayan" → Muratpaşa / Çağlayan)
     if (Array.isArray(d.kayitlar)) d.kayitlar = d.kayitlar.map((k) => { const r = belirsizKonumOnar((k.veri?.lokasyonlar ?? []) as any[]); return r.degisti ? { ...k, veri: { ...k.veri, lokasyonlar: r.lokasyonlar } } : k; }) as typeof d.kayitlar;
+    // v3.22.1 — satışta yanlış "Aylık" periyot, eski "hariç" talepler, "site içi olmayan" (demo/onarim.ts)
+    if (Array.isArray(d.kayitlar)) d.kayitlar = kayitlariOnar(d.kayitlar as Kayit[]).kayitlar;
     return { durum: { ...bos, ...d, ayarlar: ayarlariOku(d.ayarlar) } as DepoDurumu, hatalar, yenilendi: false };
   } catch {
     return { durum: bos, hatalar, yenilendi: false };

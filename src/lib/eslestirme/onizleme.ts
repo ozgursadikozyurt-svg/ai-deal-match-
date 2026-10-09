@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * EŞLEŞTİRME MOTORU v3 (v3.11; v2 = v3.5) — veritabanı ve yapay zekâ gerektirmeyen saf fonksiyon.
  * Metin benzerliği değil, ticari gayrimenkulün katı kuralları (Killer Criteria):
  *  1. Talep DNA'sı (talep-dna.ts): öldürücü kriterler = talepte "şart" denenler + kullanım amacının doğası
@@ -40,6 +40,8 @@ export const BILINMEYEN_PUAN = 0.4;
  * düz tavan yerine çarpan, bütçesizler arasındaki sırayı korur (m²'si de eksik olan daha aşağıda kalır).
  */
 export const FIYATSIZ_CARPAN = 0.75;
+/** v3.22.1 — talepte "istemiyor" denince portföyde var olması uyumsuzluk sayılan evet/hayır alanları */
+export const ISTENMEYEBILIR: ReadonlySet<string> = new Set(["siteIcinde", "havuz"]);
 
 /** v3.17 — iki kayıtta da boş olan ve skoru şüpheli kılan temel alanlar (kullanıcıya "tamamlayın" denir) */
 export function eksikVeriUyarilari(t: OnizlemeKayit, p: OnizlemeKayit): string[] {
@@ -289,6 +291,22 @@ function lokasyonPuani(t0: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBaglami, 
   return enIyi;
 }
 
+/** v3.22.1 — satış işlemleri: fiyat her zaman toplam bedeldir (kayıttaki periyot yanlış girilmiş olsa da) */
+export const SATIS_ISLEMLERI: ReadonlySet<string> = new Set(["SATILIK", "DEVREN_SATILIK", "KAT_KARSILIGI", "TAKAS"]);
+/** Kaydın fiyat periyodu, işlem tipine göre düzeltilmiş hâli */
+export function etkinPeriyot(k: { islemTipi: string; fiyatPeriyodu?: string | null }, islem = k.islemTipi): string {
+  if (SATIS_ISLEMLERI.has(islem)) return "TOPLAM";
+  return k.fiyatPeriyodu ?? (/KIRALIK/.test(islem) ? "AYLIK" : "TOPLAM");
+}
+/** Portföy fiyatını talebin periyoduna çevirir (aylık ↔ yıllık); çevrilemiyorsa farkli = true */
+function periyotlar(t: OnizlemeKayit, p: OnizlemeKayit): { tPer: string; pPer: string; carpan: number; farkli: boolean } {
+  const tPer = etkinPeriyot(t, p.islemTipi), pPer = etkinPeriyot(p);
+  if (tPer === pPer) return { tPer, pPer, carpan: 1, farkli: false };
+  if (tPer === "AYLIK" && pPer === "YILLIK") return { tPer, pPer, carpan: 1 / 12, farkli: false };
+  if (tPer === "YILLIK" && pPer === "AYLIK") return { tPer, pPer, carpan: 12, farkli: false };
+  return { tPer, pPer, carpan: 1, farkli: true };
+}
+
 function karsilastir(alan: MulkOzellikAlani, tv: unknown, pv: unknown): KriterSonuc {
   const meta = MULK_OZELLIK_META[alan];
   if (pv == null) return "BILINMIYOR";
@@ -364,8 +382,12 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   }
   // Fiyat — esnek bütçe +%20, değilse +%10
   if (t.maxFiyat != null) {
-    const pf = p.fiyat ?? null;
-    const periyotFarkli = p.fiyatPeriyodu && t.fiyatPeriyodu && p.fiyatPeriyodu !== t.fiyatPeriyodu;
+    // v3.22.1 — fiyat periyodu işlem tipine göre okunur: satışta (satılık, devren satılık, kat karşılığı, takas) her iki taraf
+    // TOPLAM'dır. Formda yeni kayıt "Aylık" ile açılıyordu; satılığa çevrilen talep "Aylık 12.000.000" kalıyor, 11.750.000'lik
+    // satılık daire "fiyat bilinmiyor" çıkıyordu. Kirada aylık ↔ yıllık 12 ile çevrilir.
+    const per = periyotlar(t, p);
+    const pf = p.fiyat != null ? p.fiyat * per.carpan : null;
+    const periyotFarkli = per.farkli;
     const ust = t.maxFiyat * (1 + dna.fiyatTolerans / 100);
     const sonuc: KriterSonuc = pf == null || periyotFarkli ? "BILINMIYOR" : pf <= ust ? "SAGLANDI" : "SAGLANMADI";
     // v3.11 — bütçe altı: fiyat bütçenin çok altındaysa mülk büyük olasılıkla müşterinin aradığı segmentte değildir.
@@ -380,13 +402,18 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
         else if (r < A.fiyatAlt.esik1) { altPuan = A.fiyatAlt.puan1; altNot = ` · bütçenin %${Math.round(r * 100)}'i`; }
       }
     }
-    satirlar.push({ anahtar: "fiyat", etiket: `Fiyat (≤ bütçe +%${dna.fiyatTolerans})`, talep: (t.minFiyat != null && t.minFiyat > 0 ? `${fmt(t.minFiyat)} – ` : "≤ ") + fmt(t.maxFiyat), portfoy: pf == null ? "—" : fmt(pf) + (periyotFarkli ? ` (${p.fiyatPeriyodu})` : "") + altNot, sonuc, kritik: kritik.has("FIYAT"), puan: sonuc === "BILINMIYOR" ? 0.5 : pf! <= t.maxFiyat ? altPuan : sonuc === "SAGLANDI" ? 0.75 : 0, bilesen: "FIYAT" });
+    satirlar.push({ anahtar: "fiyat", etiket: `Fiyat (≤ bütçe +%${dna.fiyatTolerans})`, talep: (t.minFiyat != null && t.minFiyat > 0 ? `${fmt(t.minFiyat)} – ` : "≤ ") + fmt(t.maxFiyat), portfoy: pf == null ? "—" : fmt(p.fiyat) + (periyotFarkli ? ` (${p.fiyatPeriyodu})` : per.carpan !== 1 ? ` (${per.pPer === "YILLIK" ? "yıllık" : "aylık"} · ${fmt(Math.round(pf))} ${per.tPer === "YILLIK" ? "yıllık" : "aylık"})` : "") + altNot, sonuc, kritik: kritik.has("FIYAT"), puan: sonuc === "BILINMIYOR" ? 0.5 : pf! <= t.maxFiyat ? altPuan : sonuc === "SAGLANDI" ? 0.75 : 0, bilesen: "FIYAT" });
   }
   // Teknik alanlar: talepte dolu olan her karşılaştırılabilir alan
   for (const [alan, tv] of Object.entries(t.ozellik ?? {})) {
     const meta = MULK_OZELLIK_META[alan as MulkOzellikAlani];
     if (!meta || meta.karsilastirma === "bilgi" || tv == null || (Array.isArray(tv) && !tv.length)) continue;
-    if (meta.karsilastirma === "bool" && tv === false) continue; // "istemiyorum" kısıt değildir
+    if (meta.karsilastirma === "bool" && tv === false) {
+      // v3.22.1 — "Site içi olmayan", "havuz istemiyor": portföyde varsa yumuşak uyumsuzluk (Koşullu; engel değil).
+      // Diğer evet/hayır alanlarında "istemiyor" hâlâ kısıt sayılmaz.
+      if (ISTENMEYEBILIR.has(alan) && p.ozellik?.[alan] === true) satirlar.push({ anahtar: alan, etiket: meta.etiket, talep: "İstemiyor", portfoy: "Var", sonuc: "SAGLANMADI", kritik: false, puan: 0.3, bilesen: "KONUT" });
+      continue;
+    }
     const pv = p.ozellik?.[alan];
     const kr = "kriter" in meta ? (meta.kriter as string | undefined) : undefined;
     satirlar.push({
@@ -433,7 +460,9 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   const fiyatKarsilastirilamadi = eksikCekirdek.some((x) => x.kod === "FIYAT");
   // v3.22 — bütçe / fiyat bilinmiyorsa skor tavanı (bkz. FIYATSIZ_CARPAN)
   const fiyatBilinmiyor = fiyatKarsilastirilamadi || fiyatSatiri?.sonuc === "BILINMIYOR";
-  const cekirdekKosullu = fiyatKarsilastirilamadi || eksikCekirdek.length >= 2;
+  // v3.22.1 — çekirdek bilgi (oda, m², fiyat) portföyde yoksa "Sunulabilir" denmez: sunmadan önce sorulur
+  const cekirdekBilinmiyor = satirlar.some((x) => (x.anahtar === "odaSayisi" || x.anahtar === "m2" || x.anahtar === "fiyat") && x.sonuc === "BILINMIYOR");
+  const cekirdekKosullu = fiyatKarsilastirilamadi || eksikCekirdek.length >= 2 || cekirdekBilinmiyor;
 
   skor -= 5 * talepEksikleri.length; // talepte öldürücü bilgi eksikse skor "kesin" görünmesin
   if (fiyatBilinmiyor) skor = Math.round(skor * FIYATSIZ_CARPAN);

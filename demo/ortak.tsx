@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Demo — ekranların ortak parçaları: depo bağlamı, küçük bileşenler, eşleşme hesabı, konum öneri kutusu.
  */
 import React, { createContext, useContext, useMemo, useRef, useState } from "react";
@@ -9,6 +9,7 @@ import { kimOf } from "../src/lib/domain/kim";
 import { etiket, tl } from "./etiketler";
 import { BAGLAM, konumOner, lokEtiket, type KonumOnerisi } from "./lokasyon";
 import { kalanGun, type DepoDurumu, type Kayit, type Veri, type OrnekHata } from "./depo";
+import { sahiplikCozucu } from "./sahiplik";
 
 // ───────── Bağlam ─────────
 /** donus: bir formdan "Vazgeç / Kaydet" ile geri dönülüyor — içe aktarma / veri girişi ekranları yüklü dosya ve seçimlerini korur (demo/hafiza.ts) */
@@ -113,14 +114,17 @@ export function useEslesmeler(koparilanDahil = false): Eslesme[] {
     const r: Eslesme[] = [];
     const kimler = new Map<string, ReturnType<typeof kimOf>>();
     const kim = (k: Kayit) => { let x = kimler.get(k.id); if (!x) { x = kimOf(k.veri as any, d.kisiler); kimler.set(k.id, x); } return x; };
+    // v3.22.1 — ★ Benim / ◆ Ofisim olan taraf fırsat önceliğine girer (src/lib/eslestirme/firsat.ts)
+    const sc = sahiplikCozucu(d), sahipler = new Map<string, "BENIM" | "OFIS" | null>();
+    const sahip = (k: Kayit) => { if (!sahipler.has(k.id)) sahipler.set(k.id, sc(k.veri).tur); return sahipler.get(k.id)!; };
     for (const t of T) for (const p of P) if (temelUyum(t.veri as any, p.veri as any)) {
-      const f = firsatDegerlendir(kim(t).tur, kim(p).tur, { islemTipi: String(p.veri.islemTipi), fiyat: p.veri.fiyat ?? null, butce: t.veri.maxFiyat ?? null });
+      const f = firsatDegerlendir(kim(t).tur, kim(p).tur, { islemTipi: String(p.veri.islemTipi), fiyat: p.veri.fiyat ?? null, butce: t.veri.maxFiyat ?? null, talepSahip: sahip(t), portfoySahip: sahip(p) });
       r.push({ t, p, s: eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM), f });
     }
     const sira: Record<Uygunluk, number> = { SUNULABILIR: 0, KOSULLU: 1, UYGUN_DEGIL: 2 };
     // v3.19 — önce uygunluk, sonra fırsat kademesi (sahibinden ↔ müşteri önde), sonra skor
     return r.sort((a, b) => sira[a.s.uygunluk] - sira[b.s.uygunluk] || b.f.sira - a.f.sira || b.s.skor - a.s.skor);
-  }, [d.kayitlar, d.kisiler, d.ogrenilen]);
+  }, [d.kayitlar, d.kisiler, d.ogrenilen, d.ayarlar.sahiplik, d.ayarlar.paylasim]);
   return useMemo(() => (koparilanDahil ? tum : tum.filter((e) => d.eslesmeNotlari[`${e.t.id}~${e.p.id}`]?.durum !== "REDDEDILDI")), [tum, d.eslesmeNotlari, koparilanDahil]);
 }
 export const eKey = (tid: string, pid: string) => `${tid}~${pid}`;

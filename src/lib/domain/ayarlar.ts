@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Kullanıcının ekrandan değiştirdiği ayarlar (TTL dışındakiler): yapay zekâ sağlayıcısı, paylaşım imzası, çalışma ili.
  * Sunucu ve demo aynı şemayı kullanır; veritabanında `ayar` tablosunda anahtar başına bir satır ("ai", "paylasim", "calismaIli").
  * API ANAHTARI BURADA SAKLANMAZ — sunucuda ortam değişkenidir (AI_API_KEY).

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * v3.22 — veritabanlı: talepteki hariç bölge, kayda elle konan Benim / Ofisim işareti ve "Benim ve ofisim" ayarı
  * sunucuya yazılır, geri okunur; "Otomatik"e dönülünce işaret veritabanından da kalkar; API konum araması hariçleri saymaz.
  */

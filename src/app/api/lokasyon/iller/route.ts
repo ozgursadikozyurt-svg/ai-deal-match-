@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22 · 9 Ekim 2026
+// Anahtar CRM v3.22.1 · 9 Ekim 2026
 // GET /api/lokasyon/iller → 81 il
 import { prisma } from "@/lib/db";
 import { hata, ok } from "@/lib/http/yanit";

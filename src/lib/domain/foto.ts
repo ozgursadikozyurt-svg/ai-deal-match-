@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  * Portföy fotoğrafı kuralları — demo ve sunucu aynı sınırları kullanır.
  * Fotoğraf telefonda / tarayıcıda küçültülür (uzun kenar 1600 px, JPEG) ve öyle yüklenir: 4–8 MB'lık çekim ≈ 250–400 KB olur.
  * 8 fotoğraflı 1.000 portföy ≈ 2,5–3 GB eder; Supabase ücretsiz katmanı 1 GB'tır (≈ 350 portföy). Bkz. ALTYAPI §41.

@@ -74,3 +74,47 @@
 - Yeni: `tests/v322.test.ts` (15 test: hariç ayrıştırma / birleştirme / eşleştirme / şema / form, bütçesiz skor ve örnek verinin tamamında < 70, sahiplik kuralı, Portföyler çipleri, Ana Sayfa kısayolları, Eşleşmeler "Kimin", detay seçicisi, Ayarlar kartı, kapak fotoğrafı) ve `tests/v322-db.test.ts` (PGlite: sütunlar, hariç + işaret + ayar gidiş-dönüş, API aramasında hariç, Otomatik'e dönüşte işaretin silinmesi). `scripts/test-db.sh` listesine eklendi.
 - Güncellenen: `v3212` (yan çekmece testleri → yatay şerit), `v316`, `v319` (⋯ başlıkta, "Fırsat" kısa adı).
 - Sonuç: 292 test, 291 geçti, 1 atlandı (önceden de atlanan), 0 hata. Ek olarak demo 360 px telefon genişliğinde Chromium'da açılıp ekran görüntüleriyle bakıldı (Eşleşmeler satırı, açık skor şeridi, Benim süzgeci, HARİÇ talep, fotoğraflı kartlar).
+
+---
+
+## v3.22.1 — canlı eşleşme denetimi ve düzeltmeler (9 Ekim 2026, öğleden sonra)
+
+### Neden
+Kullanıcı ekran görüntüsü: talep ≤ 12.000.000 (3+1, ≥ 140 m², bina ≤ 12 yaş), portföy 11.750.000 (3+1, 170 m², 8 yaş) → Kriter dökümünde **Fiyat "? Bilinmiyor"**, puan ~60. Ayrıca ★ Benim portföylerin eşleşmesi "Normal fırsat", bazı portföylere fotoğraf eklenemiyor.
+
+### Kök nedenler (kanıtla)
+1. **Periyot:** `demo/form.tsx` yeni kaydı `fiyatPeriyodu: "AYLIK"` ile açıyordu; işlem "Satılık"a çevrilince periyot değişmiyordu. Motor `periyotFarkli` (Aylık ≠ Toplam) görüp fiyatı "bilinmiyor" sayıyordu → fiyat bileşeni 0,5, uygunluk Koşullu, v3.22'nin bütçesiz çarpanı da devreye giriyordu.
+2. **Kayıt sunucuya hiç ulaşmamış:** bu talep canlı veritabanında yok (11–13 M bütçeli tek talep T2WDEL18). Kayıt tablosunda 8 Ekim 19:25 UTC'den sonra hiç yazma yok. v3.22 yayını ile "Kurulumu tamamla" (11:58 UTC) arasında sunucu `isaret` sütununu bulamayıp kayıtları reddetti; kayıt kuyruğu reddedilen kaydı **içeriği değişmedikçe bir daha göndermiyordu** (`demo/canli-kaydet.ts › reddedilen`). Fotoğraf yükleme de kaydın sunucuda olmasını ister → 404 → ekranda yalnızca "dosya açılamadı".
+3. **Fırsat:** `firsatDegerlendir` yalnızca kim etiketine bakıyordu; kendi ilanım WhatsApp grubundan "emlakçı" geldiği için tek taraf aracısız sayılıyordu.
+
+### Denetim (Supabase, salt okunur)
+Aktif 327 kayıt (46 talep, 281 portföy) çekildi, `eslesmeOnizle` 3.683 temel uyumlu çiftte çalıştırıldı (betik: oturum içi, `/tmp/…/denetle.ts`); 38 talebin özgün mesajı yeniden ayrıştırılıp kayıttakiyle karşılaştırıldı.
+
+| Bulgu | Adet | Sonuç |
+|---|---|---|
+| Satış talebinde "Aylık" periyot (sunucuda) | 0 | Sorunlu talep sunucuya hiç yazılmamış; motor ve form düzeltildi |
+| "( Hurma-Sarısu-Liman hariç)" hariç görülmüyor | 1 talep, 30 uygun çift | Tire / parantez / "ve" ayraç; durak sözcüğü (bölge, taraf) → hariçler doğru |
+| "Site içi olmayan" → site istiyor | 1 | Olumsuz ek (olmayan, olmasın, istemiyor, hariç, değil) → istemiyor; site içi portföy Koşullu |
+| "Bütçe - 7.5 M", "max 7 m" okunmuyor | 2 | Bütçe / fiyat / max bağlamında M = milyon |
+| "2.000-3.000 M2" bütçe sanılıyor | 1 | Alan aralığı para sayılmaz |
+| Oda / m² portföyde yok ama Sunulabilir | 10 çift | Çekirdek bilgi bilinmiyorsa Koşullu |
+| Portföy fiyatı bütçenin %5'inden az (veri hatası) | PCNFHT99 (130.834 TL satılık daire), PTHBR026 (6.600 TL) | Elenmiş durumda; kayıtlar elle düzeltilmeli |
+| Kiralık ama aylık > 2 M | P097201K (29.950.000), P74GC000 (4.875.000) — ikisi de "devirlik" | Devir bedeli kira sanılmış; elle "Devren" yapılmalı |
+| Benzer tip (daire talebi ↔ ofis portföyü) Koşullu | 90 çift | Tasarım gereği ("benzer tip" rozetli); değiştirilmedi |
+
+Yeniden ayrıştırmada eski koda göre **gerileme yok** (eski / yeni çıktı farkı yalnızca düzeltilen üç talep).
+
+### Değişiklikler
+- `src/lib/eslestirme/onizleme.ts`: `etkinPeriyot` (satışta her zaman TOPLAM), aylık ↔ yıllık çevirme, çekirdek bilinmiyorsa Koşullu, `ISTENMEYEBILIR` (siteIcinde, havuz: talepte "istemiyor" + portföyde var → yumuşak uyumsuzluk).
+- `demo/form.tsx`: `periyotOnerisi` — işlem değişince periyot uyar; kaydederken satışta TOPLAM.
+- `src/lib/ai/yorumlayici.ts › haricler`, `src/lib/ai/hizli-ayristirici.ts`: tireli hariç, olumsuz özellikler, "7.5 M", alan aralığı.
+- `demo/onarim.ts` (yeni): açılışta onarım — satışta periyot, eski hariç talepler (başlık da), site / havuz olumsuzu, mesajda yazılı ama boş bütçe. Demoda `depoYukle`, canlıda `canli.tsx` (onarılan kayıt kuyruğa girer, sunucuya yazılır). Canlı veride onarılacak: TCPZ1V98 (hariç + site), TCPZ1X26 (bütçe 7 M).
+- `src/lib/eslestirme/firsat.ts`: `talepSahip` / `portfoySahip` — Benim taraf varsa ÖNCELİKLİ; Ofisim taraf aracısız. `demo/ortak.tsx › useEslesmeler` sahipliği geçirir.
+- `demo/canli-kaydet.ts`: reddedilen kayıt 60 sn sonra (en çok 5 kez) ve `hemen()`de yeniden denenir; `sunucudaMi`, `hataOf`; yeni kayıt / kişi yerel yedeği (`yedektenGeriAl`).
+- `demo/foto.ts`, `demo/fotograflar.tsx`: yüklemeden önce kayıt gönderilir, 404'te bir kez daha denenir, gerçek neden gösterilir; 1,5 MB'ı aşan fotoğrafta kalite kademeli düşer.
+
+### Ders (bundan sonra)
+Migration gerektiren sürümde sunucu, sütun gelmeden yeni alanı yazmaya çalışınca kayıtlar reddediliyor. Yeniden deneme bunu artık kendiliğinden toparlıyor; yine de migration'lı sürümde "Kurulumu tamamla" yayından hemen sonra basılmalı.
+
+### Testler
+`tests/v3221.test.ts` (10 test). Tam paket: 302 test, 301 geçti, 1 atlandı, 0 hata.

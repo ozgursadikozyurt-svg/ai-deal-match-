@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22 · 9 Ekim 2026
+ * Anahtar CRM v3.22.1 · 9 Ekim 2026
  */
 // Akıllı metin yorumlayıcı — yapıştırılan metnin NE olduğunu önce anlar, sonra ayrıştırır.
 //
@@ -343,7 +343,27 @@ function celisir(a: Capa, b: Capa): boolean {
 /** Metinde "hariç / dışında" denilen yerleri bulur. */
 function haricler(metin: string, ix: LokasyonIndeks): string[] {
   const bulunan: string[] = [];
-  for (const m of kucuk(metin).matchAll(/((?:[\p{L}'’]+[\s,]+){1,4})(?:harici|hariç|haricinde|dışında|olmasın)(?![\p{L}])/gu)) bulunan.push(...konumBul(m[1], ix));
+  // v3.22.1 — ayraç olarak tire / eğik çizgi / parantez / "ve" da sayılır: "( Hurma-Sarısu-Liman hariç)" eskiden yalnızca Liman'ı görüyordu
+  const duz = kucuk(metin).replace(/[-–—/()]+/g, " , ").replace(/\s+ve\s+/g, " , ");
+  for (const m of duz.matchAll(/((?:[\p{L}'’]+[\s,]+){1,8})(?:harici|hariç|haricinde|dışında|olmasın|olmayacak)(?![\p{L}])/gu)) {
+    // "Konyaaltı bölgesi , Hurma , Sarısu , Liman hariç": hariç yalnızca son virgül grubundan geriye doğru yer adlarına uygulanır;
+    // grubun başındaki ilçe adı (Konyaaltı) aranan bölgedir — bir yer adı olmayan kelimede ("bölgesi") durulur.
+    const parcalar = m[1].split(",").map((x) => x.trim()).filter(Boolean);
+    const al: string[] = [];
+    for (let i = parcalar.length - 1; i >= 0; i--) {
+      // "dutlu bahçe tarafları kepez varsak" → durak sözcüğünden (bölge, taraf, civar, yer) sonrası hariçtir, öncesi aranan yerdir
+      const durak = [...parcalar[i].matchAll(/\S*(b[öo]lge|taraf|civar|\byer)\S*/gu)].pop();
+      if (durak) { parcalar[i] = parcalar[i].slice((durak.index ?? 0) + durak[0].length).trim(); if (!parcalar[i]) break; }
+      // konumBul tek başına "liman" gibi sözcükleri (genel anlamı da var) bilerek atlar; "… hariç" listesinde çözücüye sorulur
+      const k = konumBul(parcalar[i], ix);
+      if (k.length) { al.push(...k.reverse()); if (durak) break; continue; }
+      const c = lokasyonCozumle(parcalar[i], ix);
+      if (!c.lokasyonlar.length || c.cozulemeyen.length) break;
+      al.push(parcalar[i]);
+      if (durak) break;
+    }
+    bulunan.push(...al.reverse());
+  }
   return [...new Set(bulunan)];
 }
 

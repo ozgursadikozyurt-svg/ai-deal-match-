@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22 · 9 Ekim 2026
+// Anahtar CRM v3.22.1 · 9 Ekim 2026
 // POST /api/ai/json { istem, sistem? } → { sonuc }  — arayüzün genel yapay zekâ çağrısı (AI kutusu, WhatsApp içe aktarma, bağlantı denemesi).
 // Sağlayıcı / model / adres Ayarlar › Yapay zekâ'dan (veritabanı), anahtar sunucudaki AI_API_KEY'den gelir; anahtar tarayıcıya hiç inmez.
 import { z } from "zod";
