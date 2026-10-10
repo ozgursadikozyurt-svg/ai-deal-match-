@@ -20,7 +20,9 @@ Bir kez kurulur, yaklaşık 5 dakika. Dosyaları **kendi Gmail adresinizin "+ana
 4. Üstteki işlev listesinden **kur**'u seçin → **▶ Çalıştır**. Google izin ister: **Gelişmiş › … projesine git › İzin ver**. Bu uyarı, kodu Google değil siz yazdığınız için çıkar; kod yalnızca sizin hesabınızda çalışır.
 5. Telefonda `adiniz+anahtar@gmail.com` adresini "Anahtar CRM" adıyla rehbere kaydedin.
 
-Kod ne yapar: yalnızca `+anahtar` adresine gelen, eki olan, son 14 günün postalarına bakar; `.zip .txt .xlsx .csv` eklerini Anahtar CRM'e gönderir; postayı Gmail'de **AnahtarCRM** etiketiyle işaretler. Posta göndermez, silmez, başka postaları okumaz. Durdurmak için: script.google.com › proje › Tetikleyiciler › silin.
+Kod ne yapar: (1) `+anahtar` adresine gelen, eki olan, son 14 günün postalarının `.zip .txt .xlsx .csv` eklerini Anahtar CRM'e gönderir; postayı **AnahtarCRM** etiketiyle işaretler ve **gelen kutusundan kaldırır** (posta silinmez, Gmail sol menüsündeki AnahtarCRM etiketinin altında durur). (2) Eki Drive'daki **AnahtarCRM Gelen › İşlendi** klasörüne yedekler. (3) Drive'daki **AnahtarCRM Gelen** klasörüne bıraktığınız dosyaları da (Revy Excel'i, WhatsApp zip'i; telefondan Drive'a yükleyerek de olur) 10 dakikada bir alır ve **İşlendi**'ye taşır. Posta göndermez, silmez, başka postaları okumaz. Durdurmak için: script.google.com › proje › Tetikleyiciler › silin.
+
+**Etiket sol menüde görünmüyorsa:** Gmail › Ayarlar (dişli) › Tüm ayarlar › **Etiketler** › AnahtarCRM › "Etiket listesinde" **göster**. Etiketi yanlışlıkla sildiyseniz betik bir sonraki çalışmada yeniden oluşturur (aynı dosya ikinci kez havuza girmez). Eski betiği kullanıyorsanız Gelen Kutusu › E-posta kurulumu'ndan yeni kodu kopyalayıp projedeki eski kodun yerine yapıştırın, **kur**'u yeniden çalıştırın (Drive izni bir kez daha sorulur).
 
 Sorun olursa: script.google.com › proje › **Yürütmeler** sekmesinde her çalışmanın sonucu yazar. "401" görürseniz anahtar yenilenmiştir: E-posta kurulumu'ndan kodu yeniden kopyalayıp yapıştırın.
 

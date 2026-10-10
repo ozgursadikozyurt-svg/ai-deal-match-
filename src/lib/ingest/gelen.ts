@@ -120,40 +120,66 @@ export const adrestenKod = (alici: string | null | undefined) => { const y = Str
  * Alan adı gerektirmez, ücretsizdir. Alan adı bağlanınca (GELEN_ALAN_ADI) doğrudan adrese geçilir, betik kapatılır.
  */
 export function gmailKopruBetigi(adres: string, kod: string): string {
-  return `// Anahtar CRM — Gmail köprüsü. Bu kodu DEĞİŞTİRMEDEN yapıştırın; önce "kur" işlevini bir kez çalıştırın.
+  return `// Anahtar CRM — Gmail + Drive köprüsü. Bu kodu DEĞİŞTİRMEDEN yapıştırın; önce "kur" işlevini bir kez çalıştırın.
 var ADRES = ${JSON.stringify(adres)};
 var ANAHTAR = ${JSON.stringify(kod)};
 var ETIKET = "AnahtarCRM";
+var KLASOR = "AnahtarCRM Gelen";
 var TURLER = /\\.(zip|txt|xlsx|csv)$/i;
 
 function kur() {
   ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === "anahtarCrmGonder") ScriptApp.deleteTrigger(t); });
   ScriptApp.newTrigger("anahtarCrmGonder").timeBased().everyMinutes(10).create();
+  klasor(KLASOR, null);
   anahtarCrmGonder();
-  Logger.log("Kuruldu. Dosyaları şu adrese gönderin: " + hedefAdres());
+  Logger.log("Kuruldu. Dosyaları şu adrese gönderin: " + hedefAdres() + " — ya da Drive'daki '" + KLASOR + "' klasörüne bırakın.");
 }
 
 function hedefAdres() { return Session.getEffectiveUser().getEmail().replace("@", "+anahtar@"); }
 
+function klasor(ad, ust) {
+  var it = ust ? ust.getFoldersByName(ad) : DriveApp.getFoldersByName(ad);
+  return it.hasNext() ? it.next() : (ust ? ust.createFolder(ad) : DriveApp.createFolder(ad));
+}
+
+// 0 = alındı, 1 = geçici sorun (yeniden denenir), 2 = kalıcı ret
+function gonder(bayt, ad, gonderen, konu) {
+  var yanit = UrlFetchApp.fetch(ADRES, {
+    method: "post", contentType: "application/octet-stream", payload: bayt, muteHttpExceptions: true,
+    headers: { "x-anahtar": ANAHTAR, "x-dosya-adi": encodeURIComponent(ad), "x-gonderen": encodeURIComponent(gonderen), "x-konu": encodeURIComponent(konu) }
+  });
+  var kod = yanit.getResponseCode();
+  if (kod >= 500 || kod === 429) return 1;
+  if (kod >= 300) { Logger.log(ad + " alınmadı: " + yanit.getContentText()); return 2; }
+  return 0;
+}
+
 function anahtarCrmGonder() {
   var etiket = GmailApp.getUserLabelByName(ETIKET) || GmailApp.createLabel(ETIKET);
-  var konusmalar = GmailApp.search("to:(" + hedefAdres() + ") has:attachment newer_than:14d -label:" + ETIKET, 0, 20);
-  konusmalar.forEach(function (konusma) {
+  var islendi = null;
+  // 1) Postayla gelenler: +anahtar adresine gelen ekler → CRM; posta etiketlenir ve gelen kutusundan kalkar (etiketin altında durur)
+  GmailApp.search("to:(" + hedefAdres() + ") has:attachment newer_than:14d -label:" + ETIKET, 0, 20).forEach(function (konusma) {
     var tamam = true;
     konusma.getMessages().forEach(function (posta) {
       posta.getAttachments({ includeInlineImages: false }).forEach(function (ek) {
         if (!TURLER.test(ek.getName())) return;
-        var yanit = UrlFetchApp.fetch(ADRES, {
-          method: "post", contentType: "application/octet-stream", payload: ek.getBytes(), muteHttpExceptions: true,
-          headers: { "x-anahtar": ANAHTAR, "x-dosya-adi": encodeURIComponent(ek.getName()), "x-gonderen": encodeURIComponent(posta.getFrom()), "x-konu": encodeURIComponent(posta.getSubject()) }
-        });
-        var kod = yanit.getResponseCode();
-        if (kod >= 500 || kod === 429) tamam = false;                       // geçici sorun: 10 dakika sonra yeniden denenir
-        else if (kod >= 300) Logger.log(ek.getName() + " alınmadı: " + yanit.getContentText()); // kalıcı ret (çok büyük, tür desteklenmiyor): tekrar denenmez
+        var sonuc = gonder(ek.getBytes(), ek.getName(), posta.getFrom(), posta.getSubject());
+        if (sonuc === 1) { tamam = false; return; }
+        try { islendi = islendi || klasor("İşlendi", klasor(KLASOR, null)); islendi.createFile(ek.copyBlob()); } catch (e) { Logger.log("Drive'a yedeklenemedi: " + e); }
       });
     });
-    if (tamam) konusma.addLabel(etiket);
+    if (tamam) { konusma.addLabel(etiket); konusma.moveToArchive(); }
   });
+  // 2) Drive klasörüne bırakılanlar → CRM; işlenen dosya 'İşlendi' alt klasörüne taşınır
+  var ana = klasor(KLASOR, null);
+  var dosyalar = ana.getFiles(), sayac = 0;
+  while (dosyalar.hasNext() && sayac++ < 20) {
+    var dosya = dosyalar.next();
+    if (!TURLER.test(dosya.getName())) continue;
+    if (gonder(dosya.getBlob().getBytes(), dosya.getName(), "Drive", KLASOR) === 1) continue;
+    islendi = islendi || klasor("İşlendi", ana);
+    dosya.moveTo(islendi);
+  }
 }
 `;
 }
