@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.24 · 10 Ekim 2026 (v3.14'ten)
  * AŞAMA 7 — Canlı sürümün veri köprüsü. Arayüz (demo ile aynı ekranlar) tüm durumu tek seferde okur
  * (`durumGetir`), değişiklikleri parça parça yazar (`degisiklikUygula`). Veritabanı ilişkisel kalır:
  * Notion/Google senkronu, toplu giriş, dışa aktarma ve eşleştirme servisleri aynı tablolarla çalışmaya devam eder.

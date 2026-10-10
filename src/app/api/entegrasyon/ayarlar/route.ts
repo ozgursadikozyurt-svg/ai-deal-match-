@@ -1,4 +1,4 @@
-// Anahtar CRM v3.23 · 10 Ekim 2026 (v3.13'ten)
+// Anahtar CRM v3.24 · 10 Ekim 2026 (v3.13'ten)
 // PUT /api/entegrasyon/ayarlar { saglayici, ayarlar: { otomatik, aralikDk, geriYaz, googleYaz, sadeceEtiketler } }
 // v3.21: yalnızca ofis yöneticisi; googleYaz = "çift yönlü" anahtarı. İç alanlar (bağlayan kullanıcı, yazma izni) buradan değiştirilemez.
 import { z } from "zod";

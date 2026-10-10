@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.24 · 10 Ekim 2026 (v3.14'ten)
  * v3.20: davet bağlantısıyla katılma (?davet=KOD), açılışta /api/oturum (rol, plan, yetkiler), hesabı olmayana anlaşılır mesaj.
  * Canlı giriş noktası (dist/canli/index.html): giriş → ilk kurulum denetimi → sunucudan durum → aynı demo ekranları, veri sunucuda.
  */

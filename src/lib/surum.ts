@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.23";
+export const SURUM = "3.24";
 export const TARIH = "10 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.23_10Ekim2026";
+export const DOSYA_EKI = "v3.24_10Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,29 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.24",
+    tarih: "10 Ekim 2026",
+    baslik: "Gelen Kutusu Veri Girişi'nin altında ve tarih gruplaması kalktı; yapıştırılan metinde de Gözden geçir süzgeçleri; her girişte Kaynak seçimi; başlıklar tek satırda; eşleşmede kişiye tek dokunuşla ulaşma; fotoğraf yüklemede 503 düzeltmesi",
+    degisenler: [
+      "Gelen Kutusu artık Veri Girişi'nin dördüncü sekmesi (Yapıştır · Dosya yükle · Gelen kutusu · Elle gir). Ayrı menü öğesi kalktı; onay bekleyen sayısı Veri Girişi'nin yanında rozetle görünür, Ana Sayfa kartı aynı yere götürür.",
+      "Gelen Kutusu'nda tarihe göre gruplama kaldırıldı (\"Dün · 1 kayıt / 8 Ekim · 3 kayıt…\" gibi çok satır oluşturuyordu). Tek düz liste: Hazır olanlar en üstte, sonra fiyatı değişen, kontrol gerekli ve eksik olanlar; ilan tarihi her kartta yazar. Toplu çubukta \"Hazırların tümünü ekle\" eklendi; 60'ar 60'ar gösterilir.",
+      "Veri Girişi › Yapıştır (ve Ana Sayfa'daki akıllı kutu): birden çok kayıt çıkınca WhatsApp dosyasındaki \"Gözden geçir ve onayla\" adımı burada da var — Hepsi · Hazır · Kontrol gerekli · Şemaya uymayan · Eklenen / atlanan; Hepsi · Portföyler · Talepler; Satılık + kiralık · Satılık · Kiralık; \"Hazır olanların tümünü ekle · Tümünü seç · Seçilenleri ekle · Seçilenleri atla\". Liste hazır olanlarla başlar. Eklediğiniz kayıtlar listeden kaybolmaz, \"Eklenen / atlanan\"a geçer; kalanlarla devam edersiniz.",
+      "Kaynak seçimi: Emlak grubu · Sahibinden · Portal · Kendi portföyüm. Yapay zekâ / kurallar tahmin eder, siz her yerde değiştirebilirsiniz — tek kayıt kartında dört düğme, çoklu listede her satırda ve \"Hepsi: …\" ile tümüne, WhatsApp içe aktarma ve Gelen Kutusu kartlarında, kayıt formunda. Seçim kaydın İlan sahibi / Havuz / Geldiği kanal alanlarına birlikte yazılır; eşleşmelerdeki havuz sırası (Yetkili · CRM · Partner · Web ilanı) seçimle uyumludur.",
+      "Üst satır: \"← Geri\" artık ayrı satır kaplamıyor, ekran başlığıyla aynı satırda (ör. ← Geri · Talepler · + Yeni talep; ← Geri · Eşleşmeler · 751 eşleşme · ⋯). Kayıt formunda iki geri düğmesi vardı (← Geri ← Vazgeç); yalnızca ← Vazgeç kaldı, başlıkla aynı satırda.",
+      "Eşleşme detayı: talep ve portföy kartlarında kişiler ad, telefon ve Ara / WhatsApp düğmeleriyle; WhatsApp mesajı kayda göre hazır gelir. Talep kartının altında orijinal metin kısaca (3 satır; \"Tamamını göster\").",
+      "Fotoğraf yükleme 503 hatası: fotoğraf artık sunucudan geçmeden doğrudan depoya (Supabase Storage) gider; sunucu yalnızca künyeyi yazıp tek kullanımlık yükleme bağlantısı verir. 1,5 MB'lık dosyanın Worker'da işlenmesi Cloudflare ücretsiz planın 10 ms işlemci sınırını aşıp 503 veriyordu. Doğrudan yükleme olmazsa eski yol kullanılır ve geçici 503 bir kez kendiliğinden yinelenir.",
+      "Gmail köprüsü (v3.23 yamaları): işlenen posta AnahtarCRM etiketiyle gelen kutusundan kalkar; Drive'daki \"AnahtarCRM Gelen\" klasörüne bırakılan dosyalar da alınır; aynı konulu yeni posta eski konuşmaya eklense de işlenir (posta başına izleme).",
+      "Veritabanı değişikliği yok (Kurulumu tamamla gerekmez).",
+    ],
+    testEt: [
+      "Menü › Veri Girişi › Gelen kutusu sekmesi: tarih başlıkları olmadan tek liste; en üstte Hazır kayıtlar; bir kartta Kaynak menüsünden \"Kendi portföyüm\" seçip Ekle → kayıt Kendi portföyüm olarak eklenmeli.",
+      "Veri Girişi › Yapıştır › Örnek: WhatsApp sohbeti → Gönder: \"Gözden geçir ve onayla\" süzgeçleri görünmeli; Kiralık'a basın, \"Hazır olanların tümünü ekle\" → eklenenler \"Eklenen / atlanan\"a geçmeli, kalanlar listede kalmalı.",
+      "Talepler'e gidip bir talebi açın: \"← Geri\" düğmesi \"Düzenle\" ile aynı satırda olmalı; Eşleşmeler'de ← Geri · Eşleşmeler · N eşleşme · ⋯ tek satırda.",
+      "Bir eşleşmeyi açın: talep ve portföy kartlarında kişinin yanında Ara ve WhatsApp düğmeleri, talep kartının altında orijinal metin.",
+      "Canlıda: bir portföye 3–4 fotoğraf ekleyin — 503 hatası çıkmamalı.",
+    ],
+  },
   {
     surum: "3.23",
     tarih: "10 Ekim 2026",

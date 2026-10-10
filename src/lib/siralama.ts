@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Listelerde sıralama: fiyat, alan, kayda giriş, kalan süre, skor, ad… Artan / azalan. Boş değerler her zaman sonda.
  */
 export type Yon = "artan" | "azalan";

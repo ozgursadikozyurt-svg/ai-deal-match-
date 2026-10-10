@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * v3.23 — GELEN KUTUSU (onay bekleyenler): dosya türü, e-posta / zip / Excel açma, Revy dökümü eşlemesi, mükerrer denetimi,
  * tarihe göre gruplama, toplu ekle / atla / temizle, Gmail köprüsü betiği; ekran (JSDOM).
  * Yan düzeltmeler: "otoparklı" / "müstakil tapu" şemadan dönmez; arsa "Mülk türü" imardır; başlıkta "devren" → devir bedeli.
@@ -322,7 +322,7 @@ test("demo deposu: örnek dosyalarla başlar; yükle (aynı içerik ikinci kez e
   demoGelenSifirla();
 });
 
-test("ekran: özet, tarih grupları, kaynak / tür süzgeci, grup 'Hazırları ekle', 'Atla' + 'Geri al', 'Tümünü temizle'", async () => {
+test("ekran: özet, düz liste (v3.24: tarih grubu yok, hazırlar önce), kaynak / tür süzgeci, 'Hazırların tümünü ekle', 'Atla' + 'Geri al', 'Tümünü temizle'", async () => {
   demoGelenSifirla(); gelenDepoKur(null); kutuSifirla();
   let d = durum();
   const mesajlar: string[] = [];
@@ -335,10 +335,13 @@ test("ekran: özet, tarih grupları, kaynak / tür süzgeci, grup 'Hazırları e
   assert.ok(ilk >= 25, "örnek döküm + iki örnek sohbet: " + ilk);
   assert.equal(sayi(0), sayi(1) + sayi(2) + sayi(3), "bekleyen = hazır + kontrol + fiyatı değişti");
   assert.match(e.metin(), /kutu içinde mükerrer/);
-  const gruplar = e.qa(".gk-grup-ad b").map((x) => x.textContent);
-  assert.match(gruplar[0]!, /^Bugün · /); assert.match(gruplar[1]!, /^Dün · /);
-  assert.ok(gruplar.some((g) => /^(Ağustos|Temmuz|Eylül) 2026$/.test(g!)), "eski ilanlar ay grubunda: " + gruplar.join("|"));
-  assert.equal(e.qa(".gk-grup.acik").length, 2, "ilk iki grup açık, diğerleri kapalı (yığılma)");
+  // v3.24 — tarih grupları kaldırıldı: tek düz liste, hazır olanlar önce
+  assert.equal(e.qa(".gk-grup").length, 0, "tarih grubu başlığı yok");
+  const kartlar = e.qa(".gk-kart");
+  assert.ok(kartlar.length > 0 && kartlar.length <= 60, "ilk 60 kart");
+  const hazirMi = (k: Element) => /^Hazır/.test(k.querySelector(".pill-satir")?.textContent ?? "");
+  const ilkHazirOlmayan = kartlar.findIndex((k) => !hazirMi(k));
+  assert.ok(ilkHazirOlmayan > 0 && kartlar.slice(ilkHazirOlmayan).every((k) => !hazirMi(k)), "hazırlar en üstte");
   // süzgeç: yalnızca ticari
   await e.tikla(e.dugme(/^Ticari \(/));
   assert.match(e.metin(), /Süzgeçte \d+ kayıt/);
@@ -347,9 +350,9 @@ test("ekran: özet, tarih grupları, kaynak / tür süzgeci, grup 'Hazırları e
   await e.tikla(e.dugme(/^WhatsApp \(/));
   assert.ok(e.qa(".gk-kart").every((k) => /EMLAK|SANAYİ/.test(k.textContent ?? "")), "yalnızca WhatsApp grupları");
   await e.tikla(e.dugme("Süzgeci kaldır"));
-  // grup: hazırları ekle
+  // toplu: hazırların tümünü ekle (v3.24; eskiden grup başına "Hazırları ekle")
   const kayitOnce = d.kayitlar.length;
-  const grupDugme = e.dugme(/^Hazırları ekle \(/)!; const n = Number(grupDugme.textContent!.match(/\((\d+)\)/)![1]);
+  const grupDugme = e.dugme(/^Hazırların tümünü ekle \(/)!; const n = Number(grupDugme.textContent!.match(/\((\d+)\)/)![1]);
   await e.tikla(grupDugme); await yeniden();
   assert.equal(d.kayitlar.length, kayitOnce + n); assert.equal(sayi(0), ilk - n, "eklenenler bekleyenden düştü");
   // atla + geri al
@@ -391,8 +394,8 @@ test("Ana Sayfa kartı ve bekleyeni kalmayan dosyanın kendiliğinden kaldırıl
 
 // ───────── 6) Sürüm, belgeler, kurallar ─────────
 test("sürüm 3.23: günlük kaydı, belgeler, tenancy kaydı, zamanlayıcı ve e-posta işleyicisi", () => {
-  assert.equal(SURUM, "3.23"); assert.equal(SURUM_GECMISI[0].surum, "3.23"); assert.match(SURUM_GECMISI[0].baslik, /Gelen kutusu/i);
-  for (const f of [`docs/ANAHTAR_CRM_EK_${DOSYA_EKI}.md`, `docs/ANAHTAR_CRM_DEVIR_${DOSYA_EKI}.md`, `docs/GELEN_KUTUSU_KURULUMU_${DOSYA_EKI}.md`]) assert.ok(fs.existsSync(f), f);
+  const i323 = SURUM_GECMISI.findIndex((s) => s.surum === "3.23"); assert.ok(i323 >= 0); assert.match(SURUM_GECMISI[i323].baslik, /Gelen kutusu/i);
+  for (const f of ["docs/ANAHTAR_CRM_EK_v3.23_10Ekim2026.md", "docs/ANAHTAR_CRM_DEVIR_v3.23_10Ekim2026.md", "docs/GELEN_KUTUSU_KURULUMU_v3.23_10Ekim2026.md"]) assert.ok(fs.existsSync(f), f);
   assert.ok(OFIS_MODELLERI.has("gelenDosya") && OFIS_MODELLERI.has("gelenAtlanan"), "yeni tablolar ofis süzgecinden geçer");
   const mig = fs.readFileSync("prisma/migrations/20261010100000_v323_gelen_kutusu/migration.sql", "utf8");
   assert.match(mig, /ALTER TABLE "gelen_dosya" ENABLE ROW LEVEL SECURITY/); assert.match(mig, /ALTER TABLE "gelen_atlanan" ENABLE ROW LEVEL SECURITY/);

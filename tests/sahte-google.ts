@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * TEST YARDIMCISI — bellekte çalışan sahte Google (OAuth token + People API). Gerçek Google'ın davranışının
  * senkron için önemli kısmını taklit eder: sayfalama (pageToken), artımlı çekim (syncToken → yalnızca değişenler,
  * silinenler metadata.deleted ile), kişi oluşturma, tek kişi okuma, etag denetimli güncelleme (updatePersonFields).

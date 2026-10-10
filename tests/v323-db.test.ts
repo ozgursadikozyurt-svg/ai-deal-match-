@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * v3.23 — VERİTABANLI KANIT (PGlite, depo taklit): GELEN KUTUSU sunucu tarafı.
  *   · dosya künyesi + depo: aynı içerik iki kez yazılmaz; boş / büyük / desteklenmeyen tür reddedilir; depo hatasında satır kalmaz
  *   · ofis ayrımı: bir ofisin dosyası ve atlananları diğerinde görünmez; oturumsuz giriş yalnızca gizli kodun ofisine yazar

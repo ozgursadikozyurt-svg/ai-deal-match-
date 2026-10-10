@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * MODEL DENEYİ — eşleştirme puanlamasının varyasyonlarını etiketli senaryolarla karşılaştırır.
  * Çalıştır: npx tsx scripts/deney/model-karsilastir.ts        (ayrıntı için: … --ayrinti)
  *

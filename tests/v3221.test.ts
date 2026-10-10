@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * v3.22.1 — canlı eşleşme denetiminde bulunan hatalar: satış talebinde yanlış "Aylık" periyot (fiyat "bilinmiyor"),
  * tireli "Hurma-Sarısu-Liman hariç", "Site içi olmayan", çekirdek bilgisi bilinmeyen eşleşmenin "Sunulabilir" görünmesi;
  * Benim kayıtların fırsat önceliği; reddedilen kaydın yeniden denenmesi ve sunucuya ulaşmamış yeni kaydın yedeklenmesi.

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Kişi rolleri: 11 sistem rolü + Ayarlar › "Kişi rolleri"nden eklenen özel roller (koda dokunmadan).
  * Veritabanında Kisi.roller artık serbest metin dizisidir; rol tanımları (özel roller ve yeniden adlandırmalar) Ayar tablosunda "roller" anahtarıyla JSON olarak durur.
  */

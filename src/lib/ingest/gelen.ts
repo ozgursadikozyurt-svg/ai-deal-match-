@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * GELEN KUTUSU — saf yardımcılar (ağ, veritabanı ve arayüz yok; sunucu, tarayıcı ve testler aynı kodu kullanır).
  *
  * Akış: dosya (WhatsApp .zip / .txt, Revy .xlsx, ya da bunları taşıyan e-posta) ham hâliyle saklanır →

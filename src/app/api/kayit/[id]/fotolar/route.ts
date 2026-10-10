@@ -1,7 +1,8 @@
-// Anahtar CRM v3.23 · 10 Ekim 2026
+// Anahtar CRM v3.24 · 10 Ekim 2026
 // Portföy fotoğrafları (en fazla 8; dosyalar Supabase Storage'da özel kovada, veritabanında yalnızca yol + künye)
 // GET    /api/kayit/:id/fotolar                 → [{ id, sira, ad, en, boy, boyut, url }]  (url: 1 saat geçerli imzalı bağlantı)
-// POST   /api/kayit/:id/fotolar  (multipart: dosya, en, boy)  → tarayıcıda küçültülmüş tek fotoğraf yükler
+// POST   /api/kayit/:id/fotolar  (JSON: ad, en, boy, boyut, tur)  → v3.24 doğrudan yükleme: künye + tek kullanımlık Supabase yükleme bağlantısı
+// POST   /api/kayit/:id/fotolar  (multipart: dosya, en, boy)  → yedek yol: dosya sunucu üzerinden yüklenir
 // PATCH  /api/kayit/:id/fotolar  { sira: [fotoId, …] }        → sıralama (ilk = kapak)
 // DELETE /api/kayit/:id/fotolar?fotoId=…        → fotoğrafı siler (depodan da)
 import { z } from "zod";
@@ -9,7 +10,7 @@ import { prisma } from "@/lib/db";
 import { hata, ok } from "@/lib/http/yanit";
 import { fotoDenetle, fotoYolu, FOTO_SINIR } from "@/lib/domain/foto";
 import { ofisBaglami } from "@/lib/kiracilik";
-import { dosyaYukle, dosyalariSil, imzaliBaglantilar, DepoHatasi } from "@/lib/depolama/supabase";
+import { dosyaYukle, dosyalariSil, imzaliBaglantilar, yuklemeBaglantisi, DepoHatasi } from "@/lib/depolama/supabase";
 
 type Ctx = { params: Promise<{ id: string }> };
 const depoHatasi = (e: unknown) => (e instanceof DepoHatasi ? ok({ hata: e.kod === "AYAR_YOK" ? "DEPO_KAPALI" : "DEPO", mesaj: e.message }, e.kod === "AYAR_YOK" ? 503 : 502) : hata(e));
@@ -27,6 +28,18 @@ export async function POST(req: Request, { params }: Ctx) {
     const kayit = await prisma.kayit.findUnique({ where: { id: kayitId }, select: { tip: true, _count: { select: { fotolar: true } } } });
     if (!kayit) return ok({ hata: "BULUNAMADI" }, 404);
     if (kayit.tip !== "PORTFOY") return ok({ hata: "DOGRULAMA", mesaj: "Fotoğraf yalnızca portföye eklenir" }, 422);
+    // v3.24 — doğrudan yükleme: gövde JSON künyedir (dosya yok). Kayıt satırı yazılır, tarayıcıya tek kullanımlık yükleme bağlantısı döner;
+    // tarayıcı dosyayı Supabase'e kendisi gönderir. Worker'da tek ekleme + tek küçük istek kalır (eskiden 1,5 MB'lık gövde burada işleniyordu → 503).
+    if ((req.headers.get("content-type") ?? "").includes("application/json")) {
+      const k = z.object({ ad: z.string().max(200).default("fotograf"), en: z.number().int().min(1).max(8000), boy: z.number().int().min(1).max(8000), boyut: z.number().int(), tur: z.string().max(40) }).parse(await req.json());
+      const sorunJ = fotoDenetle({ tur: k.tur, boyut: k.boyut }, kayit._count.fotolar);
+      if (sorunJ) return ok({ hata: "DOGRULAMA", mesaj: sorunJ }, 422);
+      const id = "f" + crypto.randomUUID().replace(/-/g, "").slice(0, 24);
+      const depoYolu = fotoYolu(ofisBaglami().ofisId, kayitId, id, k.tur);
+      const yukle = await yuklemeBaglantisi(depoYolu);
+      const foto = await prisma.kayitFoto.create({ data: { id, kayitId, sira: kayit._count.fotolar, ad: k.ad.replace(/\.[^.]+$/, "").slice(0, 60) || "fotograf", en: k.en, boy: k.boy, boyut: k.boyut, icerikTuru: k.tur, depoYolu } });
+      return ok({ id: foto.id, ad: foto.ad, en: foto.en, boy: foto.boy, boyut: foto.boyut, sira: foto.sira, yukle, apikey: process.env.SUPABASE_ANON_KEY ?? null, kalan: FOTO_SINIR - kayit._count.fotolar - 1 }, 201);
+    }
     const form = await req.formData();
     const dosya = form.get("dosya");
     if (!(dosya instanceof File)) return ok({ hata: "DOGRULAMA", mesaj: "dosya alanı gerekli" }, 422);

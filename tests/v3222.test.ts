@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * v3.22.2 — Kişiler ekranı donması (7.800 kişi) ve Cloudflare ücretsiz plan CPU 503'leri:
  *   liste parça parça çizilir · kayıt sayıları tek geçişte · ada göre sıralama aynı sonucu daha hızlı verir · imza önbelleği ·
  *   açılışta eşitleme YOK · kişiler yalnızca değişince ve yalnızca değişenler yenilenir (artımlı birleştirme).

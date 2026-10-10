@@ -1,12 +1,12 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * GELEN KUTUSU — "onay bekleyenler". E-postayla ya da yüklemeyle gelen dosyalardaki (Revy Excel dökümü, WhatsApp sohbet .zip / .txt)
  * her ilan / talep burada tek havuzda bekler; kullanıcı ekler ya da atlar. Hiçbir kayıt onaysız havuza girmez.
  *
  *  - Mükerrer denetimi: havuzda zaten olan, başka portalda / başka grupta kopyası bulunan ve daha önce atlanan kayıtlar gösterilmez
  *    (sayıları özet satırında yazar; "Zaten var" süzgeciyle görülebilir). Havuzdaki bir ilanın fiyatı değiştiyse ayrı bir durumdur.
- *  - Yığılmaya karşı: tarihe göre gruplar (Bugün · Dün · gün gün · ay ay), kaynak / durum / tür / işlem süzgeçleri, arama,
- *    grup başına ve toplu "ekle / atla", "Tümünü temizle".
+ *  - Yığılmaya karşı: kaynak / durum / tür / işlem süzgeçleri, arama, toplu "ekle / atla", "Tümünü temizle".
+ *    v3.24: tarih gruplaması kaldırıldı (çok satır oluşturuyordu) — tek düz liste, HAZIR olanlar en üstte; ilan tarihi kartta yazar.
  *  - Dosyalar tarayıcıda açılır (demo/gelen-oku.ts); canlıda ham dosya sunucudan indirilir, demoda örnek dosyalar bu tarayıcıdadır.
  */
 import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -17,8 +17,10 @@ import { CANLI, BUGUN, type DepoDurumu, type Veri } from "./depo";
 import { gelenDepo, demoGelenSifirla, type GelenAdres } from "./gelen-depo";
 import { gelenDosyayiAc, type GelenParca } from "./gelen-oku";
 import { hamAdaylar, durumla, adaylariEkle, fiyatlariGuncelle, BEKLEYEN, GELEN_KAYNAK_ETIKET, GELEN_DURUM_ETIKET, ANA_TUR_ETIKET, type HamAday, type GelenAday, type GelenKaynak, type GelenDurum, type AnaTur, type GelenSayim } from "./gelen-aday";
-import { tarihGrubu, grupla, gmailKopruBetigi, GELEN_KANAL_ETIKET, type GelenDosyaKunye, type TarihGrubu } from "../src/lib/ingest/gelen";
-import { ICE_AKTARMA_DEVIR } from "./ice-aktarma";
+import { gmailKopruBetigi, GELEN_KANAL_ETIKET, type GelenDosyaKunye } from "../src/lib/ingest/gelen";
+import { kaynakOf, kaynakUygula, type KaynakSecimi } from "../src/lib/domain/kaynak";
+import { KaynakSecici } from "./kaynak-secici";
+import { ICE_AKTARMA_DEVIR } from "./devir";
 
 type Dosya = GelenDosyaKunye & { url?: string | null };
 
@@ -37,8 +39,10 @@ interface Kutu {
   ilerleme: { n: number; toplam: number; ad: string } | null;
   /** Son yüklemede "bekleyeni kalmadığı için" kutudan kaldırılan dosyaların adları (kullanıcıya bir kez söylenir) */
   biten: string[];
+  /** v3.24 — kullanıcının kart üzerinde değiştirdiği kaynak (aday anahtarı → seçim) */
+  kaynak: Map<string, KaynakSecimi>;
 }
-const BOS_KUTU = (): Kutu => ({ asama: "bos", hata: null, dosyalar: [], ham: new Map(), uyarilar: new Map(), sohbet: new Map(), atlanan: new Set(), depoAcik: true, ilerleme: null, biten: [] });
+const BOS_KUTU = (): Kutu => ({ asama: "bos", hata: null, dosyalar: [], ham: new Map(), uyarilar: new Map(), sohbet: new Map(), atlanan: new Set(), depoAcik: true, ilerleme: null, biten: [], kaynak: new Map() });
 let KUTU: Kutu = BOS_KUTU();
 const dinleyen = new Set<() => void>();
 const yaz = (k: Partial<Kutu>) => { KUTU = { ...KUTU, ...k }; dinleyen.forEach((f) => f()); };
@@ -112,7 +116,7 @@ const KAYNAK_TON: Record<GelenKaynak, string> = { REVY: "mor", WHATSAPP: "yesil"
 const boyutYaz = (n: number) => (n >= 1048576 ? (n / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(n / 1024)) + " KB");
 const islemUyar = (islem: string | undefined, f: string) => !f || (f === "DEVREN" ? String(islem ?? "").startsWith("DEVREN") : islem === f);
 
-function AdayKarti({ a, secili, sec, islem }: { a: GelenAday; secili: boolean; sec: (v: boolean) => void; islem: { ekle: (a: GelenAday) => void; atla: (a: GelenAday) => void; fiyat: (a: GelenAday) => void } }) {
+function AdayKarti({ a, secili, sec, islem }: { a: GelenAday; secili: boolean; sec: (v: boolean) => void; islem: { ekle: (a: GelenAday) => void; atla: (a: GelenAday) => void; fiyat: (a: GelenAday) => void; kaynak: (a: GelenAday, k: KaynakSecimi) => void } }) {
   const { git } = useDepo();
   const [ham, setHam] = useState(false);
   const t = a.taslak as Partial<Veri>;
@@ -132,6 +136,7 @@ function AdayKarti({ a, secili, sec, islem }: { a: GelenAday; secili: boolean; s
         </div>
         <div className="kk-baslik">{baslikOf(t)}</div>
         <div className="kk-alt">{konum} · {fiyatOf(t)}{m2Of(t) ? " · " + m2Of(t) : ""}{t.odaSayisi ? " · " + t.odaSayisi : ""}{t.gondeAdi ? ` · ${t.gondeAdi}` : ""}</div>
+        {a.durum !== "TEKRAR" && a.durum !== "DEGISTI" && <KaynakSecici deger={kaynakOf(t)} degis={(k) => islem.kaynak(a, k)} kucuk />}
         {a.durum === "DEGISTI" && a.degisim && <div className="gk-degisim"><b>{tl(a.degisim.eski)}</b> → <b>{tl(a.degisim.yeni)}</b> <span className="ipucu">havuzdaki kayıtta eski fiyat duruyor</span></div>}
         {a.durum === "TEKRAR" && a.tekrarNedeni && <div className="ipucu">{a.tekrarNedeni}</div>}
         {a.durum !== "TEKRAR" && a.nedenler.length > 0 && <div className="cip-satir">{a.nedenler.map((n) => <span key={n} className="cip c-uyari">{n}</span>)}</div>}
@@ -191,19 +196,16 @@ function EpostaKurulumu({ kapat }: { kapat: () => void }) {
 }
 
 // ───────────────────────────── Ekran ─────────────────────────────
-type GrupMod = "tarih" | "gelis" | "kaynak";
 interface Suzgec { kaynak: "" | GelenKaynak; alt: string; durum: "" | GelenDurum; ana: "" | AnaTur; islem: "" | "SATILIK" | "KIRALIK" | "DEVREN"; tip: "" | "PORTFOY" | "TALEP"; ara: string }
 const BOS_SUZGEC: Suzgec = { kaynak: "", alt: "", durum: "", ana: "", islem: "", tip: "", ara: "" };
-const GRUP_ILK = 20;
+const SAYFA = 60;
 
-export function GelenKutusu() {
+export function GelenKutusu({ gomulu = false }: { gomulu?: boolean } = {}) {
   const { d, guncelle, bildir, git } = useDepo();
   const k = useKutu();
   const [f, setF] = useKalici<Suzgec>("gelen.suzgec", BOS_SUZGEC);
-  const [mod, setMod] = useKalici<GrupMod>("gelen.grup", "tarih");
   const [secim, setSecim] = useKalici<Set<string>>("gelen.secim", new Set());
-  const [acik, setAcik] = useKalici<Record<string, boolean>>("gelen.acik", {});
-  const [limit, setLimit] = useKalici<Record<string, number>>("gelen.limit", {});
+  const [limit, setLimit] = useKalici<number>("gelen.limit", SAYFA);
   const [kurulum, setKurulum] = useKalici("gelen.kurulum", false);
   const [dosyalarAcik, setDosyalarAcik] = useKalici("gelen.dosyalar", false);
   const [temizle, setTemizle] = useState(false);
@@ -216,7 +218,12 @@ export function GelenKutusu() {
 
   useEffect(() => { void kutuYukle(d); }, []);
 
-  const { adaylar, sayim } = useMemo(() => durumla(hamSirali(k), d, k.atlanan), [k.ham, k.dosyalar, k.atlanan, d.kayitlar, d.kisiler]);
+  const { adaylar, sayim } = useMemo(() => {
+    const r = durumla(hamSirali(k), d, k.atlanan);
+    if (!k.kaynak.size) return r;
+    // v3.24 — kartta değiştirilen kaynak hem görünüme hem eklenecek kayda yansır
+    return { ...r, adaylar: r.adaylar.map((a) => { const s = k.kaynak.get(a.key); return s ? { ...a, taslak: kaynakUygula(a.taslak as any, s), veri: a.veri ? kaynakUygula(a.veri as any, s) : a.veri } : a; }) };
+  }, [k.ham, k.dosyalar, k.atlanan, k.kaynak, d.kayitlar, d.kisiler]);
   const bekleyen = useMemo(() => adaylar.filter((a) => BEKLEYEN.has(a.durum)), [adaylar]);
   const dosyaBekleyen = useMemo(() => { const m = new Map<string, number>(); for (const a of bekleyen) m.set(a.dosyaId, (m.get(a.dosyaId) ?? 0) + 1); return m; }, [bekleyen]);
 
@@ -232,11 +239,11 @@ export function GelenKutusu() {
   const say = (boyut: keyof Suzgec, p: (a: GelenAday) => boolean) => adaylar.filter((a) => uyar(a, boyut) && p(a)).length;
   const altlar = useMemo(() => [...new Set(adaylar.filter((a) => uyar(a, "alt")).map((a) => a.altKaynak))].sort((x, y) => x.localeCompare(y, "tr")), [adaylar, f]);
   const suzgecVar = JSON.stringify(f) !== JSON.stringify(BOS_SUZGEC);
-  const sf = (p: Partial<Suzgec>) => { setF({ ...f, ...p }); setSecim(new Set()); };
+  const sf = (p: Partial<Suzgec>) => { setF({ ...f, ...p }); setSecim(new Set()); setLimit(SAYFA); };
 
-  const grupOf = (a: GelenAday): TarihGrubu => mod === "kaynak" ? { anahtar: "k:" + a.altKaynak, etiket: `${GELEN_KAYNAK_ETIKET[a.kaynak]} · ${a.altKaynak}`, sira: a.kaynak === "REVY" ? 2 : a.kaynak === "WHATSAPP" ? 1 : 0 } : tarihGrubu(mod === "gelis" ? a.gelis : a.tarih, BUGUN);
-  const SIRA: Record<GelenDurum, number> = { DEGISTI: 0, HAZIR: 1, KONTROL: 2, HATALI: 3, TEKRAR: 4 };
-  const gruplar = useMemo(() => grupla([...gorunen].sort((x, y) => SIRA[x.durum] - SIRA[y.durum] || (y.tarih ?? "").localeCompare(x.tarih ?? "")), grupOf), [gorunen, mod]);
+  // v3.24 — düz liste: hazır olanlar önce, sonra fiyatı değişen, kontrol gerekli, hatalı; her durumda en yeni ilan üstte
+  const SIRA: Record<GelenDurum, number> = { HAZIR: 0, DEGISTI: 1, KONTROL: 2, HATALI: 3, TEKRAR: 4 };
+  const sirali = useMemo(() => [...gorunen].sort((x, y) => SIRA[x.durum] - SIRA[y.durum] || (y.tarih ?? "").localeCompare(x.tarih ?? "")), [gorunen]);
   const eklenebilir = (a: GelenAday) => !!a.veri && (a.durum === "HAZIR" || a.durum === "KONTROL");
   const secilenler = gorunen.filter((a) => secim.has(a.key));
 
@@ -285,7 +292,7 @@ export function GelenKutusu() {
       if (anahtarlar.length) await depo.atla(anahtarlar);
       await depo.sil(null);
       yaz({ dosyalar: [], ham: new Map(), uyarilar: new Map(), sohbet: new Map(), atlanan: new Set([...KUTU.atlanan, ...anahtarlar]) });
-      setSecim(new Set()); setSonAtlanan([]); kaliciSil("gelen.acik"); bildir(`Gelen kutusu temizlendi (${anahtarlar.length} kayıt atlandı)`);
+      setSecim(new Set()); setSonAtlanan([]); bildir(`Gelen kutusu temizlendi (${anahtarlar.length} kayıt atlandı)`);
     } catch (e: any) { setHata(`Temizlenemedi: ${e?.message ?? e}`); }
     setMesgul(null);
   };
@@ -293,14 +300,14 @@ export function GelenKutusu() {
     try { await depo.atlananUnut(); yaz({ atlanan: new Set() }); setSonAtlanan([]); bildir("Atlananlar geri getirildi"); } catch (e: any) { setHata(`Geri getirilemedi: ${e?.message ?? e}`); }
   };
   const aiIleOku = (dosya: Dosya) => { const s = k.sohbet.get(dosya.id); if (!s?.length) return; ICE_AKTARMA_DEVIR.kaynaklar = s; git({ ad: "veri", alt: "wa" }); };
-  const kartIslem = { ekle: (a: GelenAday) => ekle([a]), atla: (a: GelenAday) => void atla([a]), fiyat: (a: GelenAday) => fiyat([a]) };
+  const kartIslem = { ekle: (a: GelenAday) => ekle([a]), atla: (a: GelenAday) => void atla([a]), fiyat: (a: GelenAday) => fiyat([a]), kaynak: (a: GelenAday, s: KaynakSecimi) => { const m = new Map(KUTU.kaynak); m.set(a.key, s); yaz({ kaynak: m }); } };
 
   const yukleniyor = k.asama === "yukleniyor" || k.asama === "bos" || k.asama === "ozet";
   const gizlenen = sayim.zatenVar + sayim.kopya + sayim.atlanan;
 
   return <div className={cx("yigin gelen-kutusu", surukle && "surukle")} onDragOver={(e) => { e.preventDefault(); setSurukle(true); }} onDragLeave={() => setSurukle(false)} onDrop={(e) => { e.preventDefault(); setSurukle(false); void dosyaEkle([...e.dataTransfer.files]); }}>
     <div className="satir-ara">
-      <h2>Gelen kutusu</h2>
+      {!gomulu && <h2>Gelen kutusu</h2>}
       <div className="satir sar gk-ust">
         <input ref={girdi} type="file" multiple hidden onChange={(e) => { const x = [...(e.target.files ?? [])]; e.target.value = ""; void dosyaEkle(x); }} />
         <button className="btn birincil" disabled={!!mesgul} onClick={() => girdi.current?.click()}>Dosya ekle</button>
@@ -363,39 +370,23 @@ export function GelenKutusu() {
           </div>
           <div className="fc">
             <div className="fc-ara"><span aria-hidden="true">⌕</span><input type="search" aria-label="Gelen kutusunda ara" placeholder="Başlık, mahalle, kişi ara…" value={f.ara} onChange={(e) => sf({ ara: e.target.value })} /></div>
-            <div className="uc mini" role="group" aria-label="Gruplama">{([["tarih", "İlan tarihi"], ["gelis", "Geliş günü"], ["kaynak", "Kaynak"]] as const).map(([x, e]) => <button key={x} className={cx(mod === x && "on")} onClick={() => setMod(x)}>{e}</button>)}</div>
           </div>
           {suzgecVar && <div className="satir"><span className="ipucu">Süzgeçte {gorunen.length.toLocaleString("tr-TR")} kayıt</span><button className="fc-temizle" onClick={() => sf(BOS_SUZGEC)}>Süzgeci kaldır</button></div>}
         </div>
 
         {f.durum !== "TEKRAR" && <div className="toplu-cubuk">
           <label className="onay-satir"><input type="checkbox" checked={gorunen.filter(eklenebilir).length > 0 && gorunen.filter(eklenebilir).every((a) => secim.has(a.key))} onChange={(e) => setSecim(e.target.checked ? new Set(gorunen.filter(eklenebilir).map((a) => a.key)) : new Set())} /> {suzgecVar ? "Süzgeçtekilerin tümü" : "Tümünü seç"} ({gorunen.filter(eklenebilir).length})</label>
-          <button className="btn kucuk" onClick={() => setSecim(new Set(gorunen.filter((a) => a.durum === "HAZIR").map((a) => a.key)))}>Hazırları seç ({gorunen.filter((a) => a.durum === "HAZIR").length})</button>
+          {gorunen.some((a) => a.durum === "HAZIR" && a.veri) && <button className="btn kucuk birincil" onClick={() => ekle(gorunen.filter((a) => a.durum === "HAZIR"))}>Hazırların tümünü ekle ({gorunen.filter((a) => a.durum === "HAZIR" && a.veri).length})</button>}
           <button className="btn kucuk birincil" disabled={!secilenler.length} onClick={() => ekle(secilenler)}>Seçilenleri ekle ({secilenler.length})</button>
           <button className="btn kucuk" disabled={!secilenler.length} onClick={() => void atla(secilenler)}>Seçilenleri atla ({secilenler.length})</button>
           {gorunen.some((a) => a.durum === "DEGISTI") && <button className="btn kucuk" onClick={() => fiyat(gorunen)}>Fiyatları güncelle ({gorunen.filter((a) => a.durum === "DEGISTI").length})</button>}
         </div>}
       </>}
-      {gruplar.map((g, gi) => {
-        const ac = acik[g.grup.anahtar] ?? gi < 2;
-        const lim = limit[g.grup.anahtar] ?? GRUP_ILK;
-        const ekl = g.ogeler.filter(eklenebilir), hazir = g.ogeler.filter((a) => a.durum === "HAZIR");
-        return <section key={g.grup.anahtar} className={cx("gk-grup", ac && "acik")}>
-          <div className="gk-grup-bas">
-            <button type="button" className="gk-grup-ad" aria-expanded={ac} onClick={() => setAcik({ ...acik, [g.grup.anahtar]: !ac })}><span className="gk-ok" aria-hidden="true">{ac ? "▾" : "▸"}</span><b>{g.grup.etiket}</b><span className="ipucu">{g.ogeler.length} kayıt{hazir.length && f.durum !== "TEKRAR" ? ` · ${hazir.length} hazır` : ""}</span></button>
-            {f.durum !== "TEKRAR" && <div className="satir sar">
-              {hazir.length > 0 && <button className="btn kucuk" onClick={() => ekle(hazir)}>Hazırları ekle ({hazir.length})</button>}
-              {ekl.length > 0 && <button className="btn kucuk" onClick={() => setSecim(new Set([...secim, ...ekl.map((a) => a.key)]))}>Seç</button>}
-              <button className="btn kucuk" onClick={() => void atla(g.ogeler)}>Grubu atla</button>
-            </div>}
-          </div>
-          {ac && <div className="yigin gk-grup-ic">
-            {g.ogeler.slice(0, lim).map((a) => <AdayKarti key={a.key + a.dosyaId} a={a} secili={secim.has(a.key)} islem={kartIslem} sec={(v) => setSecim((s) => { const n = new Set(s); v ? n.add(a.key) : n.delete(a.key); return n; })} />)}
-            {g.ogeler.length > lim && <button className="btn" onClick={() => setLimit({ ...limit, [g.grup.anahtar]: lim + 40 })}>Daha fazla göster ({g.ogeler.length - lim} kayıt daha)</button>}
-          </div>}
-        </section>;
-      })}
-      {!gruplar.length && (k.dosyalar.length === 0
+      {sirali.length > 0 && <div className="yigin gk-liste">
+        {sirali.slice(0, limit).map((a) => <AdayKarti key={a.key + a.dosyaId} a={a} secili={secim.has(a.key)} islem={kartIslem} sec={(v) => setSecim((s) => { const n = new Set(s); v ? n.add(a.key) : n.delete(a.key); return n; })} />)}
+        {sirali.length > limit && <div className="satir sar"><button className="btn" onClick={() => setLimit(limit + SAYFA)}>Daha fazla göster ({(sirali.length - limit).toLocaleString("tr-TR")} kayıt daha)</button><button className="btn" onClick={() => setLimit(sirali.length)}>Hepsini göster</button></div>}
+      </div>}
+      {!sirali.length && (k.dosyalar.length === 0
         ? <div className="kart gk-bos"><b>Gelen kutusu boş.</b><span>Revy'de süzgecinizi seçip <b>Excel'e Aktar</b> deyin, inen dosyayı buraya bırakın; WhatsApp grubunda <b>Sohbeti dışa aktar › Medya olmadan</b> ile aldığınız .zip dosyasını e-postayla gönderin ya da buraya bırakın.</span>
           <div className="satir sar"><button className="btn birincil" onClick={() => girdi.current?.click()}>Dosya ekle</button><button className="btn" onClick={() => setKurulum(true)}>E-posta kurulumu</button></div></div>
         : <p className="bos">{suzgecVar ? "Bu süzgece uyan kayıt yok." : "Onay bekleyen kayıt kalmadı. Biten dosyaları “Dosyalar” bölümünden silebilir ya da “Tümünü temizle” diyebilirsiniz."}</p>)}

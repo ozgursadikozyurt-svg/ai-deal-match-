@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Canlı (Cloudflare) paketine gömülecek veriyi üretir: migration SQL'leri + yalnız Antalya konum verisi.
  * Çıktı: src/canli/gomulu.generated.ts  (npm run canli:build içinde otomatik çalışır)
  */

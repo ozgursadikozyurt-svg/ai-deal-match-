@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * v3.20 — veritabanı gerektirmeyen denetimler: sorgu dönüştürme, roller/yetkiler, plan sınırları,
  * davet kodu ve güvenlik kuralları (ham SQL, test arka kapısı, ebeveyn modeller).
  */

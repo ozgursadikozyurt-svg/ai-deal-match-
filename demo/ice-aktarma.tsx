@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Demo — Veri Girişi: WhatsApp sohbet dosyalarını toplu içe aktarma + güvene göre ayırma + toplu onay.
  *
  * Akış (uzun sohbetlerde kullanıcının her mesajı tek tek onaylamaması için):
@@ -32,7 +32,11 @@ import { ORNEK_SOHBETLER, hazirAiSonucu } from "./ornek-sohbetler";
 
 const PAKET = 10;
 /** v3.23 — Gelen kutusundaki bir WhatsApp dosyasını bu ekrana devreder ("✦ Yapay zekâyla oku"): ekran açılınca dosya yüklenmiş olur */
-export const ICE_AKTARMA_DEVIR: { kaynaklar: { dosya: string; icerik: string; grup: string }[] | null } = { kaynaklar: null };
+import { ICE_AKTARMA_DEVIR } from "./devir";
+export { ICE_AKTARMA_DEVIR };
+import { GelenKutusu, useGelenRozet } from "./gelen-kutusu";
+import { KaynakSecici } from "./kaynak-secici";
+import { kaynakOf, kaynakUygula } from "../src/lib/domain/kaynak";
 const SON_GUN_SECENEK: [number | null, string][] = [[7, "Son 7 gün"], [30, "Son 30 gün"], [90, "Son 90 gün"], [null, "Tümü"]];
 
 // ───────── Yapay zekâ kaydı → form taslağı + sınıflandırma ─────────
@@ -181,6 +185,7 @@ function AdayKarti({ a, secili, sec, mesaj }: { a: IceAktarmaAdayi; secili: bool
         {oneCikanlar(t).length > 0 && <div className="cip-satir">{oneCikanlar(t).map((c) => <span key={c} className="cip">{c}</span>)}</div>}
         {a.nedenler.length > 0 && a.durum !== "EKLENDI" && <div className="cip-satir">{a.nedenler.map((n) => <span key={n} className={cx("cip", a.durum === "HATALI" ? "c-kotu" : "c-uyari")}>{n}</span>)}</div>}
         {a.hatalar.length > 0 && <ul className="hata-liste">{a.hatalar.map((h) => <li key={h}>{h}</li>)}</ul>}
+        {!bitti && <KaynakSecici kucuk deger={kaynakOf(t)} degis={(k) => guncelle((d) => d.aktifIceAktarma ? { ...d, aktifIceAktarma: { ...d.aktifIceAktarma, adaylar: d.aktifIceAktarma.adaylar.map((x) => (x.id === a.id ? { ...x, taslak: kaynakUygula(x.taslak as any, k) } : x)) } } : d)} />}
       </div>
     </div>
     <div className="satir sar">
@@ -252,7 +257,7 @@ function Inceleme({ ia }: { ia: IceAktarma }) {
       <div className="filtre">{([["", "Hepsi"], ["PORTFOY", "Portföyler"], ["TALEP", "Talepler"]] as const).map(([k, l]) => <button key={k} className={cx("fb", tipF === k && "on")} onClick={() => setTipF(k)}>{l}</button>)}</div>
       <div className="filtre">{([["", "Satılık + kiralık"], ["SATILIK", "Satılık"], ["KIRALIK", "Kiralık"]] as const).map(([k, l]) => <button key={k} className={cx("fb", islemF === k && "on")} onClick={() => setIslemF(k)}>{l}</button>)}</div>
       <div className="satir sar toplu">
-        {(sekme === "HAZIR" || sekme === "TUMU") && ia.adaylar.some((a) => a.durum === "HAZIR") && <button className="btn birincil" onClick={() => ekle(ia.adaylar.filter((a) => a.durum === "HAZIR" && (!tipF || a.taslak.tip === tipF)).map((a) => a.id))}>Hazır olanların tümünü ekle ({ia.adaylar.filter((a) => a.durum === "HAZIR" && (!tipF || a.taslak.tip === tipF)).length})</button>}
+        {(sekme === "HAZIR" || sekme === "TUMU") && grupla("HAZIR").length > 0 && <button className="btn birincil" onClick={() => ekle(grupla("HAZIR").map((a) => a.id))}>Hazır olanların tümünü ekle ({grupla("HAZIR").length})</button>}
         {(sekme === "HAZIR" || sekme === "KONTROL" || sekme === "TUMU") && liste.length > 0 && <>
           <button className="btn" onClick={() => { const secilebilir = liste.filter((a) => a.durum === "HAZIR" || a.durum === "KONTROL"); setSecim(secim.size === secilebilir.length ? new Set() : new Set(secilebilir.map((a) => a.id))); }}>{secim.size && secim.size === liste.filter((a) => a.durum === "HAZIR" || a.durum === "KONTROL").length ? "Seçimi kaldır" : "Tümünü seç"}</button>
           <button className="btn" disabled={!secim.size} onClick={() => ekle([...secim])}>Seçilenleri ekle ({secim.size})</button>
@@ -416,15 +421,17 @@ export function VeriGirisi({ alt, metin, donus }: { alt?: string; metin?: string
   const { git, d } = useDepo();
   hafizaBaslat("vg.", donus); // v3.15: forma gidip "Vazgeç" ile dönülünce yüklü dosya / seçimler yerinde kalır; menüden girişte sıfırlanır
   const surenIs = !alt && !donus && !!d.aktifIceAktarma; // v3.12: yarım kalan içe aktarma varsa menüden girince oraya düşer (veriler kaybolmuş gibi görünmesin)
-  const ilk = alt === "dosya" || alt === "wa" || surenIs ? "dosya" : alt === "el" ? "el" : "metin";
+  const ilk = alt === "gelen" ? "gelen" : alt === "dosya" || alt === "wa" || surenIs ? "dosya" : alt === "el" ? "el" : "metin";
   const [sekme, setSekme] = useState(ilk);
   const [dosyaTuru, setDosyaTuru] = useState(alt === "wa" || surenIs ? "wa" : "tablo");
+  const gelen = useGelenRozet(d); // v3.24 — Gelen Kutusu Veri Girişi'nin sekmesi oldu (eskiden ayrı menü öğesiydi)
   return (
     <div className="yigin">
       <h2>Veri girişi</h2>
-      <div className="sekme3" role="tablist">
-        {([["metin", "Yapıştır"], ["dosya", "Dosya yükle"], ["el", "Elle gir"]] as const).map(([k, e]) => <button key={k} role="tab" aria-selected={sekme === k} className={sekme === k ? "on" : ""} onClick={() => setSekme(k)}>{e}</button>)}
+      <div className="sekme3 sekme4" role="tablist">
+        {([["metin", "Yapıştır"], ["dosya", "Dosya yükle"], ["gelen", "Gelen kutusu"], ["el", "Elle gir"]] as const).map(([k, e]) => <button key={k} role="tab" aria-selected={sekme === k} className={sekme === k ? "on" : ""} onClick={() => setSekme(k)}>{e}{k === "gelen" && gelen.sayi > 0 && <b className="sekme-rozet">{gelen.sayi > 999 ? "999+" : gelen.sayi}</b>}</button>)}
       </div>
+      {sekme === "gelen" && <GelenKutusu gomulu />}
       {sekme === "metin" && <AkilliKutu gomulu donus={donus} baslangic={metin ?? ""} />}
       {sekme === "dosya" && (
         <div className="yigin">

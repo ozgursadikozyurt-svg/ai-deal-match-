@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Gelen kutusu — HAM dosyayı tarayıcıda açar: e-posta (.eml) → ekler, .zip → içindeki sohbet / tablo dosyaları,
  * .txt → WhatsApp sohbeti (ya da başlıklı liste), .xlsx / .csv → tablo. Sonuç "parça" listesidir; adaylar demo/gelen-aday.ts'te çıkar.
  * Sunucu dosyayı açmaz (Cloudflare ücretsiz plan: 10 ms işlemci); bu dosya o işi kullanıcının cihazında yapar.

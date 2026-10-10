@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Demo — Akıllı giriş kutusu ("Anahtar AI"). Ana sayfanın en üstünde ve Veri girişi › Yapıştır'da aynı bileşen.
  *   1) Metin önce yorumlanır (src/lib/ai/yorumlayici.ts): portal ilan sayfası, WhatsApp sohbet dökümü, toplu liste,
  *      tek talep / ilan, yalnızca bağlantı, kişi / telefon ya da soru.
@@ -7,6 +7,9 @@
  *   3) Kayıt(lar) → kural tabanlı ayrıştırma (ücretsiz) → açıklama + uyarılar + notlar → tek kayıt kartı ya da çoklu liste → Kaydet.
  *   4) "Yapay zekâ yorumlasın": kullanıcı isterse (ya da güven düşükse önerilir) metin yapay zekâya yorumlatılır (1 istek).
  * Aynı metin ikinci kez gelirse yapay zekâ çağrılmaz; havuzda kayıtlı metin / kayıt "Zaten var" olur.
+ * v3.24 — Çoklu sonuçta WhatsApp içe aktarmadaki "Gözden geçir ve onayla" süzgeçleri (durum · portföy/talep · satılık/kiralık),
+ *   hazır olanlar en üstte, "Hazır olanların tümünü ekle / Tümünü seç / Seçilenleri ekle / Seçilenleri atla". Eklenenler listede
+ *   "Eklenen / atlanan" olarak kalır (kalan kayıtlar kaybolmaz). Her kayıtta Kaynak seçimi (Emlak grubu · Sahibinden · Portal · Kendi portföyüm).
  */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { KayitCreateSchema } from "../src/lib/validation/kayit";
@@ -32,6 +35,8 @@ import { adaylariGuncelle } from "../src/lib/lokasyon/ogrenme";
 import { telNormalize } from "./form";
 import { ORNEK_TOPLANTI_NOTU } from "./ornek-dosyalar";
 import { ORNEK_PORTAL_SAYFASI, ORNEK_SOHBET } from "./ornek-metinler";
+import { kaynakOf, kaynakUygula, KAYNAK_SECIMLERI, KAYNAK_SECIM_ETIKET, type KaynakSecimi } from "../src/lib/domain/kaynak";
+import { KaynakSecici } from "./kaynak-secici";
 
 /** Çözücü sonucunu filtre konumuna çevir */
 export function konumOnerileri(ifadeler: string[]): KonumOnerisi[] {
@@ -179,6 +184,14 @@ export function AkilliKutu({ gomulu = false, baslangic = "", donus }: { gomulu?:
   const [hata, setHata] = useState(null as string | null);
   const [basari, setBasari] = useKalici(HK + "basari", null as { metin: string; talep: number; portfoy: number } | null);
   const [eklenenKisi, setEklenenKisi] = useKalici(HK + "eklenenKisi", false);
+  // v3.24 — kaynak seçimi (satır → seçim; "kaynakTum" hepsine), atlananlar ve inceleme süzgeçleri
+  const [kaynakS, setKaynakS] = useKalici(HK + "kaynak", {} as Record<number, KaynakSecimi>);
+  const [kaynakTum, setKaynakTum] = useKalici(HK + "kaynakTum", "" as "" | KaynakSecimi);
+  const [atlanan, setAtlanan] = useKalici(HK + "atlanan", new Set<number>());
+  const [sekmeF, setSekmeF] = useKalici(HK + "sekmeF", "TUMU" as "TUMU" | "HAZIR" | "KONTROL" | "HATALI" | "BITEN");
+  const [tipF, setTipF] = useKalici(HK + "tipF", "" as "" | "TALEP" | "PORTFOY");
+  const [islemF, setIslemF] = useKalici(HK + "islemF", "" as "" | "SATILIK" | "KIRALIK");
+  const [limit, setLimit] = useState(60);
   const onbellek = useRef(new Map<string, any>());
   const otoBekleyen = useRef(false);
 
@@ -192,7 +205,9 @@ export function AkilliKutu({ gomulu = false, baslangic = "", donus }: { gomulu?:
       return temelUyum(t, p) ? { k, s: eslesmeOnizle(t, p, BAGLAM) } : null;
     }).filter((x: any): x is { k: any; s: any } => !!x && x.s.uygunluk !== "UYGUN_DEGIL").sort((a: any, b: any) => b.s.skor - a.s.skor);
 
-  const satirlar: Satir[] = useMemo(() => {
+  const kaynakla = (s: Satir, i: number): Satir => { const k = kaynakS[i] ?? (kaynakTum || null); return k ? { ...s, taslak: kaynakUygula(s.taslak, k), veri: s.veri ? kaynakUygula(s.veri, k) : null } : s; };
+  const satirlar: Satir[] = useMemo(() => (satirlarHam() ?? []).map(kaynakla), [yorum, ai, secim, izler, kayitliMetinler, aktif, kaynakS, kaynakTum]);
+  function satirlarHam(): Satir[] {
     if (!yorum) return [];
     if (ai) return ai.kayitlar.map((k, i) => {
       const kaynak = String(k.kaynakMetin || (ai.kayitlar.length === 1 ? islenen : k.ozet || islenen)).trim();
@@ -205,9 +220,9 @@ export function AkilliKutu({ gomulu = false, baslangic = "", donus }: { gomulu?:
       return satirKur(p, yorum, secim, d, izler, kayitliMetinler, temiz, eslesmeBul);
     });
     return yorum.parcalar.map((p) => satirKur(p, yorum, secim, d, izler, kayitliMetinler, null, eslesmeBul));
-  }, [yorum, ai, secim, izler, kayitliMetinler, aktif]);
+  }
 
-  function temizle() { setYorum(null); setAi(null); setSoru(null); setHata(null); setSecili(new Set()); setAcik(null); setEklenenKisi(false); }
+  function temizle() { setYorum(null); setAi(null); setSoru(null); setHata(null); setSecili(new Set()); setAcik(null); setEklenenKisi(false); setKaynakS({}); setKaynakTum(""); setAtlanan(new Set()); setSekmeF("TUMU"); setLimit(60); }
 
   async function calistir(m = metin) {
     const t = m.trim();
@@ -219,9 +234,8 @@ export function AkilliKutu({ gomulu = false, baslangic = "", donus }: { gomulu?:
       else {
         setYorum(y);
         otoBekleyen.current = aiAyari(d).otomatik && y.parcalar.length === 1 && Math.round(y.guven * 100) < aiAyari(d).esik;
-        // Çoklu sonuçta hazır olanlar seçili gelsin
-        const on = y.parcalar.map((p) => satirKur(p, y, "OTO", d, izler, kayitliMetinler, null, () => []));
-        setSecili(new Set(on.map((s, i) => (s.durum === "HAZIR" || s.durum === "KONTROL") && s.veri ? i : -1).filter((i) => i >= 0)));
+        // v3.24 — çoklu sonuçta seçim boş gelir (WhatsApp incelemesiyle aynı): "Hazır olanların tümünü ekle" ya da elle seçim
+        setSecili(new Set());
       }
     } catch (e: any) {
       setHata("Metin okunamadı: " + (e?.message ?? e));
@@ -257,7 +271,7 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
       const tur = (YORUM_ETIKETI as any)[c?.tur] ? c.tur : yorum.tur;
       setYorum({ ...yorum, tur, kisiler: gecerli.length ? yorum.kisiler : kisiler });
       setAi({ kayitlar: gecerli, aciklama: String(c?.aciklama || "Yapay zekâ metni yeniden okudu."), tur });
-      setSecili(new Set(gecerli.map((_, i) => i)));
+      setSecili(new Set()); setKaynakS({}); setAtlanan(new Set());
     } catch (e: any) {
       setHata(e?.code === "not_granted" ? "Yapay zekâya izin verilmedi; kural tabanlı okuma duruyor." : "Yapay zekâ yanıt veremedi: " + (e?.message ?? e?.code ?? e));
     } finally { setAiCalisiyor(false); }
@@ -292,8 +306,9 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
     git({ ad: "detay", id: kayit.id });
   }
 
-  function topluKaydet() {
-    const secilen = satirlar.filter((s, i) => secili.has(i) && s.veri && !s.tekrar);
+  function topluKaydet(indisler?: number[]) {
+    const hedef = new Set(indisler ?? [...secili]);
+    const secilen = satirlar.filter((s, i) => hedef.has(i) && s.veri && !s.tekrar && !atlanan.has(i));
     if (!secilen.length) return;
     let sonuc: any;
     guncelle((eski: any) => (sonuc = topluEkle(eski, secilen.map((s) => ({ veri: s.veri, kisi: kisiBilgisi(s.veri, s.p) }))), sonuc.d));
@@ -301,7 +316,10 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
     const talep = secilen.filter((s) => s.veri.tip === "TALEP").length;
     const m = `${secilen.length} kayıt eklendi${sonuc?.yeniKisi ? `, ${sonuc.yeniKisi} yeni kişi` : ""}`;
     setBasari({ metin: m, talep, portfoy: secilen.length - talep });
-    bildir(m); temizle(); setMetin("");
+    bildir(m);
+    // v3.24 — bekleyen (eklenmemiş, atlanmamış) kayıt kaldıysa liste yerinde kalır; eklenenler "Eklenen / atlanan"a geçer
+    const kalan = satirlar.some((s, i) => !hedef.has(i) && !atlanan.has(i) && !s.tekrar);
+    if (kalan) setSecili(new Set()); else { temizle(); setMetin(""); }
   }
 
   function kisileriEkle() {
@@ -316,7 +334,18 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
   const firsat = tek?.veri && tek.veri.tip === "PORTFOY" && havuzKatmani(tek.veri) === "WEB" ? portfoyEdinmeFirsati(tek.eslesmeler.map((e) => e.s.skor)) : null;
   const sayim = { HAZIR: 0, KONTROL: 0, TEKRAR: 0, HATALI: 0 } as Record<string, number>;
   for (const s of satirlar) sayim[s.durum]++;
-  const secilebilir = satirlar.map((s, i) => (s.veri && !s.tekrar ? i : -1)).filter((i) => i >= 0);
+  const secilebilir = satirlar.map((s, i) => (s.veri && !s.tekrar && !atlanan.has(i) ? i : -1)).filter((i) => i >= 0);
+  // v3.24 — inceleme süzgeçleri: durum · portföy/talep · satılık/kiralık; hazır olanlar en üstte
+  const durumOf = (s: Satir, i: number) => (atlanan.has(i) || s.durum === "TEKRAR" ? "BITEN" : s.durum);
+  const SIRA_D: Record<string, number> = { HAZIR: 0, KONTROL: 1, HATALI: 2, BITEN: 3 };
+  const tipIslemUyar = (s: Satir) => { const v = s.veri ?? s.taslak; return (!tipF || v.tip === tipF) && (!islemF || String(v.islemTipi ?? "").includes(islemF)); };
+  const sekmeUyar = (s: Satir, i: number, k: string) => k === "TUMU" ? !atlanan.has(i) : durumOf(s, i) === k;
+  const gorunenIdx = satirlar.map((_, i) => i).filter((i) => tipIslemUyar(satirlar[i]) && sekmeUyar(satirlar[i], i, sekmeF))
+    .sort((x, y) => (SIRA_D[durumOf(satirlar[x], x)] - SIRA_D[durumOf(satirlar[y], y)]) || ((satirlar[y].p.guven ?? 100) - (satirlar[x].p.guven ?? 100)) || x - y);
+  const sekmeSay = (k: string) => satirlar.filter((s, i) => tipIslemUyar(s) && sekmeUyar(s, i, k)).length;
+  const hazirIdx = satirlar.map((_, i) => i).filter((i) => satirlar[i].durum === "HAZIR" && !atlanan.has(i) && satirlar[i].veri && tipIslemUyar(satirlar[i]));
+  const gorunenSecilebilir = gorunenIdx.filter((i) => secilebilir.includes(i));
+  const seciliGorunen = gorunenSecilebilir.filter((i) => secili.has(i));
   const uzun = metin.length > 80 || metin.includes("\n");
   const aiUygun = !!sample && !!yorum && islenen.length <= 12000;
   const esik = aiAyari(d).esik;
@@ -425,7 +454,7 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
               <button className="btn kucuk" disabled={aiCalisiyor} onClick={aiyaSor}>{aiCalisiyor ? "Yorumluyor…" : "Yapay zekâ yorumlasın"}</button>
             </div>
           )}
-          {ai && <div className="anla-ai"><span>Kural tabanlı okumaya dönmek için</span><button className="btn kucuk" onClick={() => { setAi(null); setSecili(new Set(yorum.parcalar.map((_, i) => i))); }}>Geri al</button></div>}
+          {ai && <div className="anla-ai"><span>Kural tabanlı okumaya dönmek için</span><button className="btn kucuk" onClick={() => { setAi(null); setSecili(new Set()); setKaynakS({}); setAtlanan(new Set()); }}>Geri al</button></div>}
         </div>
       )}
 
@@ -464,6 +493,7 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
               {tek.tekrar && (kayitliKayit(tek) ? <button className="btn kucuk" onClick={() => git({ ad: "detay", id: kayitliKayit(tek)!.id })}>Zaten kayıtlı · kayda git</button> : <Pill>Zaten kayıtlı</Pill>)}
             </div>
             <h3 className="oz-baslik">{tek.veri ? baslikOf(tek.veri) : tek.taslak.baslik}</h3>
+            <div className="kaynak-satir"><span className="ipucu">Kaynak</span><KaynakSecici deger={kaynakOf(tek.veri ?? tek.taslak)} degis={(k) => setKaynakS({ 0: k })} /></div>
             <Ozellikler s={tek} />
             {tek.veri && oneCikanlar(tek.veri).length > 0 && <div className="cip-satir">{oneCikanlar(tek.veri).map((c: string) => <span key={c} className="cip">{c}</span>)}</div>}
             {tek.p.notlar.length > 0 && <ul className="oz-notlar">{tek.p.notlar.map((n) => <li key={n}>{n}</li>)}</ul>}
@@ -497,34 +527,42 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
 
       {satirlar.length > 1 && (
         <div className="yigin">
-          <div className="toplu-cubuk coklu">
-            <div className="coklu-sayim">
-              <b>{satirlar.length} kayıt</b>
-              {sayim.HAZIR > 0 && <Pill ton="iyi">{sayim.HAZIR} hazır</Pill>}
-              {sayim.KONTROL > 0 && <Pill ton="uyari">{sayim.KONTROL} kontrol</Pill>}
-              {sayim.TEKRAR > 0 && <Pill>{sayim.TEKRAR} zaten var</Pill>}
-              {sayim.HATALI > 0 && <Pill ton="kotu">{sayim.HATALI} eksik</Pill>}
+          <div className="kart yigin kucuk-bosluk coklu-inceleme">
+            <div className="satir-ara"><h3>Gözden geçir ve onayla</h3><span className="coklu-sayim"><b>{satirlar.length} kayıt</b>{sayim.HAZIR > 0 && <Pill ton="iyi">{sayim.HAZIR} hazır</Pill>}{sayim.KONTROL > 0 && <Pill ton="uyari">{sayim.KONTROL} kontrol</Pill>}</span></div>
+            <p className="ipucu">Her kayıt doğrulamadan geçti. <b>Hazır</b> olanlar eksiksizdir, tek tuşla eklenebilir; <b>Kontrol gerekli</b> olanlarda konum, fiyat veya benzer kayıt uyarısı var.</p>
+            <div className="filtre">{([["TUMU", "Hepsi"], ["HAZIR", "Hazır"], ["KONTROL", "Kontrol gerekli"], ["HATALI", "Şemaya uymayan"], ["BITEN", "Eklenen / atlanan"]] as const).map(([k, l]) => <button key={k} className={cx("fb", sekmeF === k && "on")} onClick={() => { setSekmeF(k); setSecili(new Set()); setLimit(60); }}>{l} ({sekmeSay(k)})</button>)}</div>
+            <div className="filtre">{([["", "Hepsi"], ["PORTFOY", "Portföyler"], ["TALEP", "Talepler"]] as const).map(([k, l]) => <button key={k} className={cx("fb", tipF === k && "on")} onClick={() => setTipF(k)}>{l}</button>)}</div>
+            <div className="filtre">{([["", "Satılık + kiralık"], ["SATILIK", "Satılık"], ["KIRALIK", "Kiralık"]] as const).map(([k, l]) => <button key={k} className={cx("fb", islemF === k && "on")} onClick={() => setIslemF(k)}>{l}</button>)}</div>
+            <div className="satir sar coklu-ayar">
+              <div className="uc mini" role="group" aria-label="Kayıt türü">
+                {([["OTO", "Metinden anla"], ["TALEP", "Hepsi talep"], ["PORTFOY", "Hepsi portföy"]] as const).map(([k, e]) => <button key={k} className={secim === k ? "on" : ""} onClick={() => setSecim(k)}>{e}</button>)}
+              </div>
+              <label className="kaynak-sec"><span>Kaynak</span><select aria-label="Hepsinin kaynağı" value={kaynakTum} onChange={(e: any) => { setKaynakTum(e.target.value); setKaynakS({}); }}><option value="">Metinden anla</option>{KAYNAK_SECIMLERI.map((k) => <option key={k} value={k}>Hepsi: {KAYNAK_SECIM_ETIKET[k]}</option>)}</select></label>
             </div>
-            <div className="uc mini" role="group" aria-label="Kayıt türü">
-              {([["OTO", "Metinden anla"], ["TALEP", "Hepsi talep"], ["PORTFOY", "Hepsi portföy"]] as const).map(([k, e]) => <button key={k} className={secim === k ? "on" : ""} onClick={() => setSecim(k)}>{e}</button>)}
-            </div>
-            <div className="coklu-eylem">
-              <label className="onay-satir"><input type="checkbox" checked={secilebilir.length > 0 && secilebilir.every((i) => secili.has(i))} onChange={(e: any) => setSecili(e.target.checked ? new Set(secilebilir) : new Set())} /> Tümü</label>
-              <button className="btn birincil" disabled={!secilebilir.some((i) => secili.has(i))} onClick={topluKaydet}>Seçilenleri kaydet ({secilebilir.filter((i) => secili.has(i)).length})</button>
+            <div className="satir sar toplu">
+              {hazirIdx.length > 0 && sekmeF !== "BITEN" && <button className="btn birincil" onClick={() => topluKaydet(hazirIdx)}>Hazır olanların tümünü ekle ({hazirIdx.length})</button>}
+              {gorunenSecilebilir.length > 0 && <>
+                <button className="btn" onClick={() => setSecili(seciliGorunen.length === gorunenSecilebilir.length ? new Set() : new Set(gorunenSecilebilir))}>{seciliGorunen.length && seciliGorunen.length === gorunenSecilebilir.length ? "Seçimi kaldır" : "Tümünü seç"}</button>
+                <button className="btn" disabled={!seciliGorunen.length} onClick={() => topluKaydet(seciliGorunen)}>Seçilenleri ekle ({seciliGorunen.length})</button>
+                <button className="btn" disabled={!seciliGorunen.length} onClick={() => { setAtlanan(new Set([...atlanan, ...seciliGorunen])); setSecili(new Set()); }}>Seçilenleri atla</button>
+              </>}
             </div>
           </div>
-          {satirlar.map((s, i) => {
+          {gorunenIdx.slice(0, limit).map((i) => {
+            const s = satirlar[i];
             const v = s.veri ?? s.taslak;
+            const atl = atlanan.has(i);
+            const sec = secili.has(i) && !!s.veri && !s.tekrar && !atl;
             return (
-              <div key={i} className={"kart coklu-satir d-" + s.durum.toLowerCase() + (secili.has(i) && s.veri && !s.tekrar ? " secili" : "")}>
+              <div key={i} className={"kart coklu-satir d-" + s.durum.toLowerCase() + (sec ? " secili" : "") + (atl || s.tekrar ? " soluk" : "")}>
                 <div className="cs-ust">
                   <label className="onay-satir">
-                    <input type="checkbox" aria-label="Seç" disabled={!s.veri || s.tekrar} checked={secili.has(i) && !!s.veri && !s.tekrar} onChange={(e: any) => setSecili((o: Set<number>) => { const n = new Set(o); e.target.checked ? n.add(i) : n.delete(i); return n; })} />
+                    <input type="checkbox" aria-label="Seç" disabled={!s.veri || s.tekrar || atl} checked={sec} onChange={(e: any) => setSecili((o: Set<number>) => { const n = new Set(o); e.target.checked ? n.add(i) : n.delete(i); return n; })} />
                     <span className={"tip-et " + (v.tip === "TALEP" ? "t" : "p")}>{v.tip === "TALEP" ? "Talep" : "Portföy"}</span>
                   </label>
                   <span className="cs-kim">{s.p.kisiAdi ?? (s.p.telefon ? telYaz(s.p.telefon) : "")}</span>
                   {(s.p.guven ?? 100) < esik && !ai && <span className="guven dusuk">%{s.p.guven}</span>}
-                  <Rozet s={s} />
+                  {atl ? <Pill>Atlandı</Pill> : <Rozet s={s} />}
                 </div>
                 <div className="cs-baslik">{s.veri ? baslikOf(s.veri) : s.taslak.baslik}</div>
                 <div className="cs-meta">
@@ -534,16 +572,21 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
                   {s.veri && m2Of(s.veri) && <span>{m2Of(s.veri)}</span>}
                   {s.eslesmeler.length > 0 && <span className="cs-es">{s.eslesmeler.length} eşleşme · %{s.eslesmeler[0].s.skor}</span>}
                 </div>
-                {(s.p.uyarilar.length > 0 || s.kontrol.length > 0 || s.hatalar.length > 0) && <div className="cs-uyari">{[...s.p.uyarilar, ...s.kontrol, ...s.hatalar].join(" · ")}</div>}
+                {(s.p.uyarilar.length > 0 || s.kontrol.length > 0 || s.hatalar.length > 0) && !s.tekrar && <div className="cs-uyari">{[...s.p.uyarilar, ...s.kontrol, ...s.hatalar].join(" · ")}</div>}
                 {s.p.notlar.length > 0 && <div className="cs-not">{s.p.notlar.join(" · ")}</div>}
                 <div className="cs-alt">
+                  {!s.tekrar && !atl && <KaynakSecici kucuk deger={kaynakOf(v)} degis={(k) => setKaynakS({ ...kaynakS, [i]: k })} />}
                   <button className="link-btn" onClick={() => setAcik(acik === i ? null : i)}>{acik === i ? "Metni gizle" : "Metni göster"}</button>
-                  <button className="link-btn" onClick={() => git({ ad: "form", tip: v.tip, taslak: s.veri ?? s.taslak, geri: GERI })}>Düzenle</button>
+                  {!s.tekrar && !atl && <button className="link-btn" onClick={() => git({ ad: "form", tip: v.tip, taslak: s.veri ?? s.taslak, geri: GERI })}>Düzenle</button>}
+                  {!s.tekrar && !atl && <button className="link-btn" onClick={() => { setAtlanan(new Set([...atlanan, i])); setSecili((o: Set<number>) => { const n = new Set(o); n.delete(i); return n; }); }}>Atla</button>}
+                  {atl && <button className="link-btn" onClick={() => { const n = new Set(atlanan); n.delete(i); setAtlanan(n); }}>Geri al</button>}
                 </div>
                 {acik === i && <pre className="ham cs-ham">{s.p.metin}</pre>}
               </div>
             );
           })}
+          {gorunenIdx.length > limit && <div className="satir sar"><button className="btn" onClick={() => setLimit(limit + 60)}>Daha fazla göster ({gorunenIdx.length - limit} kayıt daha)</button></div>}
+          {!gorunenIdx.length && <p className="bos">Bu süzgeçte kayıt yok.</p>}
         </div>
       )}
     </section>

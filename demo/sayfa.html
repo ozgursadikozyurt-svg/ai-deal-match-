@@ -974,6 +974,49 @@ input[type=range]{padding:0;accent-color:var(--acc)}
 .gk-davet{border-style:solid;border-color:color-mix(in srgb,var(--acc) 45%,var(--line));cursor:pointer;color:var(--fg);font:inherit}
 .gk-davet-sayi{flex:none;min-width:2.6rem;height:2.6rem;padding:0 .5rem;border-radius:10px;display:grid;place-items:center;background:var(--acc);color:var(--acc-fg);font:700 1.05rem/1 var(--d);font-variant-numeric:tabular-nums}
 .gk-davet small{display:inline!important;color:var(--mut)}
+
+/* ───────── v3.24 ───────── */
+/* Üst satır: "← Geri" ekranın başlık satırına oturur (ayrı satır kaplamaz). Düğme akışta kalır ama yüksekliği kadar
+   negatif boşlukla bir sonraki ekranın İLK satırının soluna biner; o satır soldan düğme genişliği kadar içeri alınır. */
+:root{--geri-g:78px;--geri-y:36px}
+main.sarici>.genel-geri{position:relative;z-index:3;display:flex;align-items:center;width:fit-content;height:var(--geri-y);min-height:0;margin:0 0 calc(-1 * var(--geri-y));white-space:nowrap}
+main.sarici>.genel-geri+*>:first-child:not(.kart){padding-left:var(--geri-g);min-height:var(--geri-y)}
+/* ilk öğesi kart olan ekranda (eşleşme detayı) Geri kartın üstüne binmez, kendi satırında kalır */
+main.sarici>.genel-geri:has(+ *>.kart:first-child){margin-bottom:8px}
+main.sarici>.genel-geri+*>h2:first-child{display:flex;align-items:center}
+.bas-satir{display:flex;align-items:center;gap:10px;min-height:var(--geri-y)}
+.bas-satir h2{flex:1 1 auto;min-width:0}
+.bas-satir .geri{flex:0 0 auto;align-self:center}
+.es-baslik{flex-wrap:nowrap}.es-baslik h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:480px){
+  main.sarici>.genel-geri+* h2{font-size:1.08rem}
+  .liste-yeni{padding-inline:.7rem}
+}
+/* Veri girişi: dört sekme (Gelen kutusu eklendi) */
+.sekme4{grid-template-columns:repeat(4,1fr)}
+.sekme4 button{position:relative;line-height:1.2}
+@media (max-width:480px){.sekme4 button{font-size:.8rem;padding:.5rem .2rem}}
+.sekme-rozet{background:var(--kotu);color:#fff;border-radius:999px;min-width:1.15rem;height:1.15rem;font-size:.66rem;display:inline-grid;place-items:center;padding:0 .3rem;font-weight:700;margin-left:4px;vertical-align:1px}
+/* Kaynak seçici */
+.kaynak-dugmeler{display:flex;flex-wrap:wrap;gap:6px}
+.kaynak-satir{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:4px 0}
+.kaynak-sec{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:var(--mut)}
+.kaynak-sec select{font-size:.82rem;padding:.25rem .5rem;min-height:32px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--fg);width:auto}
+.aday-govde .kaynak-sec,.gk-kart .kaynak-sec{margin-top:6px}
+.cs-alt{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.coklu-ayar{align-items:center;gap:8px 12px}
+.coklu-inceleme h3{margin:0}
+.coklu-satir.soluk{opacity:.6}
+/* Eşleşme detayı: taraf kartı */
+.taraf{gap:8px!important}
+.taraf-ana{display:flex;flex-direction:column;gap:3px;border:0;background:none;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer;width:100%}
+.taraf-kisiler{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:8px}
+.taraf-kisi{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.taraf-kisi-ad{border:0;background:none;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer;min-width:0;font-size:.88rem;line-height:1.35}
+.taraf-ham{border-top:1px solid var(--line);padding-top:8px}
+.taraf-ham-metin{margin:2px 0 0;font-size:.84rem;color:var(--mut);white-space:pre-wrap;word-break:break-word}
+.taraf-ham-metin.kisa{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.gk-liste{gap:10px}
 </style>
 <div id="kok"></div>
 <noscript>Bu demo için JavaScript gereklidir.</noscript>

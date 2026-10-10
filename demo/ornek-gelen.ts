@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Demo — Gelen kutusu örnek dosyaları. Sütunlar Revy'nin "Excel'e Aktar" dökümüyle birebir aynıdır; ilan sahibi adları,
  * bağlantılar ve telefonlar KURGUSALDIR. Tarihler demo "bugün"üne göre üretilir (gruplama Bugün / Dün / tarih / ay görünsün).
  * İçinde bilerek şunlar var: aynı ilanın iki portaldaki kopyası, başlığında "devren" geçen iş yeri (devir bedeli),

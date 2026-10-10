@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -52,7 +52,7 @@ import { Fotograflar } from "./fotograflar";
 import { PortfoyPaylas } from "./paylas";
 import { useSahiplik, SahiplikCipleri, SahiplikRozeti, SahiplikSecici, SahiplikAyarlari, sahiplikSay } from "./sahiplik";
 import { KapakKucuk } from "./fotograflar";
-import { GelenKutusu, GelenKutusuKarti, useGelenRozet, kutuOzetYukle } from "./gelen-kutusu";
+import { GelenKutusuKarti, useGelenRozet, kutuOzetYukle } from "./gelen-kutusu";
 
 type Alan = keyof typeof MULK_OZELLIK_META;
 
@@ -437,16 +437,33 @@ function Eslesmeler() {
     {topluAcik && <TopluKoparPenceresi geriAl={topluAcik === "GERI"} ciftler={(secimModu ? liste.filter((e) => secili.has(eKey(e.t.id, e.p.id))) : liste).map((e) => ({ tid: e.t.id, pid: e.p.id }))} onKapat={() => setTopluAcik(null)} onBitti={() => { setTopluAcik(null); setSecimModu(false); setSecili(new Set()); }} />}
   </div>;
 }
-function Taraf({ k, rol }: { k: Kayit; rol: string }) {
+/** v3.24 — eşleşme detayında taraf kartı: kişiler ad · telefon · Ara / WhatsApp düğmeleriyle; talepte orijinal metin kısaca.
+ *  (Eskiden kartın tamamı tek düğmeydi; içine bağlantı konamadığı için kişiye ulaşmak için kayda gitmek gerekiyordu.) */
+function Taraf({ k, rol, ham = false, karsi }: { k: Kayit; rol: string; ham?: boolean; karsi?: Kayit }) {
   const { git, d } = useDepo(); const v = k.veri;
   const sahip = useSahiplik()(v).tur;
-  return <button className="kart taraf" onClick={() => git({ ad: "detay", id: k.id })}>
-    <div className="ust-etiket">{rol}</div><div className="pill-satir"><SahiplikRozeti s={sahip} /><KimPill v={v} adli={false} /></div>
-    <div className="taraf-bas"><KapakKucuk k={k} boyut={48} /><div className="kk-baslik">{baslikOf(v)}</div></div>
-    <div className="kk-alt">{v.lokasyonlar.map(lokEtiket).join(" · ")} · {fiyatOf(v)} {m2Of(v) && "· " + m2Of(v)}</div>
-    {(v.kisiler ?? []).length ? <div className="kk-alt">{(v.kisiler ?? []).map((b) => d.kisiler.find((x) => x.id === b.kisiId)).filter(Boolean).map((x) => `${x!.adSoyad}${x!.telefon ? " · " + telYaz(x!.telefon) : ""}`).join(" / ")}</div>
-      : v.gondeAdi ? <div className="kk-alt">{v.gondeAdi}{v.gondeTelefon ? " · " + telYaz(v.gondeTelefon) : ""}</div> : null}
-  </button>;
+  const [uzun, setUzun] = useState(false);
+  const kisiler = (v.kisiler ?? []).map((b) => ({ b, ki: d.kisiler.find((x) => x.id === b.kisiId) })).filter((x) => !!x.ki);
+  const mesaj = (ad: string) => selamMetni(ad, karsi ? `${baslikOf(v)} ${v.tip === "TALEP" ? "talebinizle" : "mülkünüzle"} ilgili yazıyorum.` : undefined);
+  const metin = String(v.hamMetin ?? "").trim();
+  return <div className="kart taraf">
+    <button type="button" className="taraf-ana" onClick={() => git({ ad: "detay", id: k.id })}>
+      <div className="ust-etiket">{rol}</div><div className="pill-satir"><SahiplikRozeti s={sahip} /><KimPill v={v} adli={false} /></div>
+      <div className="taraf-bas"><KapakKucuk k={k} boyut={48} /><div className="kk-baslik">{baslikOf(v)}</div></div>
+      <div className="kk-alt">{v.lokasyonlar.map(lokEtiket).join(" · ")} · {fiyatOf(v)} {m2Of(v) && "· " + m2Of(v)}</div>
+    </button>
+    {kisiler.length ? <div className="taraf-kisiler">{kisiler.map(({ b, ki }) => <div key={b.kisiId + b.rol} className="taraf-kisi">
+      <button type="button" className="taraf-kisi-ad" onClick={() => git({ ad: "kisi", id: ki!.id })}><b>{ki!.adSoyad}</b> <small className="ipucu">{KAYIT_ROLLERI.find((r) => r[0] === b.rol)?.[1]}</small>{ki!.telefon ? <><br /><span className="tel">{telYaz(ki!.telefon)}</span></> : null}</button>
+      <IletisimDugmeleri tel={ki!.telefon} ad={ki!.adSoyad} mesaj={mesaj(ki!.adSoyad)} kucuk />
+    </div>)}</div>
+      : v.gondeAdi || v.gondeTelefon ? <div className="taraf-kisiler"><div className="taraf-kisi">
+        <span className="taraf-kisi-ad"><b>{v.gondeAdi ?? "Gönderen"}</b>{v.gondeTelefon ? <><br /><span className="tel">{telYaz(v.gondeTelefon)}</span></> : null}</span>
+        <IletisimDugmeleri tel={v.gondeTelefon} ad={v.gondeAdi ?? undefined} mesaj={v.gondeAdi ? mesaj(v.gondeAdi) : undefined} kucuk />
+      </div></div> : null}
+    {ham && metin && <div className="taraf-ham"><div className="ust-etiket">Orijinal metin</div>
+      <p className={cx("taraf-ham-metin", !uzun && "kisa")}>{metin}</p>
+      {metin.length > 180 && <button type="button" className="link-btn" onClick={() => setUzun(!uzun)}>{uzun ? "Kısalt" : "Tamamını göster"}</button>}</div>}
+  </div>;
 }
 function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
   const { d, guncelle, git, bildir } = useDepo();
@@ -464,7 +481,7 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
       {e.s.tipUyumu.oran < 1 && <div className="ipucu">Mülk tipi: {e.s.tipUyumu.aciklama}</div>}
       {e.s.kritikEngeller.length > 0 && <div className="hata-satir">Olmazsa olmaz karşılanmıyor: {e.s.kritikEngeller.join(", ")}</div>}</div></section>
     <section className={cx("kart kopar-kart", n.durum === "REDDEDILDI" && "kopuk")}><div className="satir-ara"><div><b>{n.durum === "REDDEDILDI" ? "Bu eşleşme koparıldı" : "Uygun değil mi, sunuldu ve beğenilmedi mi?"}</b><div className="ipucu">{n.durum === "REDDEDILDI" ? "Ana ekranda ve listelerde gösterilmiyor." : "Koparırsanız bir daha önerilmez."}</div></div><KoparDugmesi tid={tid} pid={pid} /></div></section>
-    <div className="iki-kolon"><Taraf k={e.t} rol="Talep" /><Taraf k={e.p} rol="Portföy" /></div>
+    <div className="iki-kolon"><Taraf k={e.t} rol="Talep" ham karsi={e.p} /><Taraf k={e.p} rol="Portföy" karsi={e.t} /></div>
     <section className="kart">
       <h3>Kriter dökümü</h3>
       <div className="tablo-sar"><table><thead><tr><th>Kriter</th><th>İstenen</th><th>Portföyde</th><th>Sonuç</th></tr></thead>
@@ -568,6 +585,7 @@ function sekmeOf(e: Ekran, d: DepoDurumu): string {
   if (e.ad === "detay") return d.kayitlar.find((k) => k.id === e.id)?.veri.tip === "TALEP" ? "liste-T" : "liste-P";
   if (e.ad === "eslesme") return "eslesmeler";
   if (e.ad === "kisi") return "kisiler";
+  if (e.ad === "gelen") return "veri"; // v3.24
   if (e.ad === "konumlar" || e.ad === "baglantilar" || e.ad === "yonetim") return "ayarlar"; // v3.21.2 — Ayarlar menüsünün altına alındı
   return e.ad;
 }
@@ -629,8 +647,8 @@ export function Uygulama() {
     { k: "izleme", etiket: "İzleme", ikon: "anahtar", git: () => git({ ad: "izleme" }), rozet: (d.favoriler ?? []).length || undefined },
     { k: "kisiler", etiket: "Kişiler", ikon: "kisi", git: () => git({ ad: "kisiler" }) },
     // v3.21.2 — Konumlar, Bağlantılar ve Yönetim ana menüden kalktı; Ayarlar'ın içinde ("Yönetim ve bağlantılar")
-    { k: "gelen", etiket: "Gelen Kutusu", ikon: "gelen", git: () => git({ ad: "gelen" }), rozet: gelenRozet.sayi || undefined, alt: true }, // v3.23
-    { k: "veri", etiket: "Veri Girişi", ikon: "veri", git: () => git({ ad: "veri" }), alt: true },
+    // v3.24 — Gelen Kutusu Veri Girişi'nin sekmesi oldu; rozet (onay bekleyen sayısı) Veri Girişi'nde
+    { k: "veri", etiket: "Veri Girişi", ikon: "veri", git: () => git({ ad: "veri" }), rozet: gelenRozet.sayi || undefined, alt: true },
     { k: "ayarlar", etiket: "Ayarlar", ikon: "ayar", git: () => git({ ad: "ayarlar" }), rozet: cakisma, alt: true },
   ];
   const surumCip = <button className="surum-cip" onClick={() => setSurumAcik(true)} title="Bu sürümde neler var">v{SURUM} · {TARIH}</button>;
@@ -644,7 +662,7 @@ export function Uygulama() {
     </header>
     {yuk.hatalar.length > 0 && <div className="sarici"><div className="hata-kutu">Örnek veride {yuk.hatalar.length} kayıt güncel şemaya uymuyor. Ayrıntı: Ayarlar.</div></div>}
     <main className="sarici">
-      {ctx.geriVar && <button className="btn kucuk geri genel-geri" onClick={ctx.geri}>← Geri</button>}
+      {ctx.geriVar && ekran.ad !== "form" && <button className="btn kucuk geri genel-geri" onClick={ctx.geri}>← Geri</button>}
       {ekran.ad === "ana" && <AnaSayfa donus={ekran.donus} />}
       {ekran.ad === "liste" && <Liste key={ekran.tip + (ekran.filtre ? JSON.stringify(ekran.filtre).length : "")} tip={ekran.tip} baslangic={ekran.filtre} />}
       {ekran.ad === "detay" && <Detay id={ekran.id} />}
@@ -653,7 +671,7 @@ export function Uygulama() {
       {ekran.ad === "izleme" && <Izleme />}
       {ekran.ad === "eslesme" && <EslesmeDetay tid={ekran.tid} pid={ekran.pid} />}
       {ekran.ad === "veri" && <VeriGirisi key={(ekran.alt ?? "") + (ekran.metin?.length ?? "")} alt={ekran.alt} metin={ekran.metin} donus={ekran.donus} />}
-      {ekran.ad === "gelen" && <GelenKutusu />}
+      {ekran.ad === "gelen" && <VeriGirisi key="gelen" alt="gelen" />}
       {ekran.ad === "kisiler" && <Kisiler />}
       {ekran.ad === "kisi" && <KisiKarti key={ekran.id} id={ekran.id} />}
       {ekran.ad === "konumlar" && <Konumlar />}
@@ -676,7 +694,7 @@ export function Uygulama() {
 }
 
 /** v3.7 — sunucu tarafı çizim testleri (tests/v37-ui.test.ts) için dışa açık ekranlar */
-export { Liste, Detay, Eslesmeler, AnaSayfa };
+export { Liste, Detay, Eslesmeler, AnaSayfa, EslesmeDetay, VeriGirisi };
 /** v3.12 — Telefon klavyesi: bir yazı alanına odaklanınca alt menü ve sabit Kaydet çubuğu kaçar (yazılan yeri örtmesin),
  *  alan klavyenin üstünde görünecek yere kaydırılır; alan bırakılınca eski düzen geri gelir. */
 function klavyeIzle() {

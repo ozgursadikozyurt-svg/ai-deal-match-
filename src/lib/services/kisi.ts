@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Kişiler: arama (ad / telefon / şirket), telefonla tekilleştirerek ekleme, kişi kartı, kayda bağlama.
  */
 import { z } from "zod";

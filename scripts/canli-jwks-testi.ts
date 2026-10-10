@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Supabase'in yeni (asimetrik, ES256 / JWKS) oturum anahtarlarıyla giriş kapısı sınaması. Sahte depo sunucusu JWKS yayınlar.
  */
 import { SignJWT, generateKeyPair, exportJWK } from "jose";

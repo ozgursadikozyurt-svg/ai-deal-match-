@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Portföy fotoğrafları için dosya deposu — Supabase Storage (veritabanıyla aynı proje; ek hesap / ek anahtar gerekmez).
  * Kova ÖZELDİR (herkese açık değil): fotoğraflar yalnızca süreli, imzalı bağlantıyla görüntülenir / indirilir.
  * Ortam değişkenleri: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (yalnızca sunucuda), FOTO_KOVA (varsayılan "portfoy").
@@ -28,6 +28,16 @@ export async function kovayiHazirla(getir: Getir = fetch, a = depoAyari()): Prom
 }
 export async function dosyaYukle(yol: string, veri: ArrayBuffer | Uint8Array, tur: string, getir: Getir = fetch, a = depoAyari()): Promise<void> {
   await istek(a, getir, "POST", `object/${a.kova}/${yolKodla(yol)}`, veri as BodyInit, { "content-type": tur, "cache-control": "max-age=31536000", "x-upsert": "true" });
+}
+/**
+ * v3.24 — Tarayıcının dosyayı DOĞRUDAN depoya yükleyeceği tek kullanımlık bağlantı (2 saat geçerli). Fotoğrafın baytları
+ * Worker'dan geçmez: ücretsiz planda 10 ms işlemci sınırına takılıp 503 veren yükleme isteği böylece ortadan kalkar.
+ */
+export async function yuklemeBaglantisi(yol: string, getir: Getir = fetch, a = depoAyari()): Promise<string> {
+  const r = await istek(a, getir, "POST", `object/upload/sign/${a.kova}/${yolKodla(yol)}`, "{}", { "content-type": "application/json" });
+  const j = (await r.json()) as { url?: string };
+  if (!j.url) throw new DepoHatasi("DEPO", "Depo yükleme bağlantısı vermedi");
+  return `${a.url}/storage/v1${j.url}`;
 }
 export async function dosyalariSil(yollar: string[], getir: Getir = fetch, a = depoAyari()): Promise<void> {
   if (!yollar.length) return;

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.23 · 10 Ekim 2026
+// Anahtar CRM v3.24 · 10 Ekim 2026
 // GET /api/gelen/:id/dosya → ham dosyanın gövdesi (akış olarak aktarılır; sunucu içeriğe dokunmaz).
 // Olağan yol imzalı bağlantıdır (GET /api/gelen yanıtındaki `url`); tarayıcı ona ulaşamazsa bu yola düşer.
 import { prisma } from "@/lib/db";

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Canlı hattın uçtan uca sınaması: çalışan Worker (wrangler dev) + yerel Postgres (PGlite) karşısında
  *   giriş kapısı → kurulum durumu → demo verisini GERÇEK kaydetme kuyruğuyla yazma → geri okuma karşılaştırması → değişiklik/silme → hata yolları.
  * Hazırlık:  SADECE_HAZIRLA=1 LOKASYON_KAPSAM=07 ./scripts/test-db.sh   ve   npx wrangler dev --port 8799 --local  (.dev.vars: SUPABASE_JWT_SECRET, IZINLI_EPOSTALAR=ozgur@test.com)

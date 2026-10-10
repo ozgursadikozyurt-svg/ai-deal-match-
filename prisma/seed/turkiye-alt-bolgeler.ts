@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Antalya dışındaki büyük şehirler için BAŞLANGIÇ alt bölge (semt / ticari aks) listesi.
  * Bunlar resmî mahalle değildir ama ilanlarda ve mesajlarda yer adı olarak geçer ("Levent'te ofis", "Alsancak'ta dükkan").
  *  - Hepsi `dogrulandi: false` ve İLÇE düzeyindedir: mahalle bağları boştur, eşleştirmede ilçe gibi davranır.

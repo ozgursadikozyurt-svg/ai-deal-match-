@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Demo — portföy fotoğrafları: tarayıcıda küçültme + bu cihazda saklama (IndexedDB) + indirme / paylaşma.
  * Canlı kurulumda aynı küçültülmüş dosya /api/kayitlar/:id/fotolar ile Supabase Storage'a gider (src/lib/depolama/supabase.ts).
  * Kayıtta yalnızca künye durur (FotoMeta: id, ad, ölçü); görüntünün kendisi burada tutulur.
@@ -88,6 +88,28 @@ export function fotoEsle(kayitlar: { id: string; fotolar?: { id: string }[] }[])
 async function canliYukle(kayitId: string, dosya: File, blob: Blob, en: number, boy: number): Promise<FotoMeta> {
   // Kayıt sunucuda yoksa fotoğraf yüklenemez: bekleyen kaydı önce gönder (v3.22.1: reddedilmiş kayıt da yeniden denenir)
   await CANLI.hemen?.();
+  const ad = dosya.name.replace(/\.[^.]+$/, "") + ".jpg";
+  // v3.24 — önce DOĞRUDAN yükleme: sunucu yalnızca künyeyi yazar ve tek kullanımlık bağlantı verir, fotoğraf Supabase'e tarayıcıdan gider.
+  // (Eskiden 1,5 MB'lık dosya Worker'dan geçiyordu; ücretsiz planın 10 ms işlemci sınırına takılınca "503" dönüyordu.)
+  // Bağlantı alınamazsa ya da tarayıcıdan yükleme olmazsa eski yola (sunucu üzerinden) düşülür; 503 bir kez yinelenir.
+  try {
+    let r0 = await CANLI.api!(`/api/kayit/${encodeURIComponent(kayitId)}/fotolar`, { method: "POST", json: { ad, en, boy, boyut: blob.size, tur: "image/jpeg" } });
+    if (r0.status === 404) { await new Promise((t) => setTimeout(t, 1200)); await CANLI.hemen?.(); r0 = await CANLI.api!(`/api/kayit/${encodeURIComponent(kayitId)}/fotolar`, { method: "POST", json: { ad, en, boy, boyut: blob.size, tur: "image/jpeg" } }); }
+    const j0: any = await r0.json().catch(() => ({}));
+    if (r0.status === 422 || r0.status === 404) {
+      if (r0.status === 404) { const neden = CANLI.kayitHatasi?.(kayitId); throw Object.assign(new Error(`Portföy henüz sunucuya kaydedilmedi${neden ? `: ${neden}` : ""}. Üstteki kayıt uyarısına bakın, düzelince fotoğrafı yeniden ekleyin.`), { kesin: true }); }
+      throw Object.assign(new Error(j0?.mesaj ?? "Fotoğraf kabul edilmedi"), { kesin: true });
+    }
+    if (r0.ok && j0?.yukle) {
+      const put = await fetch(j0.yukle, { method: "PUT", body: blob, headers: { "content-type": "image/jpeg", "x-upsert": "true", ...(j0.apikey ? { apikey: j0.apikey } : {}) } }).catch(() => null);
+      if (put?.ok) {
+        fotoKayit.set(j0.id, kayitId); fotoBlob.set(j0.id, blob);
+        return { id: j0.id, ad: j0.ad, en: j0.en, boy: j0.boy, boyut: j0.boyut };
+      }
+      // tarayıcıdan yükleme olmadı: yarım künyeyi sil, eski yola düş
+      await CANLI.api!(`/api/kayit/${encodeURIComponent(kayitId)}/fotolar?fotoId=${encodeURIComponent(j0.id)}`, { method: "DELETE" }).catch(() => {});
+    }
+  } catch (e: any) { if (e?.kesin) throw e; /* ağ / sunucu: eski yolla dene */ }
   const gonder = async () => {
     const form = new FormData();
     form.append("dosya", new File([blob], dosya.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" }));
@@ -95,6 +117,7 @@ async function canliYukle(kayitId: string, dosya: File, blob: Blob, en: number, 
     return CANLI.api!(`/api/kayit/${encodeURIComponent(kayitId)}/fotolar`, { method: "POST", form });
   };
   let r = await gonder();
+  if (r.status === 503 || r.status === 502) { await new Promise((t) => setTimeout(t, 900)); r = await gonder(); } // geçici: işlemci sınırı / depo
   if (r.status === 404) { await new Promise((t) => setTimeout(t, 1200)); await CANLI.hemen?.(); r = await gonder(); } // kayıt o anda yazılıyor olabilir
   const j: any = await r.json().catch(() => ({}));
   if (!r.ok) {

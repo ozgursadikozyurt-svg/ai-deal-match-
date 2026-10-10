@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Demo — kayıt formu. Şemadan üretilir; mülk grubuna göre yalnızca anlamlı alanlar,
  * önce "önemli alanlar", gerisi "Tüm alanlar" altında. Bölümler varsayılan kapalı.
  */
@@ -8,6 +8,8 @@ import { telStandart, telBicimle, telUyarisi } from "../src/lib/iletisim";
 import { talepDnasi } from "../src/lib/eslestirme/talep-dna";
 import { EksikUyarisi } from "./motor-ui";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { KaynakSecici } from "./kaynak-secici";
+import { kaynakOf, kaynakUygula } from "../src/lib/domain/kaynak";
 import { KayitCreateSchema, MulkOzellikSchema } from "../src/lib/validation/kayit";
 import { MULK_OZELLIK_META, alanGruptaMi, KAT_SECENEKLERI, odaListesi, odaYaz, type MulkOzellikAlani } from "../src/lib/domain/teknik-alanlar";
 import { anaKategoriOf, islemKategoriUyumlu, MULK_AILELERI, aileOf, benzerAileler } from "../src/lib/domain/kategori";
@@ -253,8 +255,9 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
   const vazgec = () => (geri ? git({ ...geri, donus: true }) : adayId ? git({ ad: "veri", alt: "wa", donus: true }) : mevcut ? git({ ad: "detay", id: mevcut.id }) : git({ ad: "liste", tip }));
 
   return <div className="yigin" ref={ust}>
-    <button className="btn kucuk geri" onClick={vazgec}>← Vazgeç</button>
-    <h2>{mevcut ? "Kaydı düzenle" : taslak ? "Yapay zekânın çıkardığı kaydı kontrol edin" : talep ? "Yeni talep" : "Yeni portföy"}</h2>
+    {/* v3.24 — Vazgeç ve başlık tek satırda (genel "← Geri" bu ekranda gösterilmez: Vazgeç aynı işi yapar) */}
+    <div className="bas-satir"><button className="btn kucuk geri" onClick={vazgec}>← Vazgeç</button>
+      <h2>{mevcut ? "Kaydı düzenle" : taslak ? "Çıkarılan kaydı kontrol edin" : talep ? "Yeni talep" : "Yeni portföy"}</h2></div>
     {hatalar.length > 0 && <div className="hata-kutu" role="alert"><b>Kaydedilmedi — {hatalar.length} sorun var:</b><ul>{hatalar.map((h, i) => <li key={i}><b>{h.yer}:</b> {h.mesaj}</li>)}</ul></div>}
 
     <Bolum baslik="Temel bilgiler" acik>
@@ -281,6 +284,8 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
         </>}
         <div className="alan"><label htmlFor="f-para">Para birimi</label><select id="f-para" value={f.paraBirimi} onChange={(e) => set("paraBirimi", e.target.value)}>{["TRY", "USD", "EUR", "GBP"].map((x) => <option key={x} value={x}>{etiket(x)}</option>)}</select></div>
         <div className="alan"><label htmlFor="f-per">Fiyat periyodu</label><select id="f-per" value={f.fiyatPeriyodu} onChange={(e) => set("fiyatPeriyodu", e.target.value)}>{["TOPLAM", "AYLIK", "YILLIK", "GUNLUK"].map((x) => <option key={x} value={x}>{etiket(x)}</option>)}</select></div>
+        {/* v3.24 — tek bakışta kaynak: seçim aşağıdaki İlan sahibi / Havuz / Geldiği kanal alanlarını birlikte ayarlar */}
+        <div className="alan genis"><label>Kaynak</label><KaynakSecici deger={kaynakOf({ ...f, tip })} degis={(k) => setF((x: any) => kaynakUygula({ ...x, tip }, k))} /></div>
         <div className="alan"><label htmlFor="f-sahip">İlan sahibi</label><select id="f-sahip" value={f.ilanSahibiTipi} onChange={(e) => set("ilanSahibiTipi", e.target.value)}>{Object.entries(ILAN_SAHIBI_ETIKET).map(([k, e]) => <option key={k} value={k}>{e}</option>)}</select></div>
         {!talep && <div className="alan"><label htmlFor="f-havuz">Havuz</label><select id="f-havuz" value={f.havuz} onChange={(e) => set("havuz", e.target.value)}>{Object.entries(HAVUZ_ETIKET).map(([k, e]) => <option key={k} value={k}>{e}</option>)}</select></div>}
         {!talep && f.havuz === "KENDI_PORTFOY" && <div className="alan"><label htmlFor="f-yetki">Yetki belgesi</label><div className="satir"><button type="button" id="f-yetki" className={cx("bool-cip", f.yetkili && "evet")} onClick={() => set("yetkili", !f.yetkili)}><span className="isaret">{f.yetkili ? "✓" : "+"}</span>Yetkili portföy</button>{f.yetkili && <input type="date" aria-label="Yetki bitiş" value={f.yetkiBitis ? new Date(f.yetkiBitis).toISOString().slice(0, 10) : ""} onChange={(e) => set("yetkiBitis", e.target.value ? new Date(e.target.value + "T12:00:00") : null)} />}</div></div>}

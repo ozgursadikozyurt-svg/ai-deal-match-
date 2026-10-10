@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * src/app/api/** /route.ts dosyalarından Cloudflare Worker yönlendirme tablosu üretir → src/canli/rotalar.generated.ts
  * ([id] gibi köşeli parantezli klasörler parametre olur; sabit yollar parametreli olanlardan önce denenir).
  */

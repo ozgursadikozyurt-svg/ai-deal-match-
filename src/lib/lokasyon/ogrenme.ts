@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Konum öğrenme — veritabanı gerektirmeyen çekirdek (demo ve sunucu aynı kodu kullanır).
  *
  * Nasıl öğrenir:

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * v3.21 — VERİTABANLI KANIT: çift yönlü Google Kişiler (PGlite + sahte Google, tests/sahte-google.ts).
  * Kuralların her biri bir testtir:
  *   Google'a eklenen Anahtar'a düşer · Anahtar'a elle eklenen Google'a gider · Anahtar'daki düzeltme Google'a yazılır

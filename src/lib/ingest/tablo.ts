@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.23 · 10 Ekim 2026
+ * Anahtar CRM v3.24 · 10 Ekim 2026
  * Toplu dosya içe aktarma (Excel / CSV / TXT): portal ilan listeleri, meslektaşın gönderdiği portföy/talep listesi,
  * ofisin haftalık talep tablosu… Başlık satırı nerede olursa olsun bulunur, sütunlar eş anlamlılarla eşlenir,
  * her satır kurala dayalı olarak kayda çevrilir. YAPAY ZEKÂ KULLANILMAZ:

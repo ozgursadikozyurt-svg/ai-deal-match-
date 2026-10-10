@@ -1,4 +1,4 @@
-// Anahtar CRM v3.23 · 10 Ekim 2026
+// Anahtar CRM v3.24 · 10 Ekim 2026
 // POST /api/gelen/al — OTURUMSUZ giriş kapısı: Gmail köprüsü (ya da başka bir otomasyon) bir dosyayı gelen kutusuna bırakır.
 //   Gövde: dosyanın ham baytları.  Başlıklar: x-anahtar (ofisin gizli kodu; zorunlu), x-dosya-adi, x-gonderen, x-konu (URL-kodlu).
 //   Yanıt: 201 { yeni: true } · 200 { yeni: false } (aynı dosya zaten kutuda) · 401 anahtar geçersiz · 413 çok büyük · 415 tür desteklenmiyor.
