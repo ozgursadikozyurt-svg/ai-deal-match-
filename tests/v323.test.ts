@@ -99,36 +99,37 @@ test("Gmail köprüsü betiği: adres ve anahtar gömülü, geçerli JavaScript,
   assert.doesNotThrow(() => new Function(b), "sözdizimi geçerli");
   assert.match(b, /function kur\(\)/); assert.match(b, /everyMinutes\(10\)/);
   assert.match(b, /replace\("@", "\+anahtar@"\)/, "kullanıcının kendi adresinin +anahtar takma adı");
-  assert.match(b, /-label:" \+ ETIKET/, "işlenen posta ikinci kez gitmez");
+  assert.match(b, /yapilan\.indexOf\(no\)/, "işlenen posta ikinci kez gitmez (posta kimliğiyle; konuşma etiketiyle değil)");
   assert.match(b, /"x-anahtar": ANAHTAR/);
   assert.ok(!/GmailApp\.(sendEmail|moveToTrash|markRead)|deleteThread|\.reply\(/.test(b), "betik posta göndermez / silmez");
   // sahte ortamda çalıştır: 2 ekten yalnızca desteklenen tür gider; başarılıysa etiketlenir, 500'de etiketlenmez
   const calistir = (durumKodu: number) => {
     const giden: any[] = []; let etiketlendi = 0, arsivlendi = 0, yedeklendi = 0, tasindi = 0;
     const ek = (ad: string) => ({ getName: () => ad, getBytes: () => [1, 2, 3], copyBlob: () => ({}) });
-    const konusma = { getMessages: () => [{ getAttachments: () => [ek("WhatsApp Sohbeti - A.zip"), ek("foto.jpg")], getFrom: () => "Özgür <o@gmail.com>", getSubject: () => "Sohbet" }], addLabel: () => { etiketlendi++; }, moveToArchive: () => { arsivlendi++; } };
+    const konusma = { getMessages: () => [{ getAttachments: () => [ek("WhatsApp Sohbeti - A.zip"), ek("foto.jpg")], getId: () => "m1", getFrom: () => "Özgür <o@gmail.com>", getSubject: () => "Sohbet" }], addLabel: () => { etiketlendi++; }, moveToArchive: () => { arsivlendi++; } };
     const dosya = { getName: () => "Revy 10 Ekim.xlsx", getBlob: () => ({ getBytes: () => [9] }), moveTo: () => { tasindi++; } };
-    let verildi = false;
+    let verildi = false, bellek: string | null = null;
     const klasor: any = { getFoldersByName: () => ({ hasNext: () => true, next: () => klasor }), createFile: () => { yedeklendi++; }, getFiles: () => ({ hasNext: () => !verildi, next: () => { verildi = true; return dosya; } }) };
     const ortam = { Session: { getEffectiveUser: () => ({ getEmail: () => "ozgur@gmail.com" }) }, Logger: { log: () => {} },
       GmailApp: { getUserLabelByName: () => ({}), createLabel: () => ({}), search: (q: string) => { giden.push({ q }); return [konusma]; } },
       UrlFetchApp: { fetch: (u: string, o: any) => { giden.push({ u, o }); return { getResponseCode: () => durumKodu, getContentText: () => "" }; } },
       DriveApp: { getFoldersByName: () => ({ hasNext: () => true, next: () => klasor }) },
+      PropertiesService: { getScriptProperties: () => ({ getProperty: () => bellek, setProperty: (_k: string, v: string) => { bellek = v; } }) },
       ScriptApp: { getProjectTriggers: () => [], newTrigger: () => ({ timeBased: () => ({ everyMinutes: () => ({ create: () => {} }) }) }) } };
-    new Function(...Object.keys(ortam), b + "\nanahtarCrmGonder();")(...Object.values(ortam));
+    new Function(...Object.keys(ortam), b + "\nanahtarCrmGonder(); anahtarCrmGonder();")(...Object.values(ortam));
     return { giden, etiketlendi, arsivlendi, yedeklendi, tasindi };
   };
   const ok = calistir(201);
-  assert.match(ok.giden[0].q, /^to:\(ozgur\+anahtar@gmail\.com\) has:attachment newer_than:14d -label:AnahtarCRM$/);
-  assert.equal(ok.giden.length, 3, "posta: yalnızca .zip (.jpg atlandı) + Drive klasöründeki xlsx");
-  assert.equal(ok.arsivlendi, 1, "işlenen posta gelen kutusundan kalkar, AnahtarCRM etiketinde durur");
+  assert.match(ok.giden[0].q, /^to:\(ozgur\+anahtar@gmail\.com\) has:attachment newer_than:14d$/);
+  assert.equal(ok.giden.length, 4, "arama×2 + .zip (.jpg atlandı; ikinci çalışmada tekrar gitmez) + Drive klasöründeki xlsx");
+  assert.ok(ok.arsivlendi >= 1, "işlenen posta gelen kutusundan kalkar, AnahtarCRM etiketinde durur");
   assert.equal(ok.yedeklendi, 1, "ek Drive 'İşlendi' klasörüne yedeklenir"); assert.equal(ok.tasindi, 1, "Drive'a bırakılan dosya İşlendi'ye taşınır");
   assert.equal(calistir(503).arsivlendi, 0, "geçici hatada posta kutuda kalır"); assert.equal(calistir(503).tasindi, 0);
   assert.equal(ok.giden[1].o.headers["x-dosya-adi"], encodeURIComponent("WhatsApp Sohbeti - A.zip"));
   assert.equal(ok.giden[1].o.headers["x-gonderen"], encodeURIComponent("Özgür <o@gmail.com>"), "Türkçe karakter başlıkta URL-kodlu");
-  assert.equal(ok.etiketlendi, 1);
+  assert.ok(ok.etiketlendi >= 1);
   assert.equal(calistir(503).etiketlendi, 0, "geçici hata: etiketlenmez, 10 dk sonra yeniden denenir");
-  assert.equal(calistir(415).etiketlendi, 1, "kalıcı ret: bir daha denenmez");
+  assert.ok(calistir(415).etiketlendi >= 1, "kalıcı ret: bir daha denenmez");
 });
 
 // ───────── 2) Yan düzeltmeler (Revy dökümünde görülen hatalar) ─────────

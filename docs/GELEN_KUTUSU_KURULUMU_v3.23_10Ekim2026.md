@@ -24,6 +24,8 @@ Kod ne yapar: (1) `+anahtar` adresine gelen, eki olan, son 14 günün postaları
 
 **Etiket sol menüde görünmüyorsa:** Gmail › Ayarlar (dişli) › Tüm ayarlar › **Etiketler** › AnahtarCRM › "Etiket listesinde" **göster**. Etiketi yanlışlıkla sildiyseniz betik bir sonraki çalışmada yeniden oluşturur (aynı dosya ikinci kez havuza girmez). Eski betiği kullanıyorsanız Gelen Kutusu › E-posta kurulumu'ndan yeni kodu kopyalayıp projedeki eski kodun yerine yapıştırın, **kur**'u yeniden çalıştırın (Drive izni bir kez daha sorulur).
 
+**Posta düştü ama CRM'e gelmedi:** işlev listesinden **anahtarCrmGonder**'i seçip ▶ Çalıştırın; alttaki günlükte "Bulunan konuşma: N" ve "Gönderildi: dosya adı" satırları görünür. N = 0 ise posta `+anahtar` adresine gitmemiştir (alıcı adresini kontrol edin); hata satırı varsa bize iletin. Betik her postayı tek tek izler, aynı konulu yeni posta eski konuşmaya eklense de işlenir.
+
 Sorun olursa: script.google.com › proje › **Yürütmeler** sekmesinde her çalışmanın sonucu yazar. "401" görürseniz anahtar yenilenmiştir: E-posta kurulumu'ndan kodu yeniden kopyalayıp yapıştırın.
 
 ## E-postayla gönderme — kendi alan adınızla (kalıcı çözüm)

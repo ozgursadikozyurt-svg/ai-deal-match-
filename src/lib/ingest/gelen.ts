@@ -154,22 +154,33 @@ function gonder(bayt, ad, gonderen, konu) {
   return 0;
 }
 
+function islenenler() { try { return JSON.parse(PropertiesService.getScriptProperties().getProperty("islenen") || "[]"); } catch (e) { return []; } }
+
 function anahtarCrmGonder() {
   var etiket = GmailApp.getUserLabelByName(ETIKET) || GmailApp.createLabel(ETIKET);
-  var islendi = null;
-  // 1) Postayla gelenler: +anahtar adresine gelen ekler → CRM; posta etiketlenir ve gelen kutusundan kalkar (etiketin altında durur)
-  GmailApp.search("to:(" + hedefAdres() + ") has:attachment newer_than:14d -label:" + ETIKET, 0, 20).forEach(function (konusma) {
+  var islendi = null, yapilan = islenenler();
+  // 1) Postayla gelenler: +anahtar adresine gelen ekler → CRM. Her posta tek tek izlenir (Gmail aynı konulu postaları tek konuşmada toplar);
+  //    işlenen konuşma etiketlenir ve gelen kutusundan kalkar (posta silinmez, etiketin altında durur).
+  var konusmalar = GmailApp.search("to:(" + hedefAdres() + ") has:attachment newer_than:14d", 0, 30);
+  Logger.log("Bulunan konuşma: " + konusmalar.length);
+  konusmalar.forEach(function (konusma) {
     var tamam = true;
     konusma.getMessages().forEach(function (posta) {
+      var no = posta.getId();
+      if (yapilan.indexOf(no) >= 0) return;
+      var bekleyen = false;
       posta.getAttachments({ includeInlineImages: false }).forEach(function (ek) {
         if (!TURLER.test(ek.getName())) return;
         var sonuc = gonder(ek.getBytes(), ek.getName(), posta.getFrom(), posta.getSubject());
-        if (sonuc === 1) { tamam = false; return; }
+        if (sonuc === 1) { bekleyen = true; return; }
+        Logger.log("Gönderildi: " + ek.getName());
         try { islendi = islendi || klasor("İşlendi", klasor(KLASOR, null)); islendi.createFile(ek.copyBlob()); } catch (e) { Logger.log("Drive'a yedeklenemedi: " + e); }
       });
+      if (bekleyen) tamam = false; else yapilan.push(no);
     });
     if (tamam) { konusma.addLabel(etiket); konusma.moveToArchive(); }
   });
+  PropertiesService.getScriptProperties().setProperty("islenen", JSON.stringify(yapilan.slice(-150)));
   // 2) Drive klasörüne bırakılanlar → CRM; işlenen dosya 'İşlendi' alt klasörüne taşınır
   var ana = klasor(KLASOR, null);
   var dosyalar = ana.getFiles(), sayac = 0;
