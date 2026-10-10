@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * Canlı — arayüz durumu (DepoDurumu) ile sunucu durumu (/api/durum) arasındaki eşleme ve fark hesabı. Saf işlevler (ağ yok): testlenebilir.
  *  sunucudanDurum: GET /api/durum cevabı → arayüzün beklediği durum
  *  imzaAl / planla: son kaydedilenle şimdiki durumu karşılaştırır, yalnızca değişenleri POST /api/durum parçalarına böler
@@ -44,14 +44,19 @@ export interface Imza { kayit: Map<string, string>; kisi: Map<string, string>; e
 const KISI_ALANLARI = ["id", "adSoyad", "telefon", "ikincilTelefon", "email", "sirket", "roller", "uzmanlikAileleri", "referans", "notlar", "whatsappGruplari", "olusturma", "sonIletisim", "kaynak", "ilanSahibiTipi", "googleaGonder"] as const;
 export const kisiYuku = (k: Kisi) => Object.fromEntries(KISI_ALANLARI.map((a) => [a, (k as any)[a]]).filter(([, v]) => v !== undefined));
 const kayitYuku = (k: Kayit) => ({ id: k.id, olusturma: k.olusturma, veri: k.veri, notlar: k.notlar ?? [] });
+// v3.22.2 — İmza önbelleği: kuyruğa her durum değişikliğinde 7.800 kişi + tüm kayıt JSON.stringify ediliyordu (her tuş / her ekran geçişi).
+// Arayüz durumu değişmez (immutable) güncellendiği için bir nesne aynı kaldıkça imzası da aynıdır; yalnızca yeni / değişen nesneler yeniden hesaplanır.
+const KISI_IMZA = new WeakMap<object, string>(), KAYIT_IMZA = new WeakMap<object, string>();
+export const kisiImzasi = (k: Kisi): string => { let s = KISI_IMZA.get(k); if (s === undefined) { s = JSON.stringify(kisiYuku(k)); KISI_IMZA.set(k, s); } return s; };
+const kayitImzasi = (k: Kayit): string => { let s = KAYIT_IMZA.get(k); if (s === undefined) { s = JSON.stringify(kayitYuku(k)); KAYIT_IMZA.set(k, s); } return s; };
 const arayuzYuku = (d: DepoDurumu) => ({ testler: d.testler, geriBildirim: d.geriBildirim, ogrenilen: d.ogrenilen, adaylar: d.adaylar, iceAktarmaGecmisi: d.iceAktarmaGecmisi, islenmisMesajlar: d.islenmisMesajlar, dosyaIzleri: d.dosyaIzleri, favoriler: d.favoriler ?? [] });
 const ayarYuku = (d: DepoDurumu) => ({ ttl: d.ayarlar.ttl, ai: aiAyari(d), paylasim: paylasimAyari(d), calismaIli: calismaIli(d), roller: d.roller ?? [], sahiplik: sahiplikAyari(d) });
 
 export function imzaAl(d: DepoDurumu): Imza {
   const ay = ayarYuku(d);
   return {
-    kayit: new Map(d.kayitlar.map((k) => [k.id, JSON.stringify(kayitYuku(k))])),
-    kisi: new Map(d.kisiler.map((k) => [k.id, JSON.stringify(kisiYuku(k))])),
+    kayit: new Map(d.kayitlar.map((k) => [k.id, kayitImzasi(k)])),
+    kisi: new Map(d.kisiler.map((k) => [k.id, kisiImzasi(k)])),
     es: new Map(Object.entries(d.eslesmeNotlari).map(([a, n]) => [a, JSON.stringify(n)])),
     ayar: Object.fromEntries(Object.entries(ay).map(([a, v]) => [a, JSON.stringify(v)])),
     arayuz: JSON.stringify(arayuzYuku(d)),

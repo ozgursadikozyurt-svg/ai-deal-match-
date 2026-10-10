@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.1 · 9 Ekim 2026
+// Anahtar CRM v3.22.2 · 10 Ekim 2026
 // GET /api/lokasyon/ilceler?ilId=7 → ilçeler (+ komşu ilçe ID'leri)
 import { z } from "zod";
 import { prisma } from "@/lib/db";

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026 (v3.13'ten)
  * Bağlantılar — Google Kişiler (v3.21: çift yönlü, "Google ile bağlan" tek düğme). Demo ve canlı AYNI ekran:
  *   demo  → gerçek hesaba bağlanmaz; örnek rehberle sunucudaki planlayıcıların aynısı çalışır (demo/senkron-demo.ts)
  *   canlı → sunucuya bağlanır (demo/google-baglanti.ts): bağlan → Google izin ekranı → dönüş → ilk içe aktarma (ilerlemeli)
@@ -73,9 +73,9 @@ function Rapor({ c }: { c: DemoCalisma }) {
 
 function Ayarlar({ b, set, google, etiketSecimi = true }: { b: DemoBaglanti; set: (a: Partial<DemoBaglanti["ayar"]>) => void; google: boolean; etiketSecimi?: boolean }) {
   return <details className="ic-ayar"><summary>Ayarlar</summary>
-    <label className="onay-satir"><input type="checkbox" checked={b.ayar.otomatik} onChange={(e) => set({ otomatik: e.target.checked })} /> Otomatik eşitle</label>
-    <label className="satir sar ipucu">Sıklık
-      <select value={b.ayar.aralikDk} style={{ width: "auto" }} onChange={(e) => set({ aralikDk: Number(e.target.value) })}>{[5, 15, 30, 60, 180, 1440].map((m) => <option key={m} value={m}>{m < 60 ? `${m} dakikada bir` : m === 1440 ? "Günde bir" : `${m / 60} saatte bir`}</option>)}</select></label>
+    <label className="onay-satir"><input type="checkbox" checked={b.ayar.otomatik} onChange={(e) => set({ otomatik: e.target.checked })} /> {google ? "Her sabah 08:00'de otomatik eşitle" : "Otomatik eşitle"}</label>
+    {google ? <p className="ipucu">v3.22.2 — Otomatik eşitleme günde bir kez çalışır ve Google'ın "son eşitlemeden beri değişenler" listesini kullanır: rehberiniz baştan taranmaz, yalnızca yeni / değişen kişiler gelir. Telefonda hemen kaydettiğiniz kişiyi beklemeden almak için Kişiler › "Google ile eşitle" ya da aşağıdaki "Şimdi eşitle".</p> : <label className="satir sar ipucu">Sıklık
+      <select value={b.ayar.aralikDk} style={{ width: "auto" }} onChange={(e) => set({ aralikDk: Number(e.target.value) })}>{[5, 15, 30, 60, 180, 1440].map((m) => <option key={m} value={m}>{m < 60 ? `${m} dakikada bir` : m === 1440 ? "Günde bir" : `${m / 60} saatte bir`}</option>)}</select></label>}
     {google ? (etiketSecimi && <>
       <div className="ipucu">Yalnızca şu etiketlerdeki kişileri al (hiçbiri seçili değilse telefonu olan herkes):</div>
       <div className="cip-satir">{GOOGLE_GRUPLAR.map((g) => { const on = b.ayar.sadeceEtiketler.includes(g.formattedName!); return <button key={g.resourceName} className={cx("cip secilir", on && "on")} onClick={() => set({ sadeceEtiketler: on ? b.ayar.sadeceEtiketler.filter((x) => x !== g.formattedName) : [...b.ayar.sadeceEtiketler, g.formattedName!] })}>{g.formattedName}</button>; })}</div>
@@ -287,7 +287,7 @@ export function Baglantilar() {
         <li><b>İzin ekranı:</b> "OAuth consent screen" → Harici (External) → uygulama adı ve e-postanız → kapsam olarak <code>…/auth/contacts</code> ekleyin → "Publish app / In production".</li>
         <li><b>Kimlik bilgisi:</b> Credentials → "OAuth client ID" → Web application → "Authorized redirect URIs" alanına şunu yapıştırın: <code style={{ wordBreak: "break-all" }}>{(typeof location !== "undefined" && canli ? location.origin : "https://ADRESINIZ")}/api/entegrasyon/google/geri-donus</code></li>
         <li><b>Cloudflare:</b> anahtarcrm › Settings › Variables and Secrets → <code>GOOGLE_CLIENT_ID</code> ve <code>GOOGLE_CLIENT_SECRET</code> (Secret) olarak ekleyin, yayınlayın.</li>
-        <li>Bu ekranı yenileyin: "Google ile bağlan" düğmesi açılır. Otomatik eşitleme (15 dakikada bir) ek ayar istemez.</li>
+        <li>Bu ekranı yenileyin: "Google ile bağlan" düğmesi açılır. Otomatik eşitleme (günde bir, sabah 08:00) ek ayar istemez.</li>
       </ol>
       <p className="ipucu">Not: Google, kişilere erişen uygulamaları "hassas" sayar. Doğrulama başvurusu yapılana kadar izin ekranında "Google bu uygulamayı doğrulamadı" uyarısı çıkar ("Gelişmiş → devam et" ile geçilir) ve en fazla 100 Google hesabı bağlanabilir. Başka ofislere açmadan önce Google doğrulamasına başvurun (gizlilik politikası sayfası ister). İzin ekranı "Testing"de kalırsa Google bağlantıyı 7 günde bir düşürür.</p>
     </details>}

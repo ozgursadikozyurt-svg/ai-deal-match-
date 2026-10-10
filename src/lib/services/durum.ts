@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026 (v3.14'ten)
  * AŞAMA 7 — Canlı sürümün veri köprüsü. Arayüz (demo ile aynı ekranlar) tüm durumu tek seferde okur
  * (`durumGetir`), değişiklikleri parça parça yazar (`degisiklikUygula`). Veritabanı ilişkisel kalır:
  * Notion/Google senkronu, toplu giriş, dışa aktarma ve eşleştirme servisleri aynı tablolarla çalışmaya devam eder.
@@ -25,18 +25,35 @@ const AYAR_ANAHTARLARI = ["ttl", "ai", "paylasim", "calismaIli", "roller", "sahi
 // ───────── Okuma ─────────
 /** Veritabanı kişisi → arayüz kişisi. v3.21: googleBekliyor = "Google'a gönderilecek" işareti (rozet için). */
 const kisiSatiri = (k: any) => ({ id: k.id, adSoyad: k.adSoyad, telefon: k.telefon, ikincilTelefon: k.ikincilTelefon, email: k.email, sirket: k.sirket, roller: k.roller, uzmanlikAileleri: k.uzmanlikAileleri, referans: k.referans, notlar: k.notlar, whatsappGruplari: k.whatsappGruplari, olusturma: k.createdAt.toISOString(), sonIletisim: k.sonIletisim?.toISOString() ?? null, kaynak: k.kaynak === "CSV" ? "MANUEL" : k.kaynak, ilanSahibiTipi: k.ilanSahibiTipi, googleResourceName: k.googleResourceName, kaynaktaSilindi: k.kaynaktaSilindi?.toISOString() ?? null, googleBekliyor: k.googleBekliyor?.toISOString() ?? null });
-/** v3.21 — yalnızca kişiler (Google eşitlemesinden sonra arayüzün yenilediği parça) */
-export async function kisileriGetir(prisma: PrismaClient) {
-  return (await prisma.kisi.findMany({ orderBy: { adSoyad: "asc" } })).map(kisiSatiri);
+/**
+ * v3.22.2 — Kişi okumalarında yalnızca arayüzün kullandığı sütunlar çekilir. Eskiden `findMany()` her satırın Google anlık görüntüsünü
+ * (googleSnapshot JSON), etag'ini ve Notion alanlarını da getiriyordu: 7.800 kişide ~3 MB gereksiz ayrıştırma = Cloudflare ücretsiz
+ * planda "Exceeded CPU Time Limits" (503) hatalarının asıl nedeni.
+ */
+const KISI_SEC = { id: true, adSoyad: true, telefon: true, ikincilTelefon: true, email: true, sirket: true, roller: true, uzmanlikAileleri: true, referans: true, notlar: true, whatsappGruplari: true, createdAt: true, sonIletisim: true, kaynak: true, ilanSahibiTipi: true, googleResourceName: true, kaynaktaSilindi: true, googleBekliyor: true } as const;
+/** Saat sapması / aynı saniyedeki yazma kaçmasın diye "sonra" sorgusu bu kadar geriden başlar */
+export const ARTIMLI_PAYI_MS = 120_000;
+/**
+ * v3.21 — yalnızca kişiler (Google eşitlemesinden sonra arayüzün yenilediği parça).
+ * v3.22.2 — `sonra` verilirse yalnızca o andan sonra eklenen / değişen kişiler gelir (artımlı): 7.800 kişinin hepsini her eşitlemeden
+ * sonra yeniden indirmek yerine birkaç satır. Yanıttaki `zaman` bir sonraki çağrının `sonra` değeridir.
+ */
+export async function kisileriGetir(prisma: PrismaClient, sonra?: Date | null) {
+  const zaman = new Date().toISOString();
+  const where = sonra && !Number.isNaN(sonra.getTime()) ? { updatedAt: { gte: new Date(sonra.getTime() - ARTIMLI_PAYI_MS) } } : undefined;
+  const satirlar = await prisma.kisi.findMany({ where, select: KISI_SEC, orderBy: { adSoyad: "asc" } });
+  return { kisiler: satirlar.map(kisiSatiri), zaman, artimli: !!where };
 }
 export async function durumGetir(prisma: PrismaClient) {
+  const zaman = new Date().toISOString(); // kişi okumasından ÖNCE alınır: sonraki artımlı çağrı hiçbir değişikliği kaçırmaz
   const [kayitlar, kisiler, eslesmeler, ayarlar] = await Promise.all([
     prisma.kayit.findMany({ include: { lokasyonlar: { orderBy: { sira: "asc" } }, ozellik: true, kisiBaglari: { orderBy: { birincil: "desc" } }, gorusmeNotlari: { orderBy: { tarih: "desc" } }, fotolar: { orderBy: { sira: "asc" } } }, orderBy: { createdAt: "desc" } }),
-    prisma.kisi.findMany({ orderBy: { adSoyad: "asc" } }),
+    prisma.kisi.findMany({ select: KISI_SEC, orderBy: { adSoyad: "asc" } }),
     prisma.match.findMany({ where: { OR: [{ durum: { not: "BEKLIYOR" } }, { operasyonNotu: { not: null } }], portfoyId: { not: null } } }),
     prisma.ayar.findMany({ where: { anahtar: { in: AYAR_ANAHTARLARI } } }),
   ]);
   return {
+    kisiZamani: zaman,
     kayitlar: kayitlar.map((k) => {
       const veri: Record<string, unknown> = Object.fromEntries(KAYIT_ALANLARI.map((a) => [a, sade((k as any)[a])]));
       veri.lokasyonlar = k.lokasyonlar.map((l) => ({ ilId: l.ilId, ilceId: l.ilceId, mahalleId: l.mahalleId, altBolgeId: l.altBolgeId, birincil: l.birincil, ...(l.haric ? { haric: true } : {}) }));

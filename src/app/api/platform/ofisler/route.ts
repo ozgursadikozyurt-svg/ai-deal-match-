@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.1 · 9 Ekim 2026
+// Anahtar CRM v3.22.2 · 10 Ekim 2026
 // Platform yöneticisi (Özgür) için ofis yönetimi.
 // GET   /api/platform/ofisler       → tüm ofisler + kullanıcı / kayıt sayıları
 // POST  /api/platform/ofisler       → yeni ofis { ad, telefon?, sehir?, plan?, denemeGun? }

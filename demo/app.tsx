@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -595,7 +595,7 @@ export function Uygulama() {
   useEffect(() => { depoKaydet(d); }, [d]);
   useEffect(() => { let iptal = false; (async () => { try { const s = CANLI.acik ? CANLI.sample : await (window as any).claude?.use("sample"); if (!iptal) setSample(() => s ?? null); /* fonksiyon doğrudan verilirse React onu güncelleyici sanıp çağırıyordu → v3.3 hatası "n.json is not a function" */ } catch { if (!iptal) setSample(null); } })(); return () => { iptal = true; }; }, []);
   useEffect(() => { if (!mesaj) return; const t = setTimeout(() => setMesaj(null), 2600); return () => clearTimeout(t); }, [mesaj]);
-  useEffect(() => googleOtomatik((f) => setD((x) => f(x))), []); // v3.21 canlı: açılışta ve 5 dakikada bir sessiz Google eşitlemesi
+  useEffect(() => googleOtomatik((f) => setD((x) => f(x))), []); // v3.22.2 canlı: açılışta yalnızca Google bağlantı DURUMU okunur; eşitleme günde bir sunucuda ya da elle (eskiden açılışta + 5 dk'da bir)
   const ctx: Ctx = {
     d, guncelle: (f) => setD((x) => f(x)), bildir: setMesaj, ornekHatalari: yuk.hatalar, sample,
     kayitKaydet: (k) => setD((x) => ({ ...x, kayitlar: x.kayitlar.some((y) => y.id === k.id) ? x.kayitlar.map((y) => (y.id === k.id ? k : y)) : [k, ...x.kayitlar] })),

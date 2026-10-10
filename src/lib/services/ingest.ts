@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * İçe aktarmada tekrar harcamayı önleme: daha önce yapay zekâya gönderilmiş mesajlar ve aynı dosyalar.
  */
 import type { PrismaClient } from "../../generated/prisma/client";

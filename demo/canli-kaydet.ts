@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * Canlı — kaydetme kuyruğu. Arayüzdeki her değişiklikte `kuyrugaAl(durum)` çağrılır; kısa bir bekleyişten sonra (arka arkaya değişiklikler birleşir)
  * yalnızca değişenler POST /api/durum ile sunucuya yazılır. Sunucunun reddettiği kayıtlar (doğrulama hatası) "değişmemiş" sayılmaz, hata listesinde görünür.
  * Ağ koparsa değişiklikler bellekte durur, aralıklarla yeniden denenir; sekme kapatılırken bekleyen iş varsa tarayıcı uyarır.
@@ -8,7 +8,7 @@
  *   (2) Sunucuya hiç ulaşmamış YENİ kayıt ve kişiler tarayıcıda yedeklenir; sayfa yenilense de bir sonraki açılışta geri gelir
  *   ve yeniden gönderilir. Var olan kayıttaki düzenlemeler yedeklenmez (başka cihazdaki yeni hâlin üstüne yazılmasın).
  */
-import { imzaAl, planla, kisiYuku, type Imza } from "./canli-esle";
+import { imzaAl, planla, kisiImzasi, type Imza } from "./canli-esle";
 import type { DepoDurumu, Kisi } from "./depo";
 
 export type KaydetAdi = "kayitli" | "bekliyor" | "kaydediliyor" | "hata";
@@ -142,9 +142,33 @@ export function kaydediciKur(a: { api: Api; baslangic: DepoDurumu; durum: (s: Ka
       for (const k of sunucu) {
         if (silinecek(k.id)) { yeniImza.set(k.id, imza.kisi.get(k.id)!); continue; }
         if (kirli(k.id)) { kisiler.push(yerel.get(k.id)!); if (imza.kisi.has(k.id)) yeniImza.set(k.id, imza.kisi.get(k.id)!); continue; }
-        kisiler.push(k); yeniImza.set(k.id, JSON.stringify(kisiYuku(k)));
+        kisiler.push(k); yeniImza.set(k.id, kisiImzasi(k));
       }
       for (const k of d.kisiler) if (!sunucuIds.has(k.id) && !imza.kisi.has(k.id)) kisiler.push(k); // yeni eklenmiş, henüz yazılmamış
+      const y = { ...d, kisiler };
+      imza = { ...imza, kisi: yeniImza }; son = y;
+      return y;
+    },
+    /**
+     * v3.22.2 — ARTIMLI birleştirme: sunucudan yalnızca son yenilemeden sonra eklenen / değişen kişiler gelir (GET /api/durum?yalniz=kisiler&sonra=…).
+     * `kisileriBirlestir` gibi kaydedilmemiş yerel işi korur (düzenlenmiş kişi yerel hâliyle kalır, silinmiş ama silmesi gitmemiş kişi geri gelmez),
+     * ama listenin GERİ KALANINA dokunmaz: gelmeyen kişi "sunucuda silinmiş" sayılmaz. 7.800 kişiyi her eşitlemeden sonra yeniden indirmeyi bitirir.
+     */
+    kisileriDegisenleriBirlestir(d: DepoDurumu, degisen: Kisi[]): DepoDurumu {
+      if (!degisen.length) return d;
+      const yerelImza = imzaAl(d).kisi;
+      const kirli = (id: string) => yerelImza.has(id) && imza.kisi.get(id) !== yerelImza.get(id);
+      const silinecek = (id: string) => imza.kisi.has(id) && !yerelImza.has(id);
+      const sira = new Map(d.kisiler.map((k, i) => [k.id, i]));
+      const kisiler = d.kisiler.slice();
+      const yeniImza = new Map(imza.kisi);
+      for (const k of degisen) {
+        sunucuda.kisi.add(k.id);
+        if (silinecek(k.id) || kirli(k.id)) continue; // yerel iş korunur; imza değişmez → bir sonraki kayıtta sunucuya gider
+        const i = sira.get(k.id);
+        if (i === undefined) { sira.set(k.id, kisiler.length); kisiler.push(k); } else kisiler[i] = k;
+        yeniImza.set(k.id, kisiImzasi(k));
+      }
       const y = { ...d, kisiler };
       imza = { ...imza, kisi: yeniImza }; son = y;
       return y;

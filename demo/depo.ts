@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026 (v3.13'ten)
  * Demo veri deposu: örnek veriyi gerçek doğrulama + konum çözücüden geçirerek yükler,
  * kullanıcının değişikliklerini tarayıcıda (localStorage) saklar.
  */
@@ -141,6 +141,9 @@ export const CANLI: {
   /** v3.22.1 — kayıt sunucuya yazıldı mı / son reddedilme nedeni (fotoğraf yükleme hatasını anlaşılır göstermek için) */
   sunucudaMi?: ((id: string) => boolean) | null;
   kayitHatasi?: ((id: string) => string | undefined) | null;
+  /** v3.22.2 — artımlı kişi yenileme: yalnızca değişen kişileri birleştirir; kisiZamani = sunucunun son kişi okuma zamanı (bir sonraki `sonra`) */
+  kisileriDegisenleriBirlestir?: ((d: DepoDurumu, degisen: Kisi[]) => DepoDurumu) | null;
+  kisiZamani?: string | null;
 } = { acik: CANLI_ORTAM, yuklu: null, kaydet: null, hemen: null, sample: null, api: null, oturum: null, kisileriBirlestir: null, googleDonus: null };
 
 export const BUGUN = CANLI_ORTAM ? new Date() : new Date(2026, 8, 30, 12, 0, 0); // demo "bugün" sabit (süre hesapları değişmesin); canlıda gerçek tarih

@@ -5,6 +5,23 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.22.2 · 10 Ekim 2026 — Cloudflare ücretsiz plan: sunucu hataları (503) ve Kişiler ekranı donması giderildi; Google Kişiler eşitlemesi günde bir kez ya da elle
+
+- Kişiler ekranı donması (7.800 kişi): liste artık 60'ar kişilik parçalarla çizilir (listenin sonuna yaklaşınca sıradaki parça kendiliğinden açılır; "Daha fazla göster" düğmesi de var). Eskiden 7.800 kartın hepsi birden çiziliyor ve her kart için tüm kayıtlar baştan taranıyordu (≈2,5 milyon karşılaştırma, her çizimde iki kez). Talep / portföy sayıları artık tek geçişte bir tabloya alınır; süzme ve sıralama yalnızca girdi değişince çalışır; arama yazarken kutu anında yanıt verir. Ada göre sıralama ortak bir Türkçe karşılaştırıcı kullanır (sonuç aynı, çok daha hızlı).
+- Kayıt kuyruğu (her ekran geçişinde 7.800 kişi + tüm kayıt JSON'a çevriliyordu) artık yalnızca yeni / değişen nesneleri yeniden hesaplar.
+- Google Kişiler eşitlemesi: uygulama açılınca ve 5 dakikada bir otomatik eşitleme KALDIRILDI. Sunucu zamanlayıcısı 15 dakikada bir yerine GÜNDE BİR (her sabah 08:00). Hemen istersen Kişiler › "Google ile eşitle" ya da Bağlantılar › "Şimdi eşitle". Uygulama açılınca yalnızca bağlantı durumu okunur.
+- Eşitleme Google'ın "son eşitlemeden beri değişenler" anahtarını (syncToken) kullanır: rehber baştan taranmaz. Değişiklik yoksa tur yalnızca 2 dış istek yapar (anahtar yenile + artımlı çekim) ve veritabanındaki 7.800 kişiyi hiç okumaz; kişiler / etiketler yalnızca Google'dan değişen kişi geldiğinde yüklenir. Gönderilecek kişi yoksa ek sorgu yapılmaz.
+- Eşitlemeden sonra arayüz tüm kişileri yeniden indirmez: yalnızca son yenilemeden sonra eklenen / değişen kişiler gelir (GET /api/durum?yalniz=kisiler&sonra=…). Kaydedilmemiş yerel düzenleme ve silme yine korunur.
+- Kişi okumaları yalnızca arayüzün kullandığı sütunları çeker (Google anlık görüntüsü, etag, Notion alanları taşınmaz): 7.800 kişide ~3 MB gereksiz ayrıştırma biter. Cloudflare panelindeki "Exceeded CPU Time Limits" (270 hata) bu yüzdendi.
+- Veritabanı değişikliği yok; "Kurulumu tamamla" gerekmez. Zamanlayıcı değişikliği (wrangler.jsonc) yayınla birlikte Cloudflare'e kendiliğinden uygulanır.
+
+**Demo'da test edilecekler**
+
+- [ ] Kişiler menüsüne girin: liste anında açılmalı, donma olmamalı; en altta "Daha fazla göster" ya da kaydırınca yeni kişiler gelmeli. Arama kutusuna yazarken takılma olmamalı.
+- [ ] Uygulamayı kapatıp açın: Network'te yalnızca durum okuması olmalı; "senkron/calistir" isteği gitmemeli.
+- [ ] Kişiler › "Google ile eşitle": değişiklik yoksa "Google eşit — değişiklik yok" çıkmalı ve birkaç saniyede bitmeli.
+- [ ] Telefonda bir kişiyi Google'a kaydedip "Google ile eşitle" deyin: yalnızca o kişi gelmeli.
+
 ## v3.22.1 · 9 Ekim 2026 — Eşleşme denetimi düzeltmeleri: satış talebinde fiyat "bilinmiyor" hatası, tireli HARİÇ, "site içi olmayan", 7.5 M bütçe; Benim = Öncelikli fırsat; fotoğraf ve kaydetme güvenliği
 
 - Fiyat "bilinmiyor" hatası: formda yeni kayıt "Aylık" periyotla açılıyordu; satılığa çevrilen talepte "Aylık 12.000.000" kalıyor, 11.750.000'lik satılık daire "? Bilinmiyor" ve ~60 puan çıkıyordu. Artık satışta (satılık, devren satılık, kat karşılığı, takas) fiyat her zaman toplam sayılır; formda işlem değişince periyot da değişir (satış → Toplam, kira → Aylık); kirada aylık ↔ yıllık 12 ile çevrilir. Aynı talep artık 100 puan, Sunulabilir.

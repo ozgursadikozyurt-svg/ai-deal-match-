@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * v3.5 — veritabanısız testler: Talep DNA'sı, eksik bilgi, Anahtar Uyum Matrisi, havuz akışı,
  * kural tabanlı hızlı ayrıştırıcı (AI kredisi harcamadan), soru → filtre, portföy edinme fırsatı.
  */

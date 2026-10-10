@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * Canlı arayüzü derler → dist/canli/ (Cloudflare statik dosyaları): index.html (arayüz + stil + uygulama kodu), manifest, ikonlar.
  * Demo ile aynı ekranlar; fark: demo/canli.tsx giriş noktası (giriş, sunucudan durum, kaydetme kuyruğu).
  * Çalıştır: npm run canli:arayuz   (npm run canli:build içinde otomatik)

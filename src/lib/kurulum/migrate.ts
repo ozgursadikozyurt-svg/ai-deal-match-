@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * Canlıda komut satırı olmadan veritabanı kurulumu: uygulamaya gömülü migration SQL'leri sırayla, her biri kendi
  * işleminde (transaction) uygulanır; uygulananlar `_anahtarcrm_migrasyon` tablosunda tutulur. Komut satırından
  * `prisma migrate deploy` ile kurulmuş bir veritabanı da tanınır (`_prisma_migrations`), aynı migration iki kez çalışmaz.

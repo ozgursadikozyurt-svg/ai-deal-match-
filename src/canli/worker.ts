@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026 (v3.20'den)
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026 (v3.20'den)
  * AŞAMA 7 — Cloudflare Worker girişi. Tek proje: arayüz (statik dosyalar, ASSETS) + /api (sunucu kodu) + zamanlanmış işler.
  *  - /api/yapilandirma, /api/saglik → açık (giriş ekranının ihtiyacı / sağlık kontrolü)
  *  - /api/davet/kabul → giriş şart, ofis şart değil (kişi henüz bir ofiste değil)
@@ -8,8 +8,8 @@
  *  - /api/entegrasyon/google/geri-donus → v3.21: Google izin ekranından dönüş. Oturum başlığı OLMAZ
  *    (tarayıcıyı Google yönlendirir); kimliği imzalı `state` taşır ve rota kendisi doğrular.
  *  - Zamanlayıcı: platform bağlamında çalışır (tüm ofisler) — her gün 03:00 (TR 06:00) uyanık
- *    tutma + süresi dolanları pasife alma; pazar 04:00 haftalık yedek; v3.21: 15 dakikada bir
- *    Google Kişiler eşitlemesi (Google'ı bağlı ofisler, her biri kendi bağlamında)
+ *    tutma + süresi dolanları pasife alma; pazar 04:00 haftalık yedek; v3.22.2: her gün 05:00 UTC (TR 08:00)
+ *    Google Kişiler eşitlemesi (Google'ı bağlı ofisler, her biri kendi bağlamında; v3.21'de 15 dakikada birdi)
  */
 import { ROTALAR } from "./rotalar.generated";
 import { kimlikDogrula, izinliMi } from "./kimlik";
@@ -109,7 +109,8 @@ export default {
       } else if (ev.cron.startsWith("0 4")) {
         await yedegiDepola(JSON.stringify(await tamYedek(prisma)), env);
       } else {
-        // v3.21 — Google Kişiler: en uzun süredir eşitlenmeyen ofisler önce; her ofis kendi bağlamında
+        // v3.21 — Google Kişiler: en uzun süredir eşitlenmeyen ofisler önce; her ofis kendi bağlamında.
+        // v3.22.2 — günde bir ("0 5 * * *"); Google'ın artımlı anahtarıyla yalnızca son eşitlemeden beri değişenler gelir.
         if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) await tumOfislerdeGoogleSenkron(prisma, { enFazla: 5, butceMs: 12_000 });
       }
     })));

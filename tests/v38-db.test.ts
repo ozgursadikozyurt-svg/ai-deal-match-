@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * v3.8 — veritabanlı: talep listesi ikinci kez eklenince kopya oluşmaz (önizlemede 'Zaten var', eklemede 'tekrar').
  * Not: v37-db aynı fikstürün talep sekmelerini zaten ekledi; bu test o kayıtların tekrar tanındığını doğrular.
  */

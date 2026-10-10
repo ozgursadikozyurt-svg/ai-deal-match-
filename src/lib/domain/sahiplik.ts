@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * "Benim / Ofisim" — kaydın kime ait olduğu (danışmanın kendi talebi / portföyü, ofis ekibinin, ya da başkasının).
  *
  * WhatsApp gruplarından gelen mesajların içinde danışmanın KENDİ ilanları ve ofis arkadaşlarının ilanları da vardır;

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * Demo lokasyon indeksi — veritabanı seed'iyle aynı kaynaklardan (PTT verisi + antalya.ts) üretilir.
  * v3.10: Türkiye'nin tamamı. Çalışma ili (varsayılan Antalya) tam sözlükle; diğer 80 il gömülü sıkıştırılmış veriden
  * ilk ihtiyaçta açılır (~72 bin mahalle/köy). Kimlikler: Antalya mahalleleri 1…N (eski kayıtlarla uyumlu),

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * Demo — Toplu veri girişi:
  *  • Dosya: Excel (.xlsx) / CSV / TXT portal listesi, meslektaş portföyü, ofisin haftalık talep tablosu; vCard (.vcf) kişi kartları.
  *    Sütunlar otomatik eşlenir (değiştirilebilir), sahibi / emlak ofisi ayrılır, ilanlara geçerlilik verilir (varsayılan 90 gün),

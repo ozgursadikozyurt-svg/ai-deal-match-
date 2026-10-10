@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * v3.21 — VERİTABANLI KANIT: çift yönlü Google Kişiler (PGlite + sahte Google, tests/sahte-google.ts).
  * Kuralların her biri bir testtir:
  *   Google'a eklenen Anahtar'a düşer · Anahtar'a elle eklenen Google'a gider · Anahtar'daki düzeltme Google'a yazılır
@@ -275,12 +275,12 @@ test("BAĞLANMA AKIŞI: 'Google ile bağlan' adresi ofise imzalıdır; dönüş 
 
 test("arayüz köprüsü: kişi listesi 'Google'a bağlı' ve 'gönderilecek' bilgisini taşır; yalnızca kişiler ucu çalışır", async () => {
   await degistir(B, { kisiler: [{ id: "KBEKLE1", adSoyad: "Sırada Bekleyen", telefon: "+905321119999", googleaGonder: true }] });
-  const liste = await icinde(B, () => kisileriGetir(prisma));
+  const liste = (await icinde(B, () => kisileriGetir(prisma))).kisiler;
   assert.ok(liste.find((k) => k.id === "KBEKLE1")!.googleBekliyor);
   assert.ok(liste.some((k) => k.googleResourceName === "people/c1000"));
   const { GET } = await import("../src/app/api/durum/route");
   const j = (await (await icinde(B, () => GET(new Request("http://x/api/durum?yalniz=kisiler")))).json()) as any;
-  assert.deepEqual(Object.keys(j), ["kisiler"]); assert.equal(j.kisiler.length, liste.length);
+  assert.deepEqual(Object.keys(j).sort(), ["artimli", "kisiler", "zaman"]); assert.equal(j.kisiler.length, liste.length);
   // Bağlantı kaldırılınca bekleyen işaretler temizlenir (sonradan başka hesaba bağlanınca toplu gönderim olmasın)
   const asil = globalThis.fetch; globalThis.fetch = sahteGoogle().f;
   try { await icinde(B, async () => { await (await import("../src/app/api/entegrasyon/google/kopar/route")).POST(); }); } finally { globalThis.fetch = asil; }

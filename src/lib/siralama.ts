@@ -1,10 +1,13 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * Listelerde sıralama: fiyat, alan, kayda giriş, kalan süre, skor, ad… Artan / azalan. Boş değerler her zaman sonda.
  */
 export type Yon = "artan" | "azalan";
 export interface Siralama { alan: string; yon: Yon }
 export interface SiralamaSecenegi<T> { alan: string; etiket: string; deger: (x: T) => number | string | null | undefined; varsayilanYon: Yon }
+// v3.22.2 — Tek ortak Intl.Collator: `a.localeCompare(b, "tr")` her karşılaştırmada yeni bir karşılaştırıcı kuruyordu; 7.800 kişilik
+// listeyi ada göre sıralamak (~100.000 karşılaştırma) telefonda saniyelerce donma yapıyordu. Sonuç aynıdır.
+const TR = new Intl.Collator("tr");
 export function sirala<T>(liste: T[], s: Siralama | null, secenekler: SiralamaSecenegi<T>[]): T[] {
   const sec = s && secenekler.find((x) => x.alan === s.alan);
   if (!sec) return liste;
@@ -13,7 +16,7 @@ export function sirala<T>(liste: T[], s: Siralama | null, secenekler: SiralamaSe
     const av = a[1], bv = b[1];
     const ab = av == null || av === "", bb = bv == null || bv === "";
     if (ab || bb) return ab && bb ? a[2] - b[2] : ab ? 1 : -1;
-    const c = typeof av === "string" ? av.localeCompare(String(bv), "tr") : (av as number) - (bv as number);
+    const c = typeof av === "string" ? TR.compare(av, String(bv)) : (av as number) - (bv as number);
     return c * k || a[2] - b[2];
   }).map((x) => x[0]);
 }

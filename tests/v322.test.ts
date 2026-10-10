@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * v3.22 — "HARİÇ" bölge · bütçesiz talebin skoru · Benim / Ofisim işareti ve süzgeci · portföy kartında küçük fotoğraf ·
  * Eşleşmeler'de yatay skor şeridi.
  */

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * Seed: Türkiye il/ilçe/mahalle + Antalya piyasa katmanı.
  * Çalıştır:  npx prisma db seed           (tüm Türkiye, ~73 bin yerleşim, ~1 dk)
  *            LOKASYON_KAPSAM=07 npx prisma db seed   (sadece Antalya — geliştirme için hızlı)

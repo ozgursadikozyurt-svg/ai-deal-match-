@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.1 · 9 Ekim 2026 (v3.13'ten)
+// Anahtar CRM v3.22.2 · 10 Ekim 2026 (v3.13'ten)
 // GET /api/entegrasyon/google/geri-donus?code&state → Google izin ekranından dönüş. Anahtarı şifreleyip saklar, uygulamaya döner.
 //
 // Bu uç OTURUMSUZ çağrılır (tarayıcıyı Google yönlendirir, oturum başlığı olmaz). Güvenlik:

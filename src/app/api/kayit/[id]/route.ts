@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.1 · 9 Ekim 2026
+// Anahtar CRM v3.22.2 · 10 Ekim 2026
 // GET   /api/kayit/:id  → detay (özellikler + lokasyon + eşleşmeler + audit)
 // PATCH /api/kayit/:id  → düzenleme (Edit modu) — her alan değişikliği audit_log'a yazılır
 import { prisma } from "@/lib/db";

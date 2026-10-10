@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026
  * API giriş modelleri (Zod) — Kayit + MulkOzellik + Lokasyon.
  * AI çıktısı da, manuel form da, Notion importu da AYNI şemadan geçer.
  * Enum dışı değer, serbest paragraf veya birim hatası DB'ye ulaşamaz.

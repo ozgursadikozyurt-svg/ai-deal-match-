@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.1 · 9 Ekim 2026
+// Anahtar CRM v3.22.2 · 10 Ekim 2026
 // GET    /api/entegrasyon/google/haric → Anahtar'dan silindiği için Google'dan geri gelmeyecek kişiler (son 200)
 // DELETE /api/entegrasyon/google/haric → "Silinenleri yeniden getir": liste boşalır, bir sonraki eşitleme tam yapılır
 // (Kural: Anahtar'dan silinen kişi Google'dan SİLİNMEZ; bu liste yalnızca "geri gelmesin" kaydıdır.)

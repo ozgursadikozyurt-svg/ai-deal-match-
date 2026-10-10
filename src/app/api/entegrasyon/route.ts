@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.1 · 9 Ekim 2026 (v3.13'ten)
+// Anahtar CRM v3.22.2 · 10 Ekim 2026 (v3.13'ten)
 // GET /api/entegrasyon → bağlantı durumu, ayarlar, son çalışmalar, açık çakışma sayısı (gizli anahtarlar dönmez).
 // v3.21: yalnızca Google Kişiler döner (Notion gizli — src/lib/ozellikler.ts). Ek alanlar: yetkili (bağlamaya yetkisi var mı),
 // bagliKisi / bekleyen (Google'a gönderilecek) / haric (Anahtar'dan silindiği için geri gelmeyecek) sayıları.

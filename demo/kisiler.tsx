@@ -1,12 +1,12 @@
 /**
- * Anahtar CRM v3.22.1 · 9 Ekim 2026 (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
+ * Anahtar CRM v3.22.2 · 10 Ekim 2026 (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
  * v3.21 — çift yönlü Google: elle eklenen kişi ve bağlı kişideki düzeltme "Google'a gönderilecek" olur; silinen kişi Google'dan silinmez.
  * Demo — Kişiler: kişi seçici (yazdıkça arama, çoklu seçim, rol, + ile anında ekleme), kişi listesi ve kişi kartı.
  * Alanlar Notion "Müşteri-Yatırımcılar-Kişiler" tablosuna göre (ROL, Phone, Açıklama, Referans, ilişkili talep/portföy).
  */
 import { TelGirdisi } from "./girdi";
 import { telUyarisi } from "../src/lib/iletisim";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useKalici } from "./kalici";
 import { MULK_AILELERI } from "../src/lib/domain/kategori";
 import { etiket } from "./etiketler";
@@ -134,15 +134,33 @@ export function Kisiler() {
   const [secimModu, setSecimModu] = useState(false);                         // v3.19: onay kutuları yalnızca "Seç" modunda görünür (kartlarda yer açar)
   const [duzenId, setDuzenId] = useState<string | null>(null);
   const [filtreAcik, setFiltreAcik] = useState(false);              // v3.15: listede hızlı düzenleme
-  const ql = q.toLocaleLowerCase("tr");
-  const kayitSay = (id: string, tip?: string) => kisininKayitlari(d.kayitlar, id).filter((x) => !tip || x.veri.tip === tip).length;
+  // v3.22.2 — 7.800 kişide ekran donuyordu: (1) her kart için TÜM kayıtlar baştan taranıyordu (kişi × kayıt ≈ 2,5 milyon karşılaştırma, her çizimde
+  // iki kez), (2) ada göre sıralama her karşılaştırmada yeni bir karşılaştırıcı kuruyordu, (3) 7.800 kartın hepsi birden çiziliyordu.
+  // Artık: kayıt sayıları tek geçişte bir tabloya alınır; süzme + sıralama yalnızca girdi değişince çalışır; liste 60'ar kişilik parçalarla çizilir.
+  const [sr, setSr] = useKalici<Siralama>("kisiler.sr", { alan: "ad", yon: "artan" });
+  const [limit, setLimit] = useKalici<number>("kisiler.limit", KISI_SAYFA);
+  const qGec = useDeferredValue(q);                 // yazarken kutu anında, 7.800 kişilik süzme arkadan gelir
+  const ql = qGec.toLocaleLowerCase("tr");
+  const sayilar = useMemo(() => {
+    const m = new Map<string, { n: number; t: number; p: number }>();
+    for (const ky of d.kayitlar) {
+      const gorulen = new Set<string>();
+      for (const b of ky.veri.kisiler ?? []) {
+        if (gorulen.has(b.kisiId)) continue; gorulen.add(b.kisiId);
+        let x = m.get(b.kisiId); if (!x) { x = { n: 0, t: 0, p: 0 }; m.set(b.kisiId, x); }
+        x.n++; if (ky.veri.tip === "TALEP") x.t++; else if (ky.veri.tip === "PORTFOY") x.p++;
+      }
+    }
+    return m;
+  }, [d.kayitlar]);
+  const kayitSay = (id: string, tip?: string) => { const x = sayilar.get(id); return !x ? 0 : tip === "TALEP" ? x.t : tip === "PORTFOY" ? x.p : tip ? 0 : x.n; };
   const kSay = (id: string) => kayitSay(id);
   const kaynakTutar = (k: Kisi, x: string) => (x === "GOOGLE" ? !!k.googleResourceName : x === "NOTION" ? !!k.notionId : kaynakOf(k) === x);
-  const liste = d.kisiler.filter((k) => {
-    if (q) {
-      // v3.15: arama ad, şirket, telefonlar, e-posta, referans, not ve rol adlarında
-      const ham = `${k.adSoyad} ${k.telefon ?? ""} ${k.ikincilTelefon ?? ""} ${k.sirket ?? ""} ${k.email ?? ""} ${k.referans ?? ""} ${k.notlar ?? ""} ${k.roller.map((r) => rolAd(r)).join(" ")}`.toLocaleLowerCase("tr");
-      const rakam = q.replace(/\D/g, "");
+  const liste = useMemo(() => d.kisiler.filter((k) => {
+    if (qGec) {
+      // v3.15: arama ad, şirket, telefonlar, e-posta, referans, not ve rol adlarında (v3.22.2: kişi başına metin bir kez üretilir)
+      const ham = k.roller.length ? `${hamOf(k)} ${k.roller.map((r) => rolAd(r)).join(" ").toLocaleLowerCase("tr")}` : hamOf(k);
+      const rakam = qGec.replace(/\D/g, "");
       if (!ham.includes(ql) && !(rakam.length >= 3 && `${k.telefon ?? ""}${k.ikincilTelefon ?? ""}`.includes(rakam))) return false;
     }
     if (roller.length) { const rolsuz = roller.includes(ROLSUZ) && !k.roller.length; if (!rolsuz && !k.roller.some((r) => roller.includes(r))) return false; }
@@ -150,9 +168,20 @@ export function Kisiler() {
     if (bag === "YOK" ? kayitSay(k.id) > 0 : bag ? kayitSay(k.id, bag) === 0 : false) return false;
     if ((tel === "VAR" && !k.telefon) || (tel === "YOK" && k.telefon)) return false;
     return true;
-  });
-  const [sr, setSr] = useKalici<Siralama>("kisiler.sr", { alan: "ad", yon: "artan" });
-  const sirali = siralaUygula(liste, sr, kisiSiralama(kSay));
+  }), [d.kisiler, qGec, roller, kaynaklar, bag, tel, sayilar]); // eslint-disable-line react-hooks/exhaustive-deps
+  const siralamaSecenekleri = useMemo(() => kisiSiralama((id) => sayilar.get(id)?.n ?? 0), [sayilar]);
+  const sirali = useMemo(() => siralaUygula(liste, sr, siralamaSecenekleri), [liste, sr, siralamaSecenekleri]);
+  const gorunen = sirali.length > limit ? sirali.slice(0, limit) : sirali;
+  // Süzgeç / arama / sıralama gerçekten değişince liste başa (ilk parçaya) döner; kişi kartından Geri dönüşte açık parça korunur
+  const suzImzasi = JSON.stringify([qGec, roller, kaynaklar, bag, tel, sr]);
+  const oncekiSuz = useRef(suzImzasi);
+  useEffect(() => { if (oncekiSuz.current !== suzImzasi) { oncekiSuz.current = suzImzasi; setLimit(KISI_SAYFA); } }, [suzImzasi, setLimit]);
+  const sonRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { // listenin sonuna yaklaşılınca sıradaki parça kendiliğinden açılır (IntersectionObserver yoksa "Daha fazla göster" düğmesi yeter)
+    const el = sonRef.current; if (!el || typeof IntersectionObserver === "undefined") return;
+    const o = new IntersectionObserver((e) => { if (e[0]?.isIntersecting) setLimit((l) => l + KISI_SAYFA); }, { rootMargin: "800px" });
+    o.observe(el); return () => o.disconnect();
+  }, [gorunen.length, sirali.length, setLimit]);
   const gorunenSecili = sirali.filter((k) => secili.has(k.id)); // yalnızca ekranda görünen ve seçili olanlar işlenir (filtre değişince gizli seçimler silinmez)
   const filtreSayisi = roller.length + kaynaklar.length + (bag ? 1 : 0) + (tel ? 1 : 0);
   const filtreVar = !!(q || filtreSayisi);
@@ -225,22 +254,29 @@ export function Kisiler() {
     </div>
     {silOnay && <div className="hata-kutu" role="alert"><b>{gorunenSecili.length} kişi silinecek.</b> Bağlı oldukları {toplamBag} kayıttan kişi bağı kalkar (kayıtların kendisi silinmez).{gBagli ? <> <b>Google rehberinizden silinmez</b>{harici > 0 ? ` (${harici} kişi Google'a bağlı)` : ""}; silinen kişiler bir sonraki eşitlemede Anahtar'a geri de gelmez. İsterseniz Bağlantılar › "Silinenleri yeniden getir" ile geri alırsınız.</> : null}
       <div className="satir"><button className="btn tehlike" onClick={topluSil}>Evet, sil</button><button className="btn" onClick={() => setSilOnay(false)}>Vazgeç</button></div></div>}
-    {sirali.map((k) => { const ky = kisininKayitlari(d.kayitlar, k.id); return <React.Fragment key={k.id}>
+    {gorunen.map((k) => { const sy = sayilar.get(k.id); return <React.Fragment key={k.id}>
       <div className={cx("kart kisi-kart", secili.has(k.id) && "secili")} role="button" tabIndex={0} onClick={() => (secimModu ? degisSec(k.id) : git({ ad: "kisi", id: k.id }))} onKeyDown={(e) => { if (e.key === "Enter") (secimModu ? degisSec(k.id) : git({ ad: "kisi", id: k.id })); }}>
         {secimModu && <input type="checkbox" aria-label={`${k.adSoyad} seç`} checked={secili.has(k.id)} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} onChange={() => degisSec(k.id)} />}
         <div className="avatar">{k.adSoyad[0]?.toLocaleUpperCase("tr")}</div>
         <div className="kisi-bilgi"><b>{k.adSoyad}</b>{k.sirket && <div className="kk-alt">{k.sirket}</div>}<div className="kk-alt">{telYaz(k.telefon)}</div>
-          <div className="pill-satir"><KaynakRozeti k={k} />{k.roller.map((r) => <Pill key={r}>{rolAd(r)}</Pill>)}{ky.filter((x) => x.veri.tip === "TALEP").length > 0 && <Pill ton="mavi">{ky.filter((x) => x.veri.tip === "TALEP").length} talep</Pill>}{ky.filter((x) => x.veri.tip === "PORTFOY").length > 0 && <Pill ton="yesil">{ky.filter((x) => x.veri.tip === "PORTFOY").length} portföy</Pill>}</div></div>
+          <div className="pill-satir"><KaynakRozeti k={k} />{k.roller.map((r) => <Pill key={r}>{rolAd(r)}</Pill>)}{!!sy?.t && <Pill ton="mavi">{sy.t} talep</Pill>}{!!sy?.p && <Pill ton="yesil">{sy.p} portföy</Pill>}</div></div>
         <button className="btn kucuk" aria-label={`${k.adSoyad} hızlı düzenle`} onKeyDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setDuzenId(duzenId === k.id ? null : k.id); }}><span aria-hidden="true">✎</span><span className="kisi-duzen-yazi"> Düzenle</span></button>
         <IletisimDugmeleri tel={k.telefon} ad={k.adSoyad} kucuk />
       </div>
       {duzenId === k.id && <HizliDuzen k={k} kapat={() => setDuzenId(null)} />}
     </React.Fragment>; })}
+    {sirali.length > gorunen.length && <div ref={sonRef} className="satir" style={{ justifyContent: "center", padding: "12px 0" }}>
+      <button className="btn" onClick={() => setLimit((l) => l + KISI_SAYFA)}>Daha fazla göster ({sirali.length - gorunen.length} kişi daha)</button></div>}
     {!liste.length && <p className="bos">Eşleşen kişi yok.</p>}
   </div>;
 }
 
 const ROLSUZ = "__ROLSUZ";
+/** v3.22.2 — Kişiler listesi bu kadarlık parçalarla çizilir (7.800 kartın hepsi birden DOM'a girince telefon donuyordu) */
+const KISI_SAYFA = 60;
+/** Arama metni kişi başına bir kez üretilir (kişi nesnesi değişmedikçe); rol adları ayrıca eklenir (özel roller yeniden adlandırılabilir) */
+const HAM_METIN = new WeakMap<Kisi, string>();
+const hamOf = (k: Kisi): string => { let h = HAM_METIN.get(k); if (h === undefined) { h = `${k.adSoyad} ${k.telefon ?? ""} ${k.ikincilTelefon ?? ""} ${k.sirket ?? ""} ${k.email ?? ""} ${k.referans ?? ""} ${k.notlar ?? ""}`.toLocaleLowerCase("tr"); HAM_METIN.set(k, h); } return h; };
 
 /** v3.15 — listeden çıkmadan hızlı düzenleme: ad, telefon, şirket, e-posta, roller */
 function HizliDuzen({ k, kapat }: { k: Kisi; kapat: () => void }) {
