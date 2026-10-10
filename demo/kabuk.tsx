@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Demo — uygulama kabuğu: logo, simgeler, gezinme (masaüstünde sol menü, telefonda alt çubuk + menü sayfası).
  */
 import React from "react";
@@ -40,6 +40,7 @@ const YOL: Record<string, string> = {
   konum: "M12 21s-6.5-6.1-6.5-11a6.5 6.5 0 0 1 13 0C18.5 14.9 12 21 12 21zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",
   ayar: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm7.4-3a7.4 7.4 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7.5 7.5 0 0 0-2-1.2L14.5 3h-5l-.4 2.6a7.5 7.5 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6a7.4 7.4 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-1a7.5 7.5 0 0 0 2 1.2l.4 2.6h5l.4-2.6a7.5 7.5 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z",
   menu: "M4 7h16M4 12h16M4 17h16",
+  gelen: "M4 13.500 6.400 5.800A1.200 1.200 0 0 1 7.500 5h9a1.200 1.200 0 0 1 1.100.8L20 13.500M4 13.500V18a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4.500M4 13.500h4.500a3.500 3.500 0 0 0 7 0H20",
   kapat: "M6 6l12 12M18 6 6 18",
 };
 export function Ikon({ ad, boyut = 20 }: { ad: keyof typeof YOL | string; boyut?: number }) {

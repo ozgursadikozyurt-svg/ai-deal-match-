@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.2 · 10 Ekim 2026 (v3.13'ten)
+// Anahtar CRM v3.23 · 10 Ekim 2026 (v3.13'ten)
 // POST /api/entegrasyon/google/kopar → bağlantıyı kaldırır. Kişiler Anahtar'da ve Google'da OLDUĞU GİBİ kalır; yalnızca eşitleme durur.
 // v3.21: Google tarafındaki izin de geri alınır (en iyi çaba), "gönderilecek" işaretleri temizlenir.
 import { prisma } from "@/lib/db";

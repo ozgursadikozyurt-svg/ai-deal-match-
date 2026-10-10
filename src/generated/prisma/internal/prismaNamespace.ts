@@ -398,6 +398,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Ofis: 'Ofis',
+  GelenDosya: 'GelenDosya',
+  GelenAtlanan: 'GelenAtlanan',
   Kullanici: 'Kullanici',
   Davet: 'Davet',
   Il: 'Il',
@@ -441,7 +443,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "ofis" | "kullanici" | "davet" | "il" | "ilce" | "mahalle" | "altBolge" | "altBolgeMahalle" | "ilceKomsuluk" | "lokasyonAlias" | "lokasyonAday" | "ayar" | "kayitLokasyon" | "kayit" | "mulkOzellik" | "kisi" | "kayitKisi" | "islenmisMesaj" | "match" | "portalIlan" | "auditLog" | "ingestionLog" | "entegrasyon" | "senkronHaric" | "senkronCalisma" | "senkronCakisma" | "notionSyncLog" | "kayitNot" | "kayitFoto"
+    modelProps: "ofis" | "gelenDosya" | "gelenAtlanan" | "kullanici" | "davet" | "il" | "ilce" | "mahalle" | "altBolge" | "altBolgeMahalle" | "ilceKomsuluk" | "lokasyonAlias" | "lokasyonAday" | "ayar" | "kayitLokasyon" | "kayit" | "mulkOzellik" | "kisi" | "kayitKisi" | "islenmisMesaj" | "match" | "portalIlan" | "auditLog" | "ingestionLog" | "entegrasyon" | "senkronHaric" | "senkronCalisma" | "senkronCakisma" | "notionSyncLog" | "kayitNot" | "kayitFoto"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -516,6 +518,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.OfisCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.OfisCountAggregateOutputType> | number
+        }
+      }
+    }
+    GelenDosya: {
+      payload: Prisma.$GelenDosyaPayload<ExtArgs>
+      fields: Prisma.GelenDosyaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GelenDosyaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenDosyaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GelenDosyaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenDosyaPayload>
+        }
+        findFirst: {
+          args: Prisma.GelenDosyaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenDosyaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GelenDosyaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenDosyaPayload>
+        }
+        findMany: {
+          args: Prisma.GelenDosyaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenDosyaPayload>[]
+        }
+        create: {
+          args: Prisma.GelenDosyaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenDosyaPayload>
+        }
+        createMany: {
+          args: Prisma.GelenDosyaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GelenDosyaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenDosyaPayload>[]
+        }
+        delete: {
+          args: Prisma.GelenDosyaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenDosyaPayload>
+        }
+        update: {
+          args: Prisma.GelenDosyaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenDosyaPayload>
+        }
+        deleteMany: {
+          args: Prisma.GelenDosyaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GelenDosyaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GelenDosyaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenDosyaPayload>[]
+        }
+        upsert: {
+          args: Prisma.GelenDosyaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenDosyaPayload>
+        }
+        aggregate: {
+          args: Prisma.GelenDosyaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGelenDosya>
+        }
+        groupBy: {
+          args: Prisma.GelenDosyaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GelenDosyaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GelenDosyaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GelenDosyaCountAggregateOutputType> | number
+        }
+      }
+    }
+    GelenAtlanan: {
+      payload: Prisma.$GelenAtlananPayload<ExtArgs>
+      fields: Prisma.GelenAtlananFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GelenAtlananFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenAtlananPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GelenAtlananFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenAtlananPayload>
+        }
+        findFirst: {
+          args: Prisma.GelenAtlananFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenAtlananPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GelenAtlananFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenAtlananPayload>
+        }
+        findMany: {
+          args: Prisma.GelenAtlananFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenAtlananPayload>[]
+        }
+        create: {
+          args: Prisma.GelenAtlananCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenAtlananPayload>
+        }
+        createMany: {
+          args: Prisma.GelenAtlananCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GelenAtlananCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenAtlananPayload>[]
+        }
+        delete: {
+          args: Prisma.GelenAtlananDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenAtlananPayload>
+        }
+        update: {
+          args: Prisma.GelenAtlananUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenAtlananPayload>
+        }
+        deleteMany: {
+          args: Prisma.GelenAtlananDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GelenAtlananUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GelenAtlananUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenAtlananPayload>[]
+        }
+        upsert: {
+          args: Prisma.GelenAtlananUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GelenAtlananPayload>
+        }
+        aggregate: {
+          args: Prisma.GelenAtlananAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGelenAtlanan>
+        }
+        groupBy: {
+          args: Prisma.GelenAtlananGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GelenAtlananGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GelenAtlananCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GelenAtlananCountAggregateOutputType> | number
         }
       }
     }
@@ -2642,10 +2792,37 @@ export const OfisScalarFieldEnum = {
   sehir: 'sehir',
   notlar: 'notlar',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  gelenKod: 'gelenKod'
 } as const
 
 export type OfisScalarFieldEnum = (typeof OfisScalarFieldEnum)[keyof typeof OfisScalarFieldEnum]
+
+
+export const GelenDosyaScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  ad: 'ad',
+  tur: 'tur',
+  boyut: 'boyut',
+  ozet: 'ozet',
+  kanal: 'kanal',
+  gonderen: 'gonderen',
+  konu: 'konu',
+  depoYolu: 'depoYolu',
+  createdAt: 'createdAt'
+} as const
+
+export type GelenDosyaScalarFieldEnum = (typeof GelenDosyaScalarFieldEnum)[keyof typeof GelenDosyaScalarFieldEnum]
+
+
+export const GelenAtlananScalarFieldEnum = {
+  ofisId: 'ofisId',
+  anahtar: 'anahtar',
+  createdAt: 'createdAt'
+} as const
+
+export type GelenAtlananScalarFieldEnum = (typeof GelenAtlananScalarFieldEnum)[keyof typeof GelenAtlananScalarFieldEnum]
 
 
 export const KullaniciScalarFieldEnum = {
@@ -3403,6 +3580,20 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
  * Reference to a field of type 'Rol'
  */
 export type EnumRolFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Rol'>
@@ -3427,20 +3618,6 @@ export type EnumDavetDurumuFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'DavetDurumu[]'
  */
 export type ListEnumDavetDurumuFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DavetDurumu[]'>
-    
-
-
-/**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -4281,6 +4458,8 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   ofis?: Prisma.OfisOmit
+  gelenDosya?: Prisma.GelenDosyaOmit
+  gelenAtlanan?: Prisma.GelenAtlananOmit
   kullanici?: Prisma.KullaniciOmit
   davet?: Prisma.DavetOmit
   il?: Prisma.IlOmit

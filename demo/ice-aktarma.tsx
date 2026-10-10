@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Demo — Veri Girişi: WhatsApp sohbet dosyalarını toplu içe aktarma + güvene göre ayırma + toplu onay.
  *
  * Akış (uzun sohbetlerde kullanıcının her mesajı tek tek onaylamaması için):
@@ -11,7 +11,7 @@
  *       HATALI  → şemaya uymadı (yapay zekâ uydurma alan/değer üretti) → eklenmez
  *  4. Tanınmayan konumlar Konum öğrenme listesine düşer.
  */
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { unzipSync, strFromU8 } from "fflate";
 import { DosyaAktarma } from "./toplu-giris";
 import { hafizaBaslat } from "./hafiza";
@@ -31,6 +31,8 @@ import { telNormalize } from "./form";
 import { ORNEK_SOHBETLER, hazirAiSonucu } from "./ornek-sohbetler";
 
 const PAKET = 10;
+/** v3.23 — Gelen kutusundaki bir WhatsApp dosyasını bu ekrana devreder ("✦ Yapay zekâyla oku"): ekran açılınca dosya yüklenmiş olur */
+export const ICE_AKTARMA_DEVIR: { kaynaklar: { dosya: string; icerik: string; grup: string }[] | null } = { kaynaklar: null };
 const SON_GUN_SECENEK: [number | null, string][] = [[7, "Son 7 gün"], [30, "Son 30 gün"], [90, "Son 90 gün"], [null, "Tümü"]];
 
 // ───────── Yapay zekâ kaydı → form taslağı + sınıflandırma ─────────
@@ -349,6 +351,8 @@ export function TopluIceAktarma() {
     guncelle((dd) => dd.aktifIceAktarma ? { ...dd, aktifIceAktarma: { ...dd.aktifIceAktarma, asama: "INCELEME" } } : dd);
   }
 
+  // v3.23 — Gelen kutusundan devredilen dosya: ekran açılınca kendiliğinden ön filtreden geçer
+  useEffect(() => { const k = ICE_AKTARMA_DEVIR.kaynaklar; if (k && !d.aktifIceAktarma) { ICE_AKTARMA_DEVIR.kaynaklar = null; baslat(k); } }, []);
   const ornekMi = ia?.dosyalar.every((x) => x.includes("(örnek)")) ?? false;
   if (!ia) return <div className="yigin">
     <p className="ipucu">WhatsApp grubunda <b>⋮ → Diğer → Sohbeti dışa aktar → Medya olmadan</b> ile aldığınız .txt, .md veya .zip dosyalarını buraya bırakın. Birden çok grubu aynı anda seçebilirsiniz.</p>

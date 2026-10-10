@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Emlak jargonu sözlüğü — WhatsApp / ilan metinlerindeki kısaltma ve deyimleri teknik alanlara çevirir.
  * Sözlüğün insan tarafından okunur hali: docs/emlak_jargon.md (ikisi birlikte güncellenir, tests/v317.test.ts ikisini de denetler).
  * Buradaki kurallar yapay zekâdan ÖNCE çalışır: ne kadar çok jargon kuralla çözülürse o kadar az yapay zekâ çağrısı yapılır.
@@ -26,7 +26,10 @@ export const JARGON_ALANLI: JargonKurali[] = [
   { re: /iskanl[ıi]|iskan\s*(var|al[ıi]nm[ıi][şs])/u, alan: "iskan", deger: true, etiket: "İskanlı" },
   // Konut özellikleri
   { re: /ebeveyn\s*banyo/u, alan: "ebeveynBanyosu", deger: true, etiket: "Ebeveyn banyolu" },
-  { re: /(kapal[ıi]|a[çc][ıi]k)\s*otopark|otopark[ıi]?\s*var|otoparkl[ıi]/u, alan: "otoparkDurumu", deger: true, etiket: "Otoparklı" },
+  // v3.23 — otoparkDurumu bir seçenek alanıdır (YOK · ACIK · KAPALI…): eskiden `true` yazılıyor, "otoparklı" geçen her ilan şemadan dönüyordu.
+  // İlk eşleşen kural kazanır: "kapalı otopark" → KAPALI; türü yazmayan "otoparklı" → ACIK (en zayıf "var").
+  { re: /kapal[ıi]\s*otopark/u, alan: "otoparkDurumu", deger: "KAPALI", etiket: "Kapalı otoparklı" },
+  { re: /a[çc][ıi]k\s*otopark|otopark[ıi]?\s*var|otoparkl[ıi]/u, alan: "otoparkDurumu", deger: "ACIK", etiket: "Otoparklı" },
   { re: /havuzlu|havuz\s*var/u, alan: "havuz", deger: true, etiket: "Havuzlu" },
   { re: /asans[öo]rl?[üu]?/u, alan: "asansor", deger: true, etiket: "Asansörlü" },
   { re: /site\s*i[çc]|site\s*içinde|g[üu]venlikli\s*site/u, alan: "siteIcinde", deger: true, etiket: "Site içinde" },
@@ -46,7 +49,7 @@ export const JARGON_ALANLI: JargonKurali[] = [
   { re: /imarl[ıi]|imar[ıi]\s*var|konut\s*imarl[ıi]/u, alan: "imarDurumu", deger: "KONUT", etiket: "Konut imarlı" },
   { re: /tarla\s*vasf|tarla\s*imar/u, alan: "imarDurumu", deger: "TARLA", etiket: "Tarla vasıflı" },
   // Arsa
-  { re: /tek\s*tapu\s*tek\s*imza|m[üu]stakil\s*tapu/u, alan: "tapuTipi", deger: "MUSTAKIL", etiket: "Tek tapu tek imza" },
+  { re: /tek\s*tapu\s*tek\s*imza|m[üu]stakil\s*tapu/u, alan: "tapuTipi", deger: "MUSTAKIL_PARSEL", etiket: "Tek tapu tek imza" } /* v3.23: "MUSTAKIL" şemada yoktu */,
 ];
 
 /** Alan karşılığı OLMAYAN jargon: kaydın "Notlar" alanına yazılır (bilgi kaybolmasın) */

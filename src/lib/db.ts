@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.2 · 10 Ekim 2026
+// Anahtar CRM v3.23 · 10 Ekim 2026
 // Prisma 7 istemcisi — Supabase pooler (6543) üzerinden pg adapter ile.
 // Node (testler, komut satırı): tek örnek. Cloudflare Workers: her istek kendi istemcisini kullanır
 // (Workers bir isteğin açtığı bağlantıyı başka istekte kullanmaya izin vermez) → `istekIcinde` ile sarılır.

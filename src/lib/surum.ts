@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.22.2";
+export const SURUM = "3.23";
 export const TARIH = "10 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.22.2_10Ekim2026";
+export const DOSYA_EKI = "v3.23_10Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,35 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.23",
+    tarih: "10 Ekim 2026",
+    baslik: "Gelen kutusu (onay bekleyenler): Revy dökümü ve WhatsApp sohbetleri e-postayla ya da yüklemeyle tek havuza düşer; tarihe göre gruplu, kaynak süzgeçli, toplu ekle / atla, Tümünü temizle",
+    degisenler: [
+      "Yeni ekran: Gelen Kutusu (menüde; bekleyen sayısı rozetle, Ana Sayfa'da kartla görünür). Revy'den \"Excel'e Aktar\" ile aldığınız döküm ve WhatsApp'tan \"Sohbeti dışa aktar\" ile aldığınız .zip / .txt dosyaları burada ONAY BEKLER; onaylamadığınız hiçbir kayıt havuza girmez. Dosyayı e-postayla gönderir ya da ekrana bırakırsınız.",
+      "Yığılmaya karşı: kayıtlar ilan / mesaj tarihine göre gruplanır (Bugün · Dün · gün gün, 14 günden eskiler ay ay); ilk iki grup açık, diğerleri kapalı gelir. Gruplama \"Geliş günü\" ya da \"Kaynak\" olarak değiştirilebilir. Süzgeçler: kaynak (Revy / portal · WhatsApp · Excel listesi), portal ya da grup adı, tür (Ticari · Konut · Arsa), işlem (Satılık · Kiralık · Devren), durum (Hazır · Kontrol gerekli · Fiyatı değişti) ve arama.",
+      "Toplu işlem: Tümünü seç / Hazırları seç → Seçilenleri ekle ya da atla; her tarih grubunda \"Hazırları ekle\" ve \"Grubu atla\"; süzgeçle birlikte çalışır (ör. Konut → tümünü seç → atla). \"Tümünü temizle\" bekleyenlerin hepsini atlar ve dosyaları siler; havuza eklediklerinize dokunmaz.",
+      "Mükerrer denetimi: havuzda zaten olan ilan, aynı ilanın başka portaldaki / başka gruptaki kopyası ve önceki dökümde de bulunan ilan gösterilmez (sayıları özet satırında; \"Mükerrerleri göster\" ile görülür). Atladığınız kayıt hatırlanır: Revy'den her gün döküm alsanız da aynı ilan bir daha sorulmaz (\"Atla\"dan hemen sonra \"Geri al\"; topluca \"Atlananları geri getir\").",
+      "Fiyatı değişti: havuzdaki bir portal ilanı yeni dökümde farklı fiyatla gelirse ayrı durumda görünür (eski → yeni); \"Fiyatı güncelle\" kaydın fiyatını değiştirir ve değişikliği kaydın notlarına yazar.",
+      "E-postayla gönderme: Gelen Kutusu › \"E-posta kurulumu\". Alan adı gerektirmeyen ücretsiz yol Gmail köprüsüdür: bir kez kurulan küçük Gmail ayarı, kendi adresinizin +anahtar takma adına (ornek+anahtar@gmail.com) gönderdiğiniz postaların eklerini 10 dakikada bir Anahtar CRM'e taşır. Kod, ofisinizin gizli anahtarıyla birlikte ekranda hazır gelir (\"Kodu kopyala\"). Alan adı Cloudflare'e bağlanınca her ofisin kendi adresi olur ve posta anında düşer (kod buna hazır: Worker e-posta işleyicisi).",
+      "Sunucu dosyayı açmaz, yalnızca saklar (Supabase Storage, ayrı özel \"gelen\" kovası; ilk kullanımda kendiliğinden oluşur). Zip açma, Excel okuma, e-posta eklerini çıkarma ve mükerrer denetimi tarayıcıda yapılır — Cloudflare ücretsiz planın 10 ms işlemci sınırına takılmamak için. 45 günden eski dosyalar kendiliğinden silinir; bekleyeni kalmayan dosya kutudan kaldırılır.",
+      "Revy dökümü okuması düzeltildi (gerçek 1.000 satırlık dökümle sınandı; 17 satır hatalı, 79 satır türsüz çıkıyordu → 0 hatalı): (1) \"otoparklı\" ya da \"müstakil tapu\" geçen ilanlar şemadan dönüyordu — WhatsApp mesajlarında da; (2) Arsa kategorisinde \"Mülk türü\" sütunu imardır: \"Arsa / Villa\", \"Arsa / Konut\" artık arsa (eskiden villa / daire oluyor, konut talepleriyle eşleşiyordu) ve imar durumu yazılır; (3) portal kategori adları birebir karşılanır (Spor Tesisi, Pazar Yeri, Apartman Dairesi, Düğün Salonu…); (4) türü yazılmamış ticari ilanda başlıktaki işletme adı okunur (kuaför, butik, market, oto yıkama…).",
+      "Devren: Revy'nin \"Devren mi\" sütunu çoğu devren ilanda \"Hayır\" yazıyor; artık başlıktaki \"devren / devir\" de sayılır. \"Devren kiralık\" ilanında yazan tutar çoğunlukla devir bedelidir (36 m² butik, 580.000 TL): büyük tutar Devren Satılık (toplam) olur ve \"aylık kira sorulmalı\" notu düşülür; küçük tutar aylık kira kalır; belirsizse Kontrol gerekli.",
+      "Veri kalitesi uyarıları (Kontrol gerekli): aylık kira 1.000.000 TL ve üstü ya da m² başına 5.000 TL ve üstü (devir bedeli / satış fiyatı olabilir), kira 5.000 TL altı ve satış 100.000 TL altı (eksik sıfır). Telefonda toplu işlem çubuğu artık üst başlığın arkasında kalmıyor.",
+      "Veritabanı: migration 20261010100000_v323_gelen_kutusu — yalnızca ekleme (gelen_dosya, gelen_atlanan tabloları; ofis.gelenKod). Yayından sonra \"Kurulumu tamamla\" düğmesi çıkar, bir kez basılır.",
+    ],
+    testEt: [
+      "Menü › Gelen Kutusu: üç örnek dosyadan gelen kayıtlar tarih gruplarında (Bugün, Dün, …, ay ay) görünmeli; üstte \"onay bekliyor / hazır / kontrol gerekli / fiyatı değişti\" sayıları olmalı.",
+      "\"Ticari\" ve \"Kiralık\" süzgeçlerine basın; sonra \"Tümünü seç\" → \"Seçilenleri ekle\". Kayıtlar Portföyler'e düşmeli, Gelen Kutusu'ndaki sayı azalmalı.",
+      "Bir kartta \"Atla\" deyin, çıkan şeritten \"Geri al\" ile geri getirin. Bir tarih grubunda \"Grubu atla\" deyin.",
+      "\"Fiyatı değişti\" sayısına dokunun: Pınarlı arsası 36.000.000 → 31.500.000 görünmeli; \"Fiyatı güncelle\" deyip \"Havuzdaki kaydı aç\" ile notu görün.",
+      "\"DEVREN KİRALIK FAAL KUAFÖR SALONU\" kartı Devren Satılık ve 950.000 TL (toplam) görünmeli; \"Bahçelievler'de kiralık dükkan\" (2.500 TL) Kontrol gerekli olmalı.",
+      "\"Mükerrerleri göster\": Eski Sanayi ofisinin Emlakjet kopyası \"sahibinden.com kaynağında da var\" diye listelenmeli.",
+      "Kendi dosyanızla: Revy'den aldığınız Excel'i ve bir WhatsApp .zip dökümünü \"Dosya ekle\" ile yükleyin. 1.000 satırlık döküm birkaç saniyede listelenmeli.",
+      "\"Tümünü temizle…\" → \"Evet\": kutu boşalmalı; Portföyler'e eklediğiniz kayıtlar yerinde durmalı. (Demo: Dosyalar › \"Örnek dosyaları yeniden yükle\".)",
+      "\"E-posta kurulumu\": dört adım ve \"Kodu kopyala\" düğmesi görünmeli.",
+    ],
+  },
   {
     surum: "3.22.2",
     tarih: "10 Ekim 2026",

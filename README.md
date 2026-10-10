@@ -22,6 +22,7 @@ npm run canli:test && npm run canli:test:depo && npm run canli:test:giris && npm
 
 ## Google ile bağlan — çift yönlü Google Kişiler (v3.21)
 - Kullanıcı için tek adım: Bağlantılar › **Google ile bağlan** → Google'da "İzin ver". Kurallar ve platform kurulumu (bir kez): **`docs/GOOGLE_BAGLANTI_KURULUMU_v3.21_8Ekim2026.md`**; mimari: **`docs/ANAHTAR_CRM_EK_v3.21_8Ekim2026.md`**.
+- **Gelen Kutusu (v3.23):** Revy Excel dökümü ve WhatsApp sohbet dosyaları e-postayla ya da yüklemeyle onay bekleyenlere düşer. Kurulum ve günlük kullanım: **`docs/GELEN_KUTUSU_KURULUMU_v3.23_10Ekim2026.md`**; mimari: **`docs/ANAHTAR_CRM_EK_v3.23_10Ekim2026.md`**.
 - Kural özeti: Google'a eklenen Anahtar'a düşer · Anahtar'da elle eklenen / düzeltilen Google'a yazılır · **Anahtar'dan silinen Google'dan silinmez** (ve geri gelmez) · Google'da silinen Anahtar'da kalır.
 - Cloudflare'e girilecek iki değer: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`. Girilmezse özellik kapalı kalır.
 - Otomatik eşitleme: Cloudflare zamanlayıcısı (15 dk, `wrangler.jsonc`). `prisma/sql/senkron_cron.sql` (Supabase pg_cron) artık gerekmez.

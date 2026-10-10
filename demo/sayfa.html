@@ -925,6 +925,55 @@ input[type=range]{padding:0;accent-color:var(--acc)}
 .ayar-gecis-ikon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--panel2);color:var(--mut);flex:none}
 .ayar-gecis-metin{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}.ayar-gecis-metin small{color:var(--mut);font-size:.78rem}
 .ayar-gecis-ok{color:var(--mut);font-size:1.2rem}
+
+/* v3.23 — Gelen kutusu (onay bekleyenler) */
+.gelen-kutusu.surukle{outline:2px dashed var(--acc);outline-offset:6px;border-radius:var(--r)}
+.gk-aciklama{margin:-4px 0 0}
+.gk-ozet{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px}
+.gk-sayi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;color:var(--fg);font:inherit;min-width:0}
+.gk-sayi b{font:600 1.45rem/1.1 var(--d);font-variant-numeric:tabular-nums}
+.gk-sayi span{font-size:.78rem;color:var(--mut)}
+.gk-sayi.on{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc);background:var(--acc-soft)}
+.gk-sayi.d-hazir b{color:var(--iyi)}.gk-sayi.d-kontrol b{color:var(--uyari)}.gk-sayi.d-degisti b{color:var(--mavi)}.gk-sayi.d-hatali b{color:var(--kotu)}
+.gk-gizlenen{margin:-4px 0 0}
+.gk-dosyalar{padding:10px 14px}
+.gk-dosyalar summary{cursor:pointer;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.gk-dosya{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);margin-top:10px}
+.gk-dosya-ad{display:flex;flex-direction:column;gap:2px;min-width:0}
+.gk-dosya-ad b{overflow-wrap:anywhere;font-size:.9rem}
+.gk-dosya-say{font-size:.85rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:560px){.gk-dosya{grid-template-columns:minmax(0,1fr) auto}.gk-dosya>.satir{grid-column:1/-1}}
+.gk-suzgec{display:flex;flex-direction:column;gap:8px}
+@media(min-width:700px){.gk-suzgec .filtre{flex-wrap:wrap;overflow-x:visible}}
+.gk-suzgec .filtre .fb{flex:none}
+.gk-ayrac{flex:none;width:1px;align-self:stretch;background:var(--line);margin:2px 4px}
+.gk-suzgec .uc.mini{flex:none}
+.gk-bosluk{flex:1}
+.btn.gk-temizle{color:var(--kotu);border-color:color-mix(in srgb,var(--kotu) 40%,var(--line))}
+.gk-ust .btn{flex:none}
+@media(max-width:560px){.gelen-kutusu .toplu-cubuk{gap:6px;padding:8px 10px}.gelen-kutusu .toplu-cubuk .btn{padding:.3rem .55rem}}
+/* v3.23 — telefonda üst başlık (61 px) yapışkandır: toplu işlem çubuğu onun ALTINA yapışsın (eskiden başlığın arkasında kalıp görünmüyordu) */
+@media(max-width:959px){.toplu-cubuk{top:calc(61px + env(safe-area-inset-top,0px))}}
+.gk-grup{display:flex;flex-direction:column;gap:8px}
+.gk-grup-bas{display:flex;gap:8px 12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:8px 10px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
+.gk-grup-ad{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;border:0;background:none;padding:2px 0;cursor:pointer;color:var(--fg);font:inherit;text-align:left;flex:1 1 230px;min-width:0}
+.gk-grup-ad b{font-size:.95rem}
+.gk-ok{color:var(--mut);width:.9rem;display:inline-block}
+.gk-grup-ic{padding-left:0}
+.gk-kart{gap:8px}
+.gk-kart .aday-bas input{margin-top:.2rem;accent-color:var(--acc);width:auto;flex:none}
+.gk-tarih{margin-left:auto;font-size:.76rem;color:var(--mut);white-space:nowrap}
+.gk-degisim{font-size:.88rem;font-variant-numeric:tabular-nums}
+.gk-kart a.btn{text-decoration:none;color:var(--fg)}
+.gk-bos{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.gk-bos span{color:var(--mut);font-size:.9rem}
+.gk-kurulum p{margin:0}
+.gk-adimlar{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:8px;font-size:.9rem}
+.gk-adimlar li .btn{margin-left:4px;vertical-align:middle}
+.gk-adres{font:600 .88rem/1.4 var(--m);background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:.15rem .45rem;overflow-wrap:anywhere}
+.gk-davet{border-style:solid;border-color:color-mix(in srgb,var(--acc) 45%,var(--line));cursor:pointer;color:var(--fg);font:inherit}
+.gk-davet-sayi{flex:none;min-width:2.6rem;height:2.6rem;padding:0 .5rem;border-radius:10px;display:grid;place-items:center;background:var(--acc);color:var(--acc-fg);font:700 1.05rem/1 var(--d);font-variant-numeric:tabular-nums}
+.gk-davet small{display:inline!important;color:var(--mut)}
 </style>
 <div id="kok"></div>
 <noscript>Bu demo için JavaScript gereklidir.</noscript>

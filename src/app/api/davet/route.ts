@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.2 · 10 Ekim 2026
+// Anahtar CRM v3.23 · 10 Ekim 2026
 // GET  /api/davet            → ofisin davetleri (kod gösterilmez, yalnızca durum)
 // POST /api/davet            → yeni davet üretir; yanıtta bağlantı kodu BİR KEZ döner
 //        { eposta?, rol?, gun?, ofisId? }  — ofisId yalnızca platform yöneticisi için

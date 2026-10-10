@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026 (v3.20'den)
+ * Anahtar CRM v3.23 · 10 Ekim 2026 (v3.20'den)
  * AŞAMA 7 — Cloudflare Worker girişi. Tek proje: arayüz (statik dosyalar, ASSETS) + /api (sunucu kodu) + zamanlanmış işler.
  *  - /api/yapilandirma, /api/saglik → açık (giriş ekranının ihtiyacı / sağlık kontrolü)
  *  - /api/davet/kabul → giriş şart, ofis şart değil (kişi henüz bir ofiste değil)
@@ -10,6 +10,9 @@
  *  - Zamanlayıcı: platform bağlamında çalışır (tüm ofisler) — her gün 03:00 (TR 06:00) uyanık
  *    tutma + süresi dolanları pasife alma; pazar 04:00 haftalık yedek; v3.22.2: her gün 05:00 UTC (TR 08:00)
  *    Google Kişiler eşitlemesi (Google'ı bağlı ofisler, her biri kendi bağlamında; v3.21'de 15 dakikada birdi)
+ *  - v3.23 — GELEN KUTUSU: /api/gelen/al oturumsuzdur (Gmail köprüsü); kimlik, isteğin taşıdığı gizli ofis kodudur ve rota
+ *    kendisi doğrular. `email` işleyicisi alan adına gelen postayı aynı kutuya koyar (Cloudflare Email Routing → bu Worker).
+ *    İkisi de dosyayı açmadan saklar; ayrıştırma tarayıcıdadır (ücretsiz planda 10 ms işlemci sınırı).
  */
 import { ROTALAR } from "./rotalar.generated";
 import { kimlikDogrula, izinliMi } from "./kimlik";
@@ -20,6 +23,7 @@ import { kiracilikIcinde, platformOlarak, KiracilikHatasi } from "../lib/kiracil
 import { YetkiHatasi } from "../lib/guvenlik/yetki";
 import { tamYedek, yedegiDepola } from "../lib/services/yedek";
 import { tumOfislerdeGoogleSenkron } from "../lib/services/senkron";
+import { gelenPostaIsle, gelenTemizlik, type GelenPosta } from "../lib/services/gelen";
 
 export interface Env {
   ASSETS: { fetch: (r: Request) => Promise<Response> };
@@ -65,6 +69,12 @@ export async function apiIsle(req: Request, env: Env): Promise<Response> {
     return istekIcinde(env.DATABASE_URL, () => isle(req, { params }).catch(hataYaniti));
   }
 
+  // 1c) v3.23 — Gelen kutusu köprüsü: oturum başlığı yoktur. Rota, istekteki gizli ofis kodunu doğrular ve dosyayı yalnızca
+  //     o ofisin bağlamında, onay bekleyenlere koyar (src/app/api/gelen/al/route.ts → services/gelen.ts › gelenAl).
+  if (url.pathname === "/api/gelen/al") {
+    return istekIcinde(env.DATABASE_URL, () => isle(req, { params }).catch(hataYaniti));
+  }
+
   // 2) Oturum anahtarı (JWT) → e-posta
   const k = await kimlikDogrula(req, env);
   if ("hata" in k) return json({ hata: "KIMLIK", mesaj: k.hata }, k.durum);
@@ -97,6 +107,15 @@ export default {
     }
     return env.ASSETS.fetch(req);
   },
+  /**
+   * v3.23 — Alan adına gelen e-posta (Cloudflare Email Routing › "Send to a Worker"). İşin tamamı services/gelen.ts › gelenPostaIsle'dedir:
+   * posta açılmadan (.eml) ofisin gelen kutusuna konur. Beklenmeyen hata (veritabanı / depo) geçici sayılır ve gönderene bildirilir.
+   */
+  async email(message: GelenPosta, env: Env): Promise<void> {
+    ortamiYukle(env);
+    try { await istekIcinde(env.DATABASE_URL, () => gelenPostaIsle(prisma, message)); }
+    catch (e) { console.error("Gelen e-posta kaydedilemedi:", e); message.setReject("Temporary failure, please retry"); }
+  },
   async scheduled(ev: { cron: string }, env: Env, ctx: { waitUntil: (p: Promise<unknown>) => void }) {
     ortamiYukle(env);
     // Zamanlayıcı tüm ofisler için çalışır → platform bağlamı (ofis süzgeci uygulanmaz)
@@ -106,6 +125,8 @@ export default {
         await prisma.$queryRawUnsafe("SELECT 1");
         await fetch(`${env.SUPABASE_URL.replace(/\/$/, "")}/rest/v1/`, { headers: { apikey: env.SUPABASE_ANON_KEY } }).catch(() => {});
         await prisma.kayit.updateMany({ where: { durum: "ACTIVE", validUntil: { lt: new Date() } }, data: { durum: "EXPIRED" } });
+        // v3.23 — gelen kutusu: 45 günden eski ham dosyalar ve 1 yıldan eski "atlandı" anahtarları
+        await gelenTemizlik(prisma).catch((e) => console.error("Gelen kutusu temizliği:", e));
       } else if (ev.cron.startsWith("0 4")) {
         await yedegiDepola(JSON.stringify(await tamYedek(prisma)), env);
       } else {

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * v3.22.2 — VERİTABANLI KANIT (PGlite + sahte Google): "değişiklik yok" turu hafif; artımlı kişi okuması; günde bir zamanlayıcı.
  *   · Google'da değişiklik yokken tur yalnızca 2 dış istek yapar (anahtar + artımlı çekim): etiket listesi bile istenmez
  *   · Google'da bir kişi değişince yalnızca o kişi gelir (artımlı anahtar) ve doğru işlenir

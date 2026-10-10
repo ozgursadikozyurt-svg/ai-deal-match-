@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * v3.17 — jargon sözlüğü (docs/emlak_jargon.md), eksik veri cezası, kişi tablosu içe aktarma (paketli).
  */
 import { test } from "node:test";
@@ -53,7 +53,7 @@ test("anahtar kelimeler alana, karşılığı olmayan jargon nota yazılır", ()
   const h = hizliAyristir("Vatandaşlığa uygun ebeveyn banyolu havuzlu kapalı otopark full krediye uygun takaslı 2+1 satılık 9 MTL");
   assert.equal(h.ozellik.ebeveynBanyosu, true);
   assert.equal(h.ozellik.havuz, true);
-  assert.equal(h.ozellik.otoparkDurumu, true);
+  assert.equal(h.ozellik.otoparkDurumu, "KAPALI"); // v3.23: seçenek alanı (eskiden true yazılıp şemadan dönüyordu)
   assert.equal(h.kayitAlanlari.krediyeUygun, true);
   assert.equal(h.kayitAlanlari.takasaAcik, true);
   assert.ok(h.jargonNotlari.some((n) => /Yabancıya satışa/.test(n)), h.jargonNotlari.join("|"));

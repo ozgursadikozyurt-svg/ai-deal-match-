@@ -47,6 +47,18 @@ export { Prisma }
  */
 export type Ofis = Prisma.OfisModel
 /**
+ * Model GelenDosya
+ * v3.23 — Gelen kutusu: e-postayla ya da yüklemeyle gelen HAM dosyalar (WhatsApp .zip / .txt, Revy .xlsx, .eml).
+ * Dosyanın kendisi Supabase Storage'da ("gelen" kovası); burada yalnızca künye durur. Ayrıştırma tarayıcıda yapılır
+ * (Cloudflare ücretsiz planda istek başına 10 ms işlemci: sunucu dosyayı açmaz, yalnızca saklar).
+ */
+export type GelenDosya = Prisma.GelenDosyaModel
+/**
+ * Model GelenAtlanan
+ * v3.23 — Gelen kutusunda "atla / temizle" denen kayıtların anahtarları: aynı ilan sonraki dökümde yeniden gelince gösterilmez
+ */
+export type GelenAtlanan = Prisma.GelenAtlananModel
+/**
  * Model Kullanici
  * 
  */

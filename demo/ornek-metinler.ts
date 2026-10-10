@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Akıllı giriş kutusunun örnek metinleri (kişi adları ve telefonlar kurgusaldır)
  */
 export const ORNEK_PORTAL_SAYFASI = `SAHİBİNDEN KİRALIK 135m2 DEPO

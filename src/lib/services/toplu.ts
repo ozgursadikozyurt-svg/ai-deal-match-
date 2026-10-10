@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Toplu içe aktarma (dosya / toplu mesaj) ve görüşme notları — sunucu servisi.
  * Önizleme saf fonksiyonlarla (src/lib/ingest/*) yapılır; burada yalnızca veritabanı işleri var:
  * aynı ilanı tanıma (ilan no / bağlantı), kişiyi telefonla ya da adla bulma, kayıtları tek tek oluşturma.

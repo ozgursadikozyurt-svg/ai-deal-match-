@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Demo — "Benim / Ofisim" işareti: kart rozeti, kayıt detayındaki seçici, hızlı süzgeç ve Ayarlar kartı.
  * Kural src/lib/domain/sahiplik.ts'de (saf fonksiyon). Burada yalnızca arayüz ve depo bağlantısı var.
  */

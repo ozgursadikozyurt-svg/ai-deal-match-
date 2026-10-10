@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Ekran durumu hafızası: kullanıcı bir içe aktarma / veri girişi ekranından bir kaydı formda açıp "Vazgeç" derse,
  * aynı ekrana dönünce yüklenmiş dosya, ayrıştırılmış satırlar ve seçimler yerinde kalsın.
  * Hafıza yalnızca bellekte tutulur (sayfa yenilenince silinir). Ekrana "dönüş" (donus) işaretiyle girilmediyse o ekranın hafızası sıfırlanır,

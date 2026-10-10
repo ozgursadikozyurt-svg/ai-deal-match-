@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Demo — ekranların ortak parçaları: depo bağlamı, küçük bileşenler, eşleşme hesabı, konum öneri kutusu.
  */
 import React, { createContext, useContext, useMemo, useRef, useState } from "react";
@@ -18,6 +18,7 @@ export type Ekran = (
   | { ad: "form"; tip: "TALEP" | "PORTFOY"; id?: string; taslak?: Partial<Veri>; adayId?: string; geri?: Ekran }
   | { ad: "eslesmeler" } | { ad: "eslesme"; tid: string; pid: string } | { ad: "izleme" }
   | { ad: "veri"; alt?: "metin" | "dosya" | "mesaj" | "wa" | "el"; metin?: string } | { ad: "konumlar" } | { ad: "kisiler" } | { ad: "kisi"; id: string } | { ad: "ayarlar" } | { ad: "baglantilar" } | { ad: "yonetim" }
+  | { ad: "gelen" } // v3.23 — gelen kutusu (onay bekleyenler)
 ) & { donus?: boolean };
 export interface Ctx {
   d: DepoDurumu;

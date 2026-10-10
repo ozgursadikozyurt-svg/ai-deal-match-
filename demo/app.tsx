@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -52,6 +52,7 @@ import { Fotograflar } from "./fotograflar";
 import { PortfoyPaylas } from "./paylas";
 import { useSahiplik, SahiplikCipleri, SahiplikRozeti, SahiplikSecici, SahiplikAyarlari, sahiplikSay } from "./sahiplik";
 import { KapakKucuk } from "./fotograflar";
+import { GelenKutusu, GelenKutusuKarti, useGelenRozet, kutuOzetYukle } from "./gelen-kutusu";
 
 type Alan = keyof typeof MULK_OZELLIK_META;
 
@@ -81,6 +82,7 @@ function AnaSayfa({ donus }: { donus?: boolean } = {}) {
         <span><b>{notionEksik && googleEksik ? "Notion ve Google Kişiler'i bağlayın" : notionEksik ? "Notion'u da bağlayın" : "Google ile bağlanın"}</b><br /><small>{notionAcik() ? "Mevcut talep, portföy ve kişileriniz tek seferde gelsin, hemen eşleştirmeye girsin." : "Telefon rehberiniz ile Anahtar CRM çift yönlü eşitlensin: telefona kaydettiğiniz kişi buraya düşsün, burada eklediğiniz telefona gitsin."}</small></span>
         <Ikon ad="baglanti" /></button></Kapanir>;
     })()}
+    <GelenKutusuKarti />
     {(d.cakismalar ?? []).filter((c) => notionAcik() || c.saglayici !== "NOTION").length > 0 && <button className="uyari-kutu" onClick={() => git({ ad: "baglantilar" })} style={{ border: 0, cursor: "pointer", textAlign: "left" }}><b>{d.cakismalar.filter((c) => notionAcik() || c.saglayici !== "NOTION").length} eşitleme çakışması</b> seçiminizi bekliyor — Bağlantılar'da karar verin.</button>}
     <div className="istat">
       {([[aktif.filter((k) => k.veri.tip === "TALEP").length, "Aktif talep", () => git({ ad: "liste", tip: "TALEP" })], [aktif.filter((k) => k.veri.tip === "PORTFOY").length, "Aktif portföy", () => git({ ad: "liste", tip: "PORTFOY" })], [sunulabilir.length, "Sunulabilir eşleşme", () => git({ ad: "eslesmeler" })], [yaklasan.length, "14 gün içinde süresi dolacak", () => git({ ad: "liste", tip: "PORTFOY" })]] as const).map(([n, l, f]) =>
@@ -595,6 +597,8 @@ export function Uygulama() {
   useEffect(() => { depoKaydet(d); }, [d]);
   useEffect(() => { let iptal = false; (async () => { try { const s = CANLI.acik ? CANLI.sample : await (window as any).claude?.use("sample"); if (!iptal) setSample(() => s ?? null); /* fonksiyon doğrudan verilirse React onu güncelleyici sanıp çağırıyordu → v3.3 hatası "n.json is not a function" */ } catch { if (!iptal) setSample(null); } })(); return () => { iptal = true; }; }, []);
   useEffect(() => { if (!mesaj) return; const t = setTimeout(() => setMesaj(null), 2600); return () => clearTimeout(t); }, [mesaj]);
+  useEffect(() => { void kutuOzetYukle(); }, []); // v3.23 — gelen kutusu: açılışta yalnızca dosya listesi (tek küçük istek); dosyalar ekran açılınca okunur
+  const gelenRozet = useGelenRozet(d);
   useEffect(() => googleOtomatik((f) => setD((x) => f(x))), []); // v3.22.2 canlı: açılışta yalnızca Google bağlantı DURUMU okunur; eşitleme günde bir sunucuda ya da elle (eskiden açılışta + 5 dk'da bir)
   const ctx: Ctx = {
     d, guncelle: (f) => setD((x) => f(x)), bildir: setMesaj, ornekHatalari: yuk.hatalar, sample,
@@ -625,6 +629,7 @@ export function Uygulama() {
     { k: "izleme", etiket: "İzleme", ikon: "anahtar", git: () => git({ ad: "izleme" }), rozet: (d.favoriler ?? []).length || undefined },
     { k: "kisiler", etiket: "Kişiler", ikon: "kisi", git: () => git({ ad: "kisiler" }) },
     // v3.21.2 — Konumlar, Bağlantılar ve Yönetim ana menüden kalktı; Ayarlar'ın içinde ("Yönetim ve bağlantılar")
+    { k: "gelen", etiket: "Gelen Kutusu", ikon: "gelen", git: () => git({ ad: "gelen" }), rozet: gelenRozet.sayi || undefined, alt: true }, // v3.23
     { k: "veri", etiket: "Veri Girişi", ikon: "veri", git: () => git({ ad: "veri" }), alt: true },
     { k: "ayarlar", etiket: "Ayarlar", ikon: "ayar", git: () => git({ ad: "ayarlar" }), rozet: cakisma, alt: true },
   ];
@@ -635,7 +640,7 @@ export function Uygulama() {
     <div className="icerik">
     <header className="ust-bas">
       <Logo alt={false} />
-      <div className="satir"><SenkronDurumu /><button className="menu-btn" aria-label="Menü" onClick={() => setMenuAcik(true)}><Ikon ad="menu" boyut={22} />{cakisma > 0 && <b className="menu-rozet">{cakisma}</b>}</button></div>
+      <div className="satir"><SenkronDurumu /><button className="menu-btn" aria-label="Menü" onClick={() => setMenuAcik(true)}><Ikon ad="menu" boyut={22} />{cakisma + gelenRozet.sayi > 0 && <b className="menu-rozet">{cakisma + gelenRozet.sayi > 999 ? "999+" : cakisma + gelenRozet.sayi}</b>}</button></div>
     </header>
     {yuk.hatalar.length > 0 && <div className="sarici"><div className="hata-kutu">Örnek veride {yuk.hatalar.length} kayıt güncel şemaya uymuyor. Ayrıntı: Ayarlar.</div></div>}
     <main className="sarici">
@@ -648,6 +653,7 @@ export function Uygulama() {
       {ekran.ad === "izleme" && <Izleme />}
       {ekran.ad === "eslesme" && <EslesmeDetay tid={ekran.tid} pid={ekran.pid} />}
       {ekran.ad === "veri" && <VeriGirisi key={(ekran.alt ?? "") + (ekran.metin?.length ?? "")} alt={ekran.alt} metin={ekran.metin} donus={ekran.donus} />}
+      {ekran.ad === "gelen" && <GelenKutusu />}
       {ekran.ad === "kisiler" && <Kisiler />}
       {ekran.ad === "kisi" && <KisiKarti key={ekran.id} id={ekran.id} />}
       {ekran.ad === "konumlar" && <Konumlar />}

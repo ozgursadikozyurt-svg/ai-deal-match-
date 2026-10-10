@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Anahtar CRM v3.19 — Anahtar (favori) işareti ve İzleme ekranı.
  * Talep, portföy ve eşleşme kartlarında 🔑 ile işaretlenen kayıtlar "İzleme" ekranında toplanır.
  * Saklama: DepoDurumu.favoriler (canlıda `arayuz` Ayar kaydı — veritabanı değişikliği gerekmez).

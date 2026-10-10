@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.2 · 10 Ekim 2026 — Supabase Storage uçlarını taklit eden küçük sunucu (yalnızca yerel deneme için)
+// Anahtar CRM v3.23 · 10 Ekim 2026 — Supabase Storage uçlarını taklit eden küçük sunucu (yalnızca yerel deneme için)
 import http from "node:http";
 const dosyalar = new Map(); // "kova/yol" → Buffer
 const gunluk = [];
@@ -19,6 +19,7 @@ const sunucu = http.createServer(async (req, res) => {
   if (req.method === "POST" && yol.startsWith("object/list/")) { const kova = yol.slice(12); return json(200, [...dosyalar.keys()].filter((k) => k.startsWith(kova + "/")).map((k) => ({ name: k.slice(kova.length + 1) }))); }
   if (req.method === "POST" && yol.startsWith("object/")) { dosyalar.set(yol.slice(7), govde); return json(200, { Key: yol.slice(7) }); }
   if (req.method === "GET" && yol.startsWith("object/sign/")) { const d = dosyalar.get(yol.slice(12)); if (!d) return json(404, {}); res.writeHead(200, { "content-type": "image/jpeg" }); return res.end(d); }
+  if (req.method === "GET" && yol.startsWith("object/")) { const d = dosyalar.get(yol.slice(7)); if (!d) return json(404, {}); res.writeHead(200, { "content-type": "application/octet-stream" }); return res.end(d); } // v3.23: gelen kutusu indirme
   if (req.method === "DELETE" && yol.startsWith("object/")) { const kova = yol.slice(7); for (const p of JSON.parse(govde.toString()).prefixes) dosyalar.delete(`${kova}/${p}`); return json(200, []); }
   return json(404, { yol });
 });

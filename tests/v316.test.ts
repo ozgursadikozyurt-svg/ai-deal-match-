@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * v3.16 — her ekranda geri, kişi rolüne göre filtre, eşleşmelerde işlem tipi, kaynak otomasyonu, geri sayımın kayıt gününden başlaması.
  */
 import { test } from "node:test";

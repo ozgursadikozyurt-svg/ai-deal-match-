@@ -9,6 +9,8 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Ofis'
+export type * from './models/GelenDosya'
+export type * from './models/GelenAtlanan'
 export type * from './models/Kullanici'
 export type * from './models/Davet'
 export type * from './models/Il'

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Toplu dosya içe aktarma (Excel / CSV / TXT): portal ilan listeleri, meslektaşın gönderdiği portföy/talep listesi,
  * ofisin haftalık talep tablosu… Başlık satırı nerede olursa olsun bulunur, sütunlar eş anlamlılarla eşlenir,
  * her satır kurala dayalı olarak kayda çevrilir. YAPAY ZEKÂ KULLANILMAZ:
@@ -110,13 +110,50 @@ export function tarihOku(s?: string): Date | null {
 }
 
 const TUR_EK: Record<string, string> = { bina: "KOMPLE_BINA", "komple bina": "KOMPLE_BINA", konut: "DAIRE", "toplu konut": "DAIRE", "ticari konut": "DAIRE", "residence": "REZIDANS", "rezidans": "REZIDANS", arsa: "ARSA", "i̇mar arsa": "ARSA" };
-export function mulkTuruOku(tur?: string, ana?: string, metin?: string): { mulkTipi: string | null; tahmin: boolean } {
-  const k = kucuk(tur ?? "");
-  if (k) { const t = TUR_EK[k] ?? hizliAyristir(tur!).mulkTipi; if (t) return { mulkTipi: t, tahmin: false }; }
+/**
+ * v3.23 — Portal dökümlerindeki (Revy · Sahibinden · Hepsiemlak · Emlakjet) "Mülk türü" sütunu kategori adıdır: birebir karşılanır,
+ * serbest metin ayrıştırıcısına bırakılmaz ("Spor Tesisi" → daire, "Pazar Yeri" → diğer çıkıyordu). Anahtarlar `kucuk()` biçimindedir.
+ */
+const PORTAL_TUR: Record<string, string> = {
+  daire: "DAIRE", "müstakil ev": "MUSTAKIL_EV", villa: "VILLA", "çiftlik evi": "CIFTLIK_EVI", "köşk konak": "KOSK_KONAK", "yalı": "YALI", "yalı dairesi": "YALI",
+  "yazlık": "YAZLIK", "prefabrik ev": "PREFABRIK_EV", kooperatif: "KOOPERATIF",
+  "apartman dairesi": "OFIS_APARTMAN_DAIRESI", "atölye": "ATOLYE", avm: "AVM", "büfe": "BUFE_KANTIN", kantin: "BUFE_KANTIN", "büro ofis": "BURO_OFIS", "çiftlik": "CIFTLIK",
+  "depo antrepo": "DEPO_ANTREPO", "düğün salonu": "DUGUN_SALONU", "dükkan mağaza": "DUKKAN_MAGAZA", "enerji santrali": "ENERJI_SANTRALI",
+  "fabrika üretim tesisi": "FABRIKA_URETIM_TESISI", "garaj park yeri": "OTOPARK_GARAJ", "otopark garaj": "OTOPARK_GARAJ", "imalathane": "IMALATHANE",
+  "iş hanı katı ofisi": "IS_HANI_KATI", "kafe bar": "CAFE_BAR", "kıraathane": "CAFE_BAR", "kır kahvaltı bahçesi": "KIR_KAHVALTI_BAHCESI", "maden ocağı": "MADEN_OCAGI",
+  "oto yıkama kuaför": "OTO_YIKAMA", "pastane fırın tatlıcı": "PASTANE_FIRIN", "pazar yeri": "PAZAR_YERI", plaza: "PLAZA", "plaza katı ofisi": "PLAZA_KATI_OFIS", "plaza katı": "PLAZA_KATI_OFIS",
+  "restoran lokanta": "RESTORAN_LOKANTA", "rezidans katı ofisi": "REZIDANS_KATI_OFIS", "sağlık merkezi": "SAGLIK_MERKEZI_KLINIK", "sinema konferans salonu": "SINEMA_KONFERANS",
+  "spa hamam sauna": "SPA_HAMAM", "spor tesisi": "SPOR_TESISI", yurt: "YURT", "akaryakıt istasyonu": "AKARYAKIT_ISTASYONU", "soğuk hava deposu": "SOGUK_HAVA_DEPOSU",
+  otel: "OTEL", "apart otel": "APART_OTEL", "butik otel": "BUTIK_OTEL", motel: "MOTEL", pansiyon: "PANSIYON", "kamp yeri": "KAMP_ALANI", "tatil köyü": "TATIL_KOYU", "devre mülk": "DEVRE_MULK",
+};
+/** Arsa kategorisinde "Mülk türü" sütunu İMAR durumudur ("Konut", "Villa", "Ticari"): mülk tipi arsa kalır, imar ayrıca yazılır */
+const ARSA_TUR: Record<string, string> = { tarla: "TARLA", "bağ": "BAG_BAHCE", "bahçe": "BAG_BAHCE", "bağ bahçe": "BAG_BAHCE", zeytinlik: "ZEYTINLIK" };
+const ARSA_IMAR: [RegExp, string][] = [
+  [/^ticari konut|^konut ticari/, "TICARI_KONUT"], [/^(konut|toplu konut|villa)/, "KONUT"], [/^ticari/, "TICARI"], [/sanayi/, "SANAYI"], [/depo/, "DEPO_ANTREPO"],
+  [/turizm konut/, "TURIZM_KONUT"], [/turizm ticari/, "TURIZM_TICARI"], [/turizm/, "TURIZM"], [/^tarla/, "TARLA"], [/^ba[ğg]|^bah[çc]e/, "BAG_BAHCE"], [/zeytin/, "ZEYTINLIK"],
+  [/sera/, "SERA"], [/e[ğg]itim/, "EGITIM"], [/sa[ğg]l[ıi]k/, "SAGLIK"], [/enerji/, "ENERJI"], [/[öo]zel kullan/, "OZEL_KULLANIM"], [/sit alan/, "SIT_ALANI"],
+];
+/** Türü yazılmamış ticari ilanın başlığındaki işletme adı ("devren kuaför", "butik", "tekel bayi") → iş yeri tipi */
+const ISLETME: [RegExp, string][] = [
+  [/oto y[ıi]kama/, "OTO_YIKAMA"], [/pastane|f[ıi]r[ıi]n|tatl[ıi]c[ıi]|b[öo]rek/, "PASTANE_FIRIN"], [/klinik|muayene|poliklinik|di[şs] hekim/, "SAGLIK_MERKEZI_KLINIK"],
+  [/spor salon|pilates|fitness|hal[ıi] ?saha/, "SPOR_TESISI"], [/sauna|masaj|(^| )spa( |$)|hamam/, "SPA_HAMAM"], [/b[üu]fe|kantin/, "BUFE_KANTIN"], [/kre[şs]|ana ?okul/, "KRES"], [/d[üu][ğg][üu]n salon/, "DUGUN_SALONU"],
+  [/butik|[şs]ark[üu]teri|kuaf[öo]r|berber|g[üu]zellik (merkez|salon)|k[ıi]rtasiye|market|tekel|bakkal|manav|kasap|eczane|[çc]i[ğg] ?k[öo]fte|d[öo]ner|kuru ?temizleme|[çc]ama[şs][ıi]rhane|terzi|bayi|acente|ma[ğg]aza|d[üu]kk[aâ]n|i[şs] ?yeri|i[şs]letme/, "DUKKAN_MAGAZA"],
+];
+const KONUT_TIPLERI = new Set(["DAIRE", "REZIDANS", "MUSTAKIL_EV", "VILLA", "CIFTLIK_EVI", "KOSK_KONAK", "YALI", "YAZLIK", "PREFABRIK_EV", "KOOPERATIF"]);
+export function mulkTuruOku(tur?: string, ana?: string, metin?: string): { mulkTipi: string | null; tahmin: boolean; imar?: string | null } {
+  const k = kucuk(tur ?? ""), a = kucuk(ana ?? "");
+  // v3.23 — Arsa: "Mülk türü" imardır. Eskiden "Arsa / Villa" villa, "Arsa / Konut" daire oluyor, arsa ilanı konut talebiyle eşleşiyordu.
+  if (a === "arsa") return { mulkTipi: ARSA_TUR[k] ?? "ARSA", tahmin: false, imar: ARSA_IMAR.find(([re]) => re.test(k))?.[1] ?? null };
+  const ticari = /ticari|i[şs] ?yeri/.test(a);
+  if (k) { const t = PORTAL_TUR[k] ?? TUR_EK[k] ?? hizliAyristir(tur!).mulkTipi; if (t) return { mulkTipi: t, tahmin: false }; }
   const h = metin ? hizliAyristir(metin) : null;
-  if (h?.mulkTipi) return { mulkTipi: h.mulkTipi, tahmin: true };
-  const a = kucuk(ana ?? "");
-  if (a === "arsa") return { mulkTipi: "ARSA", tahmin: true };
+  if (h?.mulkTipi) {
+    const konut = KONUT_TIPLERI.has(h.mulkTipi);
+    // Sütun "Ticari" diyorsa başlıktan konut tipi, "Konut" diyorsa başlıktan iş yeri tipi çıkarılmaz (sütun daha güvenilir)
+    if (!(ticari && konut) && !(a === "konut" && !konut)) return { mulkTipi: h.mulkTipi, tahmin: true };
+    if (ticari && h.mulkTipi === "DAIRE") return { mulkTipi: "OFIS_APARTMAN_DAIRESI", tahmin: true };
+  }
+  if (ticari && metin) { const t = ISLETME.find(([re]) => re.test(kucuk(metin)))?.[1]; if (t) return { mulkTipi: t, tahmin: true }; }
   if (h?.odaSayisi || a === "konut") return { mulkTipi: "DAIRE", tahmin: true };
   return { mulkTipi: null, tahmin: true };
 }
@@ -171,8 +208,16 @@ export function satirDonustur(s: string[], e: Eslesme, o: AktarimSecenek, satirN
   const isK = kucuk(v.islem ?? "");
   let islem = /kat kar/.test(isK) ? "KAT_KARSILIGI" : /kiral/.test(isK) ? "KIRALIK" : /sat/.test(isK) ? "SATILIK" : h?.islemTipi ?? null;
   if (!islem) { islem = o.varsayilanIslem; if (!v.islem) kontrol.push(`İşlem belirtilmemiş (${o.varsayilanIslem === "SATILIK" ? "satılık" : "kiralık"} varsayıldı)`); }
-  const ticari = /ticari|i[şs]yeri/.test(kucuk(v.anaKategori ?? "")) || /DUKKAN|OFIS|BURO|PLAZA|DEPO|FABRIKA|IMALAT|RESTORAN|CAFE/.test(mt.mulkTipi ?? "");
-  if (evet(v.devren) && ticari && mt.mulkTipi) { const d = islem === "KIRALIK" ? "DEVREN_KIRALIK" : "DEVREN_SATILIK"; if (islemKategoriUyumlu(anaKategoriOf(mt.mulkTipi as any), d as any)) islem = d; }
+  const ticari = /ticari|i[şs] ?yeri/.test(kucuk(v.anaKategori ?? "")) || /DUKKAN|OFIS|BURO|PLAZA|DEPO|FABRIKA|IMALAT|RESTORAN|CAFE/.test(mt.mulkTipi ?? "");
+  // v3.23 — Devren: portal dökümünde "Devren mi" sütunu çoğu devren ilanda "Hayır" yazıyor; başlıktaki "devren / devir" daha güvenilir.
+  const devren = ticari && (evet(v.devren) === true || /devren|devir/.test(kucuk(v.baslik ?? "")));
+  let devirBedeli = false, devrenBelirsiz = false;
+  if (devren && (mt.mulkTipi ? islemKategoriUyumlu(anaKategoriOf(mt.mulkTipi as any), "DEVREN_SATILIK" as any) : true) && (islem === "KIRALIK" || islem === "SATILIK")) {
+    const f = paraOku(v.fiyat ?? "").deger, alan = sayiOku(v.m2);
+    // "Devren kiralık" ilanında yazan tutar çoğunlukla aylık kira değil DEVİR BEDELİdir (36 m² butik 580.000 TL). Devir bedeli = toplam → Devren Satılık.
+    if (islem === "KIRALIK" && f != null && f >= 150_000) { if (!alan || f / alan >= 1500) { islem = "DEVREN_SATILIK"; devirBedeli = true; } else { islem = "DEVREN_KIRALIK"; devrenBelirsiz = true; } }
+    else islem = islem === "KIRALIK" ? "DEVREN_KIRALIK" : "DEVREN_SATILIK";
+  }
   const kira = /KIRALIK/.test(islem);
 
   // Fiyat / bütçe
@@ -216,6 +261,7 @@ export function satirDonustur(s: string[], e: Eslesme, o: AktarimSecenek, satirN
   if (evet(v.site)) ozellik.siteIcinde = true;
   const es = evet(v.esyali); if (es != null) ozellik.esyaDurumu = es ? "ESYALI" : "ESYASIZ";
   if (/kirac/.test(kucuk(v.kullanim ?? ""))) ozelSartlar.push("Kiracılı");
+  if (mt.imar) ozellik.imarDurumu = mt.imar;
   delete ozellik.kritikKriterler; delete ozellik.esnekKriterler;
   if (tip === "PORTFOY") { delete (ozellik as any).kullanimAmaclari; }
 
@@ -231,6 +277,17 @@ export function satirDonustur(s: string[], e: Eslesme, o: AktarimSecenek, satirN
   if (v.ilanDurumu && !/aktif|yay[ıi]nda/.test(kucuk(v.ilanDurumu))) kontrol.push(`İlan durumu: ${v.ilanDurumu}`);
   const notlar: string[] = [];
   if (ilk.deger && fiyat.deger && ilk.deger > fiyat.deger) notlar.push(`Fiyat düştü: ${ilk.deger.toLocaleString("tr-TR")} → ${fiyat.deger.toLocaleString("tr-TR")}`);
+  if (devirBedeli) notlar.push("İlanda “devren kiralık”: yazan tutar devir bedeli sayıldı — aylık kira ayrıca sorulmalı");
+  if (devrenBelirsiz) kontrol.push("Devren: tutar aylık kira mı devir bedeli mi belli değil — kontrol edin");
+  // v3.23 — veri kalitesi: portallarda eksik / fazla sıfırla girilmiş fiyatlar ("kiralık 1.200 TL", "kiralık 8.000.000 TL") sessizce havuza girmesin
+  if (tip === "PORTFOY" && fiyat.deger != null && !devrenBelirsiz) {
+    const yaz = fiyat.deger.toLocaleString("tr-TR");
+    if (kira && fiyat.deger >= 1_000_000) kontrol.push(`Aylık kira için çok yüksek (${yaz} TL) — satış ya da devir bedeli olabilir`);
+    else if (kira && ticari && m2 && fiyat.deger / m2 >= 5_000) kontrol.push(`Aylık kira m² başına çok yüksek (${Math.round(fiyat.deger / m2).toLocaleString("tr-TR")} TL/m²) — devir bedeli olabilir`);
+    else if (kira && fiyat.deger < 5_000) kontrol.push(`Kira çok düşük (${yaz} TL) — eksik sıfır olabilir`);
+    else if (!kira && islem !== "DEVREN_SATILIK" && fiyat.deger < 100_000) kontrol.push(`Satış fiyatı çok düşük (${yaz} TL) — eksik sıfır olabilir`);
+    else if (islem === "DEVREN_SATILIK" && fiyat.deger < 10_000) kontrol.push(`Devir bedeli çok düşük (${yaz} TL) — kontrol edin`);
+  }
 
   const girdi: SatirSonucu["girdi"] = {
     tip, mulkTipi: (mt.mulkTipi ?? "DIGER") as any, islemTipi: islem as any,

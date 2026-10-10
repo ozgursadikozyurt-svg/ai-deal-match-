@@ -52,6 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Ofis: 'Ofis',
+  GelenDosya: 'GelenDosya',
+  GelenAtlanan: 'GelenAtlanan',
   Kullanici: 'Kullanici',
   Davet: 'Davet',
   Il: 'Il',
@@ -110,10 +112,37 @@ export const OfisScalarFieldEnum = {
   sehir: 'sehir',
   notlar: 'notlar',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  gelenKod: 'gelenKod'
 } as const
 
 export type OfisScalarFieldEnum = (typeof OfisScalarFieldEnum)[keyof typeof OfisScalarFieldEnum]
+
+
+export const GelenDosyaScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  ad: 'ad',
+  tur: 'tur',
+  boyut: 'boyut',
+  ozet: 'ozet',
+  kanal: 'kanal',
+  gonderen: 'gonderen',
+  konu: 'konu',
+  depoYolu: 'depoYolu',
+  createdAt: 'createdAt'
+} as const
+
+export type GelenDosyaScalarFieldEnum = (typeof GelenDosyaScalarFieldEnum)[keyof typeof GelenDosyaScalarFieldEnum]
+
+
+export const GelenAtlananScalarFieldEnum = {
+  ofisId: 'ofisId',
+  anahtar: 'anahtar',
+  createdAt: 'createdAt'
+} as const
+
+export type GelenAtlananScalarFieldEnum = (typeof GelenAtlananScalarFieldEnum)[keyof typeof GelenAtlananScalarFieldEnum]
 
 
 export const KullaniciScalarFieldEnum = {

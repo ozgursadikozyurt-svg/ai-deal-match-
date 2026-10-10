@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Notion API istemcisi (bağımlılıksız, fetch). Notion-Version 2025-09-03: sorgular data source üzerinden.
  * Hız sınırı: Notion ortalama 3 istek/sn verir → istekler arasında en az 350 ms; 429'da Retry-After kadar beklenir.
  * Kimlik: NOTION_TOKEN (Notion → Ayarlar → Bağlantılar → "Dahili entegrasyon" gizli anahtarı). Üç tablo bu bağlantıyla paylaşılmalı.

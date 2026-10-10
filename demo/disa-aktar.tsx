@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Demo — Ayarlar → Verilerimi dışa aktar: talepler, portföyler, kişiler, eşleşme takibi, görüşme notları (CSV, Excel'de açılır)
  * ve tam yedek (JSON). Canlıda aynı içerik /api/disa-aktar'dan iner. Arşiv ya da başka bir CRM'e taşıma için.
  */

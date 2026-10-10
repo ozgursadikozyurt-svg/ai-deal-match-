@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.2 · 10 Ekim 2026
+// Anahtar CRM v3.23 · 10 Ekim 2026
 // POST   /api/eslesme/kopar { talepId, portfoyId, neden, not? } → eşleşme koparılır (durum REDDEDILDI), bir daha önerilmez
 // DELETE /api/eslesme/kopar?talepId=…&portfoyId=…              → geri alınır (durum BEKLIYOR)
 import { z } from "zod";

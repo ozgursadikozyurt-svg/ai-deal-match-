@@ -47,14 +47,15 @@ Talepte bu ifadeler **istenen katlar** alanına (çoklu seçim), portföyde **bu
 | `takaslı`, `takasa açık`, `takas olur` | Takasa açık | evet |
 | `iskanlı`, `iskan var` | İskan | evet |
 | `ebeveyn banyolu` | Ebeveyn banyosu | evet |
-| `kapalı otopark`, `açık otopark`, `otoparklı` | Otopark | evet |
+| `kapalı otopark` | Otopark | Kapalı |
+| `açık otopark`, `otoparklı`, `otopark var` | Otopark | Açık |
 | `havuzlu` | Havuz | evet |
 | `asansörlü` | Asansör | evet |
 | `site içinde`, `güvenlikli site` | Site içinde | evet |
 | `deniz manzaralı` | Deniz manzarası | evet |
 | `dubleks`, `dublex`, `ters dubleks` | Dubleks | evet |
 | `0.70 emsal`, `emsal 0,70` | Emsal (KAKS) | 0,70 |
-| `tek tapu tek imza`, `müstakil tapu` | Tapu tipi | Müstakil |
+| `tek tapu tek imza`, `müstakil tapu` | Tapu tipi | Müstakil parsel |
 
 ## 4. Alan karşılığı olmayan jargon → "Notlar"
 

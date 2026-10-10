@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * Notion → Anahtar içe aktarma planlayıcısı (saf). Ne ekleneceğine, neyin güncelleneceğine, neyin çakıştığına
  * karar verir; uygulamayı sunucu (Prisma) ya da demo (tarayıcı deposu) yapar.
  *

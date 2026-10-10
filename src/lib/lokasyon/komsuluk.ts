@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.22.2 · 10 Ekim 2026
+ * Anahtar CRM v3.23 · 10 Ekim 2026
  * MAHALLE KOMŞULUĞU ve MESAFESİ — "Fener'de arayan müşteriye Çağlayan da olur, Doğuyaka olmaz."
  * Veri: antalya-komsuluk.json (scripts/build_komsuluk.py üretir; Antalya'nın 19 ilçesi, 914 mahalle).
  *   mesafe = iki mahallenin SINIRLARI arasındaki en kısa mesafe (m); komşu = en az 100 m ortak sınır.

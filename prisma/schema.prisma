@@ -1,4 +1,4 @@
-// Anahtar CRM v3.22.2 · 10 Ekim 2026
+// Anahtar CRM v3.23 · 10 Ekim 2026
 // ============================================================================
 //  Anahtar.ai — Prisma Şeması (AŞAMA 2 v3.1; v3.3: konut, kaynak, konum öğrenme, ayarlar; v3.4: kişi bağları, işlenmiş mesaj; v3.5: yetkili portföy)
 //  Tarih: 30 Eylül 2026  |  Önceki: v2.0 (14–18 Eylül 2026)
@@ -650,9 +650,51 @@ model Ofis {
   kayitNotlari       KayitNot[]
   kayitFotolari      KayitFoto[]
   senkronHaricleri   SenkronHaric[]
+  gelenDosyalari     GelenDosya[]
+  gelenAtlananlar    GelenAtlanan[]
+
+  /// v3.23 — Gelen kutusu adresi: e-posta adresinin yerel kısmı ve köprü anahtarı (gizli; küçük harf + rakam)
+  gelenKod  String?    @unique
 
   @@index([durum])
   @@map("ofis")
+}
+
+/// v3.23 — Gelen kutusu: e-postayla ya da yüklemeyle gelen HAM dosyalar (WhatsApp .zip / .txt, Revy .xlsx, .eml).
+/// Dosyanın kendisi Supabase Storage'da ("gelen" kovası); burada yalnızca künye durur. Ayrıştırma tarayıcıda yapılır
+/// (Cloudflare ücretsiz planda istek başına 10 ms işlemci: sunucu dosyayı açmaz, yalnızca saklar).
+model GelenDosya {
+  id        String   @id @default(cuid())
+  ofisId    String   @default("")
+  ofis      Ofis     @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  ad        String
+  /// eml · zip · txt · xlsx · csv
+  tur       String
+  boyut     Int
+  /// İçeriğin SHA-256 özeti: aynı dosya ikinci kez gelirse yeniden kaydedilmez
+  ozet      String
+  /// EPOSTA (alan adına gelen posta) · KOPRU (Gmail köprüsü) · YUKLEME (ekrandan)
+  kanal     String   @default("YUKLEME")
+  gonderen  String?
+  konu      String?
+  depoYolu  String
+  createdAt DateTime @default(now())
+
+  @@unique([ofisId, ozet])
+  @@index([ofisId, createdAt])
+  @@map("gelen_dosya")
+}
+
+/// v3.23 — Gelen kutusunda "atla / temizle" denen kayıtların anahtarları: aynı ilan sonraki dökümde yeniden gelince gösterilmez
+model GelenAtlanan {
+  ofisId    String   @default("")
+  ofis      Ofis     @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  anahtar   String
+  createdAt DateTime @default(now())
+
+  @@id([ofisId, anahtar])
+  @@index([ofisId, createdAt])
+  @@map("gelen_atlanan")
 }
 
 model Kullanici {
