@@ -1,9 +1,9 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026
+ * Anahtar CRM v3.25 · 11 Ekim 2026
  * Demo — kayıt formu. Şemadan üretilir; mülk grubuna göre yalnızca anlamlı alanlar,
  * önce "önemli alanlar", gerisi "Tüm alanlar" altında. Bölümler varsayılan kapalı.
  */
-import { SayiGir, TelGirdisi, sayiYap } from "./girdi";
+import { SayiGir, SayiAdim, TelGirdisi, sayiYap } from "./girdi";
 import { telStandart, telBicimle, telUyarisi } from "../src/lib/iletisim";
 import { talepDnasi } from "../src/lib/eslestirme/talep-dna";
 import { EksikUyarisi } from "./motor-ui";
@@ -173,11 +173,13 @@ function TeknikAlanlar({ f, setO, talep }: { f: any; setO: (k: string, v: any) =
     if (t.tur === "coklu") return <div key={a} className="alan genis">{lbl}<div className="cip-satir">{t.degerler.map((x) => { const on = (v ?? []).includes(x); return <button type="button" key={x} className={cx("cip secilir", on && "on")} onClick={() => setO(a, on ? v.filter((y: string) => y !== x) : [...(v ?? []), x])}>{etiket(x)}</button>; })}</div></div>;
     if (t.tur === "tarih") return <div key={a} className="alan">{lbl}<input id={idx} type="date" value={tarihInput(v)} onChange={(e) => setO(a, e.target.value ? new Date(e.target.value + "T12:00:00").toISOString() : null)} /></div>;
     if (t.tur === "metin") return <div key={a} className="alan">{lbl}<input id={idx} value={v ?? ""} onChange={(e) => setO(a, e.target.value || null)} /></div>;
+    // v3.25 — birimsiz küçük sayılar (banyo, kat, bina yaşı…) dar kutu + −/+ ; birimli alanlar (m², kW…) düz kutu
+    if (!m.birim && !/Fiyat|Bedel|Kira|Aidat|Depozito/i.test(a)) return <div key={a} className="alan kucuk">{lbl}<SayiAdim id={idx} etiket={m.etiket} deger={v} onChange={(x) => setO(a, x)} enAz={a === "bulunduguKat" ? -5 : 0} enCok={a === "binaYasi" ? 150 : 200} /></div>;
     return <div key={a} className="alan">{lbl}<SayiGir id={idx} deger={v} onChange={(x) => setO(a, x)} /></div>;
   };
   const cizim = (liste: Alan[]) => {
     const deger = liste.filter((a) => alanTuru(a).tur !== "bool"), bool = liste.filter((a) => alanTuru(a).tur === "bool");
-    return <>{deger.length > 0 && <div className="alanlar">{deger.map(girdi)}</div>}
+    return <>{deger.length > 0 && <div className="alanlar kompakt">{deger.map(girdi)}</div>}
       {bool.length > 0 && <div className="cip-satir bool-satir">{bool.map((a) => <BoolCip key={a} a={a} v={f.ozellik[a]} talep={talep} onChange={(x) => setO(a, x)} />)}</div>}</>;
   };
   const gruplu = useMemo(() => { const m = new Map<string, Alan[]>(); for (const a of diger) { const g = MULK_OZELLIK_META[a].grup; m.set(g, [...(m.get(g) ?? []), a]); } return [...m.entries()]; }, [f.mulkTipi]);

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.25 · 11 Ekim 2026 (v3.14'ten)
  * AŞAMA 7 — Canlı sürümün veri köprüsü. Arayüz (demo ile aynı ekranlar) tüm durumu tek seferde okur
  * (`durumGetir`), değişiklikleri parça parça yazar (`degisiklikUygula`). Veritabanı ilişkisel kalır:
  * Notion/Google senkronu, toplu giriş, dışa aktarma ve eşleştirme servisleri aynı tablolarla çalışmaya devam eder.
@@ -13,6 +13,7 @@ import { varsayilanValidUntil as vu, TtlAyarSchema, TTL_VARSAYILAN } from "../do
 import { AiAyarSchema, PaylasimAyarSchema, aiAyarNormalize, paylasimNormalize, calismaIliNormalize } from "../domain/ayarlar";
 import { RolTanimSchema, rolNormalize, ROL_SINIRI } from "../domain/roller";
 import { SahiplikAyarSchema, sahiplikNormalize } from "../domain/sahiplik";
+import { GOREV_SINIRI, ILGILENEN_SINIRI, gorevlerNormalize, ilgilenenlerNormalize } from "../domain/gorev";
 import { gonderimAlaniDegisti } from "../google/kisiler";
 import { googleSilinenleriIsaretle, googleGonderimAcik } from "./senkron";
 
@@ -20,7 +21,7 @@ const KAYIT_ALANLARI = [...new Set([...Object.keys(KayitTemel.shape), "anaKatego
 const OZELLIK_ALANLARI = Object.keys((MulkOzellikObje as any).shape ?? (MulkOzellikObje as any)._def?.schema?.shape ?? {});
 const sade = (v: unknown): unknown => (v == null ? null : v instanceof Date ? v.toISOString() : typeof v === "object" && v && "toNumber" in (v as any) ? Number(v) : v);
 const ARAYUZ = "arayuz";
-const AYAR_ANAHTARLARI = ["ttl", "ai", "paylasim", "calismaIli", "roller", "sahiplik", ARAYUZ];
+const AYAR_ANAHTARLARI = ["ttl", "ai", "paylasim", "calismaIli", "roller", "sahiplik", "gorevler", "ilgilenenler", ARAYUZ];
 
 // ───────── Okuma ─────────
 /** Veritabanı kişisi → arayüz kişisi. v3.21: googleBekliyor = "Google'a gönderilecek" işareti (rozet için). */
@@ -63,7 +64,7 @@ export async function durumGetir(prisma: PrismaClient) {
     }),
     kisiler: kisiler.map(kisiSatiri),
     eslesmeNotlari: Object.fromEntries(eslesmeler.map((m) => [`${m.talepId}~${m.portfoyId}`, { durum: m.durum === "BEKLIYOR" ? "YENI" : m.durum, not: m.operasyonNotu ?? "", ...(m.kopmaNedeni ? { neden: m.kopmaNedeni } : {}), ...(m.koparilma ? { tarih: m.koparilma.toISOString() } : {}) }])),
-    ayarlar: { ttl: TtlAyarSchema.parse({ ...TTL_VARSAYILAN, ...((ayarlar.find((a) => a.anahtar === "ttl")?.deger as object) ?? {}) }), ai: aiAyarNormalize(ayarlar.find((a) => a.anahtar === "ai")?.deger), paylasim: paylasimNormalize(ayarlar.find((a) => a.anahtar === "paylasim")?.deger), calismaIli: calismaIliNormalize(ayarlar.find((a) => a.anahtar === "calismaIli")?.deger), roller: rolNormalize(ayarlar.find((a) => a.anahtar === "roller")?.deger), sahiplik: sahiplikNormalize(ayarlar.find((a) => a.anahtar === "sahiplik")?.deger) },
+    ayarlar: { ttl: TtlAyarSchema.parse({ ...TTL_VARSAYILAN, ...((ayarlar.find((a) => a.anahtar === "ttl")?.deger as object) ?? {}) }), ai: aiAyarNormalize(ayarlar.find((a) => a.anahtar === "ai")?.deger), paylasim: paylasimNormalize(ayarlar.find((a) => a.anahtar === "paylasim")?.deger), calismaIli: calismaIliNormalize(ayarlar.find((a) => a.anahtar === "calismaIli")?.deger), roller: rolNormalize(ayarlar.find((a) => a.anahtar === "roller")?.deger), sahiplik: sahiplikNormalize(ayarlar.find((a) => a.anahtar === "sahiplik")?.deger), gorevler: gorevlerNormalize(ayarlar.find((a) => a.anahtar === "gorevler")?.deger), ilgilenenler: ilgilenenlerNormalize(ayarlar.find((a) => a.anahtar === "ilgilenenler")?.deger) },
     arayuz: (ayarlar.find((a) => a.anahtar === ARAYUZ)?.deger ?? {}) as Record<string, unknown>,
   };
 }
@@ -83,7 +84,7 @@ export const DegisiklikSchema = z.object({
   kayitlar: z.array(KayitZ).max(5000).default([]), kayitSil: z.array(z.string()).max(5000).default([]),
   kisiler: z.array(KisiZ).max(5000).default([]), kisiSil: z.array(z.string()).max(5000).default([]),
   eslesmeNotlari: z.record(EsNotZ).default({}),
-  ayarlar: z.object({ ttl: z.record(z.number()).optional(), ai: AiAyarSchema.optional(), paylasim: PaylasimAyarSchema.optional(), calismaIli: z.number().int().optional(), roller: z.array(RolTanimSchema).max(ROL_SINIRI).optional(), sahiplik: SahiplikAyarSchema.optional() }).optional(),
+  ayarlar: z.object({ ttl: z.record(z.number()).optional(), ai: AiAyarSchema.optional(), paylasim: PaylasimAyarSchema.optional(), calismaIli: z.number().int().optional(), roller: z.array(RolTanimSchema).max(ROL_SINIRI).optional(), sahiplik: SahiplikAyarSchema.optional(), /** v3.25 — Bugün panosu görevleri ve ilgilenenler (ofis ayarı olarak JSON) */ gorevler: z.array(z.unknown()).max(GOREV_SINIRI).optional(), ilgilenenler: z.array(z.unknown()).max(ILGILENEN_SINIRI).optional() }).optional(),
   arayuz: z.record(z.unknown()).optional(),
 });
 export type Degisiklik = z.output<typeof DegisiklikSchema>;
@@ -161,6 +162,8 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
     if (g.ayarlar.calismaIli != null) await yaz("calismaIli", g.ayarlar.calismaIli);
     if (g.ayarlar.roller) await yaz("roller", rolNormalize(g.ayarlar.roller)); // v3.15: özel roller + yeniden adlandırmalar
     if (g.ayarlar.sahiplik) await yaz("sahiplik", g.ayarlar.sahiplik); // v3.22: Benim ve ofisim
+    if (g.ayarlar.gorevler) await yaz("gorevler", gorevlerNormalize(g.ayarlar.gorevler)); // v3.25: Bugün panosu (boş liste de yazılır: tüm görevler silinebilir)
+    if (g.ayarlar.ilgilenenler) await yaz("ilgilenenler", ilgilenenlerNormalize(g.ayarlar.ilgilenenler)); // v3.25: İlgilenenler
   }
   if (g.arayuz) await ayarYaz(prisma, ARAYUZ, g.arayuz);
   return { tamam: hatalar.length === 0, hatalar };

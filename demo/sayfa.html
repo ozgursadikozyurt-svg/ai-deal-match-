@@ -136,7 +136,7 @@ td.sonuc{white-space:nowrap;font-weight:600}
 .uc button:last-child{border-right:0}
 .uc button.on{background:var(--acc);color:var(--acc-fg);font-weight:600}
 .form h3{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
-.alanlar{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:8px}
+.alanlar{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px 12px;margin-top:8px}
 .alan{display:flex;flex-direction:column;gap:4px;min-width:0}.alan.genis{grid-column:1/-1}
 .alan label{font-size:.78rem;font-weight:600;color:var(--mut)}
 details{border-top:1px solid var(--line);padding:8px 0}details:first-of-type{border-top:0}
@@ -1017,6 +1017,45 @@ main.sarici>.genel-geri+*>h2:first-child{display:flex;align-items:center}
 .taraf-ham-metin{margin:2px 0 0;font-size:.84rem;color:var(--mut);white-space:pre-wrap;word-break:break-word}
 .taraf-ham-metin.kisa{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .gk-liste{gap:10px}
+/* ───── v3.25 · 11 Ekim 2026 — Bugün panosu, İlgilenenler, kompakt form ───── */
+.alanlar.kompakt{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px 10px}
+.alanlar.kompakt .alan label{font-size:.72rem;line-height:1.2;min-height:1.7em;display:flex;align-items:flex-end}
+.alanlar.kompakt input,.alanlar.kompakt select{padding:.42rem .55rem}
+.sayi-adim{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+.sayi-adim input{border:0;border-radius:0;text-align:center;padding:.42rem .2rem;min-width:0;flex:1 1 auto;font-weight:600}
+.adim-btn{flex:none;width:2.1rem;border:0;background:transparent;color:var(--acc);font-size:1.15rem;line-height:1;cursor:pointer}
+.adim-btn:disabled{color:var(--mut);opacity:.4;cursor:default}
+.adim-btn:hover:not(:disabled){background:var(--line)}
+.bugun{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.bugun-bas{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px}.bugun-bas h3{margin:0}
+.bugun-cipler{display:flex;flex-wrap:wrap;gap:6px}
+.bugun-cip{font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--line);color:var(--fg)}
+.bugun-cip.kotu{background:#fde2e2;color:#a31515}.bugun-cip.uyari{background:#fff1d6;color:#8a5200}.bugun-cip.iyi{background:#dcf5e3;color:#14702f}
+@media (prefers-color-scheme:dark){.bugun-cip.kotu{background:#4a1c1c;color:#ffb4b4}.bugun-cip.uyari{background:#4a3814;color:#ffd98a}.bugun-cip.iyi{background:#173d25;color:#9be6b4}}
+.bugun-ilerleme{height:5px;border-radius:99px;background:var(--line);overflow:hidden}.bugun-ilerleme i{display:block;height:100%;background:var(--acc)}
+.bugun-bos{margin:4px 0;font-weight:600}
+.bugun-alt{display:flex;gap:8px;flex-wrap:wrap}
+.gorev-liste{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.gorev{border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:8px;background:var(--panel)}
+.gorev.gec{border-left-color:#d93636}
+.gorev-ust{display:flex;align-items:flex-start;gap:8px}
+.gorev-ikon{flex:none;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:.85rem}
+.gorev-ad{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px;text-align:left;background:none;border:0;padding:0;color:inherit;cursor:pointer;font:inherit}
+.gorev-baslik{font-size:.88rem}.gorev-alt{color:var(--mut)}.gorev-vade.gec{color:#d93636;font-weight:700}
+.gorev-sag{display:flex;align-items:center;gap:6px;flex:none}
+.gorev-takvim{text-decoration:none;color:var(--mut);font-size:1.05rem}
+.gorev-dugmeler{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.gorev-dugmeler .btn{width:100%;justify-content:center}
+.gorev-panel{display:flex;flex-direction:column;gap:6px}
+.gorev-hafta{display:flex;align-items:center;gap:8px;border-bottom:1px dashed var(--line);padding:5px 0}
+.gorev-ekle{display:flex;flex-direction:column;gap:8px}
+.sonraki-soru{border-left:4px solid var(--acc);display:flex;flex-direction:column;gap:6px}
+.kisa-girdi{width:auto;max-width:11rem}
+.ilgi-liste{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ilgi-satir{border-bottom:1px dashed var(--line);padding-bottom:8px;display:flex;flex-direction:column;gap:6px}
+.ilgi-ust{display:flex;align-items:center;gap:8px}
+.ilgi-ekle{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.es-gorevler ul{margin:4px 0 0;padding-left:18px}
+@media (max-width:420px){.gorev-dugmeler .btn{padding:.4rem .2rem;font-size:.8rem}}
 </style>
 <div id="kok"></div>
 <noscript>Bu demo için JavaScript gereklidir.</noscript>

@@ -1,11 +1,12 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026 (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
+ * Anahtar CRM v3.25 · 11 Ekim 2026 (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
  * v3.21 — çift yönlü Google: elle eklenen kişi ve bağlı kişideki düzeltme "Google'a gönderilecek" olur; silinen kişi Google'dan silinmez.
  * Demo — Kişiler: kişi seçici (yazdıkça arama, çoklu seçim, rol, + ile anında ekleme), kişi listesi ve kişi kartı.
  * Alanlar Notion "Müşteri-Yatırımcılar-Kişiler" tablosuna göre (ROL, Phone, Açıklama, Referans, ilişkili talep/portföy).
  */
 import { TelGirdisi } from "./girdi";
 import { telUyarisi } from "../src/lib/iletisim";
+import { GosterilenPortfoyler } from "./ilgilenenler";
 import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useKalici } from "./kalici";
 import { MULK_AILELERI } from "../src/lib/domain/kategori";
@@ -371,6 +372,7 @@ export function KisiKarti({ id }: { id: string }) {
       <div className="bolum-bas"><h3>Görüşmeler ve notlar</h3></div>
       <div className="kart"><ul className="not-akisi">{ky.flatMap((x) => (x.notlar ?? []).map((n) => ({ n, x }))).sort((a, b) => b.n.tarih.localeCompare(a.n.tarih)).slice(0, 15).map(({ n, x }) => <li key={n.id}><span className={"not-tur t-" + n.tur.toLowerCase()}>{NOT_TURU[n.tur]}</span><div><div className="ipucu">{tarihYaz(n.tarih)} · <button className="baglanti" onClick={() => git({ ad: "detay", id: x.id })}>{baslikOf(x.veri)}</button></div><div style={{ whiteSpace: "pre-wrap" }}>{n.metin}</div></div></li>)}</ul></div>
     </section>}
+    <GosterilenPortfoyler kisiId={id} />
     {kisiEs.length > 0 && <section>
       <div className="bolum-bas"><h3>Eşleşmeleri</h3></div>
       {kisiEs.slice(0, 10).map((e) => <button key={eKey(e.t.id, e.p.id)} className="kart es-kart" onClick={() => git({ ad: "eslesme", tid: e.t.id, pid: e.p.id })}><Skor s={e.s.skor} u={e.s.uygunluk} /><div className="es-orta"><div className="es-satir"><span className="es-tip">Talep</span>{baslikOf(e.t.veri)}</div><div className="es-satir"><span className="es-tip">Portföy</span>{baslikOf(e.p.veri)}</div></div></button>)}

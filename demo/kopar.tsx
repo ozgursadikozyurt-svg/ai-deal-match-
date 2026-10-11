@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026
+ * Anahtar CRM v3.25 · 11 Ekim 2026
  * Demo — eşleşmeyi kopar / geri al, ve kartlardaki "kim" etiketi (emlakçı mı, doğrudan müşteri mi, web ilanı mı).
  */
 import React, { useState } from "react";
@@ -7,6 +7,7 @@ import { KOPMA_NEDENLERI, kopmaEtiket, type KopmaNedeni } from "../src/lib/esles
 import { kimOf } from "../src/lib/domain/kim";
 import { useDepo, cx, eKey, Pill, tarihYaz } from "./ortak";
 import type { PipelineDurum, Veri } from "./depo";
+import { eslesmeDurumunuUygula } from "./bugun-eylem";
 
 export function KimPill({ v, adli = true }: { v: Veri; adli?: boolean }) {
   const { d } = useDepo();
@@ -17,14 +18,14 @@ export function KimPill({ v, adli = true }: { v: Veri; adli?: boolean }) {
 export const koparildiMi = (n?: { durum: PipelineDurum } | null) => n?.durum === "REDDEDILDI";
 
 /** "Eşleşmeyi kopar" düğmesi + neden penceresi. Koparılmışsa "Geri al". */
-export function KoparDugmesi({ tid, pid, kucuk = false }: { tid: string; pid: string; kucuk?: boolean }) {
+export function KoparDugmesi({ tid, pid, kucuk = false, sonra }: { tid: string; pid: string; kucuk?: boolean; sonra?: () => void }) {
   const { d, guncelle, bildir } = useDepo();
   const [acik, setAcik] = useState(false);
   const [neden, setNeden] = useState<KopmaNedeni>("YANLIS");
   const [not, setNot] = useState("");
   const anahtar = eKey(tid, pid);
   const n = d.eslesmeNotlari[anahtar];
-  const yaz = (x: any) => guncelle((dd) => ({ ...dd, eslesmeNotlari: { ...dd.eslesmeNotlari, [anahtar]: { ...({ durum: "YENI", not: "" } as const), ...(dd.eslesmeNotlari[anahtar] ?? {}), ...x } } }));
+  const yaz = (x: any) => { const { durum, ...ek } = x; guncelle((dd) => eslesmeDurumunuUygula(dd, tid, pid, durum ?? dd.eslesmeNotlari[anahtar]?.durum ?? "YENI", ek)); };
   if (koparildiMi(n)) return <div className="satir sar" onClick={(e) => e.stopPropagation()}>
     {!kucuk && <span className="ipucu">Koparıldı{n?.tarih ? ` (${tarihYaz(n.tarih)})` : ""}: {kopmaEtiket(n?.neden)}</span>}
     <button type="button" className="btn kucuk" onClick={() => { yaz({ durum: "YENI", neden: undefined, tarih: undefined }); bildir("Eşleşme geri alındı"); }}>Geri al</button>
@@ -37,7 +38,7 @@ export function KoparDugmesi({ tid, pid, kucuk = false }: { tid: string; pid: st
         <p className="ipucu">Bu talep ile portföy bir daha ana ekranda, eşleşme listesinde ve çekmecede çıkmaz. Eşleşmeler → Koparılanlar'dan geri alabilirsiniz.</p>
         <div className="yigin kucuk-bosluk" role="radiogroup">{KOPMA_NEDENLERI.map(([k, l]) => <label key={k} className="onay-satir"><input type="radio" name="neden" checked={neden === k} onChange={() => setNeden(k)} /> {l}</label>)}</div>
         <textarea rows={2} placeholder="Not (isteğe bağlı): ör. müşteri cepheyi beğenmedi" value={not} onChange={(e) => setNot(e.target.value)} />
-        <div className="satir"><button type="button" className="btn birincil" onClick={() => { yaz({ durum: "REDDEDILDI", neden, tarih: new Date().toISOString(), ...(not.trim() ? { not: [n?.not, not.trim()].filter(Boolean).join("\n") } : {}) }); setAcik(false); bildir("Eşleşme koparıldı — artık gösterilmeyecek"); }}>Kopar</button><button type="button" className="btn" onClick={() => setAcik(false)}>Vazgeç</button></div>
+        <div className="satir"><button type="button" className="btn birincil" onClick={() => { yaz({ durum: "REDDEDILDI", neden, tarih: new Date().toISOString(), ...(not.trim() ? { not: [n?.not, not.trim()].filter(Boolean).join("\n") } : {}) }); setAcik(false); bildir("Eşleşme koparıldı — artık gösterilmeyecek"); sonra?.(); }}>Kopar</button><button type="button" className="btn" onClick={() => setAcik(false)}>Vazgeç</button></div>
       </div>
     </div>}
   </>;
@@ -52,16 +53,12 @@ export function TopluKoparPenceresi({ ciftler, geriAl = false, onKapat, onBitti 
   const [not, setNot] = useState("");
   const uygula = () => {
     const simdi = new Date().toISOString();
-    guncelle((dd) => {
-      const notlar = { ...dd.eslesmeNotlari };
-      for (const { tid, pid } of ciftler) {
-        const a = eKey(tid, pid), onceki = notlar[a];
-        notlar[a] = geriAl
-          ? { ...({ durum: "YENI", not: "" } as const), ...(onceki ?? {}), durum: "YENI", neden: undefined, tarih: undefined }
-          : { ...({ durum: "YENI", not: "" } as const), ...(onceki ?? {}), durum: "REDDEDILDI", neden, tarih: simdi, ...(not.trim() ? { not: [onceki?.not, not.trim()].filter(Boolean).join("\n") } : {}) };
-      }
-      return { ...dd, eslesmeNotlari: notlar };
-    });
+    guncelle((dd) => ciftler.reduce((acc, { tid, pid }) => {
+      const onceki = acc.eslesmeNotlari[eKey(tid, pid)];
+      return geriAl
+        ? eslesmeDurumunuUygula(acc, tid, pid, "YENI", { neden: undefined, tarih: undefined })
+        : eslesmeDurumunuUygula(acc, tid, pid, "REDDEDILDI", { neden, tarih: simdi, ...(not.trim() ? { not: [onceki?.not, not.trim()].filter(Boolean).join("\n") } : {}) });
+    }, dd));
     bildir(geriAl ? `${ciftler.length} eşleşme geri alındı` : `${ciftler.length} eşleşme koparıldı`);
     onBitti();
   };

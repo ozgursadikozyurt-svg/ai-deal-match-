@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026
+ * Anahtar CRM v3.25 · 11 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.24";
-export const TARIH = "10 Ekim 2026";
+export const SURUM = "3.25";
+export const TARIH = "11 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.24_10Ekim2026";
+export const DOSYA_EKI = "v3.25_11Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,27 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.25",
+    tarih: "11 Ekim 2026",
+    baslik: "Bugün panosu (Ana Sayfa'da Benim ve ofisim kartında), İlgilenenler / gösterilenler alanı ve daha derli toplu formlar",
+    degisenler: [
+      "Ana Sayfa: \"48 aktif talep, 298 portföy ve 127 sunulabilir eşleşme seni bekliyor\" cümlesi kalktı. Yerine ★ Benim ve ofisim kartının içinde Bugün panosu var: geciken (kırmızı) · bugün · bu hafta, ilerleme çubuğu, ilk 5 görev açık, gerisi \"Kalan N görevi göster\"; günlük liste en çok 15 görev, fazlası sıraya girer.",
+      "Her görevde üç düğme: Ulaşılamadı (yarına atar) · Görüşüldü (not + Yarın / 3 gün / 1 hafta / 1 ay / tarih; talep süresi görevinde +30/60/90 gün uzatma) · İlgilenmiyor (neden sorar; eşleşme görevinde eşleşmeyi koparır, talep süresinde talebi pasife alır). Ara / WhatsApp ve Google Takvim'e ekle düğmesi satırda.",
+      "Görevleri sistem üretir: Bildirildi → 2 gün sonra yanıt al; Gösterim → ertesi gün izlenimi sor + 2 gün sonra geri dönüş al; Pazarlık → teklif takibi; Kapandı → kapora ve evrak; talep süresi 7 gün kala \"hâlâ arıyor mu?\"; portföyde 30 gün temas yoksa \"mal sahibini ara, fiyatı teyit et\"; yetki belgesi 10 gün içinde bitiyorsa uyarı; yeni sıcak eşleşme; fiyat düşünce daha önce ilgilenenler için \"tekrar ara\". Yalnızca ★ Benim / ◆ Ofisim kayıtları için.",
+      "Eşleşme detayında Görüşüldü ya da Koparıldı seçilince \"Bir sonraki iletişim ne zaman?\" sorulur; seçilen gün panoya görev olarak düşer. + Görev ile elle görev eklenir.",
+      "İlgilenenler (N): talep / portföy detayında varsayılan kapalı bölüm. Rehberden kişi + durum (İlgilendi · Sunuldu · Gösterildi · Teklif verdi · Anlaştı · Vazgeçti) + not. Kişi kartında \"Gösterilen portföyler\". Durum değişince pano görevi üretir. Eşleşme Takip düğmeleri de bu listeyi besler.",
+      "Formlar: Teknik özelliklerde banyo, kat, bina yaşı gibi küçük sayılar dar kutu + − / + düğmesi oldu; alan ızgarası telefonda 2 sütun; etiketler ve kutular daha ince.",
+      "Veritabanı değişikliği yok (Kurulumu tamamla gerekmez): görevler ve ilgilenenler ofis ayarları içinde saklanır. JSON yedeğe eklendi.",
+    ],
+    testEt: [
+      "Ana Sayfa: üstteki \"seni bekliyor\" cümlesi olmamalı; ★ Benim ve ofisim kartında Bugün panosu görünmeli (demo: 1 geciken + bugünkü görevler).",
+      "Bir görevde Ulaşılamadı'ya basın → yarına gider; Görüşüldü → not yazıp 1 hafta seçin → görev tamam, yeni görev 1 hafta sonrasına; \"İlgilenmiyor\" → neden seçin → görev kapanır.",
+      "Eşleşmeler › bir eşleşme › Takip: Görüşüldü → \"Bir sonraki iletişim ne zaman?\" çıkar; 3 gün seçin → panoda \"Bu hafta\" altında görünür. Gösterim'e basın → \"Geri dönüş al\" 2 gün sonraya düşer.",
+      "Bir portföy detayı › İlgilenenler (0) kapalı gelir; açıp kişi ekleyin, başlıkta sayı artar; Kişiler › o kişi › Gösterilen portföyler.",
+      "Talep ya da portföy formu › Teknik özellikler: Banyo sayısı / Bulunduğu kat kutuları dar, − ve + ile artıp azalıyor; telefonda iki sütun.",
+    ],
+  },
   {
     surum: "3.24",
     tarih: "10 Ekim 2026",

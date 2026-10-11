@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026
+ * Anahtar CRM v3.25 · 11 Ekim 2026
  * Canlı — arayüz durumu (DepoDurumu) ile sunucu durumu (/api/durum) arasındaki eşleme ve fark hesabı. Saf işlevler (ağ yok): testlenebilir.
  *  sunucudanDurum: GET /api/durum cevabı → arayüzün beklediği durum
  *  imzaAl / planla: son kaydedilenle şimdiki durumu karşılaştırır, yalnızca değişenleri POST /api/durum parçalarına böler
@@ -10,12 +10,13 @@ import { ORNEK_VERI_SURUMU } from "./ornek-veri";
 import { aiAyarNormalize, paylasimNormalize, calismaIliNormalize } from "../src/lib/domain/ayarlar";
 import { ttlNormalize } from "../src/lib/domain/gecerlilik";
 import { rolNormalize } from "../src/lib/domain/roller";
+import { gorevlerNormalize, ilgilenenlerNormalize } from "../src/lib/domain/gorev";
 
 export interface SunucuDurumu {
   kayitlar: { id: string; olusturma: string; veri: Record<string, unknown>; notionId?: string | null; notlar?: Kayit["notlar"]; fotolar?: { id: string; ad: string; en: number; boy: number; boyut: number }[] }[];
   kisiler: Record<string, any>[];
   eslesmeNotlari: DepoDurumu["eslesmeNotlari"];
-  ayarlar: { ttl?: unknown; ai?: unknown; paylasim?: unknown; calismaIli?: unknown; roller?: unknown; sahiplik?: unknown };
+  ayarlar: { ttl?: unknown; ai?: unknown; paylasim?: unknown; calismaIli?: unknown; roller?: unknown; sahiplik?: unknown; /** v3.25 */ gorevler?: unknown; ilgilenenler?: unknown };
   arayuz: Record<string, any>;
 }
 
@@ -32,6 +33,7 @@ export function sunucudanDurum(s: SunucuDurumu): DepoDurumu {
     ayarlar: { ttl: ttlNormalize(s.ayarlar?.ttl), ai: aiAyarNormalize(s.ayarlar?.ai), paylasim: paylasimNormalize(s.ayarlar?.paylasim), calismaIli: calismaIliNormalize(s.ayarlar?.calismaIli), sahiplik: sahiplikNormalize(s.ayarlar?.sahiplik) },
     ogrenilen: a.ogrenilen ?? [], adaylar: a.adaylar ?? [], aktifIceAktarma: null, iceAktarmaGecmisi: a.iceAktarmaGecmisi ?? [],
     roller: rolNormalize(s.ayarlar?.roller),
+    gorevler: gorevlerNormalize(s.ayarlar?.gorevler), ilgilenenler: ilgilenenlerNormalize(s.ayarlar?.ilgilenenler),
     kisiler: s.kisiler.map((k) => nullAt(k)) as unknown as Kisi[],
     islenmisMesajlar: a.islenmisMesajlar ?? [], dosyaIzleri: a.dosyaIzleri ?? {}, favoriler: a.favoriler ?? [],
     baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleBekleyen: [], googleCanli: null,
@@ -50,7 +52,8 @@ const KISI_IMZA = new WeakMap<object, string>(), KAYIT_IMZA = new WeakMap<object
 export const kisiImzasi = (k: Kisi): string => { let s = KISI_IMZA.get(k); if (s === undefined) { s = JSON.stringify(kisiYuku(k)); KISI_IMZA.set(k, s); } return s; };
 const kayitImzasi = (k: Kayit): string => { let s = KAYIT_IMZA.get(k); if (s === undefined) { s = JSON.stringify(kayitYuku(k)); KAYIT_IMZA.set(k, s); } return s; };
 const arayuzYuku = (d: DepoDurumu) => ({ testler: d.testler, geriBildirim: d.geriBildirim, ogrenilen: d.ogrenilen, adaylar: d.adaylar, iceAktarmaGecmisi: d.iceAktarmaGecmisi, islenmisMesajlar: d.islenmisMesajlar, dosyaIzleri: d.dosyaIzleri, favoriler: d.favoriler ?? [] });
-const ayarYuku = (d: DepoDurumu) => ({ ttl: d.ayarlar.ttl, ai: aiAyari(d), paylasim: paylasimAyari(d), calismaIli: calismaIli(d), roller: d.roller ?? [], sahiplik: sahiplikAyari(d) });
+// v3.25 — gorevler / ilgilenenler ayrı ayar anahtarlarıdır: yalnızca değişen anahtar sunucuya gider (görev işaretlemek tüm "arayuz" JSON'unu yeniden yazmaz)
+const ayarYuku = (d: DepoDurumu) => ({ ttl: d.ayarlar.ttl, ai: aiAyari(d), paylasim: paylasimAyari(d), calismaIli: calismaIli(d), roller: d.roller ?? [], sahiplik: sahiplikAyari(d), gorevler: d.gorevler ?? [], ilgilenenler: d.ilgilenenler ?? [] });
 
 export function imzaAl(d: DepoDurumu): Imza {
   const ay = ayarYuku(d);

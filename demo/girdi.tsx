@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026
+ * Anahtar CRM v3.25 · 11 Ekim 2026
  * Demo — ortak giriş alanları: binlik ayraçlı sayı (1.500.000) ve standart telefon (+90 5XX XXX XX XX).
  */
 import React, { useEffect, useState } from "react";
@@ -26,6 +26,17 @@ export function SayiGir({ id, deger, onChange, ph, binlik = false, etiket }: { i
     const n = sayiYap(yazi);
     onChange(Number.isNaN(n as number) ? (yazi as any) : n);
   }} />;
+}
+
+/** v3.25 — küçük tam sayılar (banyo, kat, bina yaşı…) için: dar kutu + − / + düğmeleri. Elle yazmak yine mümkün. */
+export function SayiAdim({ id, deger, onChange, etiket, enAz = 0, enCok = 999 }: { id?: string; deger: any; onChange: (n: number | null) => void; etiket?: string; enAz?: number; enCok?: number }) {
+  const n = typeof deger === "number" ? deger : null;
+  const git = (fark: number) => onChange(Math.min(enCok, Math.max(enAz, (n ?? (fark > 0 ? enAz - 1 : enAz + 1)) + fark)));
+  return <div className="sayi-adim">
+    <button type="button" className="adim-btn" aria-label={`${etiket ?? "Değer"} azalt`} disabled={n == null || n <= enAz} onClick={() => git(-1)}>−</button>
+    <SayiGir id={id} deger={deger} onChange={onChange} etiket={etiket} ph="—" />
+    <button type="button" className="adim-btn" aria-label={`${etiket ?? "Değer"} artır`} disabled={n != null && n >= enCok} onClick={() => git(1)}>+</button>
+  </div>;
 }
 
 /** Telefon girişi: 0532…, 532…, +90… nasıl yazılırsa yazılsın "+90 532 111 22 33" olarak biçimlenir; eksikse altında uyarı. */

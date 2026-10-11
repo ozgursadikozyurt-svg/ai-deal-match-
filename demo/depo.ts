@@ -1,9 +1,11 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.25 · 11 Ekim 2026 (v3.13'ten)
  * Demo veri deposu: örnek veriyi gerçek doğrulama + konum çözücüden geçirerek yükler,
  * kullanıcının değişikliklerini tarayıcıda (localStorage) saklar.
  */
 import type { FotoMeta } from "../src/lib/domain/foto";
+import type { Gorev, Ilgilenen } from "../src/lib/domain/gorev";
+import { gorevEkle, gunEkle, gunYaz, ilgilenenUygula } from "../src/lib/domain/gorev";
 import { aiAyarNormalize, paylasimNormalize, calismaIliNormalize, type AiAyar, type PaylasimAyar } from "../src/lib/domain/ayarlar";
 import { sahiplikNormalize, type SahiplikAyar } from "../src/lib/domain/sahiplik";
 import { haricBirlestir } from "../src/lib/lokasyon/haric";
@@ -102,6 +104,10 @@ export interface DepoDurumu {
   googleGiden?: { ad: string; telefon: string | null; islem: "EKLENDI" | "GUNCELLENDI"; alanlar?: string[]; tarih: string }[];
   /** v3.21 canlı — sunucudan okunan Google bağlantı özeti (arayüz durumunda saklanmaz) */
   googleCanli?: GoogleCanliDurum | null;
+  /** v3.25 — "Bugün" panosu görevleri (olay görevleri + kullanıcının sanal görevlere bıraktığı izler). Canlıda ofis ayarı "gorevler". */
+  gorevler?: Gorev[];
+  /** v3.25 — talep / portföyle ilgilenen, gösterilen kişiler (rehbere bağlı). Canlıda ofis ayarı "ilgilenenler". */
+  ilgilenenler?: Ilgilenen[];
 }
 /** v3.21 — GET /api/entegrasyon yanıtındaki Google satırı */
 export interface GoogleCanliDurum {
@@ -147,6 +153,8 @@ export const CANLI: {
 } = { acik: CANLI_ORTAM, yuklu: null, kaydet: null, hemen: null, sample: null, api: null, oturum: null, kisileriBirlestir: null, googleDonus: null };
 
 export const BUGUN = CANLI_ORTAM ? new Date() : new Date(2026, 8, 30, 12, 0, 0); // demo "bugün" sabit (süre hesapları değişmesin); canlıda gerçek tarih
+/** v3.25 — görev vadeleri için "şimdi": demoda sabit BUGUN (örnek veriyle uyumlu), canlıda gerçek saat (sayfa gece yarısını aşsa da doğru gün) */
+export const simdi = (): Date => (CANLI_ORTAM ? new Date() : BUGUN);
 const GUN = 86_400_000;
 export const TTL_VARSAYILAN: TtlAyar = TTLV;
 /** Satılık / kiralık ayrı (v3.4) — kurallar src/lib/domain/gecerlilik.ts */
@@ -222,9 +230,24 @@ export const paylasimAyari = (d: DepoDurumu): PaylasimAyar => paylasimNormalize(
 export const calismaIli = (d: DepoDurumu): number => calismaIliNormalize(d.ayarlar.calismaIli);
 export const sahiplikAyari = (d: DepoDurumu): SahiplikAyar => sahiplikNormalize(d.ayarlar.sahiplik);
 
+/** v3.25 — demoda Bugün panosu boş görünmesin: bir geciken, bir bugünkü görev + bir ilgilenen kaydı */
+function ornekGorevler(kayitlar: Kayit[], kisiler: Kisi[]): Gorev[] {
+  const k = kayitlar[0], kisi = kisiler[0];
+  if (!k || !kisi) return [];
+  const bugun = gunYaz(BUGUN);
+  let l: Gorev[] = [];
+  l = gorevEkle(l, { kural: "GERI_DONUS", tur: "ARA", baslik: "Geri dönüş al", vade: gunEkle(bugun, -2), kisiId: kisi.id, kayitId: k.id }, BUGUN);
+  l = gorevEkle(l, { kural: "ELLE", tur: "SUNUM", baslik: "Lara teklifini WhatsApp'tan ilet", vade: bugun, kisiId: (kisiler[1] ?? kisi).id, kayitId: (kayitlar[1] ?? k).id }, BUGUN);
+  return l;
+}
+function ornekIlgilenenler(kayitlar: Kayit[], kisiler: Kisi[]): Ilgilenen[] {
+  const k = kayitlar[0], kisi = kisiler[1] ?? kisiler[0];
+  return k && kisi ? ilgilenenUygula([], { kayitId: k.id, kisiId: kisi.id, durum: "GOSTERILDI", not: "Ofiste gösterildi" }, BUGUN) : [];
+}
+
 function bosDurum(): { durum: DepoDurumu; hatalar: OrnekHata[] } {
   const { kayitlar, hatalar, adaylar, kisiler } = ornekVeriyiKur();
-  return { durum: { veriSurumu: ORNEK_VERI_SURUMU, kayitlar, eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN, sahiplik: sahiplikNormalize(DEMO_SAHIPLIK) }, ogrenilen: [], adaylar, aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleHaric: [], googleGiden: [] }, hatalar };
+  return { durum: { veriSurumu: ORNEK_VERI_SURUMU, kayitlar, eslesmeNotlari: {}, testler: {}, geriBildirim: "", ayarlar: { ttl: TTL_VARSAYILAN, sahiplik: sahiplikNormalize(DEMO_SAHIPLIK) }, gorevler: ornekGorevler(kayitlar, kisiler), ilgilenenler: ornekIlgilenenler(kayitlar, kisiler), ogrenilen: [], adaylar, aktifIceAktarma: null, iceAktarmaGecmisi: [], kisiler, islenmisMesajlar: [], dosyaIzleri: {}, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleHaric: [], googleGiden: [] }, hatalar };
 }
 
 export function depoYukle(): { durum: DepoDurumu; hatalar: OrnekHata[]; yenilendi: boolean } {

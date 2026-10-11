@@ -1,8 +1,9 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026
+ * Anahtar CRM v3.25 · 11 Ekim 2026
  * Demo — kayıt detayının altındaki açılır çekmece: talebin içinden çıkmadan uygun portföyleri
  * (portföyün içindeyken uygun talepleri) filtreleyip incelemek ve eşleşmeye almak için.
  */
+import { eslesmeDurumunuUygula } from "./bugun-eylem";
 import React, { useMemo, useState } from "react";
 import { eslesmeOnizle, temelUyum } from "../src/lib/eslestirme/onizleme";
 import { aileOf, benzerAileler } from "../src/lib/domain/kategori";
@@ -54,7 +55,7 @@ export function EslesmeCekmecesi({ k }: { k: Kayit }) {
   const uygunSayi = karsi.filter((x) => x.veri.durum === "ACTIVE").filter((x) => { const t = talep ? k : x, p = talep ? x : k; return temelUyum(t.veri as any, p.veri as any) && eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM).uygunluk !== "UYGUN_DEGIL"; }).length;
   const takipte = (tid: string, pid: string) => { const n = d.eslesmeNotlari[eKey(tid, pid)]; return !!n && n.durum !== "YENI" && n.durum !== "REDDEDILDI"; };
   const takipDegis = (tid: string, pid: string, v: boolean) => {
-    guncelle((dd) => ({ ...dd, eslesmeNotlari: { ...dd.eslesmeNotlari, [eKey(tid, pid)]: { durum: (v ? "BILDIRILDI" : "YENI") as PipelineDurum, not: dd.eslesmeNotlari[eKey(tid, pid)]?.not ?? "" } } }));
+    guncelle((dd) => eslesmeDurumunuUygula(dd, tid, pid, v ? "BILDIRILDI" : "YENI"));
     bildir(v ? "Eşleşmeye alındı (Bildirildi)" : "Eşleşmeden çıkarıldı");
   };
   return <>

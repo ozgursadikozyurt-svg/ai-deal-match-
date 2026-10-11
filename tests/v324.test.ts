@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026
+ * Anahtar CRM v3.25 · 11 Ekim 2026
  * v3.24 — Kaynak seçimi (Emlak grubu · Sahibinden · Portal · Kendi portföyüm) ↔ havuz / ilan sahibi / kanal;
  * Yapıştır incelemesinde süzgeçler + hazırlar önce + eklenenler listede kalır; Gelen Kutusu Veri Girişi sekmesi;
  * eşleşme detayında kişi iletişimi + orijinal metin; üst satır (Geri başlıkla aynı satırda); fotoğraf doğrudan yükleme.
@@ -158,11 +158,4 @@ test("Gmail köprüsü: posta kimliğiyle izler (aynı konulu yeni posta da işl
   const b = gmailKopruBetigi("https://x.workers.dev/api/gelen/al", "abcdefghijkmnpqrstuv");
   assert.match(b, /PropertiesService/); assert.match(b, /moveToArchive\(\)/); assert.match(b, /DriveApp\.getFoldersByName/);
   assert.ok(!/-label:" \+ ETIKET/.test(b), "konuşma etiketiyle dışlama yok");
-});
-
-test("sürüm 3.24: günlük kaydı ve belgeler", () => {
-  assert.equal(SURUM, "3.24"); assert.equal(SURUM_GECMISI[0].surum, "3.24"); assert.equal(SURUM_GECMISI[1].surum, "3.23");
-  assert.match(SURUM_GECMISI[0].baslik, /Gelen Kutusu Veri Girişi/); assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 4);
-  for (const f of [`docs/ANAHTAR_CRM_EK_${DOSYA_EKI}.md`, `docs/ANAHTAR_CRM_DEVIR_${DOSYA_EKI}.md`, `docs/GELEN_KUTUSU_KURULUMU_${DOSYA_EKI}.md`]) assert.ok(fs.existsSync(f), f);
-  assert.equal(fs.readdirSync("prisma/migrations").filter((x) => x.startsWith("202610102")).length, 0, "veritabanı değişikliği yok");
 });

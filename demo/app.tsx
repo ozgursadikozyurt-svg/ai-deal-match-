@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026
+ * Anahtar CRM v3.25 · 11 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -20,6 +20,9 @@ import { KayitFormu } from "./form";
 import { VeriGirisi } from "./ice-aktarma";
 import { Konumlar } from "./konumlar";
 import { GorusmeNotlari } from "./notlar";
+import { BugunPanosu, SonrakiIletisimSorusu, EslesmeGorevleri } from "./bugun";
+import { eslesmeDurumunuUygula, fiyatDususuIsle } from "./bugun-eylem";
+import { IlgilenenlerBolumu } from "./ilgilenenler";
 import { DisaAktar } from "./disa-aktar";
 import { FirsatRozeti } from "./kartlar";
 import { KimPill, KoparDugmesi, TopluKoparPenceresi } from "./kopar";
@@ -71,7 +74,17 @@ function AnaSayfa({ donus }: { donus?: boolean } = {}) {
   const kisayol = (tip: "TALEP" | "PORTFOY", s: "BENIM" | "OFISIM") => git({ ad: "liste", tip, filtre: bosFiltre({ durumlar: ["ACTIVE"], sahiplik: s }) });
   const benimToplam = benimSay("TALEP", "BENIM") + benimSay("PORTFOY", "BENIM"), ofisToplam = benimSay("TALEP", "OFIS") + benimSay("PORTFOY", "OFIS");
   return <div className="yigin">
-    <div className="karsilama"><h1>{(() => { const h = new Date().getHours(); return h < 11 ? "Günaydın" : h < 18 ? "İyi günler" : "İyi akşamlar"; })()} Özgür</h1><p>{aktif.filter((k) => k.veri.tip === "TALEP").length} aktif talep, {aktif.filter((k) => k.veri.tip === "PORTFOY").length} portföy ve {sunulabilir.length} sunulabilir eşleşme seni bekliyor.</p></div>
+    <div className="karsilama"><h1>{(() => { const h = new Date().getHours(); return h < 11 ? "Günaydın" : h < 18 ? "İyi günler" : "İyi akşamlar"; })()} Özgür</h1></div>
+    <section className="kart benim-kisayol" aria-label="Benim ve ofisim">
+      <div className="satir-ara"><h3>★ Benim ve ofisim</h3><button className="btn kucuk" onClick={() => git({ ad: "ayarlar" })}>{benimToplam + ofisToplam ? "Ayarla" : "Tanıt"}</button></div>
+      {benimToplam + ofisToplam > 0 ? <div className="bk-izgara">
+        <button type="button" className="bk-oge benim" onClick={() => kisayol("TALEP", "BENIM")}><b>{benimSay("TALEP", "BENIM")}</b><span>Talebim</span></button>
+        <button type="button" className="bk-oge benim" onClick={() => kisayol("PORTFOY", "BENIM")}><b>{benimSay("PORTFOY", "BENIM")}</b><span>Portföyüm</span></button>
+        <button type="button" className="bk-oge ofis" onClick={() => kisayol("TALEP", "OFISIM")}><b>{benimSay("TALEP", "BENIM") + benimSay("TALEP", "OFIS")}</b><span>Ofisin talepleri</span></button>
+        <button type="button" className="bk-oge ofis" onClick={() => kisayol("PORTFOY", "OFISIM")}><b>{benimSay("PORTFOY", "BENIM") + benimSay("PORTFOY", "OFIS")}</b><span>Ofisin portföyleri</span></button>
+      </div> : <p className="ipucu">Telefonunuzu ve ofis arkadaşlarınızı Ayarlar › “Benim ve ofisim”de tanıtın; kendi ilanlarınız WhatsApp gruplarından gelse de ★ Benim olarak ayrılır.</p>}
+      <BugunPanosu es={es} sahip={sahip} />
+    </section>
     <AkilliKutu donus={donus} />
     {/* v3.21 — Notion gizli (src/lib/ozellikler.ts): davet yalnızca Google içindir. Canlıda: Google bu kurulumda açıksa ve kullanıcı bağlayabiliyorsa. */}
     {(() => {
@@ -88,16 +101,6 @@ function AnaSayfa({ donus }: { donus?: boolean } = {}) {
       {([[aktif.filter((k) => k.veri.tip === "TALEP").length, "Aktif talep", () => git({ ad: "liste", tip: "TALEP" })], [aktif.filter((k) => k.veri.tip === "PORTFOY").length, "Aktif portföy", () => git({ ad: "liste", tip: "PORTFOY" })], [sunulabilir.length, "Sunulabilir eşleşme", () => git({ ad: "eslesmeler" })], [yaklasan.length, "14 gün içinde süresi dolacak", () => git({ ad: "liste", tip: "PORTFOY" })]] as const).map(([n, l, f]) =>
         <button key={l} className="istat-kutu" onClick={f}><b>{n}</b><span>{l}</span></button>)}
     </div>
-
-    <section className="kart benim-kisayol" aria-label="Benim ve ofisim">
-      <div className="satir-ara"><h3>★ Benim ve ofisim</h3><button className="btn kucuk" onClick={() => git({ ad: "ayarlar" })}>{benimToplam + ofisToplam ? "Ayarla" : "Tanıt"}</button></div>
-      {benimToplam + ofisToplam > 0 ? <div className="bk-izgara">
-        <button type="button" className="bk-oge benim" onClick={() => kisayol("TALEP", "BENIM")}><b>{benimSay("TALEP", "BENIM")}</b><span>Talebim</span></button>
-        <button type="button" className="bk-oge benim" onClick={() => kisayol("PORTFOY", "BENIM")}><b>{benimSay("PORTFOY", "BENIM")}</b><span>Portföyüm</span></button>
-        <button type="button" className="bk-oge ofis" onClick={() => kisayol("TALEP", "OFISIM")}><b>{benimSay("TALEP", "BENIM") + benimSay("TALEP", "OFIS")}</b><span>Ofisin talepleri</span></button>
-        <button type="button" className="bk-oge ofis" onClick={() => kisayol("PORTFOY", "OFISIM")}><b>{benimSay("PORTFOY", "BENIM") + benimSay("PORTFOY", "OFIS")}</b><span>Ofisin portföyleri</span></button>
-      </div> : <p className="ipucu">Telefonunuzu ve ofis arkadaşlarınızı Ayarlar › “Benim ve ofisim”de tanıtın; kendi ilanlarınız WhatsApp gruplarından gelse de ★ Benim olarak ayrılır.</p>}
-    </section>
 
     <section>
       <div className="bolum-bas"><h3>En güçlü eşleşmeler</h3><button className="btn kucuk" onClick={() => git({ ad: "eslesmeler" })}>Tümü</button></div>
@@ -284,6 +287,7 @@ function Detay({ id }: { id: string }) {
         : <p className="ipucu">Kişi bağlı değil.{v.gondeAdi || v.gondeTelefon ? ` Mesajı gönderen: ${v.gondeAdi ?? ""} ${telYaz(v.gondeTelefon)}` : ""}</p>}
     </section>
 
+    <IlgilenenlerBolumu k={k} />
     <GorusmeNotlari k={k} />
 
     {/* v3.16 — portal arama bağlantıları ekranda yer kaplamasın: katlanır, kapalı başlar */}
@@ -473,14 +477,17 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
   const n = d.eslesmeNotlari[anahtar] ?? { durum: "YENI" as PipelineDurum, not: "" };
   const [not, setNot] = useState(n.not);
   if (!e) return <div className="yigin"><p className="bos">Bu eşleşme artık yok (kayıtlardan biri pasif ya da değişti).</p></div>;
+  const [sor, setSor] = useState(false);
   const yaz = (x: Partial<typeof n>) => guncelle((dd) => ({ ...dd, eslesmeNotlari: { ...dd.eslesmeNotlari, [anahtar]: { ...n, ...x } } }));
+  const durumDegis = (k: PipelineDurum, l: string) => { if (n.durum === k) return; guncelle((dd) => eslesmeDurumunuUygula(dd, tid, pid, k)); bildir("Durum: " + l); setSor(k === "GORUSULDU" || k === "REDDEDILDI"); };
   const sorulacak = [...new Set([...e.s.kriterler.filter((k) => k.sonuc === "BILINMIYOR").map((k) => k.etiket + " (portföy sahibine)"), ...e.s.dna.eksik.map((x) => x.etiket + " (müşteriye)")])];
   const u = UYGUNLUK[e.s.uygunluk];
   return <div className="yigin">
     <section className="kart es-bas"><Skor s={e.s.skor} u={e.s.uygunluk} /><div><Pill ton={u.ton}>{u.e}</Pill> <FirsatRozeti f={e.f} komisyon /> <AnahtarDugmesi anahtar={favEslesme(tid, pid)} kucuk={false} etiket /><div className="ipucu">{e.s.lokasyonAciklama}</div>
       {e.s.tipUyumu.oran < 1 && <div className="ipucu">Mülk tipi: {e.s.tipUyumu.aciklama}</div>}
       {e.s.kritikEngeller.length > 0 && <div className="hata-satir">Olmazsa olmaz karşılanmıyor: {e.s.kritikEngeller.join(", ")}</div>}</div></section>
-    <section className={cx("kart kopar-kart", n.durum === "REDDEDILDI" && "kopuk")}><div className="satir-ara"><div><b>{n.durum === "REDDEDILDI" ? "Bu eşleşme koparıldı" : "Uygun değil mi, sunuldu ve beğenilmedi mi?"}</b><div className="ipucu">{n.durum === "REDDEDILDI" ? "Ana ekranda ve listelerde gösterilmiyor." : "Koparırsanız bir daha önerilmez."}</div></div><KoparDugmesi tid={tid} pid={pid} /></div></section>
+    <section className={cx("kart kopar-kart", n.durum === "REDDEDILDI" && "kopuk")}><div className="satir-ara"><div><b>{n.durum === "REDDEDILDI" ? "Bu eşleşme koparıldı" : "Uygun değil mi, sunuldu ve beğenilmedi mi?"}</b><div className="ipucu">{n.durum === "REDDEDILDI" ? "Ana ekranda ve listelerde gösterilmiyor." : "Koparırsanız bir daha önerilmez."}</div></div><KoparDugmesi tid={tid} pid={pid} sonra={() => setSor(true)} /></div></section>
+    {sor && <SonrakiIletisimSorusu tid={tid} pid={pid} kapat={() => setSor(false)} />}
     <div className="iki-kolon"><Taraf k={e.t} rol="Talep" ham karsi={e.p} /><Taraf k={e.p} rol="Portföy" karsi={e.t} /></div>
     <section className="kart">
       <h3>Kriter dökümü</h3>
@@ -492,7 +499,9 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
     {sorulacak.length > 0 && <section className="kart"><h3>Sunmadan önce sorulacaklar</h3><div className="cip-satir">{sorulacak.map((s) => <span key={s} className="cip">{s}</span>)}</div></section>}
     <section className="kart">
       <h3>Takip</h3>
-      <div className="uc sar">{PIPELINE.map(([k, l]) => <button key={k} className={cx(n.durum === k && "on")} onClick={() => { yaz({ durum: k }); bildir("Durum: " + l); }}>{l}</button>)}</div>
+      <div className="uc sar">{PIPELINE.map(([k, l]) => <button key={k} className={cx(n.durum === k && "on")} onClick={() => durumDegis(k, l)}>{l}</button>)}</div>
+      {sor && <SonrakiIletisimSorusu tid={tid} pid={pid} kapat={() => setSor(false)} />}
+      <EslesmeGorevleri tid={tid} pid={pid} />
       <label className="alan-etiket" htmlFor="es-not">Operasyon notu</label>
       <textarea id="es-not" rows={3} value={not} onChange={(ev) => setNot(ev.target.value)} placeholder="Görüşme sonrası notunuz…" />
       <div className="satir"><button className="btn" onClick={() => { yaz({ not }); bildir("Not kaydedildi"); }}>Notu kaydet</button></div>
@@ -620,7 +629,7 @@ export function Uygulama() {
   useEffect(() => googleOtomatik((f) => setD((x) => f(x))), []); // v3.22.2 canlı: açılışta yalnızca Google bağlantı DURUMU okunur; eşitleme günde bir sunucuda ya da elle (eskiden açılışta + 5 dk'da bir)
   const ctx: Ctx = {
     d, guncelle: (f) => setD((x) => f(x)), bildir: setMesaj, ornekHatalari: yuk.hatalar, sample,
-    kayitKaydet: (k) => setD((x) => ({ ...x, kayitlar: x.kayitlar.some((y) => y.id === k.id) ? x.kayitlar.map((y) => (y.id === k.id ? k : y)) : [k, ...x.kayitlar] })),
+    kayitKaydet: (k) => setD((x) => { const eski = x.kayitlar.find((y) => y.id === k.id); const y = { ...x, kayitlar: eski ? x.kayitlar.map((z) => (z.id === k.id ? k : z)) : [k, ...x.kayitlar] }; return eski ? fiyatDususuIsle(y, eski, k) : y; }),
     git: (e) => {
       const y = window.scrollY; // ayrılırken konum (kaydırmadan ÖNCE okunur)
       if (e.ad === "liste" && e.filtre) kaliciSil(`liste.${e.tip}.`); // Ana Sayfa'dan hazır filtreyle gelince eski süzgeç karışmasın

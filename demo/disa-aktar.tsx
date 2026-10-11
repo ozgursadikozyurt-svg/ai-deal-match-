@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.24 · 10 Ekim 2026
+ * Anahtar CRM v3.25 · 11 Ekim 2026
  * Demo — Ayarlar → Verilerimi dışa aktar: talepler, portföyler, kişiler, eşleşme takibi, görüşme notları (CSV, Excel'de açılır)
  * ve tam yedek (JSON). Canlıda aynı içerik /api/disa-aktar'dan iner. Arşiv ya da başka bir CRM'e taşıma için.
  */
@@ -23,7 +23,7 @@ export function DisaAktar() {
     if (t === "kisiler") return [`anahtar-crm-kisiler-${tarih}.csv`, csvYaz(d.kisiler as any[], kisiSutunlari)];
     if (t === "eslesmeler") return [`anahtar-crm-eslesmeler-${tarih}.csv`, csvYaz(Object.entries(d.eslesmeNotlari).map(([a, n]) => { const [tid, pid] = a.split("~"); return { talepId: tid, talep: kayitAdi(tid), portfoyId: pid, portfoy: kayitAdi(pid), durum: n.durum, neden: n.neden, not: n.not, tarih: n.tarih }; }), eslesmeSutunlari)];
     if (t === "notlar") return [`anahtar-crm-notlar-${tarih}.csv`, csvYaz(d.kayitlar.flatMap((k) => (k.notlar ?? []).map((n) => ({ kayitId: k.id, kayit: baslikOf(k.veri), tarih: n.tarih, tur: NOT_TURU[n.tur], kisi: n.kisiId ? kisiAdi(n.kisiId) : "", metin: n.metin }))), notSutunlari)];
-    return [`anahtar-crm-yedek-${tarih}.json`, JSON.stringify({ surum: SURUM, tarih, kayitlar: d.kayitlar, kisiler: d.kisiler, eslesmeNotlari: d.eslesmeNotlari, ayarlar: d.ayarlar }, null, 1)];
+    return [`anahtar-crm-yedek-${tarih}.json`, JSON.stringify({ surum: SURUM, tarih, kayitlar: d.kayitlar, kisiler: d.kisiler, eslesmeNotlari: d.eslesmeNotlari, gorevler: d.gorevler ?? [], ilgilenenler: d.ilgilenenler ?? [], ayarlar: d.ayarlar }, null, 1)];
   };
   const indir = async (t: string) => {
     const [filename, data] = uret(t);
