@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * "Bugün" panosu — Ana Sayfa'da "★ Benim ve ofisim" kartının içinde. Danışmana her gün ne yapması gerektiğini söyler:
  * geciken + bugünkü görevler (en çok 15; ilk 5'i açık), her görevde üç düğme (Ulaşılamadı · Görüşüldü · İlgilenmiyor),
  * "Bu hafta" kapalı. Kurallar src/lib/domain/gorev.ts, durum işlemleri demo/bugun-eylem.ts.
@@ -26,7 +26,7 @@ function nedenSecenekleri(g: Gorev): [string, string][] {
   if (g.kural === "TEMAS") return [["SATILDI", "Satıldı / kiralandı"], ["VAZGECTI", "Mal sahibi vazgeçti"], ["FIYAT", "Fiyat uymuyor"], ["DIGER", "Diğer"]];
   return [["GEREK_YOK", "Gerek kalmadı"], ["DIGER", "Diğer"]];
 }
-const SURE_UZATMA = [30, 60, 90];
+const SURE_UZATMA = [30];
 
 /** Görevin karşısındaki kişi: görevde kayıtlı kişi → eşleşmedeki talebin gönderen bilgisi → bağlı kaydın gönderen bilgisi */
 function iletisimOf(g: Gorev, d: DepoDurumu): { ad: string | null; tel: string | null; kisiId: string | null } {
@@ -47,7 +47,7 @@ export function SonrakiSecici({ sec, simdi, bos }: { sec: (g: number | string) =
   </div>;
 }
 
-function GorevSatiri({ g, simdi, kapat }: { g: Gorev; simdi: Date; kapat?: boolean }) {
+export function GorevSatiri({ g, simdi, kapat }: { g: Gorev; simdi: Date; kapat?: boolean }) {
   const { d, guncelle, bildir, git } = useDepo();
   const [mod, setMod] = useState<null | "gorusuldu" | "ilgi">(null);
   const [not, setNot] = useState("");
@@ -110,7 +110,7 @@ function HaftaSatiri({ g, simdi }: { g: Gorev; simdi: Date }) {
   </li>;
 }
 
-function GorevEkleFormu({ kapat, simdi }: { kapat: () => void; simdi: Date }) {
+export function GorevEkleFormu({ kapat, simdi }: { kapat: () => void; simdi: Date }) {
   const { guncelle, bildir } = useDepo();
   const [baslik, setBaslik] = useState("");
   const [kisiId, setKisiId] = useState("");

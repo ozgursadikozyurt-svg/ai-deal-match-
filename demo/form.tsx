@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * Demo — kayıt formu. Şemadan üretilir; mülk grubuna göre yalnızca anlamlı alanlar,
  * önce "önemli alanlar", gerisi "Tüm alanlar" altında. Bölümler varsayılan kapalı.
  */
@@ -19,6 +19,7 @@ import { haricBirlestir } from "../src/lib/lokasyon/haric";
 import { SATIS_ISLEMLERI } from "../src/lib/eslestirme/onizleme";
 import { etiket, KRITER_ETIKET, ISLEM_TIPI_ETIKET, ILAN_SAHIBI_ETIKET, VERI_KANALI_ETIKET, MULK_TIPI_META, HAVUZ_ETIKET } from "./etiketler";
 import { coz, cozulenToKayitLok, lokEtiket, ilAdiOf, calismaIliOku } from "./lokasyon";
+import { suresizMi } from "../src/lib/domain/gecerlilik";
 import { BUGUN, varsayilanValidUntil, yeniId, sureUzat, type Kayit, type Veri } from "./depo";
 import { useDepo, cx, Bolum, KonumSecici, tarihYaz, telYaz, type Ekran } from "./ortak";
 import { konumOgret } from "./konumlar";
@@ -292,6 +293,7 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
         {!talep && <div className="alan"><label htmlFor="f-havuz">Havuz</label><select id="f-havuz" value={f.havuz} onChange={(e) => set("havuz", e.target.value)}>{Object.entries(HAVUZ_ETIKET).map(([k, e]) => <option key={k} value={k}>{e}</option>)}</select></div>}
         {!talep && f.havuz === "KENDI_PORTFOY" && <div className="alan"><label htmlFor="f-yetki">Yetki belgesi</label><div className="satir"><button type="button" id="f-yetki" className={cx("bool-cip", f.yetkili && "evet")} onClick={() => set("yetkili", !f.yetkili)}><span className="isaret">{f.yetkili ? "✓" : "+"}</span>Yetkili portföy</button>{f.yetkili && <input type="date" aria-label="Yetki bitiş" value={f.yetkiBitis ? new Date(f.yetkiBitis).toISOString().slice(0, 10) : ""} onChange={(e) => set("yetkiBitis", e.target.value ? new Date(e.target.value + "T12:00:00") : null)} />}</div></div>}
         <div className="alan genis"><label htmlFor="f-baslik">Başlık</label><input id="f-baslik" maxLength={160} value={f.baslik ?? ""} onChange={(e) => set("baslik", e.target.value)} placeholder="Kısa, tek satır" /></div>
+        <div className="alan genis"><label htmlFor="f-aciklama">Açıklama <small className="ipucu">· kartta kısaca, detayda tamamı</small></label><textarea id="f-aciklama" rows={3} maxLength={2000} value={f.aciklama ?? ""} onChange={(e) => set("aciklama", e.target.value || null)} placeholder="Mülkün / talebin ayrıntısı: cephe, kullanım, sahibin beklentisi…" /></div>
       </div>
       {ekstra.includes("krediyeUygun") && <div className="cip-satir bool-satir"><button type="button" className={cx("bool-cip", f.krediyeUygun === true && "evet", f.krediyeUygun === false && "hayir")} onClick={() => set("krediyeUygun", f.krediyeUygun == null ? true : f.krediyeUygun ? false : null)}><span className="isaret">{f.krediyeUygun === true ? "✓" : f.krediyeUygun === false ? "✕" : "+"}</span>Krediye uygun</button></div>}
       <div className="cip-satir bool-satir"><button type="button" className={cx("bool-cip", f.takasaAcik === true && "evet", f.takasaAcik === false && "hayir")} onClick={() => set("takasaAcik", f.takasaAcik == null ? true : f.takasaAcik ? false : null)}><span className="isaret">{f.takasaAcik === true ? "✓" : f.takasaAcik === false ? "✕" : "+"}</span>Takasa açık</button></div>
@@ -316,11 +318,11 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
       </div>}
     </Bolum>
 
-    <Bolum baslik="Geçerlilik" ozet={`${tarihYaz(vu)}'e kadar`}>
-      <div className="satir sar">
+    <Bolum baslik="Geçerlilik" ozet={suresizMi(vu) ? "Süresiz (★ Benim)" : `${tarihYaz(vu)}'e kadar`}>
+      {suresizMi(vu) ? <p className="ipucu">★ Benim kayıtlar süresizdir: siz pasife alana ya da arşivleyene kadar açık kalır.</p> : <div className="satir sar">
         <input id="f-gecerlilik" type="date" style={{ maxWidth: "12rem" }} value={tarihInput(vu)} onChange={(e) => set("validUntil", e.target.value ? new Date(e.target.value + "T12:00:00").toISOString() : null)} />
-        {[30, 60, 90].map((g) => <button type="button" key={g} className="btn kucuk" onClick={() => set("validUntil", sureUzat({ ...f, validUntil: vu } as Veri, g).validUntil)}>+{g} gün</button>)}
-      </div>
+        <button type="button" className="btn kucuk" onClick={() => set("validUntil", sureUzat({ ...f, validUntil: vu } as Veri, 30).validUntil)}>+30 gün</button>
+      </div>}
       <p className="ipucu">Bu kayıt için varsayılan: {ttlGun(tip, f.islemTipi, f.aciliyet, d.ayarlar.ttl)} gün ({etiket(f.islemTipi)}{talep && f.aciliyet === "ACIL" ? ", acil" : ""}). Süreler Ayarlar'dan değiştirilebilir.</p>
     </Bolum>
 

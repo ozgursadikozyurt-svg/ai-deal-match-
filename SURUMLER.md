@@ -5,6 +5,29 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.26 · 12 Ekim 2026 — ★ Benim kayıtlar süresiz; Süresi yaklaşanlar ayrı ekran (Toplu +30); kartta tek +30; Gelen kutusunda 7/15/30 gün; kart yanında paylaşım seçimi; Açıklama alanı; Görevler ekranı; açık kayıt (Pro altyapısı)
+
+- ★ Benim kayıtlar süresiz: siz pasife alana ya da arşivleyene kadar açık kalır. Süre rozeti görünmez, süresi dolmuş Benim kayıtlar yeniden açılır; sunucunun gece "süresi dolanları pasife al" işi bunlara dokunmaz.
+- Süresi yaklaşanlar: Ana Sayfa'daki uzun liste kalktı, yerine tek satır özet ("Süresi yaklaşanlar (N) · Listeyi aç · Toplu +30"). Ayrı ekranda 5 / 14 / 30 gün ve talep / portföy süzgeci, en üstte "Tümüne +30 gün"; kartların solundaki + ile seçip yalnızca seçilenlere de uzatılabilir.
+- Kartlarda süre: süresi 5 gün ve altı kalan (ya da dolmuş) kayıtların kartında "+30 gün" düğmesi. Detay ve formdaki +60 / +90 gün düğmeleri kalktı; yalnızca +30 (ve tarih seç).
+- Gelen kutusu: Son 7 gün · Son 15 gün · Son 30 gün · Tümü süzgeci (ilan tarihi; yoksa dosyanın geliş tarihi), yanında kayıt sayısı.
+- Paylaşım: "Paylaş"a basınca her kartın solunda + düğmesi çıkar; tek tek seçilir, seçilenler vurgulanır. Tümünü seç / kaldır, kişi bilgisi seçeneği, Kopyala ve WhatsApp aynen kaldı; hazır metin "Metni gör" altında.
+- Açıklama: talep ve portföy formunda Başlık'ın altında Açıklama alanı (2.000 harf). Kartta iki satır görünür, dokununca açılır / kapanır; detayda tamamı. Veritabanına yeni sütun eklendi.
+- Kartta kişi tekrarı kalktı: kaynak etiketinde yazan kişi (ör. "Emlakçı · Ayşegül emlak", "Mülk sahibi · +90 530…") alt satırda bir daha yazılmaz.
+- Görevler ekranı: menünün en sonunda. Bugün panosunun tamamı (15 sınırı yok): Geciken · Bugün · Bu hafta · Sonra · Tamamlananlar; Ara / Sunum / Yer göster / Belge süzgeci; + Görev.
+- Pro sürüm altyapısı: açık kayıt. Cloudflare'de ACIK_KAYIT=1 yapılınca giriş ekranı "Giriş ya da ücretsiz deneme" olur; hesabı olmayan e-posta bağlantıya dokununca "Ofisinizi açın" formunu görür → kendi ofisi, ofis yöneticisi rolü, 14 gün Pro deneme. Değişken verilmedikçe kayıt kapalı (bugünkü gibi yalnızca davet).
+- Veritabanı değişikliği VAR: "Kurulumu tamamla" bir kez basılmalı (kayit tablosuna aciklama sütunu).
+
+**Demo'da test edilecekler**
+
+- [ ] Canlıda açılışta "İlk kurulum" çıkarsa "Kurulumu tamamla"ya basın (açıklama sütunu).
+- [ ] Ana Sayfa: en altta "Süresi yaklaşanlar (N)" tek satır; dokunun → ekranda "Tümüne +30 gün"; 5 / 14 / 30 gün çiplerini deneyin.
+- [ ] Portföyler: süresi 5 gün ve altı kalan kartta +30 gün; bir ★ Benim kaydı açın → Geçerlilik "Süresiz".
+- [ ] Portföyler › Paylaş: kartların solundaki + ile iki kayıt seçin → "Metni kopyala (2)".
+- [ ] Yeni portföy: Başlık altına Açıklama yazın → listede kartta iki satır, dokununca açılır; detayda tamamı.
+- [ ] Veri Girişi › Gelen kutusu: Son 7 / 15 / 30 gün süzgeci.
+- [ ] Menü › Görevler (en sonda): Geciken / Bugün / Bu hafta grupları ve tür süzgeci.
+
 ## v3.25 · 11 Ekim 2026 — Bugün panosu (Ana Sayfa'da Benim ve ofisim kartında), İlgilenenler / gösterilenler alanı ve daha derli toplu formlar
 
 - Ana Sayfa: "48 aktif talep, 298 portföy ve 127 sunulabilir eşleşme seni bekliyor" cümlesi kalktı. Yerine ★ Benim ve ofisim kartının içinde Bugün panosu var: geciken (kırmızı) · bugün · bu hafta, ilerleme çubuğu, ilk 5 görev açık, gerisi "Kalan N görevi göster"; günlük liste en çok 15 görev, fazlası sıraya girer.

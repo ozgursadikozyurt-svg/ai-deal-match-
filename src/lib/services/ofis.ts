@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * OFİS, KULLANICI VE DAVET işlemleri.
  *
  * Hesap açma davetle olur: yönetici bir bağlantı üretir, bağlantıdaki gizli kodun yalnızca
@@ -106,6 +106,38 @@ export function etkinPlan(o: { plan: string; denemeBitis: Date | null; sinirsiz:
   const denemeAktif = !!o.denemeBitis && o.denemeBitis > new Date();
   const kod = (denemeAktif && o.plan === "UCRETSIZ" ? "PRO" : o.plan) as keyof typeof PLANLAR; // deneme Pro+ ofisi düşürmez
   return { kod, denemeAktif, sinirlar: planSinirlari(kod, o.sinirsiz) };
+}
+
+// ---------------------------------------------------------------------------
+//  v3.26 — Açık kayıt: davetsiz gelen danışman kendi ofisini açar (14 gün Pro deneme)
+// ---------------------------------------------------------------------------
+
+export const DENEME_GUN = 14;
+export const KayitOlSchema = z.object({
+  ofisAd: z.string().trim().min(2, "Ofis adı en az 2 harf").max(80),
+  adSoyad: z.string().trim().min(2, "Adınızı yazın").max(80),
+  telefon: z.string().trim().max(20).nullish(),
+  sehir: z.string().trim().max(40).nullish(),
+  onay: z.literal(true, { errorMap: () => ({ message: "Kullanım koşulları ve KVKK aydınlatma metni onaylanmalı" }) }),
+});
+export type KayitOlSonucu = { kullanici: { id: string; ofisId: string; rol: Rol }; denemeBitis: Date } | { hata: string; durum: 409 };
+
+/** Doğrulanmış e-posta (oturum anahtarından) ile yeni ofis + ofis yöneticisi. Platform bağlamında çalışır (kişinin henüz ofisi yok). */
+export async function kendiOfisiniAc(prisma: PrismaClient, eposta: string, girdi: z.input<typeof KayitOlSchema>, simdi = new Date()): Promise<KayitOlSonucu> {
+  const e = eposta.trim().toLowerCase();
+  const g = KayitOlSchema.parse(girdi);
+  return platformOlarak(async () => {
+    if (await prisma.kullanici.findFirst({ where: { eposta: e }, select: { id: true } })) return { hata: "Bu e-postanın zaten bir hesabı var", durum: 409 as const };
+    let slug = slugla(g.ofisAd) || "ofis";
+    for (let i = 2; await prisma.ofis.findFirst({ where: { slug }, select: { id: true } }); i++) slug = `${slugla(g.ofisAd) || "ofis"}-${i}`;
+    const denemeBitis = new Date(simdi.getTime() + DENEME_GUN * 864e5);
+    const ofis = await prisma.ofis.create({ data: { ad: g.ofisAd, slug, telefon: g.telefon || null, sehir: g.sehir || null, plan: "UCRETSIZ", denemeBitis }, select: { id: true } });
+    const k = await prisma.kullanici.create({
+      data: { ofisId: ofis.id, eposta: e, adSoyad: g.adSoyad, telefon: g.telefon || null, rol: "OFIS_YONETICISI", sonGiris: simdi },
+      select: { id: true, ofisId: true, rol: true },
+    });
+    return { kullanici: { id: k.id, ofisId: k.ofisId, rol: k.rol as Rol }, denemeBitis };
+  });
 }
 
 // ---------------------------------------------------------------------------

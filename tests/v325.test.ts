@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026 — Bugün panosu, İlgilenenler, kompakt form
+ * Anahtar CRM v3.26 · 12 Ekim 2026 — Bugün panosu, İlgilenenler, kompakt form
  */
 import { test as nodeTest } from "node:test";
 import assert from "node:assert/strict";
@@ -28,12 +28,6 @@ const bugun = gunYaz(BUGUN);
 const talep = () => ornek.kayitlar.find((k) => k.veri.tip === "TALEP")!;
 const portfoy = () => ornek.kayitlar.find((k) => k.veri.tip === "PORTFOY")!;
 
-test("sürüm 3.25: günlük kaydı ve belgeler", () => {
-  assert.equal(SURUM, "3.25"); assert.equal(SURUM_GECMISI[0].surum, "3.25"); assert.equal(SURUM_GECMISI[1].surum, "3.24");
-  assert.match(SURUM_GECMISI[0].baslik, /Bugün panosu/); assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 4);
-  for (const f of [`docs/ANAHTAR_CRM_EK_${DOSYA_EKI}.md`, `docs/ANAHTAR_CRM_DEVIR_${DOSYA_EKI}.md`]) assert.ok(fs.existsSync(f), f);
-  assert.equal(fs.readdirSync("prisma/migrations").filter((x) => x.startsWith("202610112")).length, 0, "veritabanı değişikliği yok");
-});
 
 test("takip: Gösterim → 'Geri dönüş al' 2 gün sonra; aynı durum tekrar basılınca görev çoğalmaz; Koparıldı görevleri kapatır", () => {
   let d = durum();

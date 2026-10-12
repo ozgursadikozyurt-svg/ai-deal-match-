@@ -1,10 +1,11 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.26 · 12 Ekim 2026 (v3.13'ten)
  * Demo veri deposu: örnek veriyi gerçek doğrulama + konum çözücüden geçirerek yükler,
  * kullanıcının değişikliklerini tarayıcıda (localStorage) saklar.
  */
 import type { FotoMeta } from "../src/lib/domain/foto";
 import type { Gorev, Ilgilenen } from "../src/lib/domain/gorev";
+import { suresizMi, SURESIZ_TARIH } from "../src/lib/domain/gecerlilik";
 import { gorevEkle, gunEkle, gunYaz, ilgilenenUygula } from "../src/lib/domain/gorev";
 import { aiAyarNormalize, paylasimNormalize, calismaIliNormalize, type AiAyar, type PaylasimAyar } from "../src/lib/domain/ayarlar";
 import { sahiplikNormalize, type SahiplikAyar } from "../src/lib/domain/sahiplik";
@@ -161,9 +162,10 @@ export const TTL_VARSAYILAN: TtlAyar = TTLV;
 export function varsayilanValidUntil(tip: "PORTFOY" | "TALEP", islem: string | undefined, aciliyet: string | undefined, simdi: Date, ttl: TtlAyar = TTL_VARSAYILAN): Date {
   return vuDomain(tip, islem, aciliyet, simdi, ttl);
 }
-export const kalanGun = (v: Veri) => (v.validUntil ? Math.ceil((new Date(v.validUntil).getTime() - BUGUN.getTime()) / GUN) : null);
+export const kalanGun = (v: Veri) => (v.validUntil && !suresizMi(v.validUntil) ? Math.ceil((new Date(v.validUntil).getTime() - BUGUN.getTime()) / GUN) : null);
 /** Süreyi uzat: süresi dolmuşsa bugünden, değilse mevcut bitişten itibaren */
 export function sureUzat(v: Veri, gun: number): Veri {
+  if (suresizMi(v.validUntil)) return v;
   const taban = Math.max(BUGUN.getTime(), v.validUntil ? new Date(v.validUntil).getTime() : 0);
   return { ...v, validUntil: new Date(taban + gun * GUN), durum: v.durum === "EXPIRED" ? "ACTIVE" : v.durum };
 }
@@ -279,3 +281,13 @@ export const yeniId = (tip: "PORTFOY" | "TALEP") => (tip === "PORTFOY" ? "P" : "
 
 /** Havuzdaki kayıtların ham metin parmak izleri (içe aktarmada zaten kayıtlı ilanı yeniden ayrıştırmamak için) */
 export const kayitliMetinIzleri = (kayitlar: Kayit[]) => new Set(kayitlar.map((k) => k.veri.hamMetin).filter(Boolean).map((m) => metinParmakIzi(m!)));
+/** v3.26 — ★ Benim kayıtlar süresiz: süre işareti konur; süresi dolmuşsa yeniden açılır. Değişiklik yoksa aynı nesne döner. */
+export function benimSuresiz(d: DepoDurumu, benimMi: (v: Veri) => boolean): DepoDurumu {
+  let degisti = false;
+  const kayitlar = d.kayitlar.map((k) => {
+    if (k.veri.durum === "PASSIVE" || k.veri.durum === "ARSIV" || suresizMi(k.veri.validUntil) || !benimMi(k.veri)) return k;
+    degisti = true;
+    return { ...k, veri: { ...k.veri, validUntil: SURESIZ_TARIH, durum: k.veri.durum === "EXPIRED" ? "ACTIVE" : k.veri.durum } as Veri };
+  });
+  return degisti ? { ...d, kayitlar } : d;
+}

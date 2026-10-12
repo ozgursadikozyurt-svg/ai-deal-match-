@@ -101,6 +101,7 @@ export type KayitMinAggregateOutputType = {
   portalIlanSahibi: string | null
   baslik: string | null
   ozet: string | null
+  aciklama: string | null
   hamMetin: string | null
   operasyonNotu: string | null
   arsivNotu: string | null
@@ -163,6 +164,7 @@ export type KayitMaxAggregateOutputType = {
   portalIlanSahibi: string | null
   baslik: string | null
   ozet: string | null
+  aciklama: string | null
   hamMetin: string | null
   operasyonNotu: string | null
   arsivNotu: string | null
@@ -227,6 +229,7 @@ export type KayitCountAggregateOutputType = {
   portalIlanSahibi: number
   baslik: number
   ozet: number
+  aciklama: number
   hamMetin: number
   operasyonNotu: number
   arsivNotu: number
@@ -321,6 +324,7 @@ export type KayitMinAggregateInputType = {
   portalIlanSahibi?: true
   baslik?: true
   ozet?: true
+  aciklama?: true
   hamMetin?: true
   operasyonNotu?: true
   arsivNotu?: true
@@ -383,6 +387,7 @@ export type KayitMaxAggregateInputType = {
   portalIlanSahibi?: true
   baslik?: true
   ozet?: true
+  aciklama?: true
   hamMetin?: true
   operasyonNotu?: true
   arsivNotu?: true
@@ -447,6 +452,7 @@ export type KayitCountAggregateInputType = {
   portalIlanSahibi?: true
   baslik?: true
   ozet?: true
+  aciklama?: true
   hamMetin?: true
   operasyonNotu?: true
   arsivNotu?: true
@@ -602,6 +608,7 @@ export type KayitGroupByOutputType = {
   portalIlanSahibi: string | null
   baslik: string | null
   ozet: string | null
+  aciklama: string | null
   hamMetin: string | null
   operasyonNotu: string | null
   arsivNotu: string | null
@@ -693,6 +700,7 @@ export type KayitWhereInput = {
   portalIlanSahibi?: Prisma.StringNullableFilter<"Kayit"> | string | null
   baslik?: Prisma.StringNullableFilter<"Kayit"> | string | null
   ozet?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  aciklama?: Prisma.StringNullableFilter<"Kayit"> | string | null
   hamMetin?: Prisma.StringNullableFilter<"Kayit"> | string | null
   operasyonNotu?: Prisma.StringNullableFilter<"Kayit"> | string | null
   arsivNotu?: Prisma.StringNullableFilter<"Kayit"> | string | null
@@ -773,6 +781,7 @@ export type KayitOrderByWithRelationInput = {
   portalIlanSahibi?: Prisma.SortOrderInput | Prisma.SortOrder
   baslik?: Prisma.SortOrderInput | Prisma.SortOrder
   ozet?: Prisma.SortOrderInput | Prisma.SortOrder
+  aciklama?: Prisma.SortOrderInput | Prisma.SortOrder
   hamMetin?: Prisma.SortOrderInput | Prisma.SortOrder
   operasyonNotu?: Prisma.SortOrderInput | Prisma.SortOrder
   arsivNotu?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -858,6 +867,7 @@ export type KayitWhereUniqueInput = Prisma.AtLeast<{
   portalIlanSahibi?: Prisma.StringNullableFilter<"Kayit"> | string | null
   baslik?: Prisma.StringNullableFilter<"Kayit"> | string | null
   ozet?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  aciklama?: Prisma.StringNullableFilter<"Kayit"> | string | null
   hamMetin?: Prisma.StringNullableFilter<"Kayit"> | string | null
   operasyonNotu?: Prisma.StringNullableFilter<"Kayit"> | string | null
   arsivNotu?: Prisma.StringNullableFilter<"Kayit"> | string | null
@@ -938,6 +948,7 @@ export type KayitOrderByWithAggregationInput = {
   portalIlanSahibi?: Prisma.SortOrderInput | Prisma.SortOrder
   baslik?: Prisma.SortOrderInput | Prisma.SortOrder
   ozet?: Prisma.SortOrderInput | Prisma.SortOrder
+  aciklama?: Prisma.SortOrderInput | Prisma.SortOrder
   hamMetin?: Prisma.SortOrderInput | Prisma.SortOrder
   operasyonNotu?: Prisma.SortOrderInput | Prisma.SortOrder
   arsivNotu?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -1014,6 +1025,7 @@ export type KayitScalarWhereWithAggregatesInput = {
   portalIlanSahibi?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
   baslik?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
   ozet?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
+  aciklama?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
   hamMetin?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
   operasyonNotu?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
   arsivNotu?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
@@ -1079,6 +1091,7 @@ export type KayitCreateInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -1159,6 +1172,7 @@ export type KayitUncheckedCreateInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -1233,6 +1247,7 @@ export type KayitUpdateInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1313,6 +1328,7 @@ export type KayitUncheckedUpdateInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1390,6 +1406,7 @@ export type KayitCreateManyInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -1455,6 +1472,7 @@ export type KayitUpdateManyMutationInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1523,6 +1541,7 @@ export type KayitUncheckedUpdateManyInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1640,6 +1659,7 @@ export type KayitCountOrderByAggregateInput = {
   portalIlanSahibi?: Prisma.SortOrder
   baslik?: Prisma.SortOrder
   ozet?: Prisma.SortOrder
+  aciklama?: Prisma.SortOrder
   hamMetin?: Prisma.SortOrder
   operasyonNotu?: Prisma.SortOrder
   arsivNotu?: Prisma.SortOrder
@@ -1719,6 +1739,7 @@ export type KayitMaxOrderByAggregateInput = {
   portalIlanSahibi?: Prisma.SortOrder
   baslik?: Prisma.SortOrder
   ozet?: Prisma.SortOrder
+  aciklama?: Prisma.SortOrder
   hamMetin?: Prisma.SortOrder
   operasyonNotu?: Prisma.SortOrder
   arsivNotu?: Prisma.SortOrder
@@ -1781,6 +1802,7 @@ export type KayitMinOrderByAggregateInput = {
   portalIlanSahibi?: Prisma.SortOrder
   baslik?: Prisma.SortOrder
   ozet?: Prisma.SortOrder
+  aciklama?: Prisma.SortOrder
   hamMetin?: Prisma.SortOrder
   operasyonNotu?: Prisma.SortOrder
   arsivNotu?: Prisma.SortOrder
@@ -2213,6 +2235,7 @@ export type KayitCreateWithoutOfisInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -2291,6 +2314,7 @@ export type KayitUncheckedCreateWithoutOfisInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -2397,6 +2421,7 @@ export type KayitScalarWhereInput = {
   portalIlanSahibi?: Prisma.StringNullableFilter<"Kayit"> | string | null
   baslik?: Prisma.StringNullableFilter<"Kayit"> | string | null
   ozet?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  aciklama?: Prisma.StringNullableFilter<"Kayit"> | string | null
   hamMetin?: Prisma.StringNullableFilter<"Kayit"> | string | null
   operasyonNotu?: Prisma.StringNullableFilter<"Kayit"> | string | null
   arsivNotu?: Prisma.StringNullableFilter<"Kayit"> | string | null
@@ -2462,6 +2487,7 @@ export type KayitCreateWithoutSahipKullaniciInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -2540,6 +2566,7 @@ export type KayitUncheckedCreateWithoutSahipKullaniciInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -2640,6 +2667,7 @@ export type KayitCreateWithoutLokasyonlarInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -2719,6 +2747,7 @@ export type KayitUncheckedCreateWithoutLokasyonlarInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -2808,6 +2837,7 @@ export type KayitUpdateWithoutLokasyonlarInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2887,6 +2917,7 @@ export type KayitUncheckedUpdateWithoutLokasyonlarInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2960,6 +2991,7 @@ export type KayitCreateWithoutOzellikInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -3039,6 +3071,7 @@ export type KayitUncheckedCreateWithoutOzellikInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -3128,6 +3161,7 @@ export type KayitUpdateWithoutOzellikInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3207,6 +3241,7 @@ export type KayitUncheckedUpdateWithoutOzellikInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3280,6 +3315,7 @@ export type KayitCreateWithoutKisiInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -3358,6 +3394,7 @@ export type KayitUncheckedCreateWithoutKisiInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -3458,6 +3495,7 @@ export type KayitCreateWithoutKisiBaglariInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -3537,6 +3575,7 @@ export type KayitUncheckedCreateWithoutKisiBaglariInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -3626,6 +3665,7 @@ export type KayitUpdateWithoutKisiBaglariInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3705,6 +3745,7 @@ export type KayitUncheckedUpdateWithoutKisiBaglariInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3778,6 +3819,7 @@ export type KayitCreateWithoutTalepMatchleriInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -3857,6 +3899,7 @@ export type KayitUncheckedCreateWithoutTalepMatchleriInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -3935,6 +3978,7 @@ export type KayitCreateWithoutPortfoyMatchleriInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -4014,6 +4058,7 @@ export type KayitUncheckedCreateWithoutPortfoyMatchleriInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -4103,6 +4148,7 @@ export type KayitUpdateWithoutTalepMatchleriInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4182,6 +4228,7 @@ export type KayitUncheckedUpdateWithoutTalepMatchleriInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4266,6 +4313,7 @@ export type KayitUpdateWithoutPortfoyMatchleriInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4345,6 +4393,7 @@ export type KayitUncheckedUpdateWithoutPortfoyMatchleriInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4418,6 +4467,7 @@ export type KayitCreateWithoutPortalKaynagiInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -4497,6 +4547,7 @@ export type KayitUncheckedCreateWithoutPortalKaynagiInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -4586,6 +4637,7 @@ export type KayitUpdateWithoutPortalKaynagiInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4665,6 +4717,7 @@ export type KayitUncheckedUpdateWithoutPortalKaynagiInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4738,6 +4791,7 @@ export type KayitCreateWithoutAuditLoglariInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -4817,6 +4871,7 @@ export type KayitUncheckedCreateWithoutAuditLoglariInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -4906,6 +4961,7 @@ export type KayitUpdateWithoutAuditLoglariInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4985,6 +5041,7 @@ export type KayitUncheckedUpdateWithoutAuditLoglariInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5058,6 +5115,7 @@ export type KayitCreateWithoutGorusmeNotlariInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -5137,6 +5195,7 @@ export type KayitUncheckedCreateWithoutGorusmeNotlariInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -5226,6 +5285,7 @@ export type KayitUpdateWithoutGorusmeNotlariInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5305,6 +5365,7 @@ export type KayitUncheckedUpdateWithoutGorusmeNotlariInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5378,6 +5439,7 @@ export type KayitCreateWithoutFotolarInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -5457,6 +5519,7 @@ export type KayitUncheckedCreateWithoutFotolarInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -5546,6 +5609,7 @@ export type KayitUpdateWithoutFotolarInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5625,6 +5689,7 @@ export type KayitUncheckedUpdateWithoutFotolarInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5700,6 +5765,7 @@ export type KayitCreateManyOfisInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -5765,6 +5831,7 @@ export type KayitUpdateWithoutOfisInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5843,6 +5910,7 @@ export type KayitUncheckedUpdateWithoutOfisInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5919,6 +5987,7 @@ export type KayitUncheckedUpdateManyWithoutOfisInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5986,6 +6055,7 @@ export type KayitCreateManySahipKullaniciInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -6051,6 +6121,7 @@ export type KayitUpdateWithoutSahipKullaniciInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6129,6 +6200,7 @@ export type KayitUncheckedUpdateWithoutSahipKullaniciInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6205,6 +6277,7 @@ export type KayitUncheckedUpdateManyWithoutSahipKullaniciInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6272,6 +6345,7 @@ export type KayitCreateManyKisiInput = {
   portalIlanSahibi?: string | null
   baslik?: string | null
   ozet?: string | null
+  aciklama?: string | null
   hamMetin?: string | null
   operasyonNotu?: string | null
   arsivNotu?: string | null
@@ -6337,6 +6411,7 @@ export type KayitUpdateWithoutKisiInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6415,6 +6490,7 @@ export type KayitUncheckedUpdateWithoutKisiInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6491,6 +6567,7 @@ export type KayitUncheckedUpdateManyWithoutKisiInput = {
   portalIlanSahibi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baslik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ozet?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aciklama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hamMetin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   operasyonNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arsivNotu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6644,6 +6721,7 @@ export type KayitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   portalIlanSahibi?: boolean
   baslik?: boolean
   ozet?: boolean
+  aciklama?: boolean
   hamMetin?: boolean
   operasyonNotu?: boolean
   arsivNotu?: boolean
@@ -6725,6 +6803,7 @@ export type KayitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   portalIlanSahibi?: boolean
   baslik?: boolean
   ozet?: boolean
+  aciklama?: boolean
   hamMetin?: boolean
   operasyonNotu?: boolean
   arsivNotu?: boolean
@@ -6796,6 +6875,7 @@ export type KayitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   portalIlanSahibi?: boolean
   baslik?: boolean
   ozet?: boolean
+  aciklama?: boolean
   hamMetin?: boolean
   operasyonNotu?: boolean
   arsivNotu?: boolean
@@ -6867,6 +6947,7 @@ export type KayitSelectScalar = {
   portalIlanSahibi?: boolean
   baslik?: boolean
   ozet?: boolean
+  aciklama?: boolean
   hamMetin?: boolean
   operasyonNotu?: boolean
   arsivNotu?: boolean
@@ -6884,7 +6965,7 @@ export type KayitSelectScalar = {
   updatedAt?: boolean
 }
 
-export type KayitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "sahipKullaniciId" | "gorunurluk" | "isaret" | "tip" | "durum" | "aciliyet" | "anaKategori" | "mulkTipi" | "alternatifMulkTipleri" | "islemTipi" | "alternatifIslemTipleri" | "fiyat" | "minFiyat" | "maxFiyat" | "paraBirimi" | "fiyatPeriyodu" | "krediyeUygun" | "takasaAcik" | "m2" | "netM2" | "minM2" | "maxM2" | "m2ToleransYuzde" | "odaSayisi" | "lokasyonHam" | "adres" | "enlem" | "boylam" | "veriKanali" | "ilanSahibiTipi" | "havuz" | "yetkili" | "yetkiBitis" | "musteriKaynagi" | "portfoyAlinabilirlik" | "kisiId" | "gondeAdi" | "gondeTelefon" | "gondeSirket" | "kayitGrubu" | "mesajTarihi" | "kaynakDosya" | "ingestionId" | "portalUrl" | "portalIlanNo" | "portalIlanSahibi" | "baslik" | "ozet" | "hamMetin" | "operasyonNotu" | "arsivNotu" | "ozelSartlar" | "validUntil" | "ttlUyariGonderildi" | "fingerprint" | "notionId" | "notionSonSync" | "notionSnapshot" | "notionGeriYazim" | "alanGuvenleri" | "aiModelVersiyon" | "createdAt" | "updatedAt", ExtArgs["result"]["kayit"]>
+export type KayitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "sahipKullaniciId" | "gorunurluk" | "isaret" | "tip" | "durum" | "aciliyet" | "anaKategori" | "mulkTipi" | "alternatifMulkTipleri" | "islemTipi" | "alternatifIslemTipleri" | "fiyat" | "minFiyat" | "maxFiyat" | "paraBirimi" | "fiyatPeriyodu" | "krediyeUygun" | "takasaAcik" | "m2" | "netM2" | "minM2" | "maxM2" | "m2ToleransYuzde" | "odaSayisi" | "lokasyonHam" | "adres" | "enlem" | "boylam" | "veriKanali" | "ilanSahibiTipi" | "havuz" | "yetkili" | "yetkiBitis" | "musteriKaynagi" | "portfoyAlinabilirlik" | "kisiId" | "gondeAdi" | "gondeTelefon" | "gondeSirket" | "kayitGrubu" | "mesajTarihi" | "kaynakDosya" | "ingestionId" | "portalUrl" | "portalIlanNo" | "portalIlanSahibi" | "baslik" | "ozet" | "aciklama" | "hamMetin" | "operasyonNotu" | "arsivNotu" | "ozelSartlar" | "validUntil" | "ttlUyariGonderildi" | "fingerprint" | "notionId" | "notionSonSync" | "notionSnapshot" | "notionGeriYazim" | "alanGuvenleri" | "aiModelVersiyon" | "createdAt" | "updatedAt", ExtArgs["result"]["kayit"]>
 export type KayitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   sahipKullanici?: boolean | Prisma.Kayit$sahipKullaniciArgs<ExtArgs>
@@ -7005,6 +7086,10 @@ export type $KayitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     portalIlanSahibi: string | null
     baslik: string | null
     ozet: string | null
+    /**
+     * v3.26 — serbest açıklama (başlığın altında; kartta kısaca açılır, detayda tamamı)
+     */
+    aciklama: string | null
     hamMetin: string | null
     operasyonNotu: string | null
     arsivNotu: string | null
@@ -7517,6 +7602,7 @@ export interface KayitFieldRefs {
   readonly portalIlanSahibi: Prisma.FieldRef<"Kayit", 'String'>
   readonly baslik: Prisma.FieldRef<"Kayit", 'String'>
   readonly ozet: Prisma.FieldRef<"Kayit", 'String'>
+  readonly aciklama: Prisma.FieldRef<"Kayit", 'String'>
   readonly hamMetin: Prisma.FieldRef<"Kayit", 'String'>
   readonly operasyonNotu: Prisma.FieldRef<"Kayit", 'String'>
   readonly arsivNotu: Prisma.FieldRef<"Kayit", 'String'>

@@ -1,8 +1,9 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026 (v3.20'den)
+ * Anahtar CRM v3.26 · 12 Ekim 2026 (v3.20'den)
  * AŞAMA 7 — Cloudflare Worker girişi. Tek proje: arayüz (statik dosyalar, ASSETS) + /api (sunucu kodu) + zamanlanmış işler.
  *  - /api/yapilandirma, /api/saglik → açık (giriş ekranının ihtiyacı / sağlık kontrolü)
  *  - /api/davet/kabul → giriş şart, ofis şart değil (kişi henüz bir ofiste değil)
+ *  - /api/kayit-ol → v3.26: aynı kapı; ek olarak ACIK_KAYIT=1 olmalı (davetsiz yeni ofis + 14 gün Pro deneme)
  *  - diğer /api/* → üç kapı: (1) oturum anahtarı doğrulanır (2) e-posta bir ofis kullanıcısına
  *    çözülür (3) istek o ofisin bağlamında çalışır; ofise ait her sorgu ofisId ile süzülür.
  *  - /api/entegrasyon/google/geri-donus → v3.21: Google izin ekranından dönüş. Oturum başlığı OLMAZ
@@ -29,8 +30,10 @@ export interface Env {
   ASSETS: { fetch: (r: Request) => Promise<Response> };
   DATABASE_URL: string; DIRECT_URL?: string; SUPABASE_URL: string; SUPABASE_ANON_KEY: string;
   SUPABASE_JWT_SECRET?: string; SUPABASE_SERVICE_ROLE_KEY?: string; IZINLI_EPOSTALAR: string;
-  CRON_SECRET?: string; [k: string]: unknown;
+  CRON_SECRET?: string; ACIK_KAYIT?: string; [k: string]: unknown;
 }
+/** v3.26 — Cloudflare değişkeni ACIK_KAYIT=1 → giriş ekranında "Ücretsiz dene" ve /api/kayit-ol açılır */
+export const acikKayit = (env: Env) => env.ACIK_KAYIT === "1" || env.ACIK_KAYIT === "true";
 const ortamiYukle = (env: Env) => { for (const [k, v] of Object.entries(env)) if (typeof v === "string") (globalThis as any).process.env[k] = v; };
 const json = (v: unknown, status = 200) => Response.json(v, { status, headers: { "cache-control": "no-store" } });
 
@@ -43,7 +46,7 @@ const hataYaniti = (e: unknown) => {
 
 export async function apiIsle(req: Request, env: Env): Promise<Response> {
   const url = new URL(req.url);
-  if (url.pathname === "/api/yapilandirma") return json({ supabaseUrl: env.SUPABASE_URL, supabaseAnonKey: env.SUPABASE_ANON_KEY });
+  if (url.pathname === "/api/yapilandirma") return json({ supabaseUrl: env.SUPABASE_URL, supabaseAnonKey: env.SUPABASE_ANON_KEY, acikKayit: acikKayit(env) });
 
   const rota = (() => {
     for (const r of ROTALAR) {
@@ -88,6 +91,12 @@ export async function apiIsle(req: Request, env: Env): Promise<Response> {
 
   // 3) Davet kabul: giriş yeter, ofis gerekmez (kişi henüz bir ofiste değil)
   if (url.pathname === "/api/davet/kabul") {
+    return istekIcinde(env.DATABASE_URL, () => davetBaglamiIcinde(k.eposta, () => isle(req, { params })).catch(hataYaniti));
+  }
+
+  // 3b) v3.26 — Açık kayıt: davetsiz gelen danışman kendi ofisini açar. Giriş yeter, ofis gerekmez. ACIK_KAYIT=1 değilse kapalı.
+  if (url.pathname === "/api/kayit-ol") {
+    if (!acikKayit(env)) return json({ hata: "KAPALI", mesaj: "Yeni ofis kaydı şu an kapalı. Davet bağlantısıyla katılabilirsiniz." }, 403);
     return istekIcinde(env.DATABASE_URL, () => davetBaglamiIcinde(k.eposta, () => isle(req, { params })).catch(hataYaniti));
   }
 

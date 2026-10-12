@@ -1056,6 +1056,25 @@ main.sarici>.genel-geri+*>h2:first-child{display:flex;align-items:center}
 .ilgi-ekle{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .es-gorevler ul{margin:4px 0 0;padding-left:18px}
 @media (max-width:420px){.gorev-dugmeler .btn{padding:.4rem .2rem;font-size:.8rem}}
+/* ───── v3.26 · 12 Ekim 2026 — süre, paylaşım seçimi, açıklama ───── */
+.kart-ek{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin:-4px 2px 4px}
+.kart-aciklama{flex:1 1 auto;min-width:0;text-align:left;background:none;border:0;padding:2px 0;color:var(--mut);font:inherit;font-size:.82rem;cursor:pointer;display:flex;flex-direction:column;gap:1px}
+.kart-aciklama span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap}
+.kart-aciklama.acik span{display:block;-webkit-line-clamp:unset}
+.kart-aciklama small{color:var(--acc);font-weight:600}
+.uzat-btn{flex:none;border-color:var(--acc);color:var(--acc);font-weight:700}
+.kart-sar.secmeli{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:start}
+.kart-sar.secmeli>.kart-anahtar{right:8px}
+.kart-sar.secmeli>.kart-ek{grid-column:2}
+.kart-sec{width:2.2rem;height:2.2rem;margin-top:10px;border-radius:50%;border:2px solid var(--line);background:var(--panel);color:var(--mut);font-size:1.1rem;font-weight:700;cursor:pointer}
+.kart-sar.secili>.kart-sec{background:var(--acc);border-color:var(--acc);color:#fff}
+.kart-sar.secili>.kayit-kart{outline:2px solid var(--acc)}
+.btn.pasif{opacity:.45;pointer-events:none}
+.sure-ozet{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;cursor:pointer;width:100%;font:inherit;color:inherit}
+.toplu-uzat{display:flex;flex-wrap:wrap;align-items:center;gap:10px;position:sticky;top:0;z-index:3}
+.cip-ayrac{width:1px;align-self:stretch;background:var(--line);margin:0 2px}
+.d-aciklama{margin:4px 0 8px;white-space:pre-wrap;color:var(--fg);line-height:1.45}
+.gorev-grup .gorev-liste{margin-top:8px}
 </style>
 <div id="kok"></div>
 <noscript>Bu demo için JavaScript gereklidir.</noscript>

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * Geçerlilik süresi (TTL) kuralları — sunucu ve demo aynı kodu kullanır.
  * v3.4: satılık ve kiralık ayrı (kiralık ilan/talep çabuk eskir: varsayılan portföy 45, talep 30 gün).
  * Acil talep: işlem süresinden kısa olan uygulanır.
@@ -32,3 +32,10 @@ export function ttlGun(tip: "PORTFOY" | "TALEP", islem: string | undefined | nul
 export function varsayilanValidUntil(tip: "PORTFOY" | "TALEP", islem: string | undefined | null, aciliyet: string | undefined | null, simdi = new Date(), ttl: TtlAyar = TTL_VARSAYILAN): Date {
   return new Date(simdi.getTime() + ttlGun(tip, islem, aciliyet, ttl) * 86_400_000);
 }
+// ───────── v3.26 — ★ Benim kayıtlar süresiz ─────────
+/** "Süresiz" işareti: veritabanında geçerlilik sütunu zorunlu olduğu için uzak bir tarih yazılır (göç gerekmez).
+ *  Sunucunun "süresi dolanları pasife al" işi bu tarihe hiç ulaşmaz. Kayıt pasife alınana / arşivlenene kadar açık kalır. */
+export const SURESIZ_TARIH = new Date(Date.UTC(2099, 11, 31, 12, 0, 0));
+export const suresizMi = (vu: Date | string | null | undefined) => !!vu && new Date(vu).getUTCFullYear() >= 2099;
+/** Süresi yaklaşan kayıtlarda kartta "+30" görünür (gün) */
+export const UZAT_ESIK_GUN = 5;

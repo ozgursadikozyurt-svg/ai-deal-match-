@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -20,6 +20,12 @@ import { KayitFormu } from "./form";
 import { VeriGirisi } from "./ice-aktarma";
 import { Konumlar } from "./konumlar";
 import { GorusmeNotlari } from "./notlar";
+import { SuresiYaklasanlar, SureOzeti, UzatDugmesi, Aciklama } from "./sure";
+import { GorevlerEkrani } from "./gorevler";
+import { kimOf } from "../src/lib/domain/kim";
+import { suresizMi, UZAT_ESIK_GUN } from "../src/lib/domain/gecerlilik";
+import { benimSuresiz } from "./depo";
+import { sahiplikCozucu } from "./sahiplik";
 import { BugunPanosu, SonrakiIletisimSorusu, EslesmeGorevleri } from "./bugun";
 import { eslesmeDurumunuUygula, fiyatDususuIsle } from "./bugun-eylem";
 import { IlgilenenlerBolumu } from "./ilgilenenler";
@@ -98,7 +104,7 @@ function AnaSayfa({ donus }: { donus?: boolean } = {}) {
     <GelenKutusuKarti />
     {(d.cakismalar ?? []).filter((c) => notionAcik() || c.saglayici !== "NOTION").length > 0 && <button className="uyari-kutu" onClick={() => git({ ad: "baglantilar" })} style={{ border: 0, cursor: "pointer", textAlign: "left" }}><b>{d.cakismalar.filter((c) => notionAcik() || c.saglayici !== "NOTION").length} eşitleme çakışması</b> seçiminizi bekliyor — Bağlantılar'da karar verin.</button>}
     <div className="istat">
-      {([[aktif.filter((k) => k.veri.tip === "TALEP").length, "Aktif talep", () => git({ ad: "liste", tip: "TALEP" })], [aktif.filter((k) => k.veri.tip === "PORTFOY").length, "Aktif portföy", () => git({ ad: "liste", tip: "PORTFOY" })], [sunulabilir.length, "Sunulabilir eşleşme", () => git({ ad: "eslesmeler" })], [yaklasan.length, "14 gün içinde süresi dolacak", () => git({ ad: "liste", tip: "PORTFOY" })]] as const).map(([n, l, f]) =>
+      {([[aktif.filter((k) => k.veri.tip === "TALEP").length, "Aktif talep", () => git({ ad: "liste", tip: "TALEP" })], [aktif.filter((k) => k.veri.tip === "PORTFOY").length, "Aktif portföy", () => git({ ad: "liste", tip: "PORTFOY" })], [sunulabilir.length, "Sunulabilir eşleşme", () => git({ ad: "eslesmeler" })], [yaklasan.length, "14 gün içinde süresi dolacak", () => git({ ad: "suresi" })]] as const).map(([n, l, f]) =>
         <button key={l} className="istat-kutu" onClick={f}><b>{n}</b><span>{l}</span></button>)}
     </div>
 
@@ -113,19 +119,21 @@ function AnaSayfa({ donus }: { donus?: boolean } = {}) {
       {acil.map((k) => <KayitKart key={k.id} k={k} />)}
     </section>}
 
-    {yaklasan.length > 0 && <section>
-      <div className="bolum-bas"><h3>Süresi yaklaşanlar</h3></div>
-      {yaklasan.map((k) => <KayitKart key={k.id} k={k} />)}
-    </section>}
+    <SureOzeti />
   </div>;
 }
 
 // ───────────────────────────── Liste ─────────────────────────────
-function KayitKart({ k }: { k: Kayit }) {
+export function KayitKart({ k, sec, uzat }: { k: Kayit; sec?: { on: boolean; degis: () => void }; uzat?: boolean }) {
   const { git, d } = useDepo();
   const v = k.veri;
   const sahip = useSahiplik()(v).tur;
-  return <div className="kart-sar"><button className={cx("kart kayit-kart", v.durum !== "ACTIVE" && "soluk", sahip === "BENIM" && "benim", sahip === "OFIS" && "ofisim")} onClick={() => git({ ad: "detay", id: k.id })}>
+  // v3.26 — kaynak etiketindeki kişi (ör. "Emlakçı · Ayşegül emlak") alt satırda tekrar yazılmaz
+  const kimAd = sade(kimOf(v as any, d.kisiler).ad);
+  const kisiAdlari = (v.kisiler ?? []).map((b) => d.kisiler.find((x) => x.id === b.kisiId)?.adSoyad).filter((a): a is string => !!a && !(kimAd && kimAd.includes(sade(a))));
+  const kalan = kalanGun(v);
+  const uzatGoster = uzat ?? (kalan != null && kalan <= UZAT_ESIK_GUN && (v.durum === "ACTIVE" || v.durum === "EXPIRED"));
+  return <div className={cx("kart-sar", sec && "secmeli", sec?.on && "secili")}>{sec && <button type="button" className="kart-sec" aria-pressed={sec.on} aria-label={sec.on ? "Paylaşımdan çıkar" : "Paylaşıma ekle"} onClick={sec.degis}>{sec.on ? "✓" : "+"}</button>}<button className={cx("kart kayit-kart", v.durum !== "ACTIVE" && "soluk", sahip === "BENIM" && "benim", sahip === "OFIS" && "ofisim")} onClick={() => git({ ad: "detay", id: k.id })}>
     <div className="pill-satir">
       <Pill ton={v.tip === "TALEP" ? "mavi" : "yesil"}>{tipYaz(v)}</Pill>
       <IslemPill islem={v.islemTipi} />
@@ -140,19 +148,21 @@ function KayitKart({ k }: { k: Kayit }) {
       <div className="kk-sol">
         <div className="kk-baslik">{baslikOf(v)}</div>
         <div className="kk-alt">{v.lokasyonlar.map(lokEtiket).join(" · ") || "Konum yok"}</div>
-        {(v.kisiler ?? []).length > 0 && <div className="kk-alt">{(v.kisiler ?? []).map((b) => d.kisiler.find((x) => x.id === b.kisiId)?.adSoyad).filter(Boolean).join(", ")}</div>}
+        {kisiAdlari.length > 0 && <div className="kk-alt">{kisiAdlari.join(", ")}</div>}
         {oneCikanlar(v).length > 0 && <div className="cip-satir">{oneCikanlar(v).map((c) => <span key={c} className="cip">{c}</span>)}</div>}
       </div>
       <div className="kk-sag"><b>{fiyatOf(v)}</b><span>{m2Of(v)}</span></div>
     </div>
-  </button><div className="kart-anahtar"><AnahtarDugmesi anahtar={v.tip === "TALEP" ? favTalep(k.id) : favPortfoy(k.id)} /></div></div>;
+  </button><div className="kart-anahtar"><AnahtarDugmesi anahtar={v.tip === "TALEP" ? favTalep(k.id) : favPortfoy(k.id)} /></div>
+    {(v.aciklama || uzatGoster) && <div className="kart-ek">{v.aciklama ? <Aciklama metin={v.aciklama} /> : <span />}{uzatGoster && <UzatDugmesi k={k} />}</div>}
+  </div>;
 }
+const sade = (x?: string | null) => (x ?? "").toLocaleLowerCase("tr").replace(/[^0-9a-zçğıöşü]/g, "");
 
 /** v3.16 — Talep / portföy listesini metin olarak paylaşma: istenenler seçilir, hazır metin kopyalanır ya da WhatsApp'a verilir.
  *  Kişi adı ve telefonu varsayılan olarak çıkmaz (müşteri bilgisi yanlışlıkla paylaşılmasın). */
-function ListePaylas({ tip, kayitlar }: { tip: "TALEP" | "PORTFOY"; kayitlar: Kayit[] }) {
+function ListePaylas({ tip, kayitlar, secili, setSecili }: { tip: "TALEP" | "PORTFOY"; kayitlar: Kayit[]; secili: Set<string>; setSecili: (s: Set<string>) => void }) {
   const { d } = useDepo();
-  const [secili, setSecili] = useState<Set<string>>(() => new Set(kayitlar.map((k) => k.id)));
   const [iletisim, setIletisim] = useState(false);
   const sec = kayitlar.filter((k) => secili.has(k.id));
   const satir = (k: Kayit) => {
@@ -167,10 +177,10 @@ function ListePaylas({ tip, kayitlar }: { tip: "TALEP" | "PORTFOY"; kayitlar: Ka
       <button className="btn kucuk" onClick={() => setSecili(secili.size === kayitlar.length ? new Set() : new Set(kayitlar.map((k) => k.id)))}>{secili.size === kayitlar.length ? "Seçimi kaldır" : "Tümünü seç"}</button>
       <label className="onay-satir"><input type="checkbox" checked={iletisim} onChange={(e) => setIletisim(e.target.checked)} /> Kişi adı ve telefonu da eklensin</label>
       <Kopyala metin={metin} etiketi={`Metni kopyala (${sec.length})`} />
-      <a className="btn kucuk" href={`https://wa.me/?text=${encodeURIComponent(metin)}`} target="_blank" rel="noreferrer">WhatsApp'ta paylaş</a>
+      <a className={cx("btn kucuk", !sec.length && "pasif")} aria-disabled={!sec.length} href={`https://wa.me/?text=${encodeURIComponent(metin)}`} target="_blank" rel="noreferrer">WhatsApp'ta paylaş</a>
     </div>
-    <div className="cip-satir">{kayitlar.slice(0, 60).map((k) => { const on = secili.has(k.id); return <button key={k.id} className={cx("cip secilir", on && "on")} onClick={() => { const y = new Set(secili); on ? y.delete(k.id) : y.add(k.id); setSecili(y); }}>{baslikOf(k.veri)}</button>; })}</div>
-    <textarea readOnly rows={Math.min(12, sec.length + 2)} aria-label="Paylaşılacak metin" value={metin} />
+    <p className="ipucu">Aşağıdaki kartların solundaki <b>+</b> ile tek tek seçin{sec.length ? ` — ${sec.length} seçili` : ""}.</p>
+    {sec.length > 0 && <details><summary className="ipucu">Metni gör</summary><textarea readOnly rows={Math.min(12, sec.length + 2)} aria-label="Paylaşılacak metin" value={metin} /></details>}
   </section>;
 }
 
@@ -183,6 +193,7 @@ function Liste({ tip, baslangic }: { tip: "TALEP" | "PORTFOY"; baslangic?: Filtr
   const kisiRol = (id: string) => d.kisiler.find((k) => k.id === id)?.roller ?? [];
   const [sr, setSr] = useKalici<Siralama>(`liste.${tip}.sr`, { alan: "giris", yon: "azalan" });
   const [paylasAcik, setPaylasAcik] = useState(false); // v3.16 — seçili/tüm kayıtları metin olarak paylaş
+  const [paylasSecili, setPaylasSecili] = useState<Set<string>>(() => new Set()); // v3.26 — kartların yanında tek tek seçim
   const secenek = kayitSiralama(tip);
   const sahip = useSahiplik();
   const sahipTur = (v: Veri) => sahip(v).tur;
@@ -194,9 +205,9 @@ function Liste({ tip, baslangic }: { tip: "TALEP" | "PORTFOY"; baslangic?: Filtr
     <FiltrePaneli f={f} set={setF} ogeler={hepsi.map((k) => k.veri)} sirala={<SiralaDugmesi secenekler={secenek} s={sr} set={setSr} />} />
     <SahiplikCipleri deger={f.sahiplik ?? null} set={(x) => setF({ ...f, sahiplik: x })} sayilar={sahipSayilari} />
     <div className="satir-ara"><div className="ipucu">{liste.length} / {hepsi.length} kayıt</div>
-      {liste.length > 0 && <button className="btn kucuk" onClick={() => setPaylasAcik(!paylasAcik)}>{paylasAcik ? "Paylaşımı kapat" : `Listeyi paylaş (${liste.length})`}</button>}</div>
-    {paylasAcik && liste.length > 0 && <ListePaylas tip={tip} kayitlar={liste} />}
-    {liste.map((k) => <KayitKart key={k.id} k={k} />)}
+      {liste.length > 0 && <button className="btn kucuk" onClick={() => setPaylasAcik(!paylasAcik)}>{paylasAcik ? "Paylaşımı kapat" : "Paylaş"}</button>}</div>
+    {paylasAcik && liste.length > 0 && <ListePaylas tip={tip} kayitlar={liste} secili={paylasSecili} setSecili={setPaylasSecili} />}
+    {liste.map((k) => <KayitKart key={k.id} k={k} sec={paylasAcik ? { on: paylasSecili.has(k.id), degis: () => { const y = new Set(paylasSecili); y.has(k.id) ? y.delete(k.id) : y.add(k.id); setPaylasSecili(y); } } : undefined} />)}
     {!liste.length && <p className="bos">Bu filtrede kayıt yok.</p>}
   </div>;
 }
@@ -246,6 +257,7 @@ function Detay({ id }: { id: string }) {
         {v.durum !== "ACTIVE" && <Pill>{etiket(v.durum)}</Pill>}<TTL v={v} />
       </div>
       <h2 className="d-baslik">{baslikOf(v)}</h2>
+      {v.aciklama && <p className="d-aciklama">{v.aciklama}</p>}
       <SahiplikSecici k={k} />
       <div className="izgara">
         <div><span>{talep ? "Bütçe" : "Fiyat"}</span><b>{fiyatOf(v)}</b></div>
@@ -262,11 +274,12 @@ function Detay({ id }: { id: string }) {
         <div><span>Kayda giriş</span><b>{tarihYaz(k.olusturma)}</b></div>
       </div>
       <div className="gecerlilik">
+        {suresizMi(v.validUntil) ? <div><span className="ipucu">Geçerlilik</span> <b>Süresiz</b> <span className="ipucu">— ★ Benim kayıtlar siz pasife alana ya da arşivleyene kadar açık kalır</span></div> : <>
         <div><span className="ipucu">Geçerlilik</span> <b>{tarihYaz(v.validUntil)}</b> <TTL v={v} /></div>
-        <div className="satir sar">{[30, 60, 90].map((g) => <button key={g} className="btn kucuk" onClick={() => uzat(g)}>+{g} gün</button>)}
+        <div className="satir sar"><button className="btn kucuk" onClick={() => uzat(30)}>+30 gün</button>
           <button className="btn kucuk" onClick={() => setTarihAcik(!tarihAcik)}>Tarih seç</button>
           {tarihAcik && <input type="date" id="d-gecerlilik" style={{ maxWidth: "11rem" }} defaultValue={v.validUntil ? new Date(v.validUntil).toISOString().slice(0, 10) : ""} onChange={(e) => { if (e.target.value) { kayitKaydet({ ...k, veri: { ...v, validUntil: new Date(e.target.value + "T12:00:00"), durum: v.durum === "EXPIRED" ? "ACTIVE" : v.durum } }); bildir("Geçerlilik güncellendi"); } }} />}
-        </div>
+        </div></>}
       </div>
     </section>
 
@@ -622,6 +635,8 @@ export function Uygulama() {
     requestAnimationFrame(dene);
   }, [ekran]);
   useEffect(() => { depoKaydet(d); }, [d]);
+  // v3.26 — ★ Benim kayıtlar süresiz (sonradan Benim'e dönen ya da içe aktarılan kayıtlar da)
+  useEffect(() => { const s = sahiplikCozucu(d); const y = benimSuresiz(d, (v) => s(v).tur === "BENIM"); if (y !== d) setD(y); }, [d.kayitlar, d.kisiler, d.ayarlar.sahiplik]);
   useEffect(() => { let iptal = false; (async () => { try { const s = CANLI.acik ? CANLI.sample : await (window as any).claude?.use("sample"); if (!iptal) setSample(() => s ?? null); /* fonksiyon doğrudan verilirse React onu güncelleyici sanıp çağırıyordu → v3.3 hatası "n.json is not a function" */ } catch { if (!iptal) setSample(null); } })(); return () => { iptal = true; }; }, []);
   useEffect(() => { if (!mesaj) return; const t = setTimeout(() => setMesaj(null), 2600); return () => clearTimeout(t); }, [mesaj]);
   useEffect(() => { void kutuOzetYukle(); }, []); // v3.23 — gelen kutusu: açılışta yalnızca dosya listesi (tek küçük istek); dosyalar ekran açılınca okunur
@@ -659,6 +674,7 @@ export function Uygulama() {
     // v3.24 — Gelen Kutusu Veri Girişi'nin sekmesi oldu; rozet (onay bekleyen sayısı) Veri Girişi'nde
     { k: "veri", etiket: "Veri Girişi", ikon: "veri", git: () => git({ ad: "veri" }), rozet: gelenRozet.sayi || undefined, alt: true },
     { k: "ayarlar", etiket: "Ayarlar", ikon: "ayar", git: () => git({ ad: "ayarlar" }), rozet: cakisma, alt: true },
+    { k: "gorevler", etiket: "Görevler", ikon: "gorev", git: () => git({ ad: "gorevler" }), alt: true }, // v3.26 — menünün en sonunda
   ];
   const surumCip = <button className="surum-cip" onClick={() => setSurumAcik(true)} title="Bu sürümde neler var">v{SURUM} · {TARIH}</button>;
   return <C.Provider value={ctx}>
@@ -687,6 +703,8 @@ export function Uygulama() {
       {ekran.ad === "ayarlar" && <Ayarlar />}
       {ekran.ad === "baglantilar" && <Baglantilar />}
       {ekran.ad === "yonetim" && <Yonetim />}
+      {ekran.ad === "suresi" && <SuresiYaklasanlar />}
+      {ekran.ad === "gorevler" && <GorevlerEkrani />}
     </main>
     <footer className="ayak">{MARKA.ad} v{SURUM} · {TARIH}{CANLI.acik ? "" : " — Demo: veriler yalnızca bu tarayıcıda saklanır; kişi adları ve telefonlar kurgusaldır"}</footer>
     </div>

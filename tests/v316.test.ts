@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * v3.16 — her ekranda geri, kişi rolüne göre filtre, eşleşmelerde işlem tipi, kaynak otomasyonu, geri sayımın kayıt gününden başlaması.
  */
 import { test } from "node:test";
@@ -45,8 +45,8 @@ test("eşleşmeler ekranı: işlem tipi seçicisi var (v3.21.2: tek satırlık a
   await a.kapat();
 });
 
-test("listelerde 'Listeyi paylaş' düğmesi var", () => {
-  assert.match(ciz(React.createElement(Liste, { tip: "TALEP" })), /Listeyi paylaş/);
+test("listelerde 'Paylaş' düğmesi var (v3.26: kart yanında tek tek seçim)", () => {
+  assert.match(ciz(React.createElement(Liste, { tip: "TALEP" })), />Paylaş</);
 });
 
 test("genel geri düğmesi: geçmiş varsa görünür, yoksa görünmez", async () => {

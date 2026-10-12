@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.25";
-export const TARIH = "11 Ekim 2026";
+export const SURUM = "3.26";
+export const TARIH = "12 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.25_11Ekim2026";
+export const DOSYA_EKI = "v3.26_12Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,32 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.26",
+    tarih: "12 Ekim 2026",
+    baslik: "★ Benim kayıtlar süresiz; Süresi yaklaşanlar ayrı ekran (Toplu +30); kartta tek +30; Gelen kutusunda 7/15/30 gün; kart yanında paylaşım seçimi; Açıklama alanı; Görevler ekranı; açık kayıt (Pro altyapısı)",
+    degisenler: [
+      "★ Benim kayıtlar süresiz: siz pasife alana ya da arşivleyene kadar açık kalır. Süre rozeti görünmez, süresi dolmuş Benim kayıtlar yeniden açılır; sunucunun gece \"süresi dolanları pasife al\" işi bunlara dokunmaz.",
+      "Süresi yaklaşanlar: Ana Sayfa'daki uzun liste kalktı, yerine tek satır özet (\"Süresi yaklaşanlar (N) · Listeyi aç · Toplu +30\"). Ayrı ekranda 5 / 14 / 30 gün ve talep / portföy süzgeci, en üstte \"Tümüne +30 gün\"; kartların solundaki + ile seçip yalnızca seçilenlere de uzatılabilir.",
+      "Kartlarda süre: süresi 5 gün ve altı kalan (ya da dolmuş) kayıtların kartında \"+30 gün\" düğmesi. Detay ve formdaki +60 / +90 gün düğmeleri kalktı; yalnızca +30 (ve tarih seç).",
+      "Gelen kutusu: Son 7 gün · Son 15 gün · Son 30 gün · Tümü süzgeci (ilan tarihi; yoksa dosyanın geliş tarihi), yanında kayıt sayısı.",
+      "Paylaşım: \"Paylaş\"a basınca her kartın solunda + düğmesi çıkar; tek tek seçilir, seçilenler vurgulanır. Tümünü seç / kaldır, kişi bilgisi seçeneği, Kopyala ve WhatsApp aynen kaldı; hazır metin \"Metni gör\" altında.",
+      "Açıklama: talep ve portföy formunda Başlık'ın altında Açıklama alanı (2.000 harf). Kartta iki satır görünür, dokununca açılır / kapanır; detayda tamamı. Veritabanına yeni sütun eklendi.",
+      "Kartta kişi tekrarı kalktı: kaynak etiketinde yazan kişi (ör. \"Emlakçı · Ayşegül emlak\", \"Mülk sahibi · +90 530…\") alt satırda bir daha yazılmaz.",
+      "Görevler ekranı: menünün en sonunda. Bugün panosunun tamamı (15 sınırı yok): Geciken · Bugün · Bu hafta · Sonra · Tamamlananlar; Ara / Sunum / Yer göster / Belge süzgeci; + Görev.",
+      "Pro sürüm altyapısı: açık kayıt. Cloudflare'de ACIK_KAYIT=1 yapılınca giriş ekranı \"Giriş ya da ücretsiz deneme\" olur; hesabı olmayan e-posta bağlantıya dokununca \"Ofisinizi açın\" formunu görür → kendi ofisi, ofis yöneticisi rolü, 14 gün Pro deneme. Değişken verilmedikçe kayıt kapalı (bugünkü gibi yalnızca davet).",
+      "Veritabanı değişikliği VAR: \"Kurulumu tamamla\" bir kez basılmalı (kayit tablosuna aciklama sütunu).",
+    ],
+    testEt: [
+      "Canlıda açılışta \"İlk kurulum\" çıkarsa \"Kurulumu tamamla\"ya basın (açıklama sütunu).",
+      "Ana Sayfa: en altta \"Süresi yaklaşanlar (N)\" tek satır; dokunun → ekranda \"Tümüne +30 gün\"; 5 / 14 / 30 gün çiplerini deneyin.",
+      "Portföyler: süresi 5 gün ve altı kalan kartta +30 gün; bir ★ Benim kaydı açın → Geçerlilik \"Süresiz\".",
+      "Portföyler › Paylaş: kartların solundaki + ile iki kayıt seçin → \"Metni kopyala (2)\".",
+      "Yeni portföy: Başlık altına Açıklama yazın → listede kartta iki satır, dokununca açılır; detayda tamamı.",
+      "Veri Girişi › Gelen kutusu: Son 7 / 15 / 30 gün süzgeci.",
+      "Menü › Görevler (en sonda): Geciken / Bugün / Bu hafta grupları ve tür süzgeci.",
+    ],
+  },
   {
     surum: "3.25",
     tarih: "11 Ekim 2026",

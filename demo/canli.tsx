@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.26 · 12 Ekim 2026 (v3.14'ten)
  * v3.20: davet bağlantısıyla katılma (?davet=KOD), açılışta /api/oturum (rol, plan, yetkiler), hesabı olmayana anlaşılır mesaj.
  * Canlı giriş noktası (dist/canli/index.html): giriş → ilk kurulum denetimi → sunucudan durum → aynı demo ekranları, veri sunucuda.
  */
@@ -37,7 +37,7 @@ const davetTemizle = () => { try { localStorage.removeItem(DAVET_ANAHTAR); } cat
   history.replaceState(null, "", location.pathname + (p.toString() ? "?" + p : "") + location.hash);
 })();
 
-type Faz = { ad: "aciliyor" } | { ad: "giris"; mesaj?: string } | { ad: "kurulum"; ayrinti: string } | { ad: "hata"; mesaj: string; yeniden: boolean } | { ad: "hazir" };
+type Faz = { ad: "aciliyor" } | { ad: "giris"; mesaj?: string } | { ad: "kayit"; eposta?: string } | { ad: "kurulum"; ayrinti: string } | { ad: "hata"; mesaj: string; yeniden: boolean } | { ad: "hazir" };
 
 function Cerceve({ children }: { children: React.ReactNode }) {
   return <div className="sarici" style={{ maxWidth: 440, margin: "0 auto", padding: "10vh 16px 24px" }}>
@@ -47,7 +47,7 @@ function Cerceve({ children }: { children: React.ReactNode }) {
   </div>;
 }
 
-function Giris({ o, mesaj, bitti }: { o: OturumYoneticisi; mesaj?: string; bitti: () => void }) {
+function Giris({ o, mesaj, bitti, acikKayit = false }: { o: OturumYoneticisi; mesaj?: string; bitti: () => void; acikKayit?: boolean }) {
   const [eposta, setEposta] = useState(""), [kod, setKod] = useState("");
   const [adim, setAdim] = useState<"eposta" | "gonderildi">("eposta");
   const [hata, setHata] = useState<string | undefined>(mesaj), [mesgul, setMesgul] = useState(false);
@@ -55,12 +55,13 @@ function Giris({ o, mesaj, bitti }: { o: OturumYoneticisi; mesaj?: string; bitti
   const calis = async (is: () => Promise<void>) => { setMesgul(true); setHata(undefined); try { await is(); } catch (e: any) { setHata(e?.message ?? "Bir sorun oluştu"); } finally { setMesgul(false); } };
   return <Cerceve>
     <section className="kart yigin">
-      <h3>{davet ? "Davetle katılın" : "Giriş"}</h3>
+      <h3>{davet ? "Davetle katılın" : acikKayit ? "Giriş ya da ücretsiz deneme" : "Giriş"}</h3>
+      {acikKayit && !davet && adim === "eposta" && <p>Hesabınız yoksa aynı yoldan başlayın: bağlantıya dokununca ofisinizi açarsınız — <b>{DENEME_GUN_YAZI}</b>, kart bilgisi istenmez.</p>}
       {adim === "eposta" ? <>
         {davet && <p>Bir ofise davet edildiniz. E-posta adresinizi yazın; gelen bağlantıya dokununca hesabınız açılır.</p>}
         <p className="ipucu">E-posta adresinize tek kullanımlık bir giriş bağlantısı göndereceğiz. Şifre gerekmez.</p>
         <div className="alan"><label htmlFor="gi-eposta">E-posta</label><input id="gi-eposta" type="email" autoComplete="email" inputMode="email" value={eposta} onChange={(e) => setEposta(e.target.value)} placeholder="ornek@eposta.com" /></div>
-        <button className="btn birincil" disabled={mesgul || !/.+@.+\..+/.test(eposta)} onClick={() => calis(async () => { await o.baglantiIste(eposta, location.origin + "/", davet); setAdim("gonderildi"); })}>{mesgul ? "Gönderiliyor…" : "Giriş bağlantısı gönder"}</button>
+        <button className="btn birincil" disabled={mesgul || !/.+@.+\..+/.test(eposta)} onClick={() => calis(async () => { await o.baglantiIste(eposta, location.origin + "/", davet || acikKayit); setAdim("gonderildi"); })}>{mesgul ? "Gönderiliyor…" : "Giriş bağlantısı gönder"}</button>
       </> : <>
         <p>Bağlantıyı <b>{eposta}</b> adresine gönderdik. E-postadaki bağlantıya bu cihazda dokunmanız yeterli.</p>
         <p className="ipucu">E-postanızda altı haneli bir kod da varsa buraya yazabilirsiniz:</p>
@@ -73,6 +74,35 @@ function Giris({ o, mesaj, bitti }: { o: OturumYoneticisi; mesaj?: string; bitti
       {hata && <div className="hata-kutu" role="alert">{hata}</div>}
     </section>
   </Cerceve>;
+}
+
+const DENEME_GUN_YAZI = "14 gün Pro deneme";
+/** v3.26 — Açık kayıt: giriş yapmış ama hesabı olmayan danışman kendi ofisini açar */
+function KayitOl({ o, eposta, bitti }: { o: OturumYoneticisi; eposta?: string; bitti: () => void }) {
+  const [f, setF] = useState({ ofisAd: "", adSoyad: "", telefon: "", sehir: "Antalya", onay: false });
+  const [hata, setHata] = useState<string>(), [mesgul, setMesgul] = useState(false);
+  const set = (k: keyof typeof f, v: any) => setF({ ...f, [k]: v });
+  const gonder = async () => {
+    setMesgul(true); setHata(undefined);
+    try {
+      const r = await o.api("/api/kayit-ol", { method: "POST", json: f });
+      const j: any = await r.json().catch(() => ({}));
+      if (!r.ok && r.status !== 409) throw new Error(j?.mesaj ?? `Sunucu ${r.status}`);
+      bitti();
+    } catch (e: any) { setHata(e?.message ?? "Kayıt yapılamadı"); } finally { setMesgul(false); }
+  };
+  return <Cerceve><section className="kart yigin">
+    <h3>Ofisinizi açın</h3>
+    <p><b>{eposta ?? "Bu e-posta"}</b> için henüz hesap yok. Ofisinizi açın; {DENEME_GUN_YAZI} başlar, sonra Ücretsiz plana geçer (verileriniz silinmez).</p>
+    <div className="alan"><label htmlFor="ko-ofis">Ofis / marka adı</label><input id="ko-ofis" value={f.ofisAd} onChange={(e) => set("ofisAd", e.target.value)} placeholder="Örn: Lara Gayrimenkul" maxLength={80} /></div>
+    <div className="alan"><label htmlFor="ko-ad">Adınız soyadınız</label><input id="ko-ad" autoComplete="name" value={f.adSoyad} onChange={(e) => set("adSoyad", e.target.value)} maxLength={80} /></div>
+    <div className="alan"><label htmlFor="ko-tel">Cep telefonu</label><input id="ko-tel" type="tel" autoComplete="tel" value={f.telefon} onChange={(e) => set("telefon", e.target.value)} placeholder="05XX XXX XX XX" maxLength={20} /></div>
+    <div className="alan"><label htmlFor="ko-sehir">Şehir</label><input id="ko-sehir" value={f.sehir} onChange={(e) => set("sehir", e.target.value)} maxLength={40} /></div>
+    <label className="onay-satir"><input type="checkbox" checked={f.onay} onChange={(e) => set("onay", e.target.checked)} /> Kullanım koşullarını ve KVKK aydınlatma metnini okudum, kabul ediyorum.</label>
+    <div className="satir sar"><button className="btn birincil" disabled={mesgul || f.ofisAd.trim().length < 2 || f.adSoyad.trim().length < 2 || !f.onay} onClick={gonder}>{mesgul ? "Açılıyor…" : "Ofisimi aç"}</button>
+      <button className="btn" onClick={() => { o.cikis(); location.reload(); }}>Başka e-postayla gir</button></div>
+    {hata && <div className="hata-kutu" role="alert">{hata}</div>}
+  </section></Cerceve>;
 }
 
 function Canli({ cfg }: { cfg: Yapilandirma }) {
@@ -96,6 +126,7 @@ function Canli({ cfg }: { cfg: Yapilandirma }) {
       let r = await api("/api/durum");
       if (r.status === 401 || r.status === 403) {
         const j: any = await r.json().catch(() => ({}));
+        if (r.status === 403 && cfg.acikKayit && j?.hata === "HESAP_YOK") return setFaz({ ad: "kayit", eposta: o.eposta ?? undefined }); // v3.26
         if (r.status === 403) { o.cikis(); return setFaz({ ad: "giris", mesaj: j?.mesaj ?? "Bu e-posta için hesap yok. Yöneticinizden davet bağlantısı isteyin." }); }
         o.cikis(); return setFaz({ ad: "giris", mesaj: j?.mesaj && j.mesaj !== "Giriş gerekli" ? j.mesaj : undefined });
       }
@@ -157,7 +188,8 @@ function Canli({ cfg }: { cfg: Yapilandirma }) {
   }, []);
 
   if (faz.ad === "aciliyor") return <Cerceve><p>Açılıyor…</p></Cerceve>;
-  if (faz.ad === "giris") return <Giris o={o} mesaj={faz.mesaj} bitti={async () => { if (await kurulumDenetle()) await ac(); }} />;
+  if (faz.ad === "giris") return <Giris o={o} mesaj={faz.mesaj} acikKayit={!!cfg.acikKayit} bitti={async () => { if (await kurulumDenetle()) await ac(); }} />;
+  if (faz.ad === "kayit") return <KayitOl o={o} eposta={faz.eposta} bitti={() => { setFaz({ ad: "aciliyor" }); void ac(); }} />;
   if (faz.ad === "kurulum") return <Cerceve><section className="kart yigin">
     <h3>İlk kurulum</h3><p>Veritabanı henüz hazır değil.</p><p className="ipucu">{faz.ayrinti}</p>
     <button className="btn birincil" onClick={async () => { setFaz({ ad: "aciliyor" }); const r = await o.api("/api/kurulum", { method: "POST" }); const j: any = await r.json().catch(() => ({})); if (!r.ok || !j.hazir) return setFaz({ ad: "hata", mesaj: j?.mesaj ?? "Kurulum tamamlanamadı", yeniden: false }); await ac(); }}>Kurulumu tamamla</button>

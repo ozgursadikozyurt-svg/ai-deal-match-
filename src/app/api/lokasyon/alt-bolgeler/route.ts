@@ -1,4 +1,4 @@
-// Anahtar CRM v3.25 · 11 Ekim 2026
+// Anahtar CRM v3.26 · 12 Ekim 2026
 // GET  /api/lokasyon/alt-bolgeler?ilId=7          → piyasa bölgeleri (Lara, Altınova, OSB…)
 // POST /api/lokasyon/alt-bolgeler                  → yeni alt bölge + mahalle eşlemesi
 import { z } from "zod";

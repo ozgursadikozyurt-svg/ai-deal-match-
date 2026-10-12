@@ -1,11 +1,11 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * Canlı — Supabase girişi (e-posta ile tek kullanımlık bağlantı / kod). Ek kütüphane yok: Supabase Auth (GoTrue) REST uçları doğrudan çağrılır.
  * Oturum bu tarayıcıda (localStorage) tutulur; erişim anahtarı süresi dolmadan yenilenir. Yeni kayıt açılmaz (create_user: false);
  * sunucu ayrıca e-postayı IZINLI_EPOSTALAR listesiyle denetler.
  */
 export interface Oturum { access: string; refresh: string; bitis: number; eposta?: string }
-export interface Yapilandirma { supabaseUrl: string; supabaseAnonKey: string }
+export interface Yapilandirma { supabaseUrl: string; supabaseAnonKey: string; /** v3.26 — davetsiz yeni ofis kaydı açık mı (Cloudflare ACIK_KAYIT=1) */ acikKayit?: boolean }
 const ANAHTAR = "anahtarcrm-oturum";
 
 const jwtEposta = (t: string): string | undefined => { try { return JSON.parse(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).email; } catch { return undefined; } };

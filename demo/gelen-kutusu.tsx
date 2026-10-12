@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * GELEN KUTUSU — "onay bekleyenler". E-postayla ya da yüklemeyle gelen dosyalardaki (Revy Excel dökümü, WhatsApp sohbet .zip / .txt)
  * her ilan / talep burada tek havuzda bekler; kullanıcı ekler ya da atlar. Hiçbir kayıt onaysız havuza girmez.
  *
@@ -196,8 +196,9 @@ function EpostaKurulumu({ kapat }: { kapat: () => void }) {
 }
 
 // ───────────────────────────── Ekran ─────────────────────────────
-interface Suzgec { kaynak: "" | GelenKaynak; alt: string; durum: "" | GelenDurum; ana: "" | AnaTur; islem: "" | "SATILIK" | "KIRALIK" | "DEVREN"; tip: "" | "PORTFOY" | "TALEP"; ara: string }
-const BOS_SUZGEC: Suzgec = { kaynak: "", alt: "", durum: "", ana: "", islem: "", tip: "", ara: "" };
+interface Suzgec { kaynak: "" | GelenKaynak; alt: string; durum: "" | GelenDurum; ana: "" | AnaTur; islem: "" | "SATILIK" | "KIRALIK" | "DEVREN"; tip: "" | "PORTFOY" | "TALEP"; ara: string; /** v3.26 — son N gün (ilan tarihi; yoksa dosyanın geliş tarihi) */ gun?: number | null }
+const BOS_SUZGEC: Suzgec = { kaynak: "", alt: "", durum: "", ana: "", islem: "", tip: "", ara: "", gun: null };
+const GUN_SECENEK: [number | null, string][] = [[7, "Son 7 gün"], [15, "Son 15 gün"], [30, "Son 30 gün"], [null, "Tümü"]];
 const SAYFA = 60;
 
 export function GelenKutusu({ gomulu = false }: { gomulu?: boolean } = {}) {
@@ -234,7 +235,11 @@ export function GelenKutusu({ gomulu = false }: { gomulu?: boolean } = {}) {
     (haric === "durum" ? BEKLEYEN.has(a.durum) || a.durum === "TEKRAR" : f.durum ? a.durum === f.durum : BEKLEYEN.has(a.durum)) &&
     (haric === "kaynak" || !f.kaynak || a.kaynak === f.kaynak) && (haric === "kaynak" || haric === "alt" || !f.alt || a.altKaynak === f.alt) &&
     (haric === "ana" || !f.ana || a.ana === f.ana) && (haric === "islem" || islemUyar(a.taslak.islemTipi as string, f.islem)) && (haric === "tip" || !f.tip || a.taslak.tip === f.tip) &&
+    (haric === "gun" || !f.gun || gunIcinde(a, f.gun)) &&
     (!ara || (araMetni.get(a) ?? "").includes(ara));
+  const gelis = useMemo(() => new Map(k.dosyalar.map((x) => [x.id, x.gelis])), [k.dosyalar]);
+  const simdiMs = (CANLI.acik ? Date.now() : BUGUN.getTime());
+  function gunIcinde(a: GelenAday, gun: number) { const t = a.tarih ?? gelis.get(a.dosyaId); return !!t && simdiMs - new Date(t).getTime() <= gun * 86_400_000; }
   const gorunen = useMemo(() => adaylar.filter((a) => uyar(a)), [adaylar, f]);
   const say = (boyut: keyof Suzgec, p: (a: GelenAday) => boolean) => adaylar.filter((a) => uyar(a, boyut) && p(a)).length;
   const altlar = useMemo(() => [...new Set(adaylar.filter((a) => uyar(a, "alt")).map((a) => a.altKaynak))].sort((x, y) => x.localeCompare(y, "tr")), [adaylar, f]);
@@ -360,6 +365,9 @@ export function GelenKutusu({ gomulu = false }: { gomulu?: boolean } = {}) {
             <button className={cx("fb", !f.alt && "on")} onClick={() => sf({ alt: "" })}>Hepsi</button>
             {altlar.map((x) => <button key={x} className={cx("fb", f.alt === x && "on")} onClick={() => sf({ alt: x })}>{x} ({say("alt", (a) => a.altKaynak === x)})</button>)}
           </div>}
+          <div className="filtre" role="group" aria-label="Tarih">
+            {GUN_SECENEK.map(([g, e]) => { const n = g ? say("gun", (a) => gunIcinde(a, g)) : null; return <button key={e} className={cx("fb", (f.gun ?? null) === g && "on")} aria-pressed={(f.gun ?? null) === g} onClick={() => sf({ gun: g })}>{e}{n != null ? ` (${n})` : ""}</button>; })}
+          </div>
           <div className="filtre" role="group" aria-label="Tür ve işlem">
             <button className={cx("fb", !f.ana && "on")} onClick={() => sf({ ana: "" })}>Tüm türler</button>
             {(Object.keys(ANA_TUR_ETIKET) as AnaTur[]).map((x) => { const n = say("ana", (a) => a.ana === x); return n ? <button key={x} className={cx("fb", f.ana === x && "on")} onClick={() => sf({ ana: x })}>{ANA_TUR_ETIKET[x]} ({n})</button> : null; })}

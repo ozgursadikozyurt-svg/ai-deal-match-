@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * v3.12 — metin ayrıştırma düzeltmeleri (kullanıcının WhatsApp sohbetinden gelen örnekler), içe aktarma kural geçişi, sürüm.
  */
 import { test } from "node:test";

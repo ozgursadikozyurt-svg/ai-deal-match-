@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * API giriş modelleri (Zod) — Kayit + MulkOzellik + Lokasyon.
  * AI çıktısı da, manuel form da, Notion importu da AYNI şemadan geçer.
  * Enum dışı değer, serbest paragraf veya birim hatası DB'ye ulaşamaz.
@@ -181,6 +181,8 @@ export const KayitTemel = z.object({
 
   baslik: kisaMetin(160),
   ozet: kisaMetin(280),
+  /** v3.26 — serbest açıklama (kartta kısaca, detayda tamamı) */
+  aciklama: z.string().trim().max(2000).nullish(),
   hamMetin: z.string().max(20_000).nullish(),
   operasyonNotu: z.string().max(5_000).nullish(),
   ozelSartlar: z.array(z.string().trim().min(2).max(60)).max(10).default([]),

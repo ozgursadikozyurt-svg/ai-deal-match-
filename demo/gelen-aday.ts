@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * Gelen kutusu — dosya parçalarından ADAY çıkarır ve havuzla karşılaştırır (mükerrer denetimi).
  *
  * İki adım bilerek ayrıdır:

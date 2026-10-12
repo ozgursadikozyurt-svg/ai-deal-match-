@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.25 · 11 Ekim 2026
+ * Anahtar CRM v3.26 · 12 Ekim 2026
  * KAYDIN KAYNAĞI — kullanıcının tek bakışta seçtiği dört seçenek. Veritabanında yeni alan yoktur: seçim, kaydın mevcut üç alanına
  * (havuz, ilanSahibiTipi, veriKanali) yazılır; okurken bu üç alandan geri çıkarılır. Böylece eşleştirmedeki havuz katmanı
  * (src/lib/eslestirme/havuz.ts › havuzKatmani) seçimle her zaman uyumlu kalır:

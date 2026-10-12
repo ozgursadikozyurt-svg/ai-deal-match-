@@ -356,6 +356,7 @@ export const KayitScalarFieldEnum = {
   portalIlanSahibi: 'portalIlanSahibi',
   baslik: 'baslik',
   ozet: 'ozet',
+  aciklama: 'aciklama',
   hamMetin: 'hamMetin',
   operasyonNotu: 'operasyonNotu',
   arsivNotu: 'arsivNotu',
