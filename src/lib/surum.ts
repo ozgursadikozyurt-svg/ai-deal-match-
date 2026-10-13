@@ -32,6 +32,9 @@ export const SURUM_GECMISI: SurumKaydi[] = [
       "Eşleşmeler ekranı: az verili eşleşmeler varsayılan olarak gizli — başlıkta '+N az verili' ile tek dokunuşla açılır.",
       "Tip çelişkisi: talep metni başka tipi söylüyorsa ('—SATILIK ARSA—' yazıyor, tip Büro/Ofis) kayıt detayında ve eşleşme kartında 'Kontrol' uyarısı; eşleşme en fazla Koşullu.",
       "Mükerrer ilan: aynı ilan (tip, işlem, m², fiyat, oda, mahalle birebir) iki kez girildiyse eşleşme listesinde tek satır ve '+1 aynı ilan' rozeti. Kayıtlar silinmez.",
+      "Kira her zaman AYLIK saklanır: yıllık girilen kira (form, tablo, WhatsApp, API) 12'ye bölünür, ödeme şekli 'Yıllık peşin' işaretlenir, yıllık tutar işlem notuna yazılır ('Kira yıllık isteniyor: 1.300.000 TL/yıl (aylık ≈ 108.333 TL)'). Talep bütçesi de aynı. Kirada 'Toplam' periyot aylık sayılır.",
+      "Talepte istenen ama portföyde bilgisi olmayan özellik (ofis, rampa, elektrik…): eleme yok, ama her biri −4 puan (en çok −12), skor 85'i geçemez ve eşleşme 'sunmadan önce sor' (Koşullu) olur. Özelliği açıkça YOK olan portföy −8 (en çok −16). Böylece ofisi doğrulanmış depo üstte, bilgisi olmayan hemen altında, ofisi olmayan daha aşağıda. Kullanım amacı (müşterinin niyeti) sayılmaz.",
+      "Depo / sanayide kapalı alan girilmemişse ilanın m²'si kapalı alan sayılır ('ilan m²'si' notuyla).",
     ],
     testEt: [
       "Eşleşmeler: başlıkta '+N az verili' düğmesi; dokununca liste büyür, 'Az verilileri gizle' ile geri döner.",
@@ -40,6 +43,8 @@ export const SURUM_GECMISI: SurumKaydi[] = [
       "Yıllık kirası aylık görünen bir depo portföyünün detayı: üstte 'Kontrol: … yıllık girilmiş olabilir'.",
       "'SATILIK ARSA' yazan ama Ofis kayıtlı talep: detayda tip uyarısı; Düzenle'den Arsa yapınca arsa portföyleri eşleşir.",
       "Aynı ilanı iki kaynaktan girilmiş bir portföy: eşleşme kartında '+1 aynı ilan'.",
+      "Kiralık portföy formunda periyodu 'Yıllık' seçip 1.200.000 girin, kaydedin: kartta aylık 100.000 TL, detayda 'Kira yıllık isteniyor' notu.",
+      "'Yenigöl, 1000–1500 m², ofisli depo' talebi: ofisi doğrulanmış depolar üstte (Sunulabilir), ofis bilgisi olmayanlar 85 ve altı (Koşullu, 'Sorulacak: Ofis').",
     ],
   },
   {

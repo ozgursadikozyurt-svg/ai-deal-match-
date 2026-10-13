@@ -4,6 +4,7 @@
  * AI çıktısı da, manuel form da, Notion importu da AYNI şemadan geçer.
  * Enum dışı değer, serbest paragraf veya birim hatası DB'ye ulaşamaz.
  */
+import { kirayiAyligaCevir } from "../domain/kira-periyot";
 import { z } from "zod";
 import {
   KayitTipi, Durum, Aciliyet, AnaKategori, MulkTipi, IslemTipi, ParaBirimi, FiyatPeriyodu,
@@ -210,7 +211,8 @@ function kurallar(k: z.infer<typeof KayitTemel>, ctx: z.RefinementCtx) {
     ctx.addIssue({ code: "custom", path: ["ozellik", "kritikKriterler"], message: "Kritik/esnek kriter sadece TALEP kayıtlarında" });
 }
 
-export const KayitCreateSchema = KayitTemel.superRefine(kurallar).transform((k) => ({
+// v3.27 — kirada fiyat / bütçe her zaman AYLIK saklanır (yıllık girilen 12'ye bölünür, yıllık tutar nota yazılır)
+export const KayitCreateSchema = KayitTemel.superRefine(kurallar).transform((k0) => kirayiAyligaCevir(k0)).transform((k) => ({
   ...k,
   anaKategori: k.anaKategori ?? anaKategoriOf(k.mulkTipi),
   lokasyonlar: k.lokasyonlar.map((l, i) => ({ ...l, birincil: l.birincil || (k.lokasyonlar.length === 1 && i === 0) })),

@@ -287,7 +287,7 @@ export function satirDonustur(s: string[], e: Eslesme, o: AktarimSecenek, satirN
   // v3.23 — veri kalitesi: portallarda eksik / fazla sıfırla girilmiş fiyatlar ("kiralık 1.200 TL", "kiralık 8.000.000 TL") sessizce havuza girmesin
   if (tip === "PORTFOY" && fiyat.deger != null && !devrenBelirsiz) {
     const yaz = fiyat.deger.toLocaleString("tr-TR");
-    if (yillikKira) kontrol.push(`Fiyat yıllık kira olarak okundu (${yaz} TL/yıl ≈ ${Math.round(fiyat.deger / 12).toLocaleString("tr-TR")} TL/ay)`);
+    if (yillikKira) kontrol.push(`Yıllık kira aylığa çevrildi: ${yaz} TL/yıl → ${Math.round(fiyat.deger / 12).toLocaleString("tr-TR")} TL/ay`);
     else if (kira && kiraPeriyotSuphesi({ islemTipi: islem, mulkTipi: mt.mulkTipi ?? "DIGER", fiyat: fiyat.deger, m2 }) != null) kontrol.push(`Aylık kira m² başına çok yüksek (${Math.round(fiyat.deger / m2!).toLocaleString("tr-TR")} TL/m²) — yıllık kira olabilir; eşleştirmede 12'ye bölünerek karşılaştırılır`);
     else if (kira && fiyat.deger >= 1_000_000) kontrol.push(`Aylık kira için çok yüksek (${yaz} TL) — satış, devir bedeli ya da yıllık kira olabilir`);
     else if (kira && ticari && m2 && fiyat.deger / m2 >= 5_000) kontrol.push(`Aylık kira m² başına çok yüksek (${Math.round(fiyat.deger / m2).toLocaleString("tr-TR")} TL/m²) — devir bedeli olabilir`);

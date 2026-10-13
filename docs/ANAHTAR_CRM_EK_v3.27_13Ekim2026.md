@@ -23,6 +23,10 @@
 6. **Tip çelişkisi** (`src/lib/domain/tip-celiskisi.ts`): metin başka aileyi söylüyor ve kendi ailesinin hiçbir kelimesi geçmiyorsa uyarı. Türkçe harfler için Unicode kelime sınırı.
 7. **Mükerrer ilan** (`src/lib/eslestirme/mukerrer.ts`): tip/işlem/m²/fiyat/oda/mahalle birebir aynıysa aynı talebin listesinde tek satır, "+N aynı ilan". Kayıtlar silinmez.
 
+8. **Kira her zaman aylık** (`kirayiAyligaCevir`, `KayitCreateSchema` içinde — form, tablo, WhatsApp ve API aynı yoldan geçer): kirada YILLIK girilen fiyat / bütçe 12'ye bölünür, `kiraOdemeSekli = YILLIK_PESIN`, yıllık tutar `operasyonNotu`na ("Kira yıllık isteniyor: X TL/yıl (aylık ≈ Y TL)"). Kirada TOPLAM → AYLIK. Antalya'da yıllık peşin kira yaygın; karşılaştırma ve ekranda okuma aylık üzerinden.
+9. **İstenen ama bilinmeyen özellik**: 99 depo portföyünün 83'ü sahibinden/Revy'den yalnızca başlıkla geliyor (açıklama yok), yani "ofis / rampa / elektrik" bilgisi kaynağında yok. Eleme yapılmaz; her bilinmeyen istek −4 (en çok −12), skor tavanı 85, uygunluk Koşullu ("Sorulacak"). Açıkça karşılanmayan istek −8 (en çok −16). Kullanım amacı sayılmaz. Örnek ("Yenigöl 1000–1500 m², ofisli"): ofisi doğrulanmış 2 depo 90–91 Sunulabilir; ofis bilgisi olmayanlar 85 Koşullu; ofisi olmayan daha aşağıda.
+10. **Kapalı alan yedeği**: depo / sanayide `kapaliAlanM2` boşsa ilan m²'si kullanılır.
+
 ## 3. Ölçüm (aynı canlı veri, önce → sonra)
 
 | | v3.26 | v3.27 |
@@ -32,6 +36,7 @@
 | Ofis talebine daire | 151 | 0 |
 | Satışta bütçenin < %30'u | 103 | 0 |
 | Geri kazanılan depo eşleşmesi (yıllık kira) | — | 31 |
+| "Sunulabilir" | 243 | 128 (bilinmeyen istek artık sorulmadan sunulmuyor) |
 
 ## 4. Veritabanı
 

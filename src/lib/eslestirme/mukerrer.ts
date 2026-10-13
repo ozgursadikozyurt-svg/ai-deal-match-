@@ -14,15 +14,16 @@ export function portfoyImzasi(v: { mulkTipi?: unknown; islemTipi?: unknown; m2?:
 }
 
 /** Sıralı eşleşme listesinde aynı talebe düşen mükerrer portföyleri ilkinin altına toplar (sıra korunur) */
-export function mukerrerleriTopla<E extends { t: { id: string }; p: { id: string; veri: any }; kopyalar?: { id: string; veri: any }[] }>(liste: E[]): E[] {
-  const ilk = new Map<string, E>();
-  const sonuc: E[] = [];
+export function mukerrerleriTopla<E extends { t: { id: string }; p: { id: string; veri: any }; kopyalar?: { id: string; veri: any }[] }>(liste: E[]): (E & { kopyalar: E["p"][] })[] {
+  type S = E & { kopyalar: E["p"][] };
+  const ilk = new Map<string, S>();
+  const sonuc: S[] = [];
   for (const e of liste) {
     const imza = portfoyImzasi(e.p.veri);
     const anahtar = imza ? `${e.t.id}~${imza}` : null;
     const onceki = anahtar ? ilk.get(anahtar) : undefined;
-    if (onceki) { (onceki.kopyalar ??= []).push(e.p); continue; }
-    const yeni = { ...e, kopyalar: [] as { id: string; veri: any }[] };
+    if (onceki) { onceki.kopyalar.push(e.p); continue; }
+    const yeni = { ...e, kopyalar: [] as E["p"][] } as S;
     if (anahtar) ilk.set(anahtar, yeni);
     sonuc.push(yeni);
   }

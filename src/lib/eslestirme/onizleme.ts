@@ -56,6 +56,17 @@ export const ISTENMEYEBILIR: ReadonlySet<string> = new Set(["siteIcinde", "havuz
 export const KIRA_BIRIM_UST: Partial<Record<"SANAYI" | "TICARI" | "KONUT" | "ARSA", number>> = { SANAYI: 600 };
 /** v3.27 — güven: ölçülen kriter sayısı bunun altındaysa (≤) güven DÜŞÜK; bu ve üstüyse YÜKSEK olabilir */
 export const GUVEN_DUSUK_EN_COK = 3, GUVEN_YUKSEK_EN_AZ = 6;
+/**
+ * v3.27 — talepte istenen ama portföyde bilgisi olmayan her özellik (ofis, rampa, elektrik…) için puandan düşülen, en çok
+ * BILINMEYEN_ISTEK_TAVAN. Ölçüm (13 Eki 2026): 99 depo portföyünün 83'ü portaldan yalnızca başlıkla geliyor; "ofisli depo"
+ * talebine ofisi doğrulanmış depo da, ofis bilgisi hiç olmayan depo da 90 alıyordu. Eleme yapılmaz (depo yine görünür),
+ * yalnızca doğrulanmış olan öne geçer ve bilinmeyen istek "sunmadan önce sor" (Koşullu) yapar.
+ */
+export const BILINMEYEN_ISTEK_CEZASI = 4, BILINMEYEN_ISTEK_TAVAN = 12;
+/** v3.27 — istenen bir özellik bilinmiyorsa skor bunu geçemez: doğrulanmış eşleşme (ör. ofisi kesin olan depo) her zaman üstte kalır */
+export const BILINMEYEN_ISTEK_SKOR_TAVANI = 85;
+/** v3.27 — istenen özellik portföyde açıkça YOK ise (ör. ofis yok): engel değilse bile bilinmeyenden daha aşağı sıralanır */
+export const KARSILANMAYAN_ISTEK_CEZASI = 8, KARSILANMAYAN_ISTEK_TAVAN = 16;
 export type GuvenSeviye = "YUKSEK" | "ORTA" | "DUSUK";
 export interface Guven { seviye: GuvenSeviye; olculen: number; toplam: number; aciklama: string }
 
@@ -318,6 +329,8 @@ export const SATIS_ISLEMLERI: ReadonlySet<string> = new Set(["SATILIK", "DEVREN_
 /** Kaydın fiyat periyodu, işlem tipine göre düzeltilmiş hâli */
 export function etkinPeriyot(k: { islemTipi: string; fiyatPeriyodu?: string | null }, islem = k.islemTipi): string {
   if (SATIS_ISLEMLERI.has(islem)) return "TOPLAM";
+  // v3.27 — kirada "toplam" anlamsızdır: aylık sayılır (kirada fiyat her zaman aylık saklanır)
+  if (/KIRALIK/.test(islem) && !/GUNLUK/.test(islem) && (k.fiyatPeriyodu == null || k.fiyatPeriyodu === "TOPLAM")) return "AYLIK";
   return k.fiyatPeriyodu ?? (/KIRALIK/.test(islem) ? "AYLIK" : "TOPLAM");
 }
 /**
@@ -455,12 +468,14 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
       if (ISTENMEYEBILIR.has(alan) && p.ozellik?.[alan] === true) satirlar.push({ anahtar: alan, etiket: meta.etiket, talep: "İstemiyor", portfoy: "Var", sonuc: "SAGLANMADI", kritik: false, puan: 0.3, bilesen: "KONUT" });
       continue;
     }
-    const pv = p.ozellik?.[alan];
+    // v3.27 — depo / sanayide kapalı alan girilmemişse ilanın m²'si kapalı alan sayılır (portal ilanlarında ayrı alan yok)
+    const kapaliYedek = alan === "kapaliAlanM2" && p.ozellik?.[alan] == null && p.m2 != null && matrisOf(p.mulkTipi) === "SANAYI";
+    const pv = kapaliYedek ? p.m2 : p.ozellik?.[alan];
     const kr = "kriter" in meta ? (meta.kriter as string | undefined) : undefined;
     satirlar.push({
       anahtar: alan, etiket: meta.etiket + ("birim" in meta && meta.birim ? ` (${meta.birim})` : ""),
       talep: meta.karsilastirma === "min" ? `≥ ${fmt(tv)}` : meta.karsilastirma === "max" ? `≤ ${fmt(tv)}` : meta.karsilastirma === "sirali" ? `en az ${fmt(tv)}` : fmt(tv),
-      portfoy: fmt(pv), sonuc: karsilastir(alan as MulkOzellikAlani, tv, pv),
+      portfoy: fmt(pv) + (kapaliYedek ? " (ilan m²'si)" : ""), sonuc: karsilastir(alan as MulkOzellikAlani, tv, pv),
       kritik: !!kr && kritik.has(kr), bilesen: kr ? BILESEN[kr] ?? "DIGER" : "DIGER",
     });
   }
@@ -507,6 +522,14 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   const cekirdekKosullu = fiyatKarsilastirilamadi || eksikCekirdek.length >= 2 || cekirdekBilinmiyor;
 
   skor -= 5 * talepEksikleri.length; // talepte öldürücü bilgi eksikse skor "kesin" görünmesin
+  // v3.27 — istenen ama portföyde bilinmeyen özellik (çekirdek alan / fiyat / oda ve tip hariç; onların kendi kuralı var)
+  // kullanım amacı müşterinin niyetidir, portföyde doğrulanacak bir özellik değil (portföylerde neredeyse hiç dolu değil)
+  const ISTEK_DISI = ["odaSayisi", "m2", "fiyat", "mulkTipi", "kullanimAmaclari"];
+  const bilinmeyenIstekler = satirlar.filter((x) => x.sonuc === "BILINMIYOR" && !ISTEK_DISI.includes(x.anahtar)).map((x) => x.etiket);
+  skor -= Math.min(BILINMEYEN_ISTEK_TAVAN, BILINMEYEN_ISTEK_CEZASI * bilinmeyenIstekler.length);
+  if (bilinmeyenIstekler.length) skor = Math.min(skor, BILINMEYEN_ISTEK_SKOR_TAVANI);
+  const karsilanmayanIstekler = satirlar.filter((x) => x.sonuc === "SAGLANMADI" && !x.kritik && !ISTEK_DISI.includes(x.anahtar));
+  skor -= Math.min(KARSILANMAYAN_ISTEK_TAVAN, KARSILANMAYAN_ISTEK_CEZASI * karsilanmayanIstekler.length);
   if (fiyatBilinmiyor) skor = Math.round(skor * FIYATSIZ_CARPAN);
   skor = Math.max(0, Math.min(100, skor));
 
@@ -521,7 +544,7 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
     aciklama: `${toplamKriter} kriterden ${olculenKriter}'i ölçüldü` + (celiski ? " · talep tipi şüpheli" : cekirdekKosullu ? " · m² / fiyat / oda eksik" : olculenKriter <= GUVEN_DUSUK_EN_COK ? " · talepte az kriter var" : "") };
 
   const uygunluk: Uygunluk = kritikEngeller.length ? "UYGUN_DEGIL"
-    : guvenSeviye === "DUSUK" || uyarilar.length || bilinmeyenKritikler.length || talepEksikleri.length || cekirdekKosullu || tipUyumu.oran < 0.9 || satirlar.some((s) => s.sonuc === "SAGLANMADI")
+    : guvenSeviye === "DUSUK" || uyarilar.length || bilinmeyenKritikler.length || bilinmeyenIstekler.length || talepEksikleri.length || cekirdekKosullu || tipUyumu.oran < 0.9 || satirlar.some((s) => s.sonuc === "SAGLANMADI")
       // v3.11 — zayıf bileşen: konum "biraz uzak / bilinmiyor" ya da bir satırın puanı eşiğin altında → sunmadan önce sor
       || lok.belirsiz || (lok.kademe !== "IL_GENELI" && lok.kademe !== "BILINMIYOR" && lok.oran < A.kosulluAlti) || satirlar.some((s) => s.sonuc === "SAGLANDI" && s.puan != null && s.puan < A.kosulluAlti) ? "KOSULLU" : "SUNULABILIR";
   return {

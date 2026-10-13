@@ -5,10 +5,11 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { eslesmeOnizle, temelUyum, kiraPeriyotSuphesi, KIRA_BIRIM_UST, type OnizlemeKayit, type LokasyonBaglami } from "../src/lib/eslestirme/onizleme";
+import { eslesmeOnizle, temelUyum, kiraPeriyotSuphesi, KIRA_BIRIM_UST, BILINMEYEN_ISTEK_SKOR_TAVANI, type OnizlemeKayit, type LokasyonBaglami } from "../src/lib/eslestirme/onizleme";
 import { tipBenzerligi, tipGecerli } from "../src/lib/domain/kategori";
 import { tipCeliskisi } from "../src/lib/domain/tip-celiskisi";
-import { yillikKiraIfadesi } from "../src/lib/domain/kira-periyot";
+import { yillikKiraIfadesi, kirayiAyligaCevir } from "../src/lib/domain/kira-periyot";
+import { KayitCreateSchema } from "../src/lib/validation/kayit";
 import { portfoyImzasi, mukerrerleriTopla } from "../src/lib/eslestirme/mukerrer";
 import { hizliAyristir } from "../src/lib/ai/hizli-ayristirici";
 import { dosyaSatirlari, satirDonustur, satirHazirla } from "../src/lib/ingest/tablo";
@@ -105,9 +106,38 @@ test("içe aktarma: 'yıllık kira' okunur (ifade, WhatsApp mesajı, Revy satır
   const R = (fiyat: string, baslik: string) => ["05.10.2026", "Ticari", "Depo & Antrepo", "Kiralık", "1000", fiyat, "", "", baslik, "Antalya", "Kepez", "", "Yenigöl Mah", "", "", "", "", "Hayır", "", "", "Hayır", "Hayır", "Mülk Sahibi", "Ali V.", "", "5", "Aktif", "Sahibinden.com", "https://sahibinden.com/1344109419"];
   const satir = (h: string[]) => { const b = dosyaSatirlari([csvOku(ornekRevyCsv().split("\n")[0] + "\n" + h.join(";"), "x")])[0]; return satirHazirla(satirDonustur(b.satirlar[0].hucreler, b.eslesme, { tip: "PORTFOY", dosyaTuru: "PORTAL", varsayilanSahip: "EMLAKCI", ilanGun: 90, varsayilanIslem: "SATILIK", bugun: new Date(2026, 9, 13), dosyaAdi: "ads.xlsx" }, 2), INDEKS as any); };
   const y = satir(R("1000000", "YENİGÖL MAH. 1000 M2 DEPO YILLIK KİRA 1.000.000"));
-  assert.equal(y.girdi.fiyatPeriyodu, "YILLIK"); assert.ok(y.kontrol.some((k) => /yıllık kira olarak okundu/.test(k)));
+  assert.equal(y.girdi.fiyatPeriyodu, "YILLIK"); assert.ok(y.kontrol.some((k) => /aylığa çevrildi/.test(k)));
+  // kayda AYLIK girer: 1.000.000 / 12; yıllık tutar notta, ödeme şekli yıllık peşin
+  assert.equal(y.veri!.fiyatPeriyodu, "AYLIK"); assert.equal(Number(y.veri!.fiyat), 83_333);
+  assert.match(String(y.veri!.operasyonNotu), /Kira yıllık isteniyor: 1\.000\.000 TL\/yıl/);
   const s = satir(R("1300000", "Yenigöl Mah - Hava Alanı Yakınında - 1.000 m2 Depo"));
   assert.equal(s.girdi.fiyatPeriyodu, "AYLIK"); assert.ok(s.kontrol.some((k) => /yıllık kira olabilir/.test(k)), s.kontrol.join(" | "));
   const n = satir(R("120000", "Yenigöl 1000 m2 depo"));
   assert.equal(n.girdi.fiyatPeriyodu, "AYLIK"); assert.ok(!n.kontrol.some((k) => /yıllık/.test(k)));
+});
+
+test("kira her zaman AYLIK saklanır: yıllık girilen 12'ye bölünür (talep bütçesi dahil), not ve ödeme şekli eklenir; satış dokunulmaz", () => {
+  const p = kirayiAyligaCevir({ islemTipi: "KIRALIK", fiyatPeriyodu: "YILLIK", fiyat: 1_200_000, ozellik: {} as any });
+  assert.equal(p.fiyatPeriyodu, "AYLIK"); assert.equal(p.fiyat, 100_000); assert.equal(p.ozellik.kiraOdemeSekli, "YILLIK_PESIN");
+  assert.match(p.operasyonNotu!, /1\.200\.000 TL\/yıl \(aylık ≈ 100\.000 TL\)/);
+  assert.deepEqual(kirayiAyligaCevir(p), p, "ikinci geçişte değişmez");
+  const t = kirayiAyligaCevir({ islemTipi: "KIRALIK", fiyatPeriyodu: "YILLIK", minFiyat: 600_000, maxFiyat: 1_800_000 });
+  assert.equal(t.minFiyat, 50_000); assert.equal(t.maxFiyat, 150_000);
+  assert.equal(kirayiAyligaCevir({ islemTipi: "KIRALIK", fiyatPeriyodu: "TOPLAM", fiyat: 50_000 }).fiyatPeriyodu, "AYLIK");
+  assert.equal(kirayiAyligaCevir({ islemTipi: "SATILIK", fiyatPeriyodu: "YILLIK", fiyat: 9_000_000 }).fiyat, 9_000_000);
+  // tüm girişler (form, içe aktarma, API) şemadan geçer
+  const k = KayitCreateSchema.parse({ tip: "PORTFOY", mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", fiyatPeriyodu: "YILLIK", fiyat: 1_300_000, m2: 1000, lokasyonlar: [{ ilId: 7, ilceId: 103 }] });
+  assert.equal(k.fiyatPeriyodu, "AYLIK"); assert.equal(Number(k.fiyat), 108_333); assert.match(String(k.operasyonNotu), /yıllık isteniyor/);
+});
+
+test("istenen ama bilinmeyen özellik: eleme yok, skor 85'i geçmez ve Koşullu; bilinen 'yok' daha aşağıda; doğrulanmış olan üstte", () => {
+  const t = talep({ mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", fiyatPeriyodu: "AYLIK", minM2: 1000, maxM2: 1500, maxFiyat: 150_000, lokasyonlar: KEPEZ, ozellik: { ofis: true, kapaliAlanM2: 1000 } as any });
+  const depo = (ofis?: boolean) => portfoy({ mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", fiyatPeriyodu: "AYLIK", m2: 1100, fiyat: 120_000, lokasyonlar: KEPEZ, ozellik: ofis == null ? {} : ({ ofis } as any) });
+  const var_ = eslesmeOnizle(t, depo(true), B), bilinmiyor = eslesmeOnizle(t, depo(), B), yok = eslesmeOnizle(t, depo(false), B);
+  assert.notEqual(bilinmiyor.uygunluk, "UYGUN_DEGIL"); assert.equal(bilinmiyor.uygunluk, "KOSULLU");
+  assert.ok(bilinmiyor.skor <= BILINMEYEN_ISTEK_SKOR_TAVANI);
+  assert.ok(var_.skor > bilinmiyor.skor && bilinmiyor.skor > yok.skor, `${var_.skor} > ${bilinmiyor.skor} > ${yok.skor}`);
+  // depoda kapalı alan girilmemişse ilanın m²'si sayılır
+  const ka = var_.kriterler.find((k) => k.anahtar === "kapaliAlanM2")!;
+  assert.equal(ka.sonuc, "SAGLANDI"); assert.match(ka.portfoy, /ilan m²'si/);
 });
