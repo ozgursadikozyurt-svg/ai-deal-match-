@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * HIZLI AYRIŞTIRICI — yapay zekâdan ÖNCE çalışan kural tabanlı (regex + sözlük) çözümleyici. Ücretsizdir.
  * Amaç: yapıştırılan WhatsApp mesajı / portal ilanı ya da doğal dil sorusunun çoğunu yapay zekâ
  * çağırmadan anlamak; yapay zekâ yalnızca kural tabanlı sonuç "yeterli" değilse çağrılır.
@@ -11,6 +11,7 @@
  *
  * Saf fonksiyonlar; demo ve sunucu (/api/ai/ara) aynı kodu kullanır.
  */
+import { yillikKiraIfadesi } from "../domain/kira-periyot";
 import { JARGON_ALANLI, JARGON_NOTLUK, katOku, katJargonu, binaYasiOku, emsalOku, cepheYonleriOku, baglantidanOku, whatsappGurultusuTemizle, fiyatDuzelt, bosluklukBinlik } from "./jargon";
 import { lokasyonAnahtari } from "../lokasyon/normalize";
 import type { LokasyonIndeks } from "../lokasyon/cozumle";
@@ -66,7 +67,7 @@ export interface HizliSonuc {
   fiyat: number | null;
   minFiyat: number | null;
   maxFiyat: number | null;
-  fiyatPeriyodu: "TOPLAM" | "AYLIK" | "GUNLUK" | null; // v3.9: GUNLUK (portal sayfasından)
+  fiyatPeriyodu: "TOPLAM" | "AYLIK" | "YILLIK" | "GUNLUK" | null; // v3.9: GUNLUK (portal sayfasından) · v3.27: YILLIK
   paraBirimi: "TRY" | "USD" | "EUR" | "GBP";
   m2: number | null;
   minM2: number | null;
@@ -234,7 +235,8 @@ export function hizliAyristir(metin0: string): HizliSonuc {
     if (islemTipi) { islemTahmini = true; bul("işlem (tahmin)"); }
   }
   const kiralik = islemTipi === "KIRALIK" || islemTipi === "DEVREN_KIRALIK";
-  const fiyatPeriyodu: HizliSonuc["fiyatPeriyodu"] = !p.length ? null : kiralik ? "AYLIK" : "TOPLAM";
+  // v3.27 — "yıllık kira 1.200.000" / "1.2M TL/yıl" yıllık okunur (eskiden her kiralık "aylık" sayılıyordu)
+  const fiyatPeriyodu: HizliSonuc["fiyatPeriyodu"] = !p.length ? null : kiralik ? (yillikKiraIfadesi(ham) ? "YILLIK" : "AYLIK") : "TOPLAM";
 
   // Talepte tek m² → alt sınır (±%10 toleransla eşleşir)
   if (tip === "TALEP" && m2 != null) { minM2 = m2; m2 = null; }
@@ -300,7 +302,7 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   if (Object.keys(ozellik).length) bul("teknik");
 
   // v3.17 — fiyat jargonu: "15.5 TL" satılıkta 15.500.000, "25" kirada 25.000 (bkz. docs/emlak_jargon.md)
-  const kiraMi = /KIRALIK/.test(islemTipi ?? "") || fiyatPeriyodu === "AYLIK";
+  const kiraMi = /KIRALIK/.test(islemTipi ?? "") || (fiyatPeriyodu === "AYLIK" || fiyatPeriyodu === "YILLIK");
   const duzelt = (x: number | null) => (x == null ? x : fiyatDuzelt(x, { kira: kiraMi }) ?? x);
   fiyat = duzelt(fiyat); maxFiyat = duzelt(maxFiyat); minFiyat = duzelt(minFiyat);
 

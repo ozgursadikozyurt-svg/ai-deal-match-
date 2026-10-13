@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026 — Benim süresiz, süresi yaklaşanlar (+30), gelen kutusu gün süzgeci, kart yanında paylaşım seçimi,
+ * Anahtar CRM v3.27 · 13 Ekim 2026 — Benim süresiz, süresi yaklaşanlar (+30), gelen kutusu gün süzgeci, kart yanında paylaşım seçimi,
  * açıklama, kartta kişi tekrarı, Görevler ekranı, açık kayıt (kayıt ol) şeması
  */
 import { test as nodeTest } from "node:test";
@@ -31,9 +31,8 @@ const gunSonra = (g: number) => new Date(BUGUN.getTime() + g * 86_400_000);
 const kayitla = (i: number, gun: number, ek: any = {}): Kayit => { const k = ornek.kayitlar[i]; return { ...k, veri: { ...k.veri, durum: "ACTIVE", validUntil: gunSonra(gun), ...ek } }; };
 
 test("sürüm 3.26: günlük kaydı, belgeler ve göç", () => {
-  assert.equal(SURUM, "3.26"); assert.equal(SURUM_GECMISI[0].surum, "3.26"); assert.equal(SURUM_GECMISI[1].surum, "3.25");
-  assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 5);
-  for (const f of [`docs/ANAHTAR_CRM_EK_${DOSYA_EKI}.md`, `docs/ANAHTAR_CRM_DEVIR_${DOSYA_EKI}.md`, `docs/ANAHTAR_CRM_SPRINT_PLANI_${DOSYA_EKI}.md`]) assert.ok(fs.existsSync(f), f);
+  const k = SURUM_GECMISI.find((x) => x.surum === "3.26")!; assert.ok(k); assert.ok((k.testEt ?? []).length >= 5);
+  for (const f of ["docs/ANAHTAR_CRM_EK_v3.26_12Ekim2026.md", "docs/ANAHTAR_CRM_DEVIR_v3.26_12Ekim2026.md", "docs/ANAHTAR_CRM_SPRINT_PLANI_v3.26_12Ekim2026.md"]) assert.ok(fs.existsSync(f), f);
   assert.match(fs.readFileSync("prisma/migrations/20261012100000_v326_kayit_aciklama/migration.sql", "utf8"), /ADD COLUMN "aciklama"/);
 });
 

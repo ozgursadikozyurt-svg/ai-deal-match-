@@ -1,4 +1,4 @@
-// Anahtar CRM v3.26 · 12 Ekim 2026
+// Anahtar CRM v3.27 · 13 Ekim 2026
 // GELEN KUTUSU — e-postayla ya da yüklemeyle gelen ham dosyalar (WhatsApp .zip / .txt, Revy .xlsx, .eml).
 // GET    /api/gelen                 → { dosyalar: [{ id, ad, tur, boyut, kanal, gonderen, konu, gelis, url }], depo }   (url: 1 saat geçerli)
 // POST   /api/gelen  (multipart: dosya)  → ekrandan yükleme; aynı içerik zaten kutudaysa { yeni: false }

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026 Anahtar CRM v3.19 — puanlama (eksik veri) ve fırsat önceliği */
+ * Anahtar CRM v3.27 · 13 Ekim 2026 Anahtar CRM v3.19 — puanlama (eksik veri) ve fırsat önceliği */
 import { test } from "node:test";
 import { ac } from "./yardimci-arayuz";
 import assert from "node:assert/strict";

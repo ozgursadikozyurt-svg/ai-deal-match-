@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * Türkiye geneli konum: çalışma ili dışındaki il / ilçe / mahalle ifadelerini tanır ve çözer.
  *
  * Mantık (kural tabanlı, yapay zekâ gerekmez):

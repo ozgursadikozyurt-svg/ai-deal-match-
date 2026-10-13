@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -15,6 +15,8 @@ import { SURUM, TARIH, SURUM_GECMISI } from "../src/lib/surum";
 import { etiket, KRITER_ETIKET, ILAN_SAHIBI_ETIKET, VERI_KANALI_ETIKET, HAVUZ_ETIKET } from "./etiketler";
 import { ILCELER, INDEKS, ogrenilenleriYukle } from "./lokasyon";
 import { CANLI, depoYukle, depoKaydet, calismaIli, kalanGun, sureUzat, ornekVeriyiKur, type DepoDurumu, type Kayit, type Veri, type PipelineDurum } from "./depo";
+import { tipCeliskisi } from "../src/lib/domain/tip-celiskisi";
+import { kiraPeriyotSuphesi } from "../src/lib/eslestirme/onizleme";
 import { C, useDepo, tipYaz, cx, Pill, IslemPill, UYGUNLUK, Skor, TTL, baslikOf, fiyatOf, m2Of, oneCikanlar, Kopyala, useEslesmeler, eKey, enumYaz, telYaz, tarihYaz, lokEtiket, type Ctx, type Ekran, type Eslesme } from "./ortak";
 import { KayitFormu } from "./form";
 import { VeriGirisi } from "./ice-aktarma";
@@ -241,6 +243,8 @@ function Detay({ id }: { id: string }) {
   const durumYap = (durum: Veri["durum"]) => { kayitKaydet({ ...k, veri: { ...v, durum } }); bildir(etiket(durum) + " yapıldı"); };
   const uzat = (gun: number) => { const y = sureUzat(v, gun); kayitKaydet({ ...k, veri: y }); bildir(`Geçerlilik ${tarihYaz(y.validUntil)} tarihine uzatıldı`); };
   const kanal = v.veriKanali === "WHATSAPP" ? "WhatsApp" : (VERI_KANALI_ETIKET as any)[v.veriKanali];
+  const celiski = tipCeliskisi(v as any); // v3.27 — metin başka tip diyor ("SATILIK ARSA" yazıyor, tip Ofis)
+  const yillikSuphe = !talep ? kiraPeriyotSuphesi(v as any) : null; // v3.27 — "aylık" kira birim olarak akla yatkın değil
   return <div className="yigin">
     {/* v3.13 — üst satır: solda geri, sağda Düzenle + (portföyde) Portföy paylaş. Önceden paylaş düğmesi başlığın altındaydı, üst sağ boştu. */}
     <div className="detay-ust">
@@ -250,6 +254,10 @@ function Detay({ id }: { id: string }) {
         {!talep && <button className="btn kucuk birincil" id="portfoy-paylas" onClick={() => setPaylasAcik(true)}>Portföy paylaş</button>}
       </div>
     </div>
+    {(celiski || yillikSuphe != null) && <section className="kart">
+      {celiski && <div className="uyari-satir">Kontrol: metinde "{celiski.kelime}" yazıyor ama mülk tipi {tipYaz(v)}. Tip yanlışsa eşleşmeler de yanlış çıkar — Düzenle'den düzeltin.</div>}
+      {yillikSuphe != null && <div className="uyari-satir">Kontrol: aylık kira m² başına {yillikSuphe.toLocaleString("tr-TR")} TL görünüyor — fiyat yıllık girilmiş olabilir. Eşleştirmede 12'ye bölünerek karşılaştırılıyor; doğruysa Düzenle'den periyodu "Yıllık" yapın.</div>}
+    </section>}
     <section className="kart">
       <div className="pill-satir">
         <Pill ton={talep ? "mavi" : "yesil"}>{talep ? "Talep" : "Portföy"}</Pill><Pill>{tipYaz(v)}</Pill><IslemPill islem={v.islemTipi} />
@@ -363,6 +371,9 @@ function Eslesmeler() {
   const [fk, setFk] = useKalici<FirsatKademe | "">("eslesmeler.fk", "");          // v3.19 — fırsat kademesi filtresi
   const [sr, setSr] = useKalici<Siralama>("eslesmeler.sr", { alan: "firsat", yon: "azalan" });
   const [kimin, setKimin] = useKalici<"" | "BENIM" | "OFISIM" | "BENIM_PORTFOY" | "BENIM_TALEP">("eslesmeler.kimin", ""); // v3.22
+  // v3.27 — güveni düşük (talepte / portföyde çok az kriter ölçülebilmiş) eşleşmeler varsayılan olarak gizli; tek dokunuşla açılır
+  const [azVeriGoster, setAzVeriGoster] = useKalici<boolean>("eslesmeler.azVeri", false);
+  const azVeri = (e: Eslesme) => e.s.guven?.seviye === "DUSUK";
   const sahip = useSahiplik();
   const [secimModu, setSecimModu] = useState(false);            // v3.19 — toplu işlem için seçim
   const [secili, setSecili] = useState<Set<string>>(() => new Set());
@@ -396,7 +407,9 @@ function Eslesmeler() {
     { alan: "giris", etiket: "Kayda giriş", deger: (e) => Math.max(tn(e.t.olusturma) ?? 0, tn(e.p.olusturma) ?? 0), varsayilanYon: "azalan" },
     { alan: "sure", etiket: "Talebin kalan süresi", deger: (e) => tn(e.t.veri.validUntil), varsayilanYon: "artan" },
   ];
-  const liste = siralaUygula(es.filter((e) => (!fk || e.f.kademe === fk) && kiminUyar(e, kimin) && (u === "KOPUK" ? kopukMu(e) : !kopukMu(e) && (u === "TUMU" || (u === "UYGUN" ? e.s.uygunluk !== "UYGUN_DEGIL" : e.s.uygunluk === u)))), sr, esSecenek);
+  const temel = es.filter((e) => (!fk || e.f.kademe === fk) && kiminUyar(e, kimin) && (u === "KOPUK" ? kopukMu(e) : !kopukMu(e) && (u === "TUMU" || (u === "UYGUN" ? e.s.uygunluk !== "UYGUN_DEGIL" : e.s.uygunluk === u))));
+  const gizliAzVeri = u === "KOPUK" || azVeriGoster ? 0 : temel.filter(azVeri).length;
+  const liste = siralaUygula(gizliAzVeri ? temel.filter((e) => !azVeri(e)) : temel, sr, esSecenek);
   // v3.21.2 — İşlem ve Fırsat seçicileri (eski üç satır + büyük "Fırsat önceliği" kartı yerine tek satır)
   const islemSay = (k: string) => (k ? es.filter((e) => String(e.p.veri.islemTipi).includes(k)).length : es.length);
   const islemDeger = f.islemler.length === 1 ? f.islemler[0] : "";
@@ -411,6 +424,8 @@ function Eslesmeler() {
   return <div className="yigin">
     {/* v3.22 — toplu işlem menüsü (⋯) başlık satırına taşındı; seçici satırında Skor'a yer açıldı */}
     <div className="satir-ara es-baslik"><h2>Eşleşmeler</h2><div className="satir"><span className="ipucu">{liste.length} eşleşme</span>
+      {gizliAzVeri > 0 && <button className="btn kucuk" title="Talepte ya da portföyde çok az bilgi olduğu için puanı güvenilir olmayan eşleşmeler" onClick={() => setAzVeriGoster(true)}>+{gizliAzVeri} az verili</button>}
+      {azVeriGoster && u !== "KOPUK" && <button className="btn kucuk" onClick={() => setAzVeriGoster(false)}>Az verilileri gizle</button>}
       {!secimModu && <HizliMenu ad="Toplu işlemler" ogeler={[
         { l: "Seç", alt: "Birkaç eşleşmeyi seçip birlikte işlem yap", pasif: !liste.length, tikla: () => setSecimModu(true) },
         ...(u !== "KOPUK" ? [{ l: `Listedekilerin tümünü kopar (${liste.length})`, tehlike: true, pasif: !liste.length, tikla: () => setTopluAcik("KOPAR") }] : [{ l: `Tümünü geri al (${liste.length})`, pasif: !liste.length, tikla: () => setTopluAcik("GERI") }]),
@@ -498,6 +513,8 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
   return <div className="yigin">
     <section className="kart es-bas"><Skor s={e.s.skor} u={e.s.uygunluk} /><div><Pill ton={u.ton}>{u.e}</Pill> <FirsatRozeti f={e.f} komisyon /> <AnahtarDugmesi anahtar={favEslesme(tid, pid)} kucuk={false} etiket /><div className="ipucu">{e.s.lokasyonAciklama}</div>
       {e.s.tipUyumu.oran < 1 && <div className="ipucu">Mülk tipi: {e.s.tipUyumu.aciklama}</div>}
+      {e.s.guven && <div className="ipucu">Güven: {({ YUKSEK: "yüksek", ORTA: "orta", DUSUK: "düşük" } as const)[e.s.guven.seviye]} · {e.s.guven.aciklama}</div>}
+      {(e.s.uyarilar ?? []).map((x) => <div key={x} className="uyari-satir">Kontrol: {x}</div>)}
       {e.s.kritikEngeller.length > 0 && <div className="hata-satir">Olmazsa olmaz karşılanmıyor: {e.s.kritikEngeller.join(", ")}</div>}</div></section>
     <section className={cx("kart kopar-kart", n.durum === "REDDEDILDI" && "kopuk")}><div className="satir-ara"><div><b>{n.durum === "REDDEDILDI" ? "Bu eşleşme koparıldı" : "Uygun değil mi, sunuldu ve beğenilmedi mi?"}</b><div className="ipucu">{n.durum === "REDDEDILDI" ? "Ana ekranda ve listelerde gösterilmiyor." : "Koparırsanız bir daha önerilmez."}</div></div><KoparDugmesi tid={tid} pid={pid} sonra={() => setSor(true)} /></div></section>
     {sor && <SonrakiIletisimSorusu tid={tid} pid={pid} kapat={() => setSor(false)} />}

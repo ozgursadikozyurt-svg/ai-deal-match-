@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * Canlı — Ayarlar ekranının "Hesap ve veri" kartı: giriş yapan e-posta, çıkış, yapay zekâ anahtarı durumu ve demodan alınan yedeği (JSON) canlıya yükleme.
  */
 import { useEffect, useRef, useState } from "react";

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.26 · 12 Ekim 2026
+// Anahtar CRM v3.27 · 13 Ekim 2026
 // GET   /api/kullanicilar        → ofisin kullanıcıları (ofis yöneticisi)
 // PATCH /api/kullanicilar?id=…   → { rol?, aktif?, adSoyad?, telefon? }
 import { z } from "zod";

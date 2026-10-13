@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.26";
-export const TARIH = "12 Ekim 2026";
+export const SURUM = "3.27";
+export const TARIH = "13 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.26_12Ekim2026";
+export const DOSYA_EKI = "v3.27_13Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,29 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.27",
+    tarih: "13 Ekim 2026",
+    baslik: "Eşleştirme kalitesi: ofise daire önerilmez, segment dışı fiyat elenir, yıllık girilmiş depo kiraları yakalanır, güven göstergesi, mükerrer ilan tek satır",
+    degisenler: [
+      "Mülk tipi: Daire ↔ Ofis (ve Bina/Müstakil ↔ Otel) artık kendiliğinden eşleşmez; yalnızca talepte o tip alternatif olarak seçildiyse. Depo ↔ Üretim, Dükkan ↔ Restoran, Ofis ↔ Hizmet aynen sürer. Ölçüm: 50–55 m² ofis talebine 151 daire çıkıyor, gerçek ofisler 25. sıraya düşüyordu.",
+      "Satışta bütçenin %30'unun altındaki fiyat elenir (35 milyonluk talebe 3,5 milyonluk daire). Kirada uygulanmaz: büyük bütçeli depo talebine küçük / ucuz depo meşru adaydır.",
+      "Yıllık kira: kiralık depoda aylık birim kira 600 TL/m²'yi aşıyorsa fiyat yıllık sayılır (12'ye bölünür) ve kartta 'Kontrol' uyarısı çıkar. Canlı veride 11 ilan (çoğu aynı içe aktarmadan) yıllık kirayı aylık olarak taşıyordu; 31 iyi eşleşme gizleniyordu (ör. Yenigöl 1000 m², ayda 83–108 bin).",
+      "İçe aktarma: başlık / açıklama / fiyatta 'yıllık kira', 'kirası yıllık', 'TL/yıl', 'yıllık peşin' geçen kiralık ilan YILLIK kaydedilir (portal tablosu, portal sayfası, WhatsApp mesajı). Birim kirası şüpheli olan satıra kontrol notu düşer.",
+      "Güven göstergesi: her eşleşmede kaç kriterin gerçekten ölçüldüğü (ör. '5 kriterden 3'ü ölçüldü'). Güveni düşük eşleşme 'Sunulabilir' olamaz; kartta 'Az veri' rozeti.",
+      "Eşleşmeler ekranı: az verili eşleşmeler varsayılan olarak gizli — başlıkta '+N az verili' ile tek dokunuşla açılır.",
+      "Tip çelişkisi: talep metni başka tipi söylüyorsa ('—SATILIK ARSA—' yazıyor, tip Büro/Ofis) kayıt detayında ve eşleşme kartında 'Kontrol' uyarısı; eşleşme en fazla Koşullu.",
+      "Mükerrer ilan: aynı ilan (tip, işlem, m², fiyat, oda, mahalle birebir) iki kez girildiyse eşleşme listesinde tek satır ve '+1 aynı ilan' rozeti. Kayıtlar silinmez.",
+    ],
+    testEt: [
+      "Eşleşmeler: başlıkta '+N az verili' düğmesi; dokununca liste büyür, 'Az verilileri gizle' ile geri döner.",
+      "Bir ofis talebi açın (ör. Şirinyalı 50–55 m²): eşleşmelerde daire yok, yalnızca ofis / plaza.",
+      "Kiralık depo talebi (bütçe 150 bin, Yenigöl): 'Yıllık kira' uyarılı Yenigöl 1000 m² depolar listede.",
+      "Yıllık kirası aylık görünen bir depo portföyünün detayı: üstte 'Kontrol: … yıllık girilmiş olabilir'.",
+      "'SATILIK ARSA' yazan ama Ofis kayıtlı talep: detayda tip uyarısı; Düzenle'den Arsa yapınca arsa portföyleri eşleşir.",
+      "Aynı ilanı iki kaynaktan girilmiş bir portföy: eşleşme kartında '+1 aynı ilan'.",
+    ],
+  },
   {
     surum: "3.26",
     tarih: "12 Ekim 2026",

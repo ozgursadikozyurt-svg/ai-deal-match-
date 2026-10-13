@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  */
 // Akıllı metin yorumlayıcı — yapıştırılan metnin NE olduğunu önce anlar, sonra ayrıştırır.
 //
@@ -11,6 +11,7 @@
 //   3) Her parça için hızlı ayrıştırıcı + notlar/uyarılar ("ilanda 176 m², açıklamada 135 m²").
 // Yapay zekâ yalnızca kural tabanlı sonucun güveni düşükse ya da kullanıcı isterse çağrılır (bkz. aiYorumIstemi).
 
+import { yillikKiraIfadesi } from "../domain/kira-periyot";
 import { hizliAyristir, metinTuru, metindenKonumlar, type HizliSonuc } from "./hizli-ayristirici";
 import { digerIlTara } from "../lokasyon/turkiye";
 import { sohbetiAyristir, onFiltre } from "../ingest/whatsapp";
@@ -246,7 +247,8 @@ function portalParcasi(ham: string, duz: string, adresler: string[], ix: Lokasyo
     h.fiyat = fiyat;
     h.paraBirimi = /usd|\$/i.test(fiyatSatiri!) ? "USD" : /eur|€/i.test(fiyatSatiri!) ? "EUR" : /gbp|£/i.test(fiyatSatiri!) ? "GBP" : "TRY";
   }
-  h.fiyatPeriyodu = /KIRALIK/.test(h.islemTipi ?? "") ? (/GUNLUK/.test(h.islemTipi ?? "") ? "GUNLUK" : "AYLIK") : "TOPLAM";
+  // v3.27 — "yıllık kira" / "TL/yıl" yazan kiralık ilan yıllık okunur
+  h.fiyatPeriyodu = /KIRALIK/.test(h.islemTipi ?? "") ? (/GUNLUK/.test(h.islemTipi ?? "") ? "GUNLUK" : yillikKiraIfadesi(`${baslik}\n${aciklama}\n${fiyatSatiri ?? ""}`) ? "YILLIK" : "AYLIK") : "TOPLAM";
 
   const brut = sayi(al("m² (brüt)", "brüt m²", "m²", "m2", "kapalı alan m²"));
   const net = sayi(al("m² (net)", "net m²"));

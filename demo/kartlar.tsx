@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * Demo — eşleşme kartı, eşleştirme tercihleri (eski "Talep DNA" kartı), kapatılabilir bilgi kutusu.
  */
 import React, { useState } from "react";
@@ -95,6 +95,8 @@ export function EslesmeKarti({ e, sec }: { e: Eslesme; sec?: { acik: boolean; de
             <IslemPill islem={e.p.veri.islemTipi} /><Pill>{etiket(e.p.veri.mulkTipi)}</Pill>
             {not && not.durum !== "YENI" && !kopuk && <Pill ton="mavi">{PIPELINE.find((x: any) => x[0] === not.durum)?.[1]}</Pill>}
             {not?.not && <Pill>Not var</Pill>}
+            {e.s.guven?.seviye === "DUSUK" && <Pill ton="uyari"><span title={e.s.guven.aciklama}>Az veri · {e.s.guven.olculen}/{e.s.guven.toplam}</span></Pill>}
+            {(e.kopyalar?.length ?? 0) > 0 && <Pill><span title="Aynı ilan başka kaynaktan da girilmiş">+{e.kopyalar!.length} aynı ilan</span></Pill>}
             {kopuk && <Pill ton="kotu">{kopmaEtiket(not?.neden)}</Pill>}
           </div>
         </div>
@@ -106,6 +108,7 @@ export function EslesmeKarti({ e, sec }: { e: Eslesme; sec?: { acik: boolean; de
       <div className="es2-neden">
         <span className="es2-n">{String(e.s.lokasyonAciklama).replace(/\s*\([+−-]?\d+\)/, "")}</span>
         {engel && <span className="es2-n kotu">Engel: {engel}</span>}
+        {(e.s.uyarilar ?? []).map((x: string) => <span key={x} className="es2-n uyari">Kontrol: {x}</span>)}
         {sorulacak.length > 0 && <span className="es2-n uyari">Sorulacak: {sorulacak.slice(0, 3).join(", ")}{sorulacak.length > 3 ? ` +${sorulacak.length - 3}` : ""}</span>}
         {/* v3.19 — eksik bilgi puanı düşürür; hangi bilgi eksik, kısaca */}
         {eksik.length > 0 && <span className="es2-n uyari" title="Bu bilgiler tamamlanınca puan netleşir">Eksik: {eksik.slice(0, 3).join(", ")}{eksik.length > 3 ? ` +${eksik.length - 3}` : ""}</span>}

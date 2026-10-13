@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * Toplu dosya içe aktarma (Excel / CSV / TXT): portal ilan listeleri, meslektaşın gönderdiği portföy/talep listesi,
  * ofisin haftalık talep tablosu… Başlık satırı nerede olursa olsun bulunur, sütunlar eş anlamlılarla eşlenir,
  * her satır kurala dayalı olarak kayda çevrilir. YAPAY ZEKÂ KULLANILMAZ:
@@ -11,6 +11,8 @@
 import { hizliAyristir } from "../ai/hizli-ayristirici";
 import { islemKategoriUyumlu, anaKategoriOf } from "../domain/kategori";
 import { telE164, cepMi } from "../senkron/birlestir";
+import { yillikKiraIfadesi } from "../domain/kira-periyot";
+import { kiraPeriyotSuphesi } from "../eslestirme/onizleme";
 import type { KayitCreateInput } from "../validation/kayit";
 
 export type TabloAlan =
@@ -219,6 +221,9 @@ export function satirDonustur(s: string[], e: Eslesme, o: AktarimSecenek, satirN
     else islem = islem === "KIRALIK" ? "DEVREN_KIRALIK" : "DEVREN_SATILIK";
   }
   const kira = /KIRALIK/.test(islem);
+  // v3.27 — "yıllık kira 1.000.000" yazan ilan aylık sayılmasın
+  const yillikKira = kira && !/GUNLUK/.test(islem) && yillikKiraIfadesi(`${v.baslik ?? ""}\n${v.aciklama ?? ""}\n${String((v as any).fiyat ?? "")}`);
+  const periyot = kira ? (/GUNLUK/.test(islem) ? "GUNLUK" : yillikKira ? "YILLIK" : "AYLIK") : "TOPLAM";
 
   // Fiyat / bütçe
   const fiyat = paraOku(v.fiyat ?? ""), ilk = paraOku(v.ilkFiyat ?? ""), bMax = paraOku(v.butceMax ?? ""), bMin = paraOku(v.butceMin ?? "");
@@ -282,7 +287,9 @@ export function satirDonustur(s: string[], e: Eslesme, o: AktarimSecenek, satirN
   // v3.23 — veri kalitesi: portallarda eksik / fazla sıfırla girilmiş fiyatlar ("kiralık 1.200 TL", "kiralık 8.000.000 TL") sessizce havuza girmesin
   if (tip === "PORTFOY" && fiyat.deger != null && !devrenBelirsiz) {
     const yaz = fiyat.deger.toLocaleString("tr-TR");
-    if (kira && fiyat.deger >= 1_000_000) kontrol.push(`Aylık kira için çok yüksek (${yaz} TL) — satış ya da devir bedeli olabilir`);
+    if (yillikKira) kontrol.push(`Fiyat yıllık kira olarak okundu (${yaz} TL/yıl ≈ ${Math.round(fiyat.deger / 12).toLocaleString("tr-TR")} TL/ay)`);
+    else if (kira && kiraPeriyotSuphesi({ islemTipi: islem, mulkTipi: mt.mulkTipi ?? "DIGER", fiyat: fiyat.deger, m2 }) != null) kontrol.push(`Aylık kira m² başına çok yüksek (${Math.round(fiyat.deger / m2!).toLocaleString("tr-TR")} TL/m²) — yıllık kira olabilir; eşleştirmede 12'ye bölünerek karşılaştırılır`);
+    else if (kira && fiyat.deger >= 1_000_000) kontrol.push(`Aylık kira için çok yüksek (${yaz} TL) — satış, devir bedeli ya da yıllık kira olabilir`);
     else if (kira && ticari && m2 && fiyat.deger / m2 >= 5_000) kontrol.push(`Aylık kira m² başına çok yüksek (${Math.round(fiyat.deger / m2).toLocaleString("tr-TR")} TL/m²) — devir bedeli olabilir`);
     else if (kira && fiyat.deger < 5_000) kontrol.push(`Kira çok düşük (${yaz} TL) — eksik sıfır olabilir`);
     else if (!kira && islem !== "DEVREN_SATILIK" && fiyat.deger < 100_000) kontrol.push(`Satış fiyatı çok düşük (${yaz} TL) — eksik sıfır olabilir`);
@@ -292,8 +299,8 @@ export function satirDonustur(s: string[], e: Eslesme, o: AktarimSecenek, satirN
   const girdi: SatirSonucu["girdi"] = {
     tip, mulkTipi: (mt.mulkTipi ?? "DIGER") as any, islemTipi: islem as any,
     ...(tip === "PORTFOY"
-      ? { fiyat: fiyat.deger, m2, fiyatPeriyodu: kira ? "AYLIK" : "TOPLAM" }
-      : { maxFiyat: bMax.deger ?? fiyat.deger, minFiyat: bMin.deger, fiyatPeriyodu: kira ? "AYLIK" : "TOPLAM", ...(m2 ? (kadar ? { maxM2: m2 } : { minM2: m2 }) : {}) }),
+      ? { fiyat: fiyat.deger, m2, fiyatPeriyodu: periyot }
+      : { maxFiyat: bMax.deger ?? fiyat.deger, minFiyat: bMin.deger, fiyatPeriyodu: periyot, ...(m2 ? (kadar ? { maxM2: m2 } : { minM2: m2 }) : {}) }),
     odaSayisi: oda,
     durum: validUntil && validUntil < o.bugun ? "EXPIRED" : "ACTIVE",
     baslik: (v.baslik ?? (tip === "TALEP" && v.ad ? `${baslikHarf(v.ad)} — ${(v.aciklama ?? "").slice(0, 60)}` : null))?.slice(0, 160) ?? null,

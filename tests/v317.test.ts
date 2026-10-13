@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * v3.17 — jargon sözlüğü (docs/emlak_jargon.md), eksik veri cezası, kişi tablosu içe aktarma (paketli).
  */
 import { test } from "node:test";

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * Kategori / işlem / kaynak enum'larının Türkçe etiketleri ve iş kuralları.
  * Tek kaynak: Prisma enum'ları (src/generated/prisma). UI dropdown'ları, Gemini şeması
  * ve Notion eşlemesi bu dosyadan beslenir — hiçbir yerde elle string yazılmaz.
@@ -209,22 +209,29 @@ export const aileOf = (tip: MulkTipi) => MULK_AILELERI.find((a) => a.tipler.incl
  * Aileler arası yakınlık (0–1). Aynı tip = 1, aynı aile = 0.9.
  * Burada olmayan aile çiftleri birbirine sunulmaz.
  */
-const AILE_YAKINLIK: [string, string, number, string][] = [
-  ["DEPO", "URETIM", 0.6, "Depo arayana üretim binası, üretim yeri arayana depo çoğu zaman uyar (yükseklik, elektrik, araç erişimi aynı kriterler)"],
-  ["DUKKAN", "YEME_ICME", 0.6, "Cadde dükkanı restoran/kafeye dönüşebilir (baca ve ruhsat kontrol edilmeli)"],
-  ["OFIS", "HIZMET", 0.5, "Klinik, kurs, danışmanlık gibi işler ofis katında da yapılabilir"],
-  ["DAIRE", "OFIS", 0.4, "Ofis olarak kullanılabilecek daire (ticari kullanım izni kontrol edilmeli)"],
-  ["BINA", "TURIZM", 0.5, "Komple bina apart/otel dönüşümüne uygun olabilir"],
-  ["MUSTAKIL", "TURIZM", 0.4, "Butik otel / pansiyon dönüşümü"],
+/**
+ * v3.27 — 5. alan "otomatik": true ise talep bu aileyi istemese de eşleşme listesine girer (aynı kullanım kriterleri).
+ * false ise yalnızca talep o tipi alternatif olarak açıkça seçtiyse gösterilir. Ölçüm (13 Eki 2026, canlı veri):
+ * Daire ↔ Ofis otomatikken 50–55 m² ofis talebine 151 daire çıkıyor, gerçek ofisler 25. sıraya düşüyordu.
+ */
+const AILE_YAKINLIK: [string, string, number, string, boolean][] = [
+  ["DEPO", "URETIM", 0.6, "Depo arayana üretim binası, üretim yeri arayana depo çoğu zaman uyar (yükseklik, elektrik, araç erişimi aynı kriterler)", true],
+  ["DUKKAN", "YEME_ICME", 0.6, "Cadde dükkanı restoran/kafeye dönüşebilir (baca ve ruhsat kontrol edilmeli)", true],
+  ["OFIS", "HIZMET", 0.5, "Klinik, kurs, danışmanlık gibi işler ofis katında da yapılabilir", true],
+  ["DAIRE", "OFIS", 0.4, "Ofis olarak kullanılabilecek daire (ticari kullanım izni kontrol edilmeli)", false],
+  ["BINA", "TURIZM", 0.5, "Komple bina apart/otel dönüşümüne uygun olabilir", false],
+  ["MUSTAKIL", "TURIZM", 0.4, "Butik otel / pansiyon dönüşümü", false],
 ];
 
-export function tipBenzerligi(a: MulkTipi, b: MulkTipi): { oran: number; aciklama: string } {
-  if (a === b) return { oran: 1, aciklama: "Aynı mülk tipi" };
+export function tipBenzerligi(a: MulkTipi, b: MulkTipi): { oran: number; aciklama: string; otomatik: boolean } {
+  if (a === b) return { oran: 1, aciklama: "Aynı mülk tipi", otomatik: true };
   const aa = aileOf(a).kod, bb = aileOf(b).kod;
-  if (aa === bb) return { oran: 0.9, aciklama: `Aynı aile (${aileOf(a).etiket})` };
+  if (aa === bb) return { oran: 0.9, aciklama: `Aynı aile (${aileOf(a).etiket})`, otomatik: true };
   const y = AILE_YAKINLIK.find(([x, z]) => (x === aa && z === bb) || (x === bb && z === aa));
-  return y ? { oran: y[2], aciklama: y[3] } : { oran: 0, aciklama: "Farklı mülk ailesi" };
+  return y ? { oran: y[2], aciklama: y[3], otomatik: y[4] } : { oran: 0, aciklama: "Farklı mülk ailesi", otomatik: false };
 }
+/** v3.27 — tip uyumu eşleşmeye izin veriyor mu? Aynı tip / aile her zaman; benzer aile yalnızca "otomatik" ise. */
+export const tipGecerli = (x: { oran: number; otomatik: boolean } | undefined) => !!x && (x.oran >= 0.9 || (x.oran >= 0.4 && x.otomatik));
 /** Talep tiplerinin (ana + alternatifler) portföy tipine en iyi uyumu */
 export function enIyiTipBenzerligi(talepTipleri: MulkTipi[], portfoyTipi: MulkTipi) {
   return talepTipleri.map((t) => ({ tip: t, ...tipBenzerligi(t, portfoyTipi) })).sort((x, y) => y.oran - x.oran)[0];

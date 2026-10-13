@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * EŞLEŞTİRME MOTORU v3 (v3.11; v2 = v3.5) — veritabanı ve yapay zekâ gerektirmeyen saf fonksiyon.
  * Metin benzerliği değil, ticari gayrimenkulün katı kuralları (Killer Criteria):
  *  1. Talep DNA'sı (talep-dna.ts): öldürücü kriterler = talepte "şart" denenler + kullanım amacının doğası
@@ -16,11 +16,16 @@
  *  6. Oda (v3.11): istenen oda 1,0 · bir oda fazla 0,6 · iki+ oda fazla ya da eksik = sağlanmadı.
  *  7. Bütçe altı (v3.11): fiyat bütçenin çok altındaysa (< %60 → 0,8 · < %40 → 0,6) puan düşer; talepte alt sınır varsa o kullanılır.
  *  8. Bir bileşenin puanı 0,6'nın altındaysa eşleşme en fazla KOŞULLU olur (v3.10'da uzak mahalle "Sunulabilir" çıkıyordu).
+ *  9. v3.27 — (a) benzer ama "otomatik" olmayan aile (Daire ↔ Ofis) talep o tipi seçmedikçe elenir; (b) fiyat bütçenin %30'unun
+ *     altındaysa elenir (farklı segment); (c) kiralık depoda aylık birim kira akla yatkın değilse fiyat yıllık sayılır ve uyarılır;
+ *     (d) güven göstergesi: kaç kriterin gerçekten ölçüldüğü — güveni düşük eşleşme "Sunulabilir" olamaz;
+ *     (e) talep metni başka bir tipi söylüyorsa ("ARSA" yazıyor, tip Ofis) uyarı + en fazla Koşullu.
  * Sayılar MODEL'de (aşağıda) durur; seçim gerekçesi ve deney: scripts/deney/model-karsilastir.ts, ALTYAPI §28.
  * Havuz sırası (Yetkili → CRM → Partner → Web ilanı) havuz.ts'de.
  */
 import { MULK_OZELLIK_META, SIRALAMA, type MulkOzellikAlani } from "../domain/teknik-alanlar";
-import { enIyiTipBenzerligi, MULK_TIPI_META } from "../domain/kategori";
+import { enIyiTipBenzerligi, tipGecerli, MULK_TIPI_META } from "../domain/kategori";
+import { tipCeliskisi } from "../domain/tip-celiskisi";
 import { odaSayisiAyristir, odaListesi, odaFarkPuani, istenenKatlarOf, katUyumu, katYaz } from "../domain/teknik-alanlar";
 
 /** v3.15 — iki taraf da takasa açıksa eşleşme puanına eklenen küçük bonus (ayrı kriter satırı; uygunluk kararını değiştirmez). */
@@ -42,6 +47,17 @@ export const BILINMEYEN_PUAN = 0.4;
 export const FIYATSIZ_CARPAN = 0.75;
 /** v3.22.1 — talepte "istemiyor" denince portföyde var olması uyumsuzluk sayılan evet/hayır alanları */
 export const ISTENMEYEBILIR: ReadonlySet<string> = new Set(["siteIcinde", "havuz"]);
+/**
+ * v3.27 — aylık birim kiranın (TL/m²) akla yatkın üst sınırı; aşılırsa fiyat büyük olasılıkla YILLIK girilmiştir.
+ * Ölçüm (13 Eki 2026, canlı 95 kiralık depo): medyan 129 TL/m², gerçek en yüksek ~250; "aylık" görünen 11 ilan 830–1.670 TL/m²
+ * ve hepsinin 12'ye bölünmüş hâli medyana oturuyor (biri başlığında "YILLIK KİRA" yazıyor). Yalnızca sanayi grubu: konut ve
+ * cadde dükkanında birim kira geniş aralıkta, eşik güvenilir değil.
+ */
+export const KIRA_BIRIM_UST: Partial<Record<"SANAYI" | "TICARI" | "KONUT" | "ARSA", number>> = { SANAYI: 600 };
+/** v3.27 — güven: ölçülen kriter sayısı bunun altındaysa (≤) güven DÜŞÜK; bu ve üstüyse YÜKSEK olabilir */
+export const GUVEN_DUSUK_EN_COK = 3, GUVEN_YUKSEK_EN_AZ = 6;
+export type GuvenSeviye = "YUKSEK" | "ORTA" | "DUSUK";
+export interface Guven { seviye: GuvenSeviye; olculen: number; toplam: number; aciklama: string }
 
 /** v3.17 — iki kayıtta da boş olan ve skoru şüpheli kılan temel alanlar (kullanıcıya "tamamlayın" denir) */
 export function eksikVeriUyarilari(t: OnizlemeKayit, p: OnizlemeKayit): string[] {
@@ -77,14 +93,14 @@ export interface ModelAyar {
   };
   oda: { fazla1: number; fazla2: number };
   /** fiyat / bütçe oranı esik'in altındaysa puan; null = bütçe altı cezası yok */
-  fiyatAlt: { esik1: number; puan1: number; esik2: number; puan2: number } | null;
+  fiyatAlt: { esik1: number; puan1: number; esik2: number; puan2: number; /** v3.27 — bunun altı elenir (farklı segment) */ taban?: number } | null;
   /** bir bileşenin puanı bunun altındaysa eşleşme en fazla KOŞULLU */
   kosulluAlti: number;
 }
 export const MODEL: ModelAyar = {
   lok: { komsu: 0.85, yakin: 0.65, yakinM: 1500, orta: 0.4, ortaM: 3000, uzak: 0.15, uzakM: 5000, ilce: 1, ilceVerisiz: 0.75, komsuIlce: 0.4, altBolgeTanimsiz: 0.5, ilGeneli: 0.8 },
   oda: { fazla1: 0.6, fazla2: 0.25 },
-  fiyatAlt: { esik1: 0.6, puan1: 0.8, esik2: 0.4, puan2: 0.6 },
+  fiyatAlt: { esik1: 0.6, puan1: 0.8, esik2: 0.4, puan2: 0.6, taban: 0.3 },
   kosulluAlti: 0.6,
 };
 export type LokasyonKademe = "AYNI_MAHALLE" | "ALT_BOLGE" | "ILCE" | "KOMSU_MAHALLE" | "YAKIN" | "ORTA" | "UZAK" | "ILCE_VERISIZ" | "KOMSU_ILCE" | "IL_GENELI" | "BILINMIYOR" | "DISINDA";
@@ -123,6 +139,8 @@ export interface OnizlemeKayit {
   aciliyet?: string | null;
   lokasyonlar: OnizlemeLokasyon[];
   ozellik?: Record<string, unknown> & { kritikKriterler?: string[]; esnekKriterler?: string[]; eksikBilgiler?: string[]; kullanimAmaclari?: string[] };
+  /** v3.27 — tip çelişkisi denetimi için (yoksa denetim atlanır) */
+  baslik?: string | null; aciklama?: string | null; hamMetin?: string | null; ozet?: string | null;
 }
 
 export interface LokasyonBaglami {
@@ -174,6 +192,10 @@ export interface OnizlemeSonucu {
   talepEksikleri: string[];
   /** v3.17 — "Genel özellikler eksik, tamamlayın": skorun güvenilir olması için doldurulması gereken alanlar */
   veriEksikleri: string[];
+  /** v3.27 — "Kontrol edin": fiyat yıllık girilmiş olabilir, talep metni başka tip diyor… */
+  uyarilar: string[];
+  /** v3.27 — kaç kriter gerçekten ölçülebildi */
+  guven: Guven;
   dna: TalepDna;
 }
 
@@ -216,7 +238,7 @@ const fmt = (v: unknown): string => {
 export function temelUyum(t: OnizlemeKayit, p: OnizlemeKayit): boolean {
   const islemler = new Set([t.islemTipi, ...(t.alternatifIslemTipleri ?? [])]);
   const tip = enIyiTipBenzerligi([t.mulkTipi, ...(t.alternatifMulkTipleri ?? [])] as any, p.mulkTipi as any);
-  return (tip?.oran ?? 0) >= 0.4 && islemler.has(p.islemTipi);
+  return tipGecerli(tip) && islemler.has(p.islemTipi);
 }
 
 interface LokSonuc { puan: number | null; oran: number; kademe: LokasyonKademe; mesafeM: number | null; aciklama: string; /** portföyün mahallesi bilinmiyor → sunmadan önce sor */ belirsiz?: boolean; /** v3.22 — portföy talebin hariç tuttuğu yerde */ haric?: boolean }
@@ -298,9 +320,19 @@ export function etkinPeriyot(k: { islemTipi: string; fiyatPeriyodu?: string | nu
   if (SATIS_ISLEMLERI.has(islem)) return "TOPLAM";
   return k.fiyatPeriyodu ?? (/KIRALIK/.test(islem) ? "AYLIK" : "TOPLAM");
 }
+/**
+ * v3.27 — kiralık portföyde "aylık" yazan fiyat birim olarak akla yatkın değilse (bkz. KIRA_BIRIM_UST) aylık birim kira (TL/m²);
+ * değilse null. İçe aktarmada yıllık kira aylık sütununa düşüyordu.
+ */
+export function kiraPeriyotSuphesi(k: { islemTipi: string; mulkTipi: string; fiyat?: number | null; m2?: number | null; fiyatPeriyodu?: string | null }): number | null {
+  if (!/KIRALIK/.test(k.islemTipi) || /GUNLUK/.test(k.islemTipi) || etkinPeriyot(k) !== "AYLIK" || !k.fiyat || !k.m2 || k.m2 <= 0) return null;
+  const ust = KIRA_BIRIM_UST[matrisOf(k.mulkTipi)];
+  const birim = k.fiyat / k.m2;
+  return ust != null && birim > ust ? Math.round(birim) : null;
+}
 /** Portföy fiyatını talebin periyoduna çevirir (aylık ↔ yıllık); çevrilemiyorsa farkli = true */
 function periyotlar(t: OnizlemeKayit, p: OnizlemeKayit): { tPer: string; pPer: string; carpan: number; farkli: boolean } {
-  const tPer = etkinPeriyot(t, p.islemTipi), pPer = etkinPeriyot(p);
+  const tPer = etkinPeriyot(t, p.islemTipi), pPer = kiraPeriyotSuphesi(p) != null ? "YILLIK" : etkinPeriyot(p);
   if (tPer === pPer) return { tPer, pPer, carpan: 1, farkli: false };
   if (tPer === "AYLIK" && pPer === "YILLIK") return { tPer, pPer, carpan: 1 / 12, farkli: false };
   if (tPer === "YILLIK" && pPer === "AYLIK") return { tPer, pPer, carpan: 12, farkli: false };
@@ -341,6 +373,12 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   // Mülk tipi
   const tu = enIyiTipBenzerligi([t.mulkTipi, ...(t.alternatifMulkTipleri ?? [])] as any, p.mulkTipi as any);
   const tipUyumu = { oran: tu.oran, aciklama: tu.aciklama, talepTipi: tu.tip };
+  const tipIzinli = tipGecerli(tu);
+  const uyarilar: string[] = [];
+  const supheliBirim = kiraPeriyotSuphesi(p);
+  if (supheliBirim != null) uyarilar.push(`Portföy fiyatı yıllık girilmiş olabilir (aylık sayılırsa ${supheliBirim.toLocaleString("tr-TR")} TL/m²) — 12'ye bölünerek karşılaştırıldı`);
+  const celiski = tipCeliskisi(t);
+  if (celiski) uyarilar.push(`Talep metni "${celiski.kelime}" diyor ama tip ${MULK_TIPI_META[t.mulkTipi as keyof typeof MULK_TIPI_META]?.etiket ?? t.mulkTipi} — talebin tipini kontrol edin`);
   if (tu.oran < 1) satirlar.push({ anahtar: "mulkTipi", etiket: "Mülk tipi", talep: String(MULK_TIPI_META[tu.tip as keyof typeof MULK_TIPI_META]?.etiket ?? tu.tip), portfoy: String(MULK_TIPI_META[p.mulkTipi as keyof typeof MULK_TIPI_META]?.etiket ?? p.mulkTipi), sonuc: tu.oran >= 0.9 ? "SAGLANDI" : "BILINMIYOR", kritik: kritik.has("MULK_TIPI"), bilesen: "TIP_SATIR" });
   // Oda sayısı (konut / ofis). v3.11: "2+1" isteyen müşteriye 3+1 tam uyum değildir —
   // istenen oda 1,0 · bir oda fazla kısmi puan (sunulabilir) · iki+ oda fazla ya da eksik = sağlanmadı.
@@ -392,17 +430,20 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
     const sonuc: KriterSonuc = pf == null || periyotFarkli ? "BILINMIYOR" : pf <= ust ? "SAGLANDI" : "SAGLANMADI";
     // v3.11 — bütçe altı: fiyat bütçenin çok altındaysa mülk büyük olasılıkla müşterinin aradığı segmentte değildir.
     // Engel değildir (sonuç "sağlandı" kalır), yalnızca puanı düşürür. Talepte alt sınır (minFiyat) varsa o esas alınır.
-    let altPuan = 1, altNot = "";
+    let altPuan = 1, altNot = "", segmentDisi = false;
     if (sonuc === "SAGLANDI" && pf! <= t.maxFiyat) {
       if (t.minFiyat != null && t.minFiyat > 0) {
         if (pf! < t.minFiyat) { altPuan = pf! >= t.minFiyat * 0.85 ? 0.8 : 0.5; altNot = " · alt sınırın altında"; }
       } else if (A.fiyatAlt && t.maxFiyat > 0) {
         const r = pf! / t.maxFiyat;
-        if (r < A.fiyatAlt.esik2) { altPuan = A.fiyatAlt.puan2; altNot = ` · bütçenin %${Math.round(r * 100)}'i`; }
+        // v3.27 — 35 milyonluk talebe 3,5 milyonluk daire: SATIŞTA bütçenin %30'unun altı başka segmenttir, elenir (esnek bütçe de
+        // kurtarmaz). Kirada uygulanmaz: 200 bin bütçeli depo talebine 500 m² / 50 bin depo meşru adaydır (ölçüm 13 Eki 2026).
+        if (A.fiyatAlt.taban != null && r < A.fiyatAlt.taban && SATIS_ISLEMLERI.has(p.islemTipi)) { segmentDisi = true; altPuan = 0; altNot = ` · bütçenin yalnızca %${Math.round(r * 100)}'i (farklı segment)`; }
+        else if (r < A.fiyatAlt.esik2) { altPuan = A.fiyatAlt.puan2; altNot = ` · bütçenin %${Math.round(r * 100)}'i`; }
         else if (r < A.fiyatAlt.esik1) { altPuan = A.fiyatAlt.puan1; altNot = ` · bütçenin %${Math.round(r * 100)}'i`; }
       }
     }
-    satirlar.push({ anahtar: "fiyat", etiket: `Fiyat (≤ bütçe +%${dna.fiyatTolerans})`, talep: (t.minFiyat != null && t.minFiyat > 0 ? `${fmt(t.minFiyat)} – ` : "≤ ") + fmt(t.maxFiyat), portfoy: pf == null ? "—" : fmt(p.fiyat) + (periyotFarkli ? ` (${p.fiyatPeriyodu})` : per.carpan !== 1 ? ` (${per.pPer === "YILLIK" ? "yıllık" : "aylık"} · ${fmt(Math.round(pf))} ${per.tPer === "YILLIK" ? "yıllık" : "aylık"})` : "") + altNot, sonuc, kritik: kritik.has("FIYAT"), puan: sonuc === "BILINMIYOR" ? 0.5 : pf! <= t.maxFiyat ? altPuan : sonuc === "SAGLANDI" ? 0.75 : 0, bilesen: "FIYAT" });
+    satirlar.push({ anahtar: "fiyat", etiket: `Fiyat (≤ bütçe +%${dna.fiyatTolerans})`, talep: (t.minFiyat != null && t.minFiyat > 0 ? `${fmt(t.minFiyat)} – ` : "≤ ") + fmt(t.maxFiyat), portfoy: pf == null ? "—" : fmt(p.fiyat) + (periyotFarkli ? ` (${p.fiyatPeriyodu})` : per.carpan !== 1 ? ` (${per.pPer === "YILLIK" ? "yıllık" : "aylık"} · ${fmt(Math.round(pf))} ${per.tPer === "YILLIK" ? "yıllık" : "aylık"})` : "") + altNot, sonuc: segmentDisi ? "SAGLANMADI" : sonuc, kritik: kritik.has("FIYAT") || segmentDisi, puan: sonuc === "BILINMIYOR" ? 0.5 : pf! <= t.maxFiyat ? altPuan : sonuc === "SAGLANDI" ? 0.75 : 0, bilesen: "FIYAT" });
   }
   // Teknik alanlar: talepte dolu olan her karşılaştırılabilir alan
   for (const [alan, tv] of Object.entries(t.ozellik ?? {})) {
@@ -427,6 +468,7 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   const lokKritik = !esnek.has("LOKASYON");
   const lok = lokasyonPuani(t, p, b, A, !lokKritik);
   const kritikEngeller = satirlar.filter((s) => s.kritik && s.sonuc === "SAGLANMADI").map((s) => s.etiket);
+  if (!tipIzinli) kritikEngeller.push("Mülk tipi uymuyor");
   if (lok.haric) kritikEngeller.push("Hariç tutulan bölge");
   else if (lok.puan == null && lokKritik) kritikEngeller.push("Lokasyon");
   const bilinmeyenKritikler = satirlar.filter((s) => s.kritik && s.sonuc === "BILINMIYOR").map((s) => s.etiket);
@@ -468,12 +510,22 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   if (fiyatBilinmiyor) skor = Math.round(skor * FIYATSIZ_CARPAN);
   skor = Math.max(0, Math.min(100, skor));
 
+  // v3.27 — güven: talepte istenen kriterlerden kaçı portföyde gerçekten ölçülebildi (bölge ve tip dahil)
+  const lokOlculdu = lok.kademe !== "BILINMIYOR" && lok.kademe !== "IL_GENELI";
+  const olculenKriter = (lokOlculdu ? 1 : 0) + 1 + satirlar.filter((s) => s.sonuc !== "BILINMIYOR").length;
+  const toplamKriter = 2 + satirlar.length;
+  const bilinmeyenSayi = toplamKriter - olculenKriter;
+  const guvenSeviye: GuvenSeviye = olculenKriter <= GUVEN_DUSUK_EN_COK || cekirdekKosullu || !!celiski ? "DUSUK"
+    : olculenKriter >= GUVEN_YUKSEK_EN_AZ && bilinmeyenSayi <= 1 ? "YUKSEK" : "ORTA";
+  const guven: Guven = { seviye: guvenSeviye, olculen: olculenKriter, toplam: toplamKriter,
+    aciklama: `${toplamKriter} kriterden ${olculenKriter}'i ölçüldü` + (celiski ? " · talep tipi şüpheli" : cekirdekKosullu ? " · m² / fiyat / oda eksik" : olculenKriter <= GUVEN_DUSUK_EN_COK ? " · talepte az kriter var" : "") };
+
   const uygunluk: Uygunluk = kritikEngeller.length ? "UYGUN_DEGIL"
-    : bilinmeyenKritikler.length || talepEksikleri.length || cekirdekKosullu || tipUyumu.oran < 0.9 || satirlar.some((s) => s.sonuc === "SAGLANMADI")
+    : guvenSeviye === "DUSUK" || uyarilar.length || bilinmeyenKritikler.length || talepEksikleri.length || cekirdekKosullu || tipUyumu.oran < 0.9 || satirlar.some((s) => s.sonuc === "SAGLANMADI")
       // v3.11 — zayıf bileşen: konum "biraz uzak / bilinmiyor" ya da bir satırın puanı eşiğin altında → sunmadan önce sor
       || lok.belirsiz || (lok.kademe !== "IL_GENELI" && lok.kademe !== "BILINMIYOR" && lok.oran < A.kosulluAlti) || satirlar.some((s) => s.sonuc === "SAGLANDI" && s.puan != null && s.puan < A.kosulluAlti) ? "KOSULLU" : "SUNULABILIR";
   return {
     uygunluk, tipUyumu, skor: uygunluk === "UYGUN_DEGIL" ? Math.min(skor, 40) : skor, lokasyonPuani: lok.puan, lokasyonOrani: lok.oran, lokasyonKademe: lok.kademe, lokasyonMesafeM: lok.mesafeM, lokasyonAciklama: lok.aciklama,
-    kriterler: satirlar, kritikEngeller, bilinmeyenKritikler, matris: { ad: M.ad, bilesenler }, talepEksikleri, veriEksikleri, dna,
+    kriterler: satirlar, kritikEngeller, bilinmeyenKritikler, matris: { ad: M.ad, bilesenler }, talepEksikleri, veriEksikleri, uyarilar, guven, dna,
   };
 }

@@ -1,0 +1,113 @@
+/**
+ * Anahtar CRM v3.27 · 13 Ekim 2026 — eşleştirme kalitesi: tip ailesi (otomatik / seçmeli), satışta bütçe tabanı,
+ * yıllık girilmiş kira, güven göstergesi, tip çelişkisi, mükerrer ilan; içe aktarmada yıllık kira okuma.
+ * Senaryolar 13 Ekim 2026 canlı veri incelemesinden (62 talep × 410 portföy) alındı.
+ */
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { eslesmeOnizle, temelUyum, kiraPeriyotSuphesi, KIRA_BIRIM_UST, type OnizlemeKayit, type LokasyonBaglami } from "../src/lib/eslestirme/onizleme";
+import { tipBenzerligi, tipGecerli } from "../src/lib/domain/kategori";
+import { tipCeliskisi } from "../src/lib/domain/tip-celiskisi";
+import { yillikKiraIfadesi } from "../src/lib/domain/kira-periyot";
+import { portfoyImzasi, mukerrerleriTopla } from "../src/lib/eslestirme/mukerrer";
+import { hizliAyristir } from "../src/lib/ai/hizli-ayristirici";
+import { dosyaSatirlari, satirDonustur, satirHazirla } from "../src/lib/ingest/tablo";
+import { csvOku } from "../src/lib/ingest/xlsx";
+import { ornekRevyCsv } from "../demo/ornek-gelen";
+import { INDEKS } from "../demo/lokasyon";
+import { SURUM, SURUM_GECMISI } from "../src/lib/surum";
+
+const B: LokasyonBaglami = { komsuIlceler: new Set(), altBolgeMahalleleri: new Map() };
+const MURATPASA = [{ ilId: 7, ilceId: 108, birincil: true }];
+const KEPEZ = [{ ilId: 7, ilceId: 103, birincil: true }];
+const talep = (x: Partial<OnizlemeKayit>): OnizlemeKayit => ({ tip: "TALEP", mulkTipi: "DAIRE", islemTipi: "SATILIK", lokasyonlar: MURATPASA, ...x });
+const portfoy = (x: Partial<OnizlemeKayit>): OnizlemeKayit => ({ tip: "PORTFOY", mulkTipi: "DAIRE", islemTipi: "SATILIK", lokasyonlar: MURATPASA, ...x });
+
+test("sürüm 3.27 kaydı", () => {
+  assert.equal(SURUM, "3.27"); assert.equal(SURUM_GECMISI[0].surum, "3.27"); assert.equal(SURUM_GECMISI[1].surum, "3.26");
+  assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 5);
+});
+
+test("tip ailesi: Daire ↔ Ofis kendiliğinden eşleşmez; Depo ↔ Üretim eşleşir; talep alternatif seçerse Daire de gelir", () => {
+  assert.equal(tipBenzerligi("BURO_OFIS", "DAIRE").oran, 0.4);
+  assert.equal(tipBenzerligi("BURO_OFIS", "DAIRE").otomatik, false);
+  assert.equal(tipGecerli(tipBenzerligi("DEPO_ANTREPO", "FABRIKA_URETIM_TESISI")), true);
+  const ofisTalebi = talep({ mulkTipi: "BURO_OFIS", minM2: 50, maxM2: 55, maxFiyat: 9_000_000 });
+  const daire = portfoy({ m2: 50, fiyat: 4_600_000, odaSayisi: "1+1" });
+  assert.equal(temelUyum(ofisTalebi, daire), false, "ofis talebine daire listeye girmez");
+  const s = eslesmeOnizle(ofisTalebi, daire, B);
+  assert.equal(s.uygunluk, "UYGUN_DEGIL"); assert.ok(s.kritikEngeller.includes("Mülk tipi uymuyor"));
+  assert.equal(temelUyum({ ...ofisTalebi, alternatifMulkTipleri: ["DAIRE"] }, daire), true, "talep daireyi de kabul ediyorsa gelir");
+  assert.equal(temelUyum(talep({ mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK" }), portfoy({ mulkTipi: "IMALATHANE", islemTipi: "KIRALIK" })), true);
+});
+
+test("satışta bütçenin %30'unun altı elenir; kirada elenmez", () => {
+  const t = talep({ mulkTipi: "ARSA", maxFiyat: 35_000_000 });
+  const ucuz = eslesmeOnizle(t, portfoy({ mulkTipi: "ARSA", m2: 500, fiyat: 3_500_000 }), B);
+  assert.equal(ucuz.uygunluk, "UYGUN_DEGIL");
+  assert.match(ucuz.kriterler.find((k) => k.anahtar === "fiyat")!.portfoy, /farklı segment/);
+  assert.notEqual(eslesmeOnizle(t, portfoy({ mulkTipi: "ARSA", m2: 3000, fiyat: 27_000_000 }), B).uygunluk, "UYGUN_DEGIL");
+  // kira: 200 bin bütçeli depo talebine 500 m² / 50 bin depo meşru aday
+  const kira = eslesmeOnizle(talep({ mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", maxFiyat: 200_000, lokasyonlar: KEPEZ }), portfoy({ mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", fiyatPeriyodu: "AYLIK", m2: 500, fiyat: 50_000, lokasyonlar: KEPEZ }), B);
+  assert.notEqual(kira.uygunluk, "UYGUN_DEGIL");
+});
+
+test("yıllık girilmiş depo kirası: 12'ye bölünür, uyarılır, eşleşme kaçmaz", () => {
+  const p = portfoy({ mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", fiyatPeriyodu: "AYLIK", m2: 1000, fiyat: 1_300_000, lokasyonlar: KEPEZ });
+  assert.equal(kiraPeriyotSuphesi(p as any), 1300);
+  assert.equal(kiraPeriyotSuphesi({ ...p, fiyat: 150_000 } as any), null, "1000 m² / 150 bin akla yatkın");
+  assert.equal(kiraPeriyotSuphesi({ ...p, fiyatPeriyodu: "YILLIK" } as any), null);
+  assert.equal(kiraPeriyotSuphesi({ ...p, mulkTipi: "DAIRE", m2: 100, fiyat: 90_000 } as any), null, "konutta eşik yok");
+  assert.equal(KIRA_BIRIM_UST.SANAYI, 600);
+  const t = talep({ mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", fiyatPeriyodu: "AYLIK", minM2: 1000, maxM2: 1500, maxFiyat: 150_000, lokasyonlar: KEPEZ });
+  const s = eslesmeOnizle(t, p, B);
+  assert.notEqual(s.uygunluk, "UYGUN_DEGIL", "eskiden 'bütçe aşımı' ile eleniyordu");
+  assert.equal(s.kriterler.find((k) => k.anahtar === "fiyat")!.sonuc, "SAGLANDI");
+  assert.ok(s.uyarilar.some((u) => /yıllık girilmiş olabilir/.test(u)));
+  assert.equal(s.uygunluk, "KOSULLU", "uyarılı eşleşme en fazla Koşullu");
+});
+
+test("güven göstergesi: az kriterli eşleşme DÜŞÜK ve Sunulabilir olamaz; dolu eşleşme YÜKSEK", () => {
+  const az = eslesmeOnizle(talep({ maxFiyat: 7_000_000 }), portfoy({ fiyat: 6_500_000, m2: 120, odaSayisi: "3+1" }), B);
+  assert.equal(az.guven.seviye, "DUSUK"); assert.notEqual(az.uygunluk, "SUNULABILIR"); assert.match(az.guven.aciklama, /kriterden/);
+  const dolu = eslesmeOnizle(
+    talep({ mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", fiyatPeriyodu: "AYLIK", minM2: 1000, maxM2: 1500, maxFiyat: 150_000, lokasyonlar: KEPEZ, ozellik: { elektrikGucuKw: 40, netYukseklikM: 7, rampa: true } }),
+    portfoy({ mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", fiyatPeriyodu: "AYLIK", m2: 1100, fiyat: 140_000, lokasyonlar: KEPEZ, ozellik: { elektrikGucuKw: 60, netYukseklikM: 8, rampa: true } }), B);
+  assert.equal(dolu.guven.seviye, "YUKSEK", dolu.guven.aciklama); assert.equal(dolu.uygunluk, "SUNULABILIR");
+});
+
+test("tip çelişkisi: 'SATILIK ARSA' yazan Ofis talebi uyarılır; kendi tipini söyleyen kayıt uyarılmaz", () => {
+  assert.deepEqual(tipCeliskisi({ mulkTipi: "BURO_OFIS", hamMetin: "〰️TALEP 〰️ ——ALTINTAŞ—— —SATILIK ARSA— 30-35 milyon" }), { kelime: "arsa", aile: "ARSA" });
+  assert.equal(tipCeliskisi({ mulkTipi: "BURO_OFIS", hamMetin: "SATILIK OFİS TALEBİ Şirinyalı 1+1 50 m²" }), null);
+  assert.equal(tipCeliskisi({ mulkTipi: "DAIRE", hamMetin: "ofis olarak kullanılacak 2+1" }), null);
+  assert.equal(tipCeliskisi({ mulkTipi: "DEPO_ANTREPO", hamMetin: "4000 m² depo, 10.000 m² arsa da olabilir" }), null);
+  assert.equal(tipCeliskisi({ mulkTipi: "DUKKAN_MAGAZA", hamMetin: "Waffle dükkânı açmaya uygun" }), null, "Türkçe harf sınırı");
+  assert.equal(tipCeliskisi({ mulkTipi: "DAIRE" }), null);
+  const s = eslesmeOnizle(talep({ mulkTipi: "BURO_OFIS", maxFiyat: 35_000_000, hamMetin: "—SATILIK ARSA— Altıntaş" }), portfoy({ mulkTipi: "BURO_OFIS", m2: 200, fiyat: 30_000_000 }), B);
+  assert.ok(s.uyarilar.some((u) => /"arsa"/.test(u))); assert.equal(s.guven.seviye, "DUSUK"); assert.notEqual(s.uygunluk, "SUNULABILIR");
+});
+
+test("mükerrer ilan: aynı tip/işlem/m²/fiyat/oda/mahalle tek satır; eksik veride gruplanmaz", () => {
+  const v = { mulkTipi: "DAIRE", islemTipi: "SATILIK", m2: 140, fiyat: 9_100_000, odaSayisi: "3+1", lokasyonlar: [{ mahalleId: 568, ilceId: 104, birincil: true }] };
+  assert.ok(portfoyImzasi(v)); assert.equal(portfoyImzasi({ ...v, fiyat: null }), null); assert.equal(portfoyImzasi({ ...v, lokasyonlar: [] }), null);
+  const e = (tid: string, pid: string, veri: any) => ({ t: { id: tid }, p: { id: pid, veri } });
+  const r = mukerrerleriTopla([e("T1", "P1", v), e("T1", "P2", { ...v }), e("T2", "P2", v), e("T1", "P3", { ...v, fiyat: 9_200_000 })]);
+  assert.deepEqual(r.map((x) => `${x.t.id}-${x.p.id}`), ["T1-P1", "T2-P2", "T1-P3"]);
+  assert.deepEqual(r[0].kopyalar!.map((x) => x.id), ["P2"]);
+});
+
+test("içe aktarma: 'yıllık kira' okunur (ifade, WhatsApp mesajı, Revy satırı); yaş ve aidat kira sayılmaz", () => {
+  for (const m of ["YENİGÖL MAH. 1000 M2 DEPO YILLIK KİRA 1.000.000", "kirası yıllık 1.300.000", "1.300.000 TL/yıl", "Yıllık 1.2 milyon", "yıllık kirası 900 bin"]) assert.ok(yillikKiraIfadesi(m), m);
+  for (const m of ["15 yıllık bina", "yıllık aidat 12.000", "aylık 85.000 TL", "KİRA BEDELİ YILLIK PEŞİN +kdv", "kira yıllık peşin ödenir", "yıllık peşin ödeme", ""]) assert.equal(yillikKiraIfadesi(m), false, m);
+  const w = hizliAyristir("Kiralık depo Yenigöl 1000 m2 yıllık kira 1.000.000 TL");
+  assert.equal(w.fiyatPeriyodu, "YILLIK");
+  assert.equal(hizliAyristir("Kiralık depo Yenigöl 1000 m2 aylık 120.000 TL").fiyatPeriyodu, "AYLIK");
+  const R = (fiyat: string, baslik: string) => ["05.10.2026", "Ticari", "Depo & Antrepo", "Kiralık", "1000", fiyat, "", "", baslik, "Antalya", "Kepez", "", "Yenigöl Mah", "", "", "", "", "Hayır", "", "", "Hayır", "Hayır", "Mülk Sahibi", "Ali V.", "", "5", "Aktif", "Sahibinden.com", "https://sahibinden.com/1344109419"];
+  const satir = (h: string[]) => { const b = dosyaSatirlari([csvOku(ornekRevyCsv().split("\n")[0] + "\n" + h.join(";"), "x")])[0]; return satirHazirla(satirDonustur(b.satirlar[0].hucreler, b.eslesme, { tip: "PORTFOY", dosyaTuru: "PORTAL", varsayilanSahip: "EMLAKCI", ilanGun: 90, varsayilanIslem: "SATILIK", bugun: new Date(2026, 9, 13), dosyaAdi: "ads.xlsx" }, 2), INDEKS as any); };
+  const y = satir(R("1000000", "YENİGÖL MAH. 1000 M2 DEPO YILLIK KİRA 1.000.000"));
+  assert.equal(y.girdi.fiyatPeriyodu, "YILLIK"); assert.ok(y.kontrol.some((k) => /yıllık kira olarak okundu/.test(k)));
+  const s = satir(R("1300000", "Yenigöl Mah - Hava Alanı Yakınında - 1.000 m2 Depo"));
+  assert.equal(s.girdi.fiyatPeriyodu, "AYLIK"); assert.ok(s.kontrol.some((k) => /yıllık kira olabilir/.test(k)), s.kontrol.join(" | "));
+  const n = satir(R("120000", "Yenigöl 1000 m2 depo"));
+  assert.equal(n.girdi.fiyatPeriyodu, "AYLIK"); assert.ok(!n.kontrol.some((k) => /yıllık/.test(k)));
+});

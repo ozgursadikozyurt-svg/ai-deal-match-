@@ -1,9 +1,10 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * Demo — ekranların ortak parçaları: depo bağlamı, küçük bileşenler, eşleşme hesabı, konum öneri kutusu.
  */
 import React, { createContext, useContext, useMemo, useRef, useState } from "react";
 import { eslesmeOnizle, temelUyum, type OnizlemeSonucu, type Uygunluk } from "../src/lib/eslestirme/onizleme";
+import { mukerrerleriTopla } from "../src/lib/eslestirme/mukerrer";
 import { firsatDegerlendir, type FirsatSonuc } from "../src/lib/eslestirme/firsat";
 import { kimOf } from "../src/lib/domain/kim";
 import { etiket, tl } from "./etiketler";
@@ -106,7 +107,7 @@ export function Bolum({ baslik, ozet, acik = false, children, id }: { baslik: st
 
 // ───────── Eşleşme hesabı ─────────
 /** f: v3.19 fırsat önceliği — kim ↔ kim (mülk sahibi/müşteri öncelikli, emlakçı↔emlakçı ikinci planda) */
-export interface Eslesme { t: Kayit; p: Kayit; s: OnizlemeSonucu; f: FirsatSonuc }
+export interface Eslesme { t: Kayit; p: Kayit; s: OnizlemeSonucu; f: FirsatSonuc; /** v3.27 — aynı ilanın diğer kayıtları (tek satırda gösterilir) */ kopyalar?: Kayit[] }
 /** v3.8: koparılan eşleşmeler (durum REDDEDILDI) varsayılan olarak hariç; Eşleşmeler ekranı ve eşleşme detayı dahil eder */
 export function useEslesmeler(koparilanDahil = false): Eslesme[] {
   const { d } = useDepo();
@@ -125,7 +126,8 @@ export function useEslesmeler(koparilanDahil = false): Eslesme[] {
     }
     const sira: Record<Uygunluk, number> = { SUNULABILIR: 0, KOSULLU: 1, UYGUN_DEGIL: 2 };
     // v3.19 — önce uygunluk, sonra fırsat kademesi (sahibinden ↔ müşteri önde), sonra skor
-    return r.sort((a, b) => sira[a.s.uygunluk] - sira[b.s.uygunluk] || b.f.sira - a.f.sira || b.s.skor - a.s.skor);
+    // v3.27 — aynı talebe düşen mükerrer portföyler tek satır ("+N aynı ilan")
+    return mukerrerleriTopla(r.sort((a, b) => sira[a.s.uygunluk] - sira[b.s.uygunluk] || b.f.sira - a.f.sira || b.s.skor - a.s.skor));
   }, [d.kayitlar, d.kisiler, d.ogrenilen, d.ayarlar.sahiplik, d.ayarlar.paylasim]);
   return useMemo(() => (koparilanDahil ? tum : tum.filter((e) => d.eslesmeNotlari[`${e.t.id}~${e.p.id}`]?.durum !== "REDDEDILDI")), [tum, d.eslesmeNotlari, koparilanDahil]);
 }

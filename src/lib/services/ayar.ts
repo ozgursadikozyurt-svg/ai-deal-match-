@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * Ayar okuma / yazma — ayarlar ofis başına tutulur (birincil anahtar: ofisId + anahtar).
  * Okumada ofis süzgeci src/lib/kiracilik.ts tarafından kendiliğinden eklenir; yazmada bileşik
  * anahtar gerektiği için ofisId burada açıkça verilir.

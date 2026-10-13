@@ -1,4 +1,4 @@
-// Anahtar CRM v3.26 · 12 Ekim 2026
+// Anahtar CRM v3.27 · 13 Ekim 2026
 // GET /api/saglik → uygulama ve veritabanı ayakta mı (giriş gerektirmez; içerik döndürmez)
 import { prisma } from "@/lib/db";
 export async function GET() {

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * Eşleşmeyi koparma: yanlış eşleşme ya da sunuldu/beğenilmedi → ana ekranda, eşleşme listesinde ve çekmecede bir daha
  * gösterilmez (Eşleşmeler → "Koparılanlar"dan geri alınabilir). Veritabanında Match.durum = REDDEDILDI + neden.
  */

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.26 · 12 Ekim 2026
+// Anahtar CRM v3.27 · 13 Ekim 2026
 // Gelen kutusu rotalarının ortak hata yanıtı: tür / boyut / anahtar hataları kendi durum koduyla, depo hataları 502 / 503 ile döner.
 import { hata, ok } from "./yanit";
 import { DepoHatasi } from "../depolama/supabase";

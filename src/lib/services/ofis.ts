@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.26 · 12 Ekim 2026
+ * Anahtar CRM v3.27 · 13 Ekim 2026
  * OFİS, KULLANICI VE DAVET işlemleri.
  *
  * Hesap açma davetle olur: yönetici bir bağlantı üretir, bağlantıdaki gizli kodun yalnızca
