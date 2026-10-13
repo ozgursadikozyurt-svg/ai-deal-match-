@@ -27,6 +27,8 @@
 9. **İstenen ama bilinmeyen özellik**: 99 depo portföyünün 83'ü sahibinden/Revy'den yalnızca başlıkla geliyor (açıklama yok), yani "ofis / rampa / elektrik" bilgisi kaynağında yok. Eleme yapılmaz; her bilinmeyen istek −4 (en çok −12), skor tavanı 85, uygunluk Koşullu ("Sorulacak"). Açıkça karşılanmayan istek −8 (en çok −16). Kullanım amacı sayılmaz. Örnek ("Yenigöl 1000–1500 m², ofisli"): ofisi doğrulanmış 2 depo 90–91 Sunulabilir; ofis bilgisi olmayanlar 85 Koşullu; ofisi olmayan daha aşağıda.
 10. **Kapalı alan yedeği**: depo / sanayide `kapaliAlanM2` boşsa ilan m²'si kullanılır.
 
+11. **Var / Yok hızlı cevap** (`HizliCevaplar`, demo/kartlar.tsx): bilinmeyen evet/hayır özellik için "Sorulacak" çipinin içinde iki küçük düğme (ayrı satır açmaz; dokunmatikte biraz büyür). Basınca portföyün özelliğine yazılır, bildirim çıkar, kart açılmaz. Eşleşme detayında da aynı.
+
 ## 3. Ölçüm (aynı canlı veri, önce → sonra)
 
 | | v3.26 | v3.27 |

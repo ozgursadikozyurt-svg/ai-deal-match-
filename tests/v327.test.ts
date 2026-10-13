@@ -117,7 +117,7 @@ test("içe aktarma: 'yıllık kira' okunur (ifade, WhatsApp mesajı, Revy satır
 });
 
 test("kira her zaman AYLIK saklanır: yıllık girilen 12'ye bölünür (talep bütçesi dahil), not ve ödeme şekli eklenir; satış dokunulmaz", () => {
-  const p = kirayiAyligaCevir({ islemTipi: "KIRALIK", fiyatPeriyodu: "YILLIK", fiyat: 1_200_000, ozellik: {} as any });
+  const p = kirayiAyligaCevir({ islemTipi: "KIRALIK", fiyatPeriyodu: "YILLIK", fiyat: 1_200_000, operasyonNotu: null as string | null, ozellik: {} as any });
   assert.equal(p.fiyatPeriyodu, "AYLIK"); assert.equal(p.fiyat, 100_000); assert.equal(p.ozellik.kiraOdemeSekli, "YILLIK_PESIN");
   assert.match(p.operasyonNotu!, /1\.200\.000 TL\/yıl \(aylık ≈ 100\.000 TL\)/);
   assert.deepEqual(kirayiAyligaCevir(p), p, "ikinci geçişte değişmez");
@@ -140,4 +140,35 @@ test("istenen ama bilinmeyen özellik: eleme yok, skor 85'i geçmez ve Koşullu;
   // depoda kapalı alan girilmemişse ilanın m²'si sayılır
   const ka = var_.kriterler.find((k) => k.anahtar === "kapaliAlanM2")!;
   assert.equal(ka.sonuc, "SAGLANDI"); assert.match(ka.portfoy, /ilan m²'si/);
+});
+
+test("Var / Yok hızlı cevap: eşleşme kartında bilinmeyen evet/hayır özellik için iki küçük düğme; basınca portföye yazılır", async () => {
+  const React = (await import("react")).default;
+  const { ac } = await import("./yardimci-arayuz");
+  const { EslesmeKarti, cevaplanabilirler } = await import("../demo/kartlar");
+  const { ornekVeriyiKur, bosBaglanti, bosGoogleBaglanti, DEMO_SAHIPLIK } = await import("../demo/depo");
+  const { BAGLAM } = await import("../demo/lokasyon");
+  const { TTL_VARSAYILAN } = await import("../src/lib/domain/gecerlilik");
+  const { sahiplikNormalize } = await import("../src/lib/domain/sahiplik");
+  const { SADECE_TEST_baglamiSabitle, VARSAYILAN_OFIS_ID, VARSAYILAN_KULLANICI_ID } = await import("../src/lib/kiracilik");
+  SADECE_TEST_baglamiSabitle({ ofisId: VARSAYILAN_OFIS_ID, kullaniciId: VARSAYILAN_KULLANICI_ID, rol: "OFIS_YONETICISI", eposta: "test@anahtar.local" });
+  const ornek = ornekVeriyiKur();
+  const t = ornek.kayitlar.find((x) => x.id === "T2")!, p = ornek.kayitlar.find((x) => x.id === "P1")!;
+  const s = eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM);
+  const e = { t, p, s, f: { kademe: "NORMAL", etiket: "Normal", aciklama: "", sira: 1, tahminiKomisyon: null, dogrudanTaraf: 1 } } as any;
+  const alanlar = cevaplanabilirler(e).map((k) => k.anahtar);
+  assert.ok(alanlar.includes("rampa"), alanlar.join(","));
+  const bildirimler: string[] = [];
+  const c: any = { d: { kayitlar: ornek.kayitlar, kisiler: ornek.kisiler, eslesmeNotlari: {}, ayarlar: { ttl: TTL_VARSAYILAN, sahiplik: sahiplikNormalize(DEMO_SAHIPLIK) }, baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, favoriler: [] },
+    guncelle: (f: any) => { c.d = f(c.d); }, kayitKaydet: (k: any) => { c.d = { ...c.d, kayitlar: c.d.kayitlar.map((y: any) => (y.id === k.id ? k : y)) }; }, bildir: (m: string) => bildirimler.push(m), git: () => { throw new Error("kart açılmamalı"); }, geri: () => {}, geriVar: false, ornekHatalari: [] };
+  const ekran = await ac(React.createElement(EslesmeKarti, { e }), c);
+  assert.equal(ekran.qa(".hc").length, alanlar.length, "her bilinmeyen evet/hayır özellik için tek çip");
+  assert.doesNotMatch(ekran.q(".es2-neden")!.textContent ?? "", /Sorulacak:[^·]*Yükleme rampası/, "düğmeli olan metinde tekrar yazılmaz");
+  await ekran.tikla(ekran.q('[aria-label="Yükleme rampası: var"]'));
+  assert.equal((c.d.kayitlar.find((x: any) => x.id === "P1").veri.ozellik as any).rampa, true);
+  assert.match(bildirimler[0], /Yükleme rampası: var — portföye kaydedildi/);
+  await ekran.kapat();
+  // cevaptan sonra aynı eşleşmede o özellik artık bilinmiyor değil
+  const s2 = eslesmeOnizle(t.veri as any, c.d.kayitlar.find((x: any) => x.id === "P1").veri, BAGLAM);
+  assert.equal(s2.kriterler.find((k) => k.anahtar === "rampa")!.sonuc, "SAGLANDI");
 });

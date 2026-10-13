@@ -669,6 +669,13 @@ main.sarici{padding-block:18px 32px}
 .es2-n{font-size:.78rem;padding:.2rem .6rem;border-radius:7px;background:var(--panel);border:1px solid var(--line);color:var(--mut)}
 .es2-n.uyari{background:var(--uyari-bg);color:var(--uyari);border-color:transparent}
 .es2-n.kotu{background:var(--kotu-bg);color:var(--kotu);border-color:transparent}
+/* v3.27 — Var / Yok hızlı cevap: tek çip, iki küçük düğme */
+.hc{display:inline-flex;align-items:center;gap:2px;font-size:.78rem;padding:1px 2px 1px .55rem;border-radius:7px;background:var(--uyari-bg);color:var(--uyari)}
+.hc-ad{margin-right:.25rem}
+.hc-b{font:inherit;font-size:.74rem;line-height:1;padding:.3rem .5rem;border-radius:5px;border:1px solid transparent;background:var(--panel);color:var(--fg);cursor:pointer}
+.hc-b.var:hover,.hc-b.var:focus-visible{background:var(--iyi-bg);color:var(--iyi);border-color:var(--iyi)}
+.hc-b.yok:hover,.hc-b.yok:focus-visible{background:var(--kotu-bg);color:var(--kotu);border-color:var(--kotu)}
+@media (pointer:coarse){.hc-b{padding:.42rem .6rem}}
 
 /* Eşleştirme tercihleri (eski Talep DNA) */
 .tercih-kart{display:flex;flex-direction:column;gap:12px}

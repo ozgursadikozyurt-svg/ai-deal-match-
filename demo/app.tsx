@@ -48,7 +48,7 @@ import { EslesmeCekmecesi } from "./cekmece";
 import { TTL_ETIKET, ttlGun, type TtlAyar } from "../src/lib/domain/gecerlilik";
 import { portalLinkleri } from "../src/lib/portal/arama-linkleri";
 import { MatrisDokumu, HavuzRozeti, katmanSirasi, FirsatBandi } from "./motor-ui";
-import { EslesmeKarti, TalepTercihleri, Kapanir, PIPELINE } from "./kartlar";
+import { EslesmeKarti, TalepTercihleri, Kapanir, PIPELINE, HizliCevaplar, cevaplanabilirler } from "./kartlar";
 import { havuzKatmani, portfoyEdinmeFirsati } from "../src/lib/eslestirme/havuz";
 import { AkilliKutu } from "./ai-kutusu";
 import { Baglantilar, SenkronDurumu } from "./baglantilar";
@@ -526,7 +526,7 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
       {!e.s.kriterler.length && <p className="bos">Talepte karşılaştırılacak kriter yok.</p>}
     </section>
     <MatrisDokumu s={e.s} />
-    {sorulacak.length > 0 && <section className="kart"><h3>Sunmadan önce sorulacaklar</h3><div className="cip-satir">{sorulacak.map((s) => <span key={s} className="cip">{s}</span>)}</div></section>}
+    {sorulacak.length > 0 && <section className="kart"><h3>Sunmadan önce sorulacaklar</h3><div className="cip-satir">{sorulacak.filter((s) => !cevaplanabilirler(e).some((k) => s.startsWith(k.etiket + " "))).map((s) => <span key={s} className="cip">{s}</span>)}<HizliCevaplar e={e} /></div></section>}
     <section className="kart">
       <h3>Takip</h3>
       <div className="uc sar">{PIPELINE.map(([k, l]) => <button key={k} className={cx(n.durum === k && "on")} onClick={() => durumDegis(k, l)}>{l}</button>)}</div>

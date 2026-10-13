@@ -14,6 +14,7 @@ import { EksikUyarisi } from "./motor-ui";
 import { AnahtarDugmesi, favEslesme } from "./favori";
 import { KimPill, KoparDugmesi } from "./kopar";
 import type { Kayit, PipelineDurum } from "./depo";
+import { MULK_OZELLIK_META } from "../src/lib/domain/teknik-alanlar";
 
 export const PIPELINE: [PipelineDurum, string][] = [["YENI", "Yeni"], ["BILDIRILDI", "Bildirildi"], ["GORUSULDU", "Görüşüldü"], ["GOSTERIM", "Gösterim"], ["PAZARLIK", "Pazarlık"], ["KAPANDI", "Kapandı"], ["REDDEDILDI", "Koparıldı"]];
 
@@ -53,6 +54,32 @@ export function FirsatRozeti({ f, komisyon = false }: { f: Eslesme["f"]; komisyo
 const kisaTl = (n: number) => (n >= 1_000_000 ? (n / 1_000_000).toLocaleString("tr-TR", { maximumFractionDigits: 1 }) + " mn" : n >= 1000 ? Math.round(n / 1000).toLocaleString("tr-TR") + " bin" : String(n)) + " ₺";
 
 /**
+ * v3.27 — HIZLI CEVAP: talepte istenen ama portföyde bilinmeyen evet/hayır özellik (ofis, rampa, TIR girişi…) için
+ * küçük "Var / Yok" düğmeleri. Mal sahibini arayıp öğrenince tek dokunuşla portföye yazılır; o portföy tüm taleplerde
+ * doğru sıraya oturur. Ayrı satır açmaz, kartın "neden" satırındaki çipin içinde durur.
+ */
+export function cevaplanabilirler(e: Eslesme) {
+  return e.s.kriterler.filter((k) => k.sonuc === "BILINMIYOR" && (MULK_OZELLIK_META as any)[k.anahtar]?.karsilastirma === "bool");
+}
+export function HizliCevaplar({ e }: { e: Eslesme }) {
+  const { d, kayitKaydet, bildir } = useDepo();
+  const alanlar = cevaplanabilirler(e);
+  if (!alanlar.length) return null;
+  const durdur = (ev: React.SyntheticEvent) => ev.stopPropagation();
+  const yaz = (ev: React.MouseEvent, anahtar: string, ad: string, deger: boolean) => {
+    ev.stopPropagation();
+    const p = d.kayitlar.find((x) => x.id === e.p.id) ?? e.p;
+    kayitKaydet({ ...p, veri: { ...p.veri, ozellik: { ...((p.veri.ozellik ?? {}) as Record<string, unknown>), [anahtar]: deger } } as any });
+    bildir(`${ad}: ${deger ? "var" : "yok"} — portföye kaydedildi`);
+  };
+  return <>{alanlar.map((k) => <span key={k.anahtar} className="hc" onClick={durdur} onKeyDown={durdur}>
+    <span className="hc-ad">{k.etiket}?</span>
+    <button type="button" className="hc-b var" aria-label={`${k.etiket}: var`} onClick={(ev) => yaz(ev, k.anahtar, k.etiket, true)}>Var</button>
+    <button type="button" className="hc-b yok" aria-label={`${k.etiket}: yok`} onClick={(ev) => yaz(ev, k.anahtar, k.etiket, false)}>Yok</button>
+  </span>)}</>;
+}
+
+/**
  * Eşleşme kartı (v3.19 sadeleştirildi): üstte skor + uygunluk + fırsat; işlem (Satılık/Kiralık) ve mülk tipi bir kez yazılır.
  * Taraflarda yalnızca kim olduğu (rol), başlık, konum ve fiyat görünür. "Web ilanı" gibi katman etiketleri kim etiketinde zaten var.
  */
@@ -79,7 +106,9 @@ export function EslesmeKarti({ e, sec }: { e: Eslesme; sec?: { acik: boolean; de
     </div>
   );
   const engel = e.s.kritikEngeller.length ? e.s.kritikEngeller.join(", ") : null;
-  const sorulacak = !engel ? [...e.s.bilinmeyenKritikler, ...e.s.talepEksikleri.map((x: string) => x + " (müşteriye)")] : [];
+  // v3.27 — Var / Yok ile cevaplanabilenler düğme olarak çıkar, metin listesinde tekrar yazılmaz
+  const dugmeli = new Set(cevaplanabilirler(e).map((k) => k.etiket));
+  const sorulacak = !engel ? [...e.s.bilinmeyenKritikler.filter((x: string) => !dugmeli.has(x)), ...e.s.talepEksikleri.map((x: string) => x + " (müşteriye)")] : [];
   const eksik = (e.s.veriEksikleri ?? []) as string[];
   return (
     <div className={"es2 s-" + u.ton + (kopuk ? " soluk" : "") + (sec?.acik ? " secili" : "")} role="button" tabIndex={0} onClick={sec ? sec.degis : ac} onKeyDown={(ev: any) => { if (ev.key === "Enter") (sec ? sec.degis : ac)(); }}>
@@ -109,6 +138,7 @@ export function EslesmeKarti({ e, sec }: { e: Eslesme; sec?: { acik: boolean; de
         <span className="es2-n">{String(e.s.lokasyonAciklama).replace(/\s*\([+−-]?\d+\)/, "")}</span>
         {engel && <span className="es2-n kotu">Engel: {engel}</span>}
         {(e.s.uyarilar ?? []).map((x: string) => <span key={x} className="es2-n uyari">Kontrol: {x}</span>)}
+        {!engel && <HizliCevaplar e={e} />}
         {sorulacak.length > 0 && <span className="es2-n uyari">Sorulacak: {sorulacak.slice(0, 3).join(", ")}{sorulacak.length > 3 ? ` +${sorulacak.length - 3}` : ""}</span>}
         {/* v3.19 — eksik bilgi puanı düşürür; hangi bilgi eksik, kısaca */}
         {eksik.length > 0 && <span className="es2-n uyari" title="Bu bilgiler tamamlanınca puan netleşir">Eksik: {eksik.slice(0, 3).join(", ")}{eksik.length > 3 ? ` +${eksik.length - 3}` : ""}</span>}
