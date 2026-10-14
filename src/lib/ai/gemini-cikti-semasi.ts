@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * Gemini "structured output" şeması — Zod şemalarından OTOMATİK üretilir.
  * Gemini'ye `generationConfig: { responseMimeType: "application/json", responseSchema }` verilir;
  * model enum dışı değer veya tanımsız alan üretemez. Dönen JSON yine de Zod'dan geçirilir (çift kilit).
@@ -138,7 +138,7 @@ KURALLAR
     "eşyalı" → esyaDurumu=ESYALI; "eşyasız/boş" → ESYASIZ. "site içi/sitede" → siteIcinde=true; "havuzlu" → havuz=true.
     "güney cephe" → cepheYonleri=["GUNEY"]; "güney-batı" → ["GUNEY","BATI"]. "3. kat" → bulunduguKat=3; "bahçe katı" → bulunduguKat=0, bahce=true.
     "krediye uygun" → krediyeUygun=true. "deniz manzaralı" → denizManzarasi=true. "5 yaşında bina" → binaYasi=5; "sıfır" → binaYasi=0.
-    Talepte "asansörlü olsun", "en az 2 banyo" gibi şartlar kritikKriterler'e (BANYO, SITE_GUVENLIK, KAT, ISINMA…) yazılır.
+    Talepte "asansör şart", "havuzlu olmalı", "en az 2 banyo" gibi şartlar kritikKriterler'e (ASANSOR, HAVUZ, BANYO, SITE_GUVENLIK, KAT, ISINMA…) yazılır; şart denmeden yalnızca "asansörlü" yazıyorsa kritik değildir (ozellik.asansor=true yeterli).
 16. TOPLU İŞLEM: Metin [#1], [#2] … diye numaralı mesajlardan oluşuyorsa her kayda çıktığı mesajın numarasını mesajNo olarak yaz.
     Bir mesajda birden fazla ilan/talep olabilir; ilan/talep içermeyen mesajları atla (kayıt üretme).
 17. ozet: en fazla 1 cümle. ozelSartlar: standart alana sığmayan kısa ifadeler (en fazla 60 karakter).

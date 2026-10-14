@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * MulkOzellik kolonlarının meta sözlüğü.
  * - UI form/filtre bileşenleri, Gemini çıktı şeması ve eşleştirme motoru buradan beslenir.
  * - `karsilastirma`: talep ↔ portföy kıyas yönü
@@ -147,7 +147,7 @@ export const MULK_OZELLIK_META = {
   asmaKat: { etiket: "Asma kat", grup: "Cephe & Trafik", karsilastirma: "bilgi", gruplar: [T, H] },
   bodrum: { etiket: "Bodrum", grup: "Cephe & Trafik", karsilastirma: "bilgi", gruplar: [T, H, K] },
   baca: { etiket: "Baca", grup: "Cephe & Trafik", karsilastirma: "bool", gruplar: [T, H] },
-  asansor: { etiket: "Asansör", grup: "Cephe & Trafik", karsilastirma: "bool", gruplar: [...KON, ...TIC, B, TU] },
+  asansor: { etiket: "Asansör", grup: "Cephe & Trafik", karsilastirma: "bool", kriter: "ASANSOR", gruplar: [...KON, ...TIC, B, TU] },
   otoparkDurumu: { etiket: "Otopark", grup: "Cephe & Trafik", karsilastirma: "bool", kriter: "OTOPARK", gruplar: [...KON, E, ...TIC, B, TU] },
   otoparkKapasitesi: { etiket: "Otopark kapasitesi", grup: "Cephe & Trafik", karsilastirma: "min", kriter: "OTOPARK", gruplar: [E, ...TIC, B, TU] },
   yayaTrafigi: { etiket: "Yaya trafiği", grup: "Cephe & Trafik", karsilastirma: "sirali", kriter: "YAYA_TRAFIGI", gruplar: [T, H] },
@@ -168,7 +168,7 @@ export const MULK_OZELLIK_META = {
   yatakKapasitesi: { etiket: "Yatak kapasitesi", grup: "Turizm", karsilastirma: "min", gruplar: [TU] },
   yildiz: { etiket: "Yıldız", grup: "Turizm", karsilastirma: "min", gruplar: [TU] },
   turizmBelgesi: { etiket: "Turizm belgesi", grup: "Turizm", karsilastirma: "bilgi", gruplar: [TU] },
-  havuz: { etiket: "Havuz", grup: "Turizm", karsilastirma: "bool", gruplar: [...KON, TU] },
+  havuz: { etiket: "Havuz", grup: "Turizm", karsilastirma: "bool", kriter: "HAVUZ", gruplar: [...KON, TU] },
 
   // Kira / devir
   kiraOdemeSekli: { etiket: "Kira ödeme şekli", grup: "Kira & Devir", karsilastirma: "bilgi", gruplar: [E, ...TIC, ...KON, B] },

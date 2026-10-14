@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.28";
+export const SURUM = "3.29";
 export const TARIH = "14 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.28_14Ekim2026";
+export const DOSYA_EKI = "v3.29_14Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,25 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.29",
+    tarih: "14 Ekim 2026",
+    baslik: "Fazla oda bütçe içindeyse sunulur; 'asansör şart' / 'havuz şart' olmazsa olmaz; Barınaklar Bulvarı bağlandı; veritabanı yolu hızlandı (Hyperdrive + Frankfurt)",
+    degisenler: [
+      "Oda: fazla oda artık elemez — fiyat bütçe içindeyse sunulur ('3+1 talebe 5+1, aynı bütçedeyse fazla odanın zararı yok'). Tam oda yine önde (bir fazla 0,9 · iki ve üstü 0,8 puan). Fiyatı bilinmiyorsa ya da talepte bütçe yoksa Koşullu: 'N oda fazla — bütçe içinde olduğu doğrulanamadı'. Eksik oda hâlâ elenir.",
+      "'Asansör şart', 'havuz olmazsa olmaz', 'mutlaka asansörlü': talepte olmazsa olmaz işaretlenir (yeni kriterler: Asansör, Havuz). Asansörü olmadığı bilinen portföy elenir, bilinmeyen Koşullu. Talep formundaki 'şart / esnek / sorulacak' düğmelerine de eklendi. Yalnızca 'asansörlü' yazan talepte şart sayılmaz.",
+      "Barınaklar Bulvarı alt bölgesi Çağlayan ve Güzeloba'yı kapsıyor. Cadde / bulvar (Barınaklar, Işıklar) bir şerittir: portföy bulvarı kendisi belirtmişse tam uyum, yalnızca geçtiği mahallede ise Koşullu ve en fazla 80 ('bulvara yakınlığını sorun'). 'Fener, Barınaklar' talebine 'yanlış' dediğiniz üç Güzeloba dairesi bu yüzden 100 puan almıyor.",
+      "Veritabanı yolu: Cloudflare Hyperdrive (bağlantı havuzu, önbellek kapalı) ve Worker'ın veritabanının yanında (Frankfurt) çalışması. Hyperdrive hata verirse uygulama 10 dakika eski doğrudan bağlantıyla devam eder.",
+      "Vercel: uygulama 3 Ekim'den (v3.14) beri Cloudflare'de; depoya bağlı eski Vercel projeleri her gönderimde derlemeye çalışıp başarısız oluyor ve e-posta atıyordu. Depoda Vercel otomatik yayını kapatıldı.",
+    ],
+    testEt: [
+      "3+1 talebi açın: aynı mahallede bütçe içindeki 4+1 / 5+1 'Sunulabilir', ama tam 3+1'in altında.",
+      "Talep formunda 'Asansör' düğmesini 'şart' yapın: asansörü 'Yok' olan portföy listeden düşer, bilinmeyen 'Koşullu' olur.",
+      "Hızlı girişe 'Fener 2+1 asansör şart, satılık, 5 milyon' yazın: talepte Asansör 'şart' işaretli gelir.",
+      "'Fener, Barınaklar Bulvarı' talebinde Güzeloba dairesi 'Koşullu' ve 80 ya da altı; açıklamada 'bulvara yakınlığını sorun'.",
+      "Birkaç kaydı arka arkaya kaydedin: kayıt eskisinden belirgin hızlı olmalı; 'Bağlantı koptu' çıkmamalı.",
+    ],
+  },
   {
     surum: "3.28",
     tarih: "14 Ekim 2026",

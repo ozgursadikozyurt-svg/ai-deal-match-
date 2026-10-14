@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * TALEP DNA'SI — bir talebin eşleştirmeden önce çıkarılan "genetiği":
  *  - Aciliyet
  *  - Kritik (öldürücü) kriterler: karşılanmazsa portföy UYGUN_DEGIL
@@ -24,6 +24,7 @@ export const KRITER_ADI: Record<string, string> = {
   YAYA_TRAFIGI: "Yaya trafiği", ARAC_TRAFIGI: "Araç trafiği", CEPHE_VITRIN: "Cephe / vitrin", ZEMIN_KAT_GIRIS: "Zemin kat girişi", KULLANIM_AMACI: "Kullanım amacı",
   KIRA_SURESI: "Kira süresi", ODA_SAYISI: "Oda sayısı", IMAR: "İmar durumu", BANYO: "Banyo", ISINMA: "Isınma", ESYA: "Eşya", SITE_GUVENLIK: "Site / güvenlik",
   CEPHE_YON: "Cephe yönü", BINA_YASI: "Bina yaşı", KAT: "Kat", BALKON_BAHCE: "Balkon / bahçe", MANZARA: "Manzara", KREDI: "Krediye uygunluk", MULK_TIPI: "Mülk tipi",
+  ASANSOR: "Asansör", HAVUZ: "Havuz", // v3.29
 };
 
 /** Müşteriye sorulacak soru (WhatsApp mesajı taslağında kullanılır) */
@@ -34,7 +35,7 @@ export const KRITER_SORUSU: Record<string, string> = {
   SANAYI_ELEKTRIGI: "Sanayi elektriği (trifaze) gerekli mi?", SOGUK_HAVA: "Soğuk hava gerekiyor mu, kaç derece ve kaç m²?", GIDAYA_UYGUNLUK: "Gıdaya uygun (hijyen, zemin) olması şart mı?",
   ACIK_ALAN: "Açık alan / saha ihtiyacı var mı, kaç m²?", OFIS_SOSYAL: "Ofis / sosyal alan gerekiyor mu?", CEPHE_VITRIN: "Cephe / vitrin genişliği önemli mi?",
   YAYA_TRAFIGI: "Yaya trafiği yoğun bir cadde mi olmalı?", ARAC_TRAFIGI: "Ana yol / araç trafiği önemli mi?", ZEMIN_KAT_GIRIS: "Zemin kat / düz giriş şart mı?",
-  OTOPARK: "Otopark gerekli mi, kaç araç?", ODA_SAYISI: "Kaç oda olmalı?", IMAR: "İmar durumu (konut / ticari / sanayi) ne olmalı?", KULLANIM_AMACI: "Mülkü ne amaçla kullanacak?",
+  OTOPARK: "Otopark gerekli mi, kaç araç?", ODA_SAYISI: "Kaç oda olmalı?", ASANSOR: "Asansör şart mı?", HAVUZ: "Havuz şart mı?", IMAR: "İmar durumu (konut / ticari / sanayi) ne olmalı?", KULLANIM_AMACI: "Mülkü ne amaçla kullanacak?",
 };
 
 export interface AmacProfili { kod: string; etiket: string; oldurucu: Kriter[]; onemli: Kriter[] }
@@ -141,8 +142,8 @@ export function talepDnasi(t: DnaGirdi): TalepDna {
   for (const k of acikKritik) ekle(k, "TALEP");
   for (const p of profiller) for (const k of p.oldurucu) ekle(k, "AMAC");
   for (const k of ["LOKASYON", "ALAN", "FIYAT"]) ekle(k, "VARSAYILAN");
-  // v3.28 — konutta oda sayısı da varsayılan öldürücü: 2+1 isteyene 1+1 ya da 4+1 sunulmaz ("yanlış" işaretlendi). Bir oda fazla
-  // engel değildir (Koşullu). Talep "oda esnek" derse uygulanmaz.
+  // v3.28 — konutta oda sayısı da varsayılan öldürücü: 2+1 isteyene 1+1 sunulmaz ("yanlış" işaretlendi). Talep "oda esnek" derse uygulanmaz.
+  // v3.29 — yalnızca EKSİK oda engeldir; fazla oda bütçe içindeyse sunulur (onizleme.ts, odaFazlasi).
   if (grup === "KONUT") ekle("ODA_SAYISI", "VARSAYILAN");
 
   const m2Tolerans = esnekSet.has("ALAN") ? Math.max(20, t.m2ToleransYuzde ?? 0) : t.m2ToleransYuzde ?? 10;

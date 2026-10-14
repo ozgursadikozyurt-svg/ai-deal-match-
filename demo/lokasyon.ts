@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * Demo lokasyon indeksi — veritabanı seed'iyle aynı kaynaklardan (PTT verisi + antalya.ts) üretilir.
  * v3.10: Türkiye'nin tamamı. Çalışma ili (varsayılan Antalya) tam sözlükle; diğer 80 il gömülü sıkıştırılmış veriden
  * ilk ihtiyaçta açılır (~72 bin mahalle/köy). Kimlikler: Antalya mahalleleri 1…N (eski kayıtlarla uyumlu),
@@ -7,7 +7,7 @@
  */
 import { lokasyonCozumle, MERKEZ_ILCELER, type LokasyonIndeks, type CozulenLokasyon } from "../src/lib/lokasyon/cozumle";
 import { lokasyonAnahtari } from "../src/lib/lokasyon/normalize";
-import type { LokasyonBaglami } from "../src/lib/eslestirme/onizleme";
+import { aksIfadesi, type LokasyonBaglami } from "../src/lib/eslestirme/onizleme";
 import { ANTALYA_ALT_BOLGELER, ANTALYA_ALIASLAR, ANTALYA_KOMSU_ILCELER } from "../prisma/seed/antalya";
 import veri from "./antalya-veri.json";
 import trVeri from "./turkiye-veri.json";
@@ -114,6 +114,8 @@ export const BAGLAM: LokasyonBaglami = {
   altBolgeMahalleleri: new Map(abler.map((b) => [b.id, new Set(b.mahalleler)])),
   komsuluk: KOMSULUK,
   mahalleAdi: (id) => (id < 100000 ? mahR[id - 1]?.ad : undefined),
+  // v3.29 — cadde / bulvar alt bölgeleri (Barınaklar Bulvarı, Işıklar Caddesi)
+  aksAltBolgeler: new Map(ANTALYA_ALT_BOLGELER.flatMap((b, n): [number, RegExp][] => (b.tip === "TICARI_AKS" ? [[n + 1, aksIfadesi(b.ad)]] : []))),
 };
 
 /**

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * HIZLI AYRIŞTIRICI — yapay zekâdan ÖNCE çalışan kural tabanlı (regex + sözlük) çözümleyici. Ücretsizdir.
  * Amaç: yapıştırılan WhatsApp mesajı / portal ilanı ya da doğal dil sorusunun çoğunu yapay zekâ
  * çağırmadan anlamak; yapay zekâ yalnızca kural tabanlı sonuç "yeterli" değilse çağrılır.
@@ -177,6 +177,17 @@ export function paraNormalize(metin: string): string {
     .replace(/((?:b[üu]t[çc]e|fiyat|fiyat[ıi]|max\.?|maks\p{L}*|en\s*fazla)[^\d\n]{0,12})(\d{1,3}(?:[.,]\d{1,2})?)\s*m(?![\p{L}²2\d])/giu, (_, on: string, n: string) => `${on}${n.replace(".", ",")} milyon`);
 }
 
+/**
+ * v3.29 — evet/hayır özelliğin "şart" dendiği kalıplar → talep DNA'sında öldürücü kriter.
+ * "asansör şart", "asansörlü olmalı", "mutlaka asansörlü", "havuz olmazsa olmaz", "havuzlu olsun şart"
+ */
+const sartKalibi = (govde: string) => new RegExp(
+  `(?:${govde})\\p{L}*\\s*(?:[şs]art|olmazsa\\s*olmaz|olmal[ıi]|zorunlu)|(?:mutlaka|kesinlikle|muhakkak)\\s+(?:${govde})`, "u");
+const SART_KALIPLARI: [alan: string, re: RegExp, kriter: string][] = [
+  ["asansor", sartKalibi("asans[öo]r"), "ASANSOR"],
+  ["havuz", sartKalibi("havuz"), "HAVUZ"],
+];
+
 export function hizliAyristir(metin0: string): HizliSonuc {
   const metin = paraNormalize(bosluklukBinlik(whatsappGurultusuTemizle(metin0))); // v3.17–v3.18: boşluklu binlik + WhatsApp sistem satırları
   const ham = metin.trim();
@@ -298,6 +309,11 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   const asans = evetHayir(/asans[öo]r(?!s[üu]z)/, /asans[öo]rs[üu]z/); if (asans != null) ozellik.asansor = asans; else if (/asans[öo]rs[üu]z/.test(m)) ozellik.asansor = false;
   const site = evetHayir(/site\s*i[çc]i|site\s*i[çc]erisinde|sitede/); if (site != null) ozellik.siteIcinde = site;
   const hv = evetHayir(/havuz(?!s[uü]z)/); if (hv != null) ozellik.havuz = hv; else if (/havuzsuz/.test(m)) ozellik.havuz = false;
+  // v3.29 — "asansör şart", "mutlaka havuzlu", "asansörlü olmalı" → talepte öldürücü (yalnızca "asansörlü" kritik değildir)
+  if (tip === "TALEP") {
+    const sartlar = SART_KALIPLARI.filter(([alan, re]) => ozellik[alan] === true && re.test(m)).map(([, , kr]) => kr);
+    if (sartlar.length) ozellik.kritikKriterler = [...new Set(sartlar)];
+  }
   if (/deniz\s*manzara/.test(m)) ozellik.denizManzarasi = true;
   const amac = tip === "TALEP" ? AMAC_SOZLUK.filter(([re]) => re.test(m)).map(([, a]) => a) : [];
   if (amac.length) ozellik.kullanimAmaclari = [...new Set(amac)];

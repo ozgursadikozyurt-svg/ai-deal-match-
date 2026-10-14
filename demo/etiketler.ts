@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * Ekranda gösterilen Türkçe etiketler. Ana kategori / mülk tipi / işlem / ilan sahibi etiketleri
  * src/lib/domain/kategori.ts'den gelir; burada sadece teknik enum değerleri var.
  * Burada olmayan bir değer eklenirse ekran onu otomatik "Büyük Harf" biçimiyle gösterir.
@@ -44,6 +44,7 @@ const E: Record<string, string> = {
 export const KRITER_ETIKET: Record<string, string> = {
   MULK_TIPI: "Mülk tipi", ISLEM_TIPI: "İşlem tipi", LOKASYON: "Lokasyon", FIYAT: "Fiyat / bütçe", ALAN: "Alan", KAPALI_ALAN: "Kapalı alan", ACIK_ALAN: "Açık alan", ARSA_ALANI: "Arsa alanı", YUKSEKLIK: "Yükseklik", KAPI: "Kapı", ARAC_ERISIMI: "Araç erişimi", RAMPA: "Rampa", VINC: "Vinç", ELEKTRIK: "Elektrik gücü", TRAFO: "Trafo", SANAYI_ELEKTRIGI: "Sanayi elektriği", YANGIN_SISTEMI: "Yangın sistemi", SPRINKLER: "Sprinkler", ISKAN: "İskan", RUHSAT: "Ruhsat", SOGUK_HAVA: "Soğuk hava", GIDAYA_UYGUNLUK: "Gıdaya uygunluk", CATI_DUVAR: "Çatı / duvar", OFIS_SOSYAL: "Ofis / sosyal alan", OTOPARK: "Otopark", YAYA_TRAFIGI: "Yaya trafiği", ARAC_TRAFIGI: "Araç trafiği", CEPHE_VITRIN: "Cephe / vitrin", ZEMIN_KAT_GIRIS: "Zemin kat girişi", KULLANIM_AMACI: "Kullanım amacı", KIRA_SURESI: "Kira süresi", ODA_SAYISI: "Oda sayısı", IMAR: "İmar",
   BANYO: "Banyo sayısı", ISINMA: "Isınma", ESYA: "Eşya", SITE_GUVENLIK: "Site / güvenlik", CEPHE_YON: "Cephe yönü", BINA_YASI: "Bina yaşı", KAT: "Kat", BALKON_BAHCE: "Balkon / bahçe", MANZARA: "Manzara", KREDI: "Krediye uygunluk",
+  ASANSOR: "Asansör", HAVUZ: "Havuz", // v3.29
 };
 
 const buyukHarf = (v: string) => v.toLocaleLowerCase("tr").replace(/_/g, " ").replace(/^./, (c) => c.toLocaleUpperCase("tr"));

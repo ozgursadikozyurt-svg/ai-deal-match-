@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * AŞAMA 2 uçtan uca doğrulama — gerçek Notion CRM kayıtlarıyla.
  * Çalıştır: DATABASE_URL=... npx tsx --test tests/asama2.test.ts
  */

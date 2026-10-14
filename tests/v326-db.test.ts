@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * v3.26 — veritabanlı: açıklama sütunu yazılır/okunur; açık kayıt (yeni ofis + yönetici + 14 gün deneme); aynı e-posta ikinci kez açamaz;
  * yeni ofis diğer ofisin verisini görmez.
  */

@@ -469,7 +469,9 @@ export const TeknikAlan = {
   KAT: 'KAT',
   BALKON_BAHCE: 'BALKON_BAHCE',
   MANZARA: 'MANZARA',
-  KREDI: 'KREDI'
+  KREDI: 'KREDI',
+  ASANSOR: 'ASANSOR',
+  HAVUZ: 'HAVUZ'
 } as const
 
 export type TeknikAlan = (typeof TeknikAlan)[keyof typeof TeknikAlan]

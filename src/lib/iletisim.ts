@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * Kişiyi arama ve WhatsApp bağlantıları. wa.me bağlantısı telefonda kurulu WhatsApp'ı açar;
  * WhatsApp Business kuruluysa (ya da ikisi birden kuruluysa telefon sorar) Business ile açılır.
  */

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * Antalya'ya özel piyasa katmanı: alt bölgeler, komşu ilçeler, alias sözlüğü.
  * Kaynak: Özgür'ün Notion CRM "Bölge" seçenekleri + WhatsApp grup kullanımları.
  * `dogrulandi: false` olanlar ilk kullanımda Ayarlar > Lokasyon ekranından onaylanmalı.
@@ -44,9 +44,9 @@ export const ANTALYA_ALT_BOLGELER: AltBolgeSeed[] = [
     mahalleler: [["Muratpaşa", "genclik"]],
   },
   {
-    ad: "Barınaklar Bulvarı", slug: "barinaklar-bulvari", ilce: "Muratpaşa", tip: "TICARI_AKS", dogrulandi: false,
-    mahalleler: [],
-    aciklama: "Mahalle eşlemesi kullanıcı tarafından tamamlanacak",
+    ad: "Barınaklar Bulvarı", slug: "barinaklar-bulvari", ilce: "Muratpaşa", tip: "TICARI_AKS", dogrulandi: true,
+    // v3.29 — kullanıcı onayı (14 Eki 2026): bulvar hem Çağlayan'ı hem Güzeloba'yı kapsar
+    mahalleler: [["Muratpaşa", "caglayan"], ["Muratpaşa", "guzeloba"]],
   },
   {
     ad: "Antalya OSB", slug: "antalya-osb", ilce: "Döşemealtı", tip: "OSB", dogrulandi: true,

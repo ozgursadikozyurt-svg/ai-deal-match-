@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * Canlı — kaydetme kuyruğu. Arayüzdeki her değişiklikte `kuyrugaAl(durum)` çağrılır; kısa bir bekleyişten sonra (arka arkaya değişiklikler birleşir)
  * yalnızca değişenler POST /api/durum ile sunucuya yazılır. Sunucunun reddettiği kayıtlar (doğrulama hatası) "değişmemiş" sayılmaz, hata listesinde görünür.
  * Ağ koparsa değişiklikler bellekte durur, aralıklarla yeniden denenir; sekme kapatılırken bekleyen iş varsa tarayıcı uyarır.
@@ -88,7 +88,7 @@ export function kaydediciKur(a: { api: Api; baslangic: DepoDurumu; durum: (s: Ka
       catch (e: any) {
         deneme++;
         // v3.28 — bağlantı kopması geçicidir: kullanıcıya anlaşılır yazılır ve hemen (3 sn) yeniden denenir
-        const gecici = /connection terminated|econnreset|socket|network|failed to fetch|load failed|zaman aşımı|timeout/i.test(String(e?.message ?? e));
+        const gecici = /connection terminated|bağlantısı koptu|hyperdrive|econnreset|socket|network|failed to fetch|load failed|zaman aşımı|timeout/i.test(String(e?.message ?? e));
         bildir("hata", gecici ? `Bağlantı koptu${deneme <= 4 ? " — yeniden deneniyor" : ""}` : `Kaydedilemedi: ${e?.message ?? e}${deneme <= 4 ? " — yeniden denenecek" : ""}`);
         if (deneme <= 4) { zaman = setTimeout(() => { zaman = undefined; void calistir(); }, a.yenidenMs ?? (gecici ? 3000 : 8000)); (zaman as any)?.unref?.(); }
       } finally { calisiyor = null; }

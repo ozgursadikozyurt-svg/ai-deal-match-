@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * MODEL DENEYİ — eşleştirme puanlamasının varyasyonlarını etiketli senaryolarla karşılaştırır.
  * Çalıştır: npx tsx scripts/deney/model-karsilastir.ts        (ayrıntı için: … --ayrinti)
  *
@@ -8,7 +8,8 @@
  * Etiketler saha mantığına göre elle konuldu (Özgür'ün v3.10'da bildirdiği Fener/Çağlayan ↔ Doğuyaka örneği dahil);
  * gerçek eşleşmeler biriktikçe buraya eklenip model yeniden ayarlanır.
  * v3.28 — etiketler Özgür'ün gerçek kararlarıyla güncellendi (14 Eki 2026: 34 "yanlış / fiyat", 11 "sunuldu"): sunulanların 10/11'i
- * aynı mahallede → komşu / yakın mahalle artık "K" (sorulur), başka ilçede komşu olmayan "U", konutta oda eksiği / iki fazla "U".
+ * aynı mahallede → komşu / yakın mahalle artık "K" (sorulur), başka ilçede komşu olmayan "U", konutta oda eksiği "U".
+ * v3.29 — fazla oda bütçe içindeyse "S" (Özgür: "3+1 talebe 5+1 gösterebiliriz, aynı bütçedeyse fazla odanın zararı yok"); tam oda önde.
  * Taban (V0) = v3.10 motorunun dondurulmuş kopyası (onizleme_v310.ts).
  */
 import { eslesmeOnizle, MODEL, type ModelAyar, type OnizlemeKayit } from "../../src/lib/eslestirme/onizleme";
@@ -33,8 +34,10 @@ const G: Grup[] = [
       c: [P("Muratpaşa / Güzeloluk", { odaSayisi: "2+1", fiyat: 8_500_000 }), "K", "Çağlayan'ın sınır komşusu (v3.28: sorulur)"],
       d: [P("Muratpaşa / Şirinyalı", { odaSayisi: "2+1", fiyat: 8_000_000 }), "K", "Fener'in sınır komşusu (v3.28: sorulur)"],
       e: [P("Muratpaşa / Doğuyaka", { odaSayisi: "3+1", fiyat: 5_650_000, m2: 115 }), "U", "3,9 km uzak + oda fazla + bütçenin %57'si (v3.10: 92 puan, Sunulabilir)"],
-      f: [P("Muratpaşa / Fener", { odaSayisi: "3+1", fiyat: 9_500_000 }), "K", "bir oda fazla — sorulur (v3.28: 2+1 kiralığa 3+1 'yanlış' işaretlendi)"],
-      g: [P("Muratpaşa / Fener", { odaSayisi: "4+1", fiyat: 9_800_000 }), "U", "iki oda fazla (v3.28: konutta oda öldürücü)"],
+      f: [P("Muratpaşa / Fener", { odaSayisi: "3+1", fiyat: 9_500_000 }), "S", "bir oda fazla, bütçe içinde (v3.29: sunulur, tam odanın altında)"],
+      g: [P("Muratpaşa / Fener", { odaSayisi: "4+1", fiyat: 9_800_000 }), "S", "iki oda fazla, bütçe içinde (v3.29)"],
+      o: [P("Muratpaşa / Fener", { odaSayisi: "4+1" }), "K", "iki oda fazla, fiyatı bilinmiyor — bütçe doğrulanmadan sunulmaz"],
+      q: [P("Muratpaşa / Fener", { odaSayisi: "4+1", fiyat: 12_500_000 }), "U", "iki oda fazla ama bütçeyi %25 aşıyor"],
       h: [P("Muratpaşa / Meltem", { odaSayisi: "2+1", fiyat: 8_000_000 }), "U", "şehrin öbür ucu"],
       i: [P("Muratpaşa / Fener", { odaSayisi: "2+1", fiyat: 3_500_000 }), "S", "bütçenin %35'i — sunulur ama (a)'nın altında"],
       j: [P("Muratpaşa / Fener", { odaSayisi: "1+1", fiyat: 6_000_000 }), "U", "oda eksik (v3.28: 2+1 talebine 1+1 'yanlış' işaretlendi)"],
@@ -43,7 +46,7 @@ const G: Grup[] = [
       m: [P("Muratpaşa / Zerdalilik", { odaSayisi: "2+1", fiyat: 9_000_000 }), "K", "Fener'e 3 km — sormadan sunulmaz"],
       n: [P("Muratpaşa", { odaSayisi: "2+1", fiyat: 9_000_000 }), "K", "portföyün mahallesi girilmemiş"],
     },
-    sira: [["a", "c"], ["a", "f"], ["a", "i"], ["c", "l"], ["d", "l"], ["l", "m"], ["m", "e"], ["f", "g"], ["f", "c"], ["a", "n"]],
+    sira: [["a", "c"], ["a", "f"], ["a", "i"], ["c", "l"], ["d", "l"], ["l", "m"], ["m", "e"], ["f", "g"], ["f", "c"], ["a", "n"], ["g", "o"]],
   },
   {
     ad: "2 · İlçe sınırı — kiralık dükkan, Meltem (Muratpaşa), 100–200 m², ≤ 100 bin TL",
@@ -127,14 +130,14 @@ type Motor = (t: OnizlemeKayit, p: OnizlemeKayit) => { skor: number; uygunluk: k
 const yeni = (a: ModelAyar): Motor => (t, p) => eslesmeOnizle(t, p, BAGLAM, a);
 const VARYASYONLAR: [string, string, Motor][] = [
   ["V0", "v3.10 (taban)", (t, p) => eski(t as any, p as any, BAGLAM)],
-  ["A", "SEÇİLEN (v3.28): komşu 0,75 / ilçe dışı 0,6 · ≤1,5 km 0,45 · ≤3 km 0,30 · tam konum dışı Koşullu · oda+1 0,5 · konutta oda öldürücü", yeni(MODEL)],
+  ["A", "SEÇİLEN (v3.29): komşu 0,75 / ilçe dışı 0,6 · ≤1,5 km 0,45 · ≤3 km 0,30 · tam konum dışı Koşullu · oda +1 0,9 / +2 0,8 bütçe içindeyse · eksik oda öldürücü", yeni(MODEL)],
   ["B", "konum dik: komşu 0,70 · yakın 0,45 · orta 0,20", yeni(M({ lok: { komsu: 0.7, yakin: 0.45, orta: 0.2 } }))],
   ["C", "konum yumuşak: komşu 0,95 · yakın 0,80 · orta 0,60", yeni(M({ lok: { komsu: 0.95, yakin: 0.8, orta: 0.6 } }))],
   ["C2", "ilçe sınırı yok sayılır (v3.27): başka ilçedeki komşu = komşu", yeni(M({ lok: { komsuIlceDisi: 0.75 } }))],
   ["D", "konum sıkı: 1,5 km'den uzağı bölge dışı", yeni(M({ lok: { ortaM: 1500 } }))],
   ["E", "konum geniş: 5 km'ye kadar koşullu", yeni(M({ lok: { ortaM: 5000 } }))],
   ["F", "oda gevşek: fazla oda tam puan (v3.10 davranışı)", yeni(M({ oda: { fazla1: 1, fazla2: 1 } }))],
-  ["G", "oda yumuşak: bir oda fazla 0,6 (v3.27)", yeni(M({ oda: { fazla1: 0.6 } }))],
+  ["G", "oda sıkı: bir oda fazla 0,5 Koşullu, iki fazla 0,25 (v3.28)", yeni(M({ oda: { fazla1: 0.5, fazla2: 0.25 } }))],
   ["H", "bütçe altı cezası yok", yeni(M({ fiyatAlt: null }))],
   ["I", "bütçe altı sert: < %60 → 0,5 (koşullu)", yeni(M({ fiyatAlt: { esik1: 0.6, puan1: 0.5, esik2: 0.4, puan2: 0.2 } }))],
   ["J", "koşullu eşiği 0,5", yeni(M({ kosulluAlti: 0.5 }))],

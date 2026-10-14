@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026
+ * Anahtar CRM v3.29 · 14 Ekim 2026
  * v3.11 — mahalle komşuluğu ve eşleştirme motoru v3 (konum kademeleri, oda, bütçe altı, belirsiz mahalle adı).
  */
 import { test } from "node:test";
@@ -109,15 +109,16 @@ test("sınır verisi olmayan il (İzmir): eski ilçe kuralı — aynı ilçe far
   assert.equal(s.uygunluk, "KOSULLU");
 });
 
-test("oda: istenen oda tam puan, bir oda fazla kısmi (koşullu), iki oda fazla ya da eksik uygun değil (v3.28)", () => {
+test("oda: istenen oda tam puan; fazla oda bütçe içindeyse sunulur ama altta; eksik oda uygun değil (v3.29)", () => {
   const t = T("Muratpaşa / Fener", { odaSayisi: "2+1", maxFiyat: 10_000_000 });
   const oda = (o: string) => { const s = es(t, P("Muratpaşa / Fener", { odaSayisi: o, fiyat: 9_000_000 })); return { u: s.uygunluk, skor: s.skor, puan: s.kriterler.find((k) => k.anahtar === "odaSayisi")!.puan }; };
   assert.deepEqual([oda("2+1").puan, oda("3+1").puan, oda("4+1").puan, oda("1+1").puan], [1, MODEL.oda.fazla1, MODEL.oda.fazla2, 0]);
-  assert.deepEqual([oda("2+1").u, oda("3+1").u, oda("4+1").u, oda("1+1").u], ["SUNULABILIR", "KOSULLU", "UYGUN_DEGIL", "UYGUN_DEGIL"]);
+  assert.deepEqual([oda("2+1").u, oda("3+1").u, oda("4+1").u, oda("1+1").u], ["SUNULABILIR", "SUNULABILIR", "SUNULABILIR", "UYGUN_DEGIL"]);
   assert.ok(oda("2+1").skor > oda("3+1").skor && oda("3+1").skor > oda("4+1").skor);
-  // Müşteri oda sayısına "şart" dediyse fazlası da eksiği de engeldir
+  // Müşteri oda sayısına "şart" dediyse eksik oda engeldir; fazla oda fiyatı bilinmeden sunulmaz
   const sart = { ...t, ozellik: { kritikKriterler: ["ODA_SAYISI"] } };
-  assert.equal(es(sart, P("Muratpaşa / Fener", { odaSayisi: "4+1", fiyat: 9_000_000 })).uygunluk, "UYGUN_DEGIL");
+  assert.equal(es(sart, P("Muratpaşa / Fener", { odaSayisi: "1+1", fiyat: 9_000_000 })).uygunluk, "UYGUN_DEGIL");
+  assert.equal(es(sart, P("Muratpaşa / Fener", { odaSayisi: "4+1" })).uygunluk, "KOSULLU");
 });
 
 test("bütçe altı: fiyat bütçenin çok altındaysa puan düşer ama elenmez; alt sınır verilmişse o kullanılır", () => {

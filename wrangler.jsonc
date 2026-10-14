@@ -1,4 +1,4 @@
-// Anahtar CRM v3.23 · 10 Ekim 2026 (v3.14'ten) — Cloudflare Workers yapılandırması (arayüz + API + zamanlayıcı tek projede)
+// Anahtar CRM v3.29 · 14 Ekim 2026 (v3.14'ten) — Cloudflare Workers yapılandırması (arayüz + API + zamanlayıcı tek projede)
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "anahtarcrm",
@@ -10,6 +10,10 @@
   // Eskiden her 15 dakikaydı; Cloudflare ücretsiz planda CPU sınırını aşıp 503 veriyordu. Anlık ihtiyaç: Kişiler › "Google ile eşitle".
   "triggers": { "crons": ["0 3 * * *", "0 4 * * sun", "0 5 * * *"] },
   "observability": { "enabled": true },
+  // v3.29 — Worker'ı veritabanının yanında (Supabase, AWS eu-central-1 / Frankfurt) çalıştır: /api isteği başına bir kez uzak yol,
+  // sorgu başına ~1–3 ms (kullanıcıya en yakın merkezden sorgu başına 30–50 ms idi; içe aktarmada kayıt başına ~0,4 sn buradan).
+  // Statik dosyalar (arayüz) yine kullanıcıya en yakın merkezden gelir.
+  "placement": { "region": "aws:eu-central-1" },
   // v3.17 — Cloudflare panelinden (Settings → Variables and Secrets) elle girilen değişkenler her yayında silinmesin.
   // Bu dosyada "vars" bloğu YOKTUR; keep_vars olmadan wrangler, paneldeki değişkenleri yayın sırasında temizler.
   "keep_vars": true,

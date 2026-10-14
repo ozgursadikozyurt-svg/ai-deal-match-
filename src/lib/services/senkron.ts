@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.29 · 14 Ekim 2026 (v3.13'ten)
  * Ekosistem senkron işi — Google Kişiler (v3.21: çift yönlü, çok ofisli) ve Notion (v3.21: gizli, kod yerinde). Planlama saf modüllerde (google/kisiler.ts, notion/plan.ts),
  * bu dosya planı veritabanına uygular, çalışma geçmişini ve çakışmaları yazar.
  *
@@ -22,7 +22,7 @@ import { kisiTaslagi, portfoyTaslagi, talepTaslagi, kisidenTalep, kayitHazirla, 
 import { kisiPlani, kayitPlani, kaybolanlar, type MevcutNotionKayit, type MevcutNotionKisi, type HazirKayit } from "../notion/plan";
 import { geriYazimDegerleri, geriYazimOzellikleri, geriYazimGerekli, eksikGeriYazimAlanlari } from "../notion/geri-yazim";
 import { eslesmeOzetleri } from "../eslestirme/ozet";
-import { eslesmeOnizle, type LokasyonBaglami } from "../eslestirme/onizleme";
+import { eslesmeOnizle, aksIfadesi, type LokasyonBaglami } from "../eslestirme/onizleme";
 import { komsulukKur } from "../lokasyon/komsuluk";
 import { lokasyonIndeksiYukle } from "../lokasyon/cozumle";
 import { kayitOlustur, ttlAyarlari } from "./kayit";
@@ -72,7 +72,8 @@ async function cakismalariYaz(prisma: PrismaClient, s: Saglayici, hedefTip: "KIS
 
 /** Sunucu tarafı konum bağlamı (komşu ilçeler, alt bölge mahalleleri) — eşleşme skoru için */
 export async function lokasyonBaglamiYukle(prisma: PrismaClient): Promise<LokasyonBaglami> {
-  const [k, a] = await Promise.all([prisma.ilceKomsuluk.findMany(), prisma.altBolgeMahalle.findMany()]);
+  // v3.29 — cadde / bulvar alt bölgeleri (TICARI_AKS) ayrıca: geçtiği mahalle tam uyum sayılmaz (bkz. LokasyonBaglami.aksAltBolgeler)
+  const [k, a, aks] = await Promise.all([prisma.ilceKomsuluk.findMany(), prisma.altBolgeMahalle.findMany(), prisma.altBolge.findMany({ where: { tip: "TICARI_AKS" }, select: { id: true, ad: true } })]);
   const m = new Map<number, Set<number>>();
   for (const x of a) { if (!m.has(x.altBolgeId)) m.set(x.altBolgeId, new Set()); m.get(x.altBolgeId)!.add(x.mahalleId); }
   // v3.11 — mahalle komşuluğu: Antalya mahalleleri (ilçe adı + slug) veritabanı kimliklerine bağlanır
@@ -80,7 +81,7 @@ export async function lokasyonBaglamiYukle(prisma: PrismaClient): Promise<Lokasy
   const anahtar = new Map(mah.map((x) => [`${x.ilce.ad}|${x.slug}`, x]));
   const adlar = new Map(mah.map((x) => [x.id, x.ad]));
   const komsuluk = komsulukKur((ilce, slug) => { const x = anahtar.get(`${ilce}|${slug}`); return x ? { id: x.id, ilceId: x.ilceId } : null; });
-  return { komsuIlceler: new Set(k.flatMap((x) => [`${x.ilceId}-${x.komsuIlceId}`, `${x.komsuIlceId}-${x.ilceId}`])), altBolgeMahalleleri: m, komsuluk, mahalleAdi: (id) => adlar.get(id) };
+  return { komsuIlceler: new Set(k.flatMap((x) => [`${x.ilceId}-${x.komsuIlceId}`, `${x.komsuIlceId}-${x.ilceId}`])), altBolgeMahalleleri: m, komsuluk, mahalleAdi: (id) => adlar.get(id), aksAltBolgeler: new Map(aks.map((x) => [x.id, aksIfadesi(x.ad)])) };
 }
 /** DB satırı → eşleştirme motorunun beklediği düz veri (Decimal → number) */
 export function kayitVeri(k: any): Record<string, any> {

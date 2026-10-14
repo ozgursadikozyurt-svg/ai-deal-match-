@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026 (v3.20'den)
+ * Anahtar CRM v3.29 · 14 Ekim 2026 (v3.20'den)
  * AŞAMA 7 — Cloudflare Worker girişi. Tek proje: arayüz (statik dosyalar, ASSETS) + /api (sunucu kodu) + zamanlanmış işler.
  *  - /api/yapilandirma, /api/saglik → açık (giriş ekranının ihtiyacı / sağlık kontrolü)
  *  - /api/davet/kabul → giriş şart, ofis şart değil (kişi henüz bir ofiste değil)
@@ -14,6 +14,9 @@
  *  - v3.23 — GELEN KUTUSU: /api/gelen/al oturumsuzdur (Gmail köprüsü); kimlik, isteğin taşıdığı gizli ofis kodudur ve rota
  *    kendisi doğrular. `email` işleyicisi alan adına gelen postayı aynı kutuya koyar (Cloudflare Email Routing → bu Worker).
  *    İkisi de dosyayı açmadan saklar; ayrıştırma tarayıcıdadır (ücretsiz planda 10 ms işlemci sınırı).
+ *  - v3.29 — VERİTABANI YOLU: Hyperdrive bağlıysa (wrangler.jsonc › hyperdrive, bağlama adı HYPERDRIVE) sorgular onun bağlantı
+ *    havuzundan geçer; bağlı değilse eskisi gibi DATABASE_URL (Supavisor). Hyperdrive kendi hatasını verirse (SQLSTATE 58000,
+ *    günlük sorgu sınırı, havuz) bu Worker örneği 10 dakika doğrudan bağlantıya döner — uygulama durmaz.
  */
 import { ROTALAR } from "./rotalar.generated";
 import { kimlikDogrula, izinliMi } from "./kimlik";
@@ -25,12 +28,16 @@ import { YetkiHatasi } from "../lib/guvenlik/yetki";
 import { tamYedek, yedegiDepola } from "../lib/services/yedek";
 import { tumOfislerdeGoogleSenkron } from "../lib/services/senkron";
 import { gelenPostaIsle, gelenTemizlik, type GelenPosta } from "../lib/services/gelen";
+import { veritabaniAdresi, hyperdriveHatasiniIsle } from "./veritabani";
 
 export interface Env {
   ASSETS: { fetch: (r: Request) => Promise<Response> };
   DATABASE_URL: string; DIRECT_URL?: string; SUPABASE_URL: string; SUPABASE_ANON_KEY: string;
   SUPABASE_JWT_SECRET?: string; SUPABASE_SERVICE_ROLE_KEY?: string; IZINLI_EPOSTALAR: string;
-  CRON_SECRET?: string; ACIK_KAYIT?: string; [k: string]: unknown;
+  CRON_SECRET?: string; ACIK_KAYIT?: string;
+  /** v3.29 — Cloudflare Hyperdrive bağlaması (önbellek kapalı; bkz. docs/HYPERDRIVE_KURULUMU_v3.29_14Ekim2026.md) */
+  HYPERDRIVE?: { connectionString: string };
+  [k: string]: unknown;
 }
 /** v3.26 — Cloudflare değişkeni ACIK_KAYIT=1 → giriş ekranında "Ücretsiz dene" ve /api/kayit-ol açılır */
 export const acikKayit = (env: Env) => env.ACIK_KAYIT === "1" || env.ACIK_KAYIT === "true";
@@ -39,6 +46,7 @@ const json = (v: unknown, status = 200) => Response.json(v, { status, headers: {
 
 /** Hata → yanıt: ofis bağlamı / yetki hataları kullanıcıya anlaşılır biçimde döner */
 const hataYaniti = (e: unknown) => {
+  if (hyperdriveHatasiniIsle(e)) return json({ hata: "SUNUCU", mesaj: "Veritabanı bağlantısı koptu (Hyperdrive) — yeniden deneyin" }, 503);
   if (e instanceof YetkiHatasi) return json({ hata: "YETKI", mesaj: e.message }, 403);
   if (e instanceof KiracilikHatasi) { console.error("Kiracılık hatası:", e.message); return json({ hata: "KIRACILIK", mesaj: "Bu istek bir ofis bağlamı gerektiriyor" }, 500); }
   return json({ hata: "SUNUCU", mesaj: String((e as Error)?.message ?? e).slice(0, 400) }, 500);
@@ -63,19 +71,19 @@ export async function apiIsle(req: Request, env: Env): Promise<Response> {
   // 1) Açık kapılar: sağlık kontrolü ve zamanlayıcı (CRON_SECRET) → platform bağlamı
   const cron = !!env.CRON_SECRET && req.headers.get("authorization") === `Bearer ${env.CRON_SECRET}`;
   if (url.pathname === "/api/saglik" || cron) {
-    return istekIcinde(env.DATABASE_URL, () => platformOlarak(() => isle(req, { params })).catch(hataYaniti));
+    return istekIcinde(veritabaniAdresi(env), () => platformOlarak(() => isle(req, { params })).catch(hataYaniti));
   }
 
   // 1b) v3.21 — Google'dan dönüş: oturum başlığı yoktur. Rota imzalı state'i doğrular, kullanıcıyı veritabanından
   //     yeniden denetler ve işi yalnızca o ofisin bağlamında yapar (src/app/api/entegrasyon/google/geri-donus/route.ts).
   if (url.pathname === "/api/entegrasyon/google/geri-donus") {
-    return istekIcinde(env.DATABASE_URL, () => isle(req, { params }).catch(hataYaniti));
+    return istekIcinde(veritabaniAdresi(env), () => isle(req, { params }).catch(hataYaniti));
   }
 
   // 1c) v3.23 — Gelen kutusu köprüsü: oturum başlığı yoktur. Rota, istekteki gizli ofis kodunu doğrular ve dosyayı yalnızca
   //     o ofisin bağlamında, onay bekleyenlere koyar (src/app/api/gelen/al/route.ts → services/gelen.ts › gelenAl).
   if (url.pathname === "/api/gelen/al") {
-    return istekIcinde(env.DATABASE_URL, () => isle(req, { params }).catch(hataYaniti));
+    return istekIcinde(veritabaniAdresi(env), () => isle(req, { params }).catch(hataYaniti));
   }
 
   // 2) Oturum anahtarı (JWT) → e-posta
@@ -86,22 +94,22 @@ export async function apiIsle(req: Request, env: Env): Promise<Response> {
   //     Yalnızca acil durum listesindeki (IZINLI_EPOSTALAR) e-postalar, platform bağlamında.
   if (url.pathname === "/api/kurulum") {
     if (!izinliMi(k.eposta, env.IZINLI_EPOSTALAR)) return json({ hata: "YETKI", mesaj: "Kurulum yalnızca platform yöneticisi içindir" }, 403);
-    return istekIcinde(env.DATABASE_URL, () => platformOlarak(() => isle(req, { params })).catch(hataYaniti));
+    return istekIcinde(veritabaniAdresi(env), () => platformOlarak(() => isle(req, { params })).catch(hataYaniti));
   }
 
   // 3) Davet kabul: giriş yeter, ofis gerekmez (kişi henüz bir ofiste değil)
   if (url.pathname === "/api/davet/kabul") {
-    return istekIcinde(env.DATABASE_URL, () => davetBaglamiIcinde(k.eposta, () => isle(req, { params })).catch(hataYaniti));
+    return istekIcinde(veritabaniAdresi(env), () => davetBaglamiIcinde(k.eposta, () => isle(req, { params })).catch(hataYaniti));
   }
 
   // 3b) v3.26 — Açık kayıt: davetsiz gelen danışman kendi ofisini açar. Giriş yeter, ofis gerekmez. ACIK_KAYIT=1 değilse kapalı.
   if (url.pathname === "/api/kayit-ol") {
     if (!acikKayit(env)) return json({ hata: "KAPALI", mesaj: "Yeni ofis kaydı şu an kapalı. Davet bağlantısıyla katılabilirsiniz." }, 403);
-    return istekIcinde(env.DATABASE_URL, () => davetBaglamiIcinde(k.eposta, () => isle(req, { params })).catch(hataYaniti));
+    return istekIcinde(veritabaniAdresi(env), () => davetBaglamiIcinde(k.eposta, () => isle(req, { params })).catch(hataYaniti));
   }
 
   // 4) E-posta → ofis + rol; istek o ofisin bağlamında çalışır
-  return istekIcinde(env.DATABASE_URL, async () => {
+  return istekIcinde(veritabaniAdresi(env), async () => {
     const o = await oturumCoz(prisma, k.eposta, env);
     if ("hata" in o) return json({ hata: o.kod, mesaj: o.hata }, o.durum);
     return kiracilikIcinde(o.baglam, () => isle(req, { params })).catch(hataYaniti);
@@ -112,7 +120,7 @@ export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     ortamiYukle(env);
     if (new URL(req.url).pathname.startsWith("/api/")) {
-      try { return await apiIsle(req, env); } catch (e) { return json({ hata: "SUNUCU", mesaj: String((e as Error)?.message ?? e).slice(0, 400) }, 500); }
+      try { return await apiIsle(req, env); } catch (e) { hyperdriveHatasiniIsle(e); return json({ hata: "SUNUCU", mesaj: String((e as Error)?.message ?? e).slice(0, 400) }, 500); }
     }
     return env.ASSETS.fetch(req);
   },
@@ -122,13 +130,13 @@ export default {
    */
   async email(message: GelenPosta, env: Env): Promise<void> {
     ortamiYukle(env);
-    try { await istekIcinde(env.DATABASE_URL, () => gelenPostaIsle(prisma, message)); }
-    catch (e) { console.error("Gelen e-posta kaydedilemedi:", e); message.setReject("Temporary failure, please retry"); }
+    try { await istekIcinde(veritabaniAdresi(env), () => gelenPostaIsle(prisma, message)); }
+    catch (e) { hyperdriveHatasiniIsle(e); console.error("Gelen e-posta kaydedilemedi:", e); message.setReject("Temporary failure, please retry"); }
   },
   async scheduled(ev: { cron: string }, env: Env, ctx: { waitUntil: (p: Promise<unknown>) => void }) {
     ortamiYukle(env);
     // Zamanlayıcı tüm ofisler için çalışır → platform bağlamı (ofis süzgeci uygulanmaz)
-    ctx.waitUntil(istekIcinde(env.DATABASE_URL, () => platformOlarak(async () => {
+    ctx.waitUntil(istekIcinde(veritabaniAdresi(env), () => platformOlarak(async () => {
       if (ev.cron.startsWith("0 3")) {
         // Supabase Free 7 gün işlem görmeyen projeyi durdurur → günlük küçük sorgu + REST isteği
         await prisma.$queryRawUnsafe("SELECT 1");

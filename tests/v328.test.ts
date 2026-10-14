@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.28 · 14 Ekim 2026 — eşleştirme, kullanıcı geri bildirimiyle yeniden ayarlandı (34 "yanlış / fiyat", 11 "sunuldu"):
+ * Anahtar CRM v3.29 · 14 Ekim 2026 — eşleştirme, kullanıcı geri bildirimiyle yeniden ayarlandı (34 "yanlış / fiyat", 11 "sunuldu"):
  * ilçe sınırı ve konum tavanı, konutta oda öldürücü, aynı kişi, birim kira, kapalı alan tutarlılığı, Koşullu ≤ 84, bütçe aralığı;
  * kaydetme: küçük parçalar, geçici bağlantı hatasında yeniden deneme, konum ön denetimi.
  */
@@ -19,8 +19,9 @@ const portfoy = (x: Partial<OnizlemeKayit>): OnizlemeKayit => ({ tip: "PORTFOY",
 const s = (t: OnizlemeKayit, p: OnizlemeKayit) => eslesmeOnizle(t, p, BAGLAM);
 
 test("sürüm 3.28 kaydı", () => {
-  assert.equal(SURUM, "3.28"); assert.equal(SURUM_GECMISI[0].surum, "3.28"); assert.equal(SURUM_GECMISI[1].surum, "3.27");
-  assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 5);
+  const i = SURUM_GECMISI.findIndex((k) => k.surum === "3.28"); // sonraki sürümler öne eklenir
+  assert.ok(i >= 0 && SURUM >= "3.28"); assert.equal(SURUM_GECMISI[i + 1].surum, "3.27");
+  assert.ok((SURUM_GECMISI[i].testEt ?? []).length >= 5);
 });
 
 test("konum: aynı mahalle Sunulabilir; komşu / yakın en fazla Koşullu ve tavanlı; başka ilçede komşu olmayan bölge dışı", () => {
@@ -58,13 +59,11 @@ test("konum: yalnızca ilçe isteyen talebe başka ilçeden yalnız sınır kom�
   assert.equal(guzeloba.lokasyonKademe, "AYNI_MAHALLE"); assert.ok(guzeloba.skor > meltem.skor);
 });
 
-test("konut: oda sayısı öldürücü — eksik oda ve iki fazla elenir, bir fazla Koşullu; 'oda esnek' denirse engel olmaz", () => {
+test("konut: oda sayısı öldürücü — eksik oda elenir (v3.29: fazla oda bütçe içindeyse sunulur, bkz. v329); 'oda esnek' denirse engel olmaz", () => {
   assert.ok(talepDnasi(talep({}) as any).kritik.some((k) => k.kriter === "ODA_SAYISI"));
   const eksik = s(talep({}), portfoy({ odaSayisi: "1+1" }));
   assert.equal(eksik.uygunluk, "UYGUN_DEGIL"); assert.ok(eksik.kritikEngeller.includes("Oda sayısı"));
-  assert.equal(s(talep({}), portfoy({ odaSayisi: "4+1" })).uygunluk, "UYGUN_DEGIL");
-  const fazla = s(talep({}), portfoy({ odaSayisi: "3+1" }));
-  assert.equal(fazla.uygunluk, "KOSULLU"); assert.ok(fazla.skor <= KOSULLU_SKOR_TAVANI);
+  assert.notEqual(s(talep({}), portfoy({ odaSayisi: "4+1" })).uygunluk, "UYGUN_DEGIL");
   assert.notEqual(s(talep({ ozellik: { esnekKriterler: ["ODA_SAYISI"] } as any }), portfoy({ odaSayisi: "1+1" })).uygunluk, "UYGUN_DEGIL");
 });
 
@@ -106,7 +105,8 @@ test("kapalı alan: talebin alt m²'siyle aynıysa ikinci satır açılmaz; ayr�
 });
 
 test("Koşullu en fazla 84: 85 ve üstü yalnızca sorulmadan sunulabilir eşleşmede", () => {
-  const r = s(talep({ odaSayisi: "2+1" }), portfoy({ odaSayisi: "3+1" }));
+  // v3.29 — fazla oda artık bütçe içindeyse sunulur; Koşullu örneği: bütçesiz talepte fazla oda
+  const r = s(talep({ odaSayisi: "2+1", maxFiyat: null }), portfoy({ odaSayisi: "3+1" }));
   assert.equal(r.uygunluk, "KOSULLU"); assert.ok(r.skor <= 84);
   assert.equal(KOSULLU_SKOR_TAVANI, 84);
 });
