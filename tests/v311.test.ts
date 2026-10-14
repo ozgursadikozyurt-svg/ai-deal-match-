@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * v3.11 — mahalle komşuluğu ve eşleştirme motoru v3 (konum kademeleri, oda, bütçe altı, belirsiz mahalle adı).
  */
 import { test } from "node:test";
@@ -47,8 +47,9 @@ test("komşuluk ilçe sınırını aşar: Meltem (Muratpaşa) ↔ Arapsuyu (Kony
   assert.equal(y?.komsu, true);
   const s = es(T("Muratpaşa / Meltem", TAM_T), P("Konyaaltı / Arapsuyu", TAM_P));
   assert.equal(s.lokasyonKademe, "KOMSU_MAHALLE");
-  assert.equal(s.lokasyonOrani, MODEL.lok.komsu);
-  assert.equal(s.uygunluk, "SUNULABILIR");
+  // v3.28 — başka ilçedeki komşu: komşudan düşük ve sorulur (Güzeloba talebine Altıntaş "yanlış" işaretlendi)
+  assert.equal(s.lokasyonOrani, MODEL.lok.komsuIlceDisi);
+  assert.equal(s.uygunluk, "KOSULLU");
 });
 
 test("v3.10'da bildirilen hata: Fener/Çağlayan 2+1 talebi ↔ Doğuyaka 3+1 artık 'Sunulabilir 92' değil", () => {
@@ -65,7 +66,8 @@ test("konum kademeleri: aynı mahalle > komşu > yakın > biraz uzak (koşullu) 
   const p = (ham: string) => es(t, P(ham, { odaSayisi: "2+1", fiyat: 9_000_000 }));
   const ayni = p("Muratpaşa / Fener"), komsu = p("Muratpaşa / Çağlayan"), yakin = p("Muratpaşa / Yeşilbahçe"), orta = p("Muratpaşa / Zerdalilik"), uzak = p("Muratpaşa / Doğuyaka");
   assert.deepEqual([ayni, komsu, yakin, orta, uzak].map((s) => s.lokasyonKademe), ["AYNI_MAHALLE", "KOMSU_MAHALLE", "YAKIN", "ORTA", "DISINDA"]);
-  assert.deepEqual([ayni, komsu, yakin, orta, uzak].map((s) => s.uygunluk), ["SUNULABILIR", "SUNULABILIR", "SUNULABILIR", "KOSULLU", "UYGUN_DEGIL"]);
+  // v3.28 — "Sunulabilir" yalnızca istenen mahallede; komşu ve yakın sorulur
+  assert.deepEqual([ayni, komsu, yakin, orta, uzak].map((s) => s.uygunluk), ["SUNULABILIR", "KOSULLU", "KOSULLU", "KOSULLU", "UYGUN_DEGIL"]);
   assert.ok(ayni.skor > komsu.skor && komsu.skor > yakin.skor && yakin.skor > orta.skor && orta.skor > uzak.skor);
   assert.equal(ayni.lokasyonPuani, 20); // eski gösterge korunur
 });
@@ -101,17 +103,17 @@ test("portföyün mahallesi girilmemişse (yalnızca ilçe) mahalle isteyen tale
   assert.equal(s.uygunluk, "KOSULLU");
 });
 
-test("sınır verisi olmayan il (İzmir): eski ilçe kuralı — aynı ilçe farklı mahalle 0,75, sunulabilir", () => {
+test("sınır verisi olmayan il (İzmir): eski ilçe kuralı — aynı ilçe farklı mahalle 0,75, sorulur (v3.28)", () => {
   const s = es(T("İzmir Bornova Kazımdirik", { ...TAM_T, maxFiyat: 6_000_000 }), P("İzmir Bornova Erzene", { ...TAM_P, fiyat: 5_500_000 }));
   assert.equal(s.lokasyonOrani, MODEL.lok.ilceVerisiz);
-  assert.equal(s.uygunluk, "SUNULABILIR");
+  assert.equal(s.uygunluk, "KOSULLU");
 });
 
-test("oda: istenen oda tam puan, bir oda fazla kısmi (sunulabilir), iki oda fazla ya da eksik koşullu", () => {
+test("oda: istenen oda tam puan, bir oda fazla kısmi (koşullu), iki oda fazla ya da eksik uygun değil (v3.28)", () => {
   const t = T("Muratpaşa / Fener", { odaSayisi: "2+1", maxFiyat: 10_000_000 });
   const oda = (o: string) => { const s = es(t, P("Muratpaşa / Fener", { odaSayisi: o, fiyat: 9_000_000 })); return { u: s.uygunluk, skor: s.skor, puan: s.kriterler.find((k) => k.anahtar === "odaSayisi")!.puan }; };
   assert.deepEqual([oda("2+1").puan, oda("3+1").puan, oda("4+1").puan, oda("1+1").puan], [1, MODEL.oda.fazla1, MODEL.oda.fazla2, 0]);
-  assert.deepEqual([oda("2+1").u, oda("3+1").u, oda("4+1").u, oda("1+1").u], ["SUNULABILIR", "SUNULABILIR", "KOSULLU", "KOSULLU"]);
+  assert.deepEqual([oda("2+1").u, oda("3+1").u, oda("4+1").u, oda("1+1").u], ["SUNULABILIR", "KOSULLU", "UYGUN_DEGIL", "UYGUN_DEGIL"]);
   assert.ok(oda("2+1").skor > oda("3+1").skor && oda("3+1").skor > oda("4+1").skor);
   // Müşteri oda sayısına "şart" dediyse fazlası da eksiği de engeldir
   const sart = { ...t, ozellik: { kritikKriterler: ["ODA_SAYISI"] } };
@@ -147,7 +149,10 @@ test("model deneyi: seçilen model (A) v3.10 tabanını ve diğer varyasyonları
   assert.equal(a.sinifDogru, a.sinifToplam);
   assert.equal(a.siraDogru, a.siraToplam);
   assert.ok(oran(v0) < 0.6);
-  for (const s of DENEY_SONUCU) if (s.kod !== "A") assert.ok(oran(s) < oran(a), s.kod);
+  // v3.28 — konum tavanları komşu / yakın ağırlıklarının küçük farklarını önemsizleştirdi (B, C eşit olabilir);
+  // eski davranışlar (ilçe sınırı yok, oda gevşek / yumuşak, konum sıkı / geniş, bütçe altı) A'dan kesin düşük kalmalı
+  for (const s of DENEY_SONUCU) assert.ok(oran(s) <= oran(a), s.kod);
+  for (const k of ["C2", "D", "E", "F", "G", "H", "I", "J"]) assert.ok(oran(DENEY_SONUCU.find((s) => s.kod === k)!) < oran(a), k);
 });
 
 test("sürüm 3.11: günlükte ve test listesinde", () => {

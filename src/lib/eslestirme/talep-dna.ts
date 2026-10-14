@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * TALEP DNA'SI — bir talebin eşleştirmeden önce çıkarılan "genetiği":
  *  - Aciliyet
  *  - Kritik (öldürücü) kriterler: karşılanmazsa portföy UYGUN_DEGIL
@@ -141,6 +141,9 @@ export function talepDnasi(t: DnaGirdi): TalepDna {
   for (const k of acikKritik) ekle(k, "TALEP");
   for (const p of profiller) for (const k of p.oldurucu) ekle(k, "AMAC");
   for (const k of ["LOKASYON", "ALAN", "FIYAT"]) ekle(k, "VARSAYILAN");
+  // v3.28 — konutta oda sayısı da varsayılan öldürücü: 2+1 isteyene 1+1 ya da 4+1 sunulmaz ("yanlış" işaretlendi). Bir oda fazla
+  // engel değildir (Koşullu). Talep "oda esnek" derse uygulanmaz.
+  if (grup === "KONUT") ekle("ODA_SAYISI", "VARSAYILAN");
 
   const m2Tolerans = esnekSet.has("ALAN") ? Math.max(20, t.m2ToleransYuzde ?? 0) : t.m2ToleransYuzde ?? 10;
   const fiyatTolerans = esnekSet.has("FIYAT") ? 20 : 10;

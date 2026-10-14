@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * Görevler ekranı (menünün en sonunda): Bugün panosunun tamamı — sınırsız. Geciken · Bugün · Bu hafta · Sonra · Tamamlananlar,
  * türe göre süzgeç (Ara · Sunum · Yer göster · Belge). Satırlar panodakiyle aynı (üç düğme).
  */

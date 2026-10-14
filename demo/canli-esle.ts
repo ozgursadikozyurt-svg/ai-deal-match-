@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * Canlı — arayüz durumu (DepoDurumu) ile sunucu durumu (/api/durum) arasındaki eşleme ve fark hesabı. Saf işlevler (ağ yok): testlenebilir.
  *  sunucudanDurum: GET /api/durum cevabı → arayüzün beklediği durum
  *  imzaAl / planla: son kaydedilenle şimdiki durumu karşılaştırır, yalnızca değişenleri POST /api/durum parçalarına böler
@@ -67,7 +67,12 @@ export function imzaAl(d: DepoDurumu): Imza {
 }
 
 export interface Plan { parcalar: Record<string, unknown>[]; imza: Imza; bos: boolean; kayitSayisi: number }
-export function planla(onceki: Imza, d: DepoDurumu, parcaBoyu = 100): Plan {
+/**
+ * v3.28 — parça boyları. Kayıt başına sunucuda ~8 sorgu (≈0,4 sn) gider; 100 kayıtlık parça 30–40 sn süren tek istek oluyordu ve
+ * Cloudflare'de istek ortasında kesiliyordu ("Connection terminated unexpectedly", 14 Eki 2026). Kişiler de artık parça parça gider.
+ */
+export const KAYIT_PARCA = 10, KISI_PARCA = 100;
+export function planla(onceki: Imza, d: DepoDurumu, parcaBoyu = KAYIT_PARCA): Plan {
   const yeni = imzaAl(d);
   const kisiler = d.kisiler.filter((k) => onceki.kisi.get(k.id) !== yeni.kisi.get(k.id)).map(kisiYuku);
   const kisiSil = [...onceki.kisi.keys()].filter((id) => !yeni.kisi.has(id));
@@ -82,10 +87,11 @@ export function planla(onceki: Imza, d: DepoDurumu, parcaBoyu = 100): Plan {
   const parcalar: Record<string, unknown>[] = [];
   // 1) kişiler + ayarlar + arayüz durumu (kayıtlar kişilere bağlanır)  2) kayıtlar (parça parça)  3) silmeler ve eşleşme takibi (kayıtlar var olmalı)
   const ilk: Record<string, unknown> = {};
-  if (kisiler.length) ilk.kisiler = kisiler;
+  if (kisiler.length) ilk.kisiler = kisiler.slice(0, KISI_PARCA);
   if (Object.keys(ayarlar).length) ilk.ayarlar = ayarlar;
   if (arayuz) ilk.arayuz = arayuz;
   if (Object.keys(ilk).length) parcalar.push(ilk);
+  for (let i = KISI_PARCA; i < kisiler.length; i += KISI_PARCA) parcalar.push({ kisiler: kisiler.slice(i, i + KISI_PARCA) });
   for (let i = 0; i < kayitlar.length; i += parcaBoyu) parcalar.push({ kayitlar: kayitlar.slice(i, i + parcaBoyu) });
   const son: Record<string, unknown> = {};
   if (kayitSil.length) son.kayitSil = kayitSil;

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.27 · 13 Ekim 2026
+// Anahtar CRM v3.28 · 14 Ekim 2026
 // Portföy fotoğrafları (en fazla 8; dosyalar Supabase Storage'da özel kovada, veritabanında yalnızca yol + künye)
 // GET    /api/kayit/:id/fotolar                 → [{ id, sira, ad, en, boy, boyut, url }]  (url: 1 saat geçerli imzalı bağlantı)
 // POST   /api/kayit/:id/fotolar  (JSON: ad, en, boy, boyut, tur)  → v3.24 doğrudan yükleme: künye + tek kullanımlık Supabase yükleme bağlantısı

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * HIZLI AYRIŞTIRICI — yapay zekâdan ÖNCE çalışan kural tabanlı (regex + sözlük) çözümleyici. Ücretsizdir.
  * Amaç: yapıştırılan WhatsApp mesajı / portal ilanı ya da doğal dil sorusunun çoğunu yapay zekâ
  * çağırmadan anlamak; yapay zekâ yalnızca kural tabanlı sonuç "yeterli" değilse çağrılır.
@@ -106,12 +106,35 @@ export function metinTuru(metin: string): MetinTuru {
   return "ILAN";
 }
 
-const CARPAN = (b?: string) => (!b ? 1 : /milyon|mn|\bm\b/.test(b) ? 1e6 : /milyar/.test(b) ? 1e9 : /bin|\bk\b/.test(b) ? 1e3 : 1);
+const CARPAN = (b?: string) => (!b ? 1 : /milyon|mn|\bm\b|^mil$/.test(b) ? 1e6 : /milyar/.test(b) ? 1e9 : /bin|\bk\b/.test(b) ? 1e3 : 1);
+
+/**
+ * v3.28 — talepte bütçe ARALIĞININ alt sınırı: "6.500-7 milyon", "6 İLA 7.500.000", "40-45 bin", "8.000.000–9.000.000 TL".
+ * Yalnızca üst sınırı zaten bulunan bütçeyle (±%2) eşleşen aralık kabul edilir; alt sınır kısaltılmış yazılabildiği için
+ * (6.500 → 6,5 milyon; 6 → 6 milyon) üst sınırın %30'u ile kendisi arasına düşen yorum seçilir.
+ * Ölçüm (14 Eki 2026): 68 aktif talebin 8'inde aralık vardı, hiçbirinde alt sınır kaydedilmemişti.
+ */
+export function butceAltSiniri(m: string, ust: number): number | null {
+  const re = /(\d[\d.,]*)\s*(?:-|–|ila|ile)\s*(\d[\d.,]*)\s*(milyar\p{L}*|milyon\p{L}*|mil\b|mn\b|bin\p{L}*|k\b|m\b)?/gu;
+  let x: RegExpExecArray | null;
+  while ((x = re.exec(m))) {
+    const [tum, a, b, birim] = x;
+    if (/^\s*(m2|m²|mt2|metre|metrekare|kw|kva|oda|kat|ya[şs])/.test(m.slice(x.index + tum.length, x.index + tum.length + 10))) continue;
+    const yorumlar = (s0: string) => { const n1 = sayiOku(s0), n2 = Number(s0.replace(",", ".")); return [...new Set([n1, n2].filter((v): v is number => v != null && Number.isFinite(v) && v > 0))]; };
+    const carpanlar = [CARPAN(birim), 1, 1e3, 1e6];
+    const ustOk = yorumlar(b).some((n) => carpanlar.some((c) => Math.abs(n * c - ust) <= ust * 0.02));
+    if (!ustOk) continue;
+    let en: number | null = null;
+    for (const n of yorumlar(a)) for (const c of carpanlar) { const v = n * c; if (v >= ust * 0.3 && v < ust && (en == null || ust - v < ust - en)) en = v; }
+    if (en != null) return Math.round(en);
+  }
+  return null;
+}
 
 /** Metindeki para ifadeleri (m², kW vb. birimli sayılar hariç) */
 function paralar(m: string): { deger: number; acik: boolean; kadar: boolean; aylik: boolean; para: HizliSonuc["paraBirimi"] }[] {
   const r: ReturnType<typeof paralar> = [];
-  const re = /(?<![\p{L}\d.,+])(\d[\d.,]*)\s*(milyar\p{L}*|milyon\p{L}*|mn\b|bin(?!ek)\p{L}*|k\b)?\s*(tl\b|₺|try\b|lira\b|euro\b|eur\b|€|usd\b|dolar\b|\$|gbp\b|sterlin\b)?('?[ey]?\s*kadar|\s*kadar|\s*alt[ıi])?/gu;
+  const re = /(?<![\p{L}\d.,+])(\d[\d.,]*)\s*(milyar\p{L}*|milyon\p{L}*|mil\b|mn\b|bin(?!ek)\p{L}*|k\b)?\s*(tl\b|₺|try\b|lira\b|euro\b|eur\b|€|usd\b|dolar\b|\$|gbp\b|sterlin\b)?('?[ey]?\s*kadar|\s*kadar|\s*alt[ıi])?/gu;
   let x: RegExpExecArray | null;
   while ((x = re.exec(m))) {
     const [tum, sayi, buyuk, birim, kadar] = x;
@@ -223,7 +246,7 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   const paraBirimi = p[0]?.para ?? "TRY";
   if (p.length) {
     const aday = p.filter((x) => x.acik).length ? p.filter((x) => x.acik) : p;
-    if (tip === "TALEP") maxFiyat = Math.max(...aday.map((x) => x.deger)); else fiyat = (aday.find((x) => !x.kadar) ?? aday[0]).deger;
+    if (tip === "TALEP") { maxFiyat = Math.max(...aday.map((x) => x.deger)); minFiyat = butceAltSiniri(m, maxFiyat); } else fiyat = (aday.find((x) => !x.kadar) ?? aday[0]).deger;
     bul("fiyat");
   }
   // İşlem yazılmamışsa tahmin: arsa/tarla ya da yatırım → satılık; ticari mülkte fiyat düzeyi (≤ 1,5 milyon ≈ aylık kira)

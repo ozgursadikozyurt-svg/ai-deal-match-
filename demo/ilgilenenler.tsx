@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * İlgilenenler / gösterilenler — bir talep ya da portföy için kimlerin ilgilendiği, kime sunulduğu, kime gösterildiği.
  * Kapalı gelir, başlıkta sayı görünür: "İlgilenenler (3)". Kişi rehberden seçilir; durum değişince Bugün panosu görev üretir.
  * Kişi kartında aynı kayıtlar "Gösterilen portföyler" olarak görünür.

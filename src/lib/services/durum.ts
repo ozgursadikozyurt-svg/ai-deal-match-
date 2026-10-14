@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.28 · 14 Ekim 2026 (v3.14'ten)
  * AŞAMA 7 — Canlı sürümün veri köprüsü. Arayüz (demo ile aynı ekranlar) tüm durumu tek seferde okur
  * (`durumGetir`), değişiklikleri parça parça yazar (`degisiklikUygula`). Veritabanı ilişkisel kalır:
  * Notion/Google senkronu, toplu giriş, dışa aktarma ve eşleştirme servisleri aynı tablolarla çalışmaya devam eder.
@@ -89,6 +89,39 @@ export const DegisiklikSchema = z.object({
 });
 export type Degisiklik = z.output<typeof DegisiklikSchema>;
 
+/** v3.28 — veritabanı bağlantısının koptuğunu gösteren (geçici) hata */
+export const geciciBaglantiHatasi = (e: unknown) => /connection terminated|econnreset|connection ended|socket hang up|terminating connection|client has encountered a connection error/i.test(String((e as any)?.message ?? e));
+/** v3.28 — geçici bağlantı hatasında işi bir kez daha dener (havuz kopan bağlantıyı atar, yenisini açar). İşler tekrar edilebilir (sil + yaz). */
+export async function geciciyseTekrarla<T>(is: () => Promise<T>): Promise<T> {
+  try { return await is(); } catch (e) { if (!geciciBaglantiHatasi(e)) throw e; await new Promise((r) => setTimeout(r, 150)); return await is(); }
+}
+/**
+ * v3.28 — gelen kayıtlardaki konum kimliklerinden veritabanında olmayanları bulur; dönen işlev bir kaydın konumları için
+ * hata metni (yoksa null) verir. Kimlik yoksa sorgu atılmaz.
+ */
+export async function konumKimlikleri(prisma: PrismaClient, kayitlar: { veri: Record<string, unknown> }[]): Promise<(l: unknown) => string | null> {
+  const ilce = new Set<number>(), mah = new Set<number>(), ab = new Set<number>();
+  for (const k of kayitlar) for (const l of ((k.veri as any)?.lokasyonlar ?? []) as any[]) {
+    if (Number.isInteger(l?.ilceId)) ilce.add(l.ilceId); if (Number.isInteger(l?.mahalleId)) mah.add(l.mahalleId); if (Number.isInteger(l?.altBolgeId)) ab.add(l.altBolgeId);
+  }
+  if (!ilce.size && !mah.size && !ab.size) return () => null;
+  const [i, m, a] = await Promise.all([
+    ilce.size ? prisma.ilce.findMany({ where: { id: { in: [...ilce] } }, select: { id: true } }) : [],
+    mah.size ? prisma.mahalle.findMany({ where: { id: { in: [...mah] } }, select: { id: true } }) : [],
+    ab.size ? prisma.altBolge.findMany({ where: { id: { in: [...ab] } }, select: { id: true } }) : [],
+  ]);
+  const vI = new Set(i.map((x) => x.id)), vM = new Set(m.map((x) => x.id)), vA = new Set(a.map((x) => x.id));
+  return (ls) => {
+    const eksik: string[] = [];
+    for (const l of (Array.isArray(ls) ? ls : []) as any[]) {
+      if (Number.isInteger(l?.ilceId) && !vI.has(l.ilceId)) eksik.push(`ilçe #${l.ilceId}`);
+      if (Number.isInteger(l?.mahalleId) && !vM.has(l.mahalleId)) eksik.push(`mahalle #${l.mahalleId}`);
+      if (Number.isInteger(l?.altBolgeId) && !vA.has(l.altBolgeId)) eksik.push(`alt bölge #${l.altBolgeId}`);
+    }
+    return eksik.length ? `Konum tanınmıyor (${[...new Set(eksik)].join(", ")}) — bu il / ilçe veritabanında yüklü değil; konumu düzeltip yeniden kaydedin` : null;
+  };
+}
+
 export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
   const hatalar: { id: string; mesaj: string }[] = [];
   const ttl = await ttlAyarlari(prisma);
@@ -105,14 +138,19 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
     catch (e: any) { hatalar.push({ id: k.id, mesaj: e?.code === "P2002" ? "Bu telefon numarası başka bir kişide kayıtlı" : String(e?.message ?? e).slice(0, 200) }); }
   }
   // 2) Kayıtlar: alt tablolar (konum, özellik, kişi bağları, notlar) silinip yeniden yazılır
+  // v3.28 — konum ön denetimi: veritabanında olmayan ilçe / mahalle / alt bölge (ör. Antalya dışı) işlemi yabancı anahtar hatasıyla
+  // bozmasın; kayıt anlaşılır mesajla reddedilir. (14 Eki 2026: iki kayıt "kayit_lokasyon_ilceId_fkey" ile düştü.)
+  const konumDenetimi = await konumKimlikleri(prisma, g.kayitlar);
   for (const k of g.kayitlar) {
+    const eksikKonum = konumDenetimi((k.veri as any)?.lokasyonlar);
+    if (eksikKonum) { hatalar.push({ id: k.id, mesaj: eksikKonum }); continue; }
     const p = KayitCreateSchema.safeParse(k.veri);
     if (!p.success) { hatalar.push({ id: k.id, mesaj: p.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ").slice(0, 300) }); continue; }
     const { lokasyonlar, ozellik, validUntil, kisiler, ...alanlar } = p.data;
     // v3.22: isaret açıkça yazılır — "Otomatik"e dönülünce (alan yok) eski elle işaret veritabanında kalmasın
     const veri = { ...alanlar, isaret: p.data.isaret ?? null, validUntil: validUntil ?? vu(p.data.tip, p.data.islemTipi, p.data.aciliyet, new Date(), ttl), kisiId: kisiler[0]?.kisiId ?? null };
     try {
-      await prisma.$transaction(async (tx) => {
+      await geciciyseTekrarla(() => prisma.$transaction(async (tx) => {
         const var_ = await tx.kayit.findUnique({ where: { id: k.id }, select: { id: true } });
         if (var_) {
           await tx.kayitLokasyon.deleteMany({ where: { kayitId: k.id } });
@@ -131,7 +169,7 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
           await tx.kayitNot.deleteMany({ where: { kayitId: k.id } });
           if (k.notlar.length) await tx.kayitNot.createMany({ data: k.notlar.map((n) => ({ id: n.id, kayitId: k.id, tur: n.tur, metin: n.metin, kisiId: n.kisiId ?? null, tarih: new Date(n.tarih) })) });
         }
-      });
+      }));
     } catch (e: any) { hatalar.push({ id: k.id, mesaj: String(e?.message ?? e).slice(0, 300) }); }
   }
   // 3) Silmeler

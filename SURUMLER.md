@@ -5,6 +5,29 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.28 · 14 Ekim 2026 — Eşleştirme sizin kararlarınızla yeniden ayarlandı: ilçe sınırı, konum tavanı, konutta oda şartı, aynı kişi, birim kira; 'Bağlantı koptu' kaydetme hatası giderildi
+
+- Ölçüm: koparıp 'yanlış' dediğiniz 34 ve müşteriye sunduğunuz 11 eşleşme motordan yeniden geçirildi. Sunulan 11'in 10'u aynı mahallede; 'yanlış'ların çoğu yakın mahalle ya da başka ilçe. Sonuç: 'yanlış'lardan Sunulabilir görünen 19 → 6, elenen 5 → 13; sunduklarınızın listedeki ortalama sırası 2,1 → 1,3.
+- Konum: 'Sunulabilir' yalnızca istenen mahallede / alt bölgede / ilçede. Komşu mahalle en fazla 80 puan ve Koşullu; 1,5 km'ye kadar yakın mahalle en fazla 70; başka ilçedeki komşu mahalle 72. Başka ilçede komşu olmayan mahalle (Güzeloba talebine Altıntaş, Meltem talebine Kepez Dokuma) artık bölge dışı — 'bölge esnek' denirse gelir.
+- Yalnızca ilçe isteyen talep ('Konyaaltı'): başka ilçeden yalnızca o ilçeye sınır komşusu mahalle (Koşullu). Talep hem ilçeyi hem o ilçeden mahalle saymışsa, sayılan mahalle ilçenin geri kalanından önde.
+- Konutta oda sayısı olmazsa olmaz: 2+1 isteyene 1+1 ya da 4+1 gelmez; bir oda fazlası Koşullu. 'Oda esnek' denirse eski davranış.
+- Aynı kişinin talebi ile portföyü eşleşmez (bir emlakçının kendi talebi ve kendi ilanı): 63 çift; biri 92 puanla birinci sıradaydı.
+- Kirada m² başına 10 TL'nin altındaki fiyat (oda / birim fiyatı: '1000 m² depo · 1.200 TL') karşılaştırılmaz, 'toplam kirayı sorun' uyarısı çıkar.
+- Kapalı alan: talebin alt m²'siyle aynıysa ayrı satır açılmaz ('Alan uygun · Kapalı alan uymuyor' çelişkisi); ayrı kapalı alan talebin alan toleransıyla karşılaştırılır.
+- Puan: 'Koşullu' en fazla 84 — 85 ve üstü yalnızca sorulmadan sunulabilecek eşleşmede. Konutta talep m² vermemişse Alan 'istenmedi' (kırmızı %40 görünmüyordu).
+- Bütçe aralığı: '6.500-7 milyon', '6 ila 7.500.000', '40-45 bin' alt sınırı da okunur; '15 mil' 15 milyon. Mevcut 7 talebin boş alt bütçesi kendi metninden dolduruldu.
+- Antalya OSB alt bölgesi OSB 1–3. Kısım mahallelerine bağlandı (boştu).
+- Kaydetme: 'Kaydedilemedi: Connection terminated unexpectedly' — kayıtlar 100'lük yerine 10'luk, kişiler 100'lük parçalarla gider (tek istek 30–40 sn sürüyor, Cloudflare'de kesiliyordu); sunucu bağlantı kopmasında kaydı bir kez kendisi yeniden dener; veritabanında olmayan konum (Antalya dışı ilçe) işlemi bozmadan anlaşılır mesajla reddedilir; arayüz 'Bağlantı koptu — yeniden deneniyor' yazar ve 3 sn'de yeniden dener.
+
+**Demo'da test edilecekler**
+
+- [ ] Bir Fener talebi açın: Çağlayan'daki portföy 'Koşullu' ve en fazla 80; Güzeloba en fazla 70; Altıntaş (Aksu) listede yok.
+- [ ] 2+1 talebinin eşleşmelerinde 1+1 ve 4+1 yok; 3+1 'Koşullu' ve 84 ya da altı.
+- [ ] Eşleşmeler ekranında 85 üstü puanların hepsi 'Sunulabilir'.
+- [ ] Depo eşleşmesi detayında 'Alan (±%10) uygun · Kapalı alan uymuyor' çelişkisi görünmüyor.
+- [ ] Birkaç kayıt düzenleyip arka arkaya kaydedin: 'Kaydedilemedi: Connection terminated' çıkmamalı; çıkarsa 'Bağlantı koptu — yeniden deneniyor' ve birkaç saniyede 'Kaydedildi'.
+- [ ] TCPZ2H24 (Şirinyalı/Fener 2+1, 6,5–7 milyon) talebinin bütçesinde alt sınır görünüyor.
+
 ## v3.27 · 13 Ekim 2026 — Eşleştirme kalitesi: ofise daire önerilmez, segment dışı fiyat elenir, yıllık girilmiş depo kiraları yakalanır, güven göstergesi, mükerrer ilan tek satır
 
 - Mülk tipi: Daire ↔ Ofis (ve Bina/Müstakil ↔ Otel) artık kendiliğinden eşleşmez; yalnızca talepte o tip alternatif olarak seçildiyse. Depo ↔ Üretim, Dükkan ↔ Restoran, Ofis ↔ Hizmet aynen sürer. Ölçüm: 50–55 m² ofis talebine 151 daire çıkıyor, gerçek ofisler 25. sıraya düşüyordu.
@@ -18,6 +41,7 @@
 - Kira her zaman AYLIK saklanır: yıllık girilen kira (form, tablo, WhatsApp, API) 12'ye bölünür, ödeme şekli 'Yıllık peşin' işaretlenir, yıllık tutar işlem notuna yazılır ('Kira yıllık isteniyor: 1.300.000 TL/yıl (aylık ≈ 108.333 TL)'). Talep bütçesi de aynı. Kirada 'Toplam' periyot aylık sayılır.
 - Talepte istenen ama portföyde bilgisi olmayan özellik (ofis, rampa, elektrik…): eleme yok, ama her biri −4 puan (en çok −12), skor 85'i geçemez ve eşleşme 'sunmadan önce sor' (Koşullu) olur. Özelliği açıkça YOK olan portföy −8 (en çok −16). Böylece ofisi doğrulanmış depo üstte, bilgisi olmayan hemen altında, ofisi olmayan daha aşağıda. Kullanım amacı (müşterinin niyeti) sayılmaz.
 - Depo / sanayide kapalı alan girilmemişse ilanın m²'si kapalı alan sayılır ('ilan m²'si' notuyla).
+- Var / Yok hızlı cevap: eşleşme kartında ve detayında, bilinmeyen evet/hayır özellik (ofis, rampa, TIR girişi…) için mevcut 'Sorulacak' çipinin içinde iki küçük düğme. Mal sahibini arayınca tek dokunuşla portföye yazılır; o portföy tüm taleplerde doğru sıraya oturur.
 
 **Demo'da test edilecekler**
 
@@ -29,6 +53,7 @@
 - [ ] Aynı ilanı iki kaynaktan girilmiş bir portföy: eşleşme kartında '+1 aynı ilan'.
 - [ ] Kiralık portföy formunda periyodu 'Yıllık' seçip 1.200.000 girin, kaydedin: kartta aylık 100.000 TL, detayda 'Kira yıllık isteniyor' notu.
 - [ ] 'Yenigöl, 1000–1500 m², ofisli depo' talebi: ofisi doğrulanmış depolar üstte (Sunulabilir), ofis bilgisi olmayanlar 85 ve altı (Koşullu, 'Sorulacak: Ofis').
+- [ ] Bir depo eşleşmesinde 'Yükleme rampası? Var · Yok' çipinde Var'a basın: bildirim çıkar, puan güncellenir, çip kaybolur.
 
 ## v3.26 · 12 Ekim 2026 — ★ Benim kayıtlar süresiz; Süresi yaklaşanlar ayrı ekran (Toplu +30); kartta tek +30; Gelen kutusunda 7/15/30 gün; kart yanında paylaşım seçimi; Açıklama alanı; Görevler ekranı; açık kayıt (Pro altyapısı)
 

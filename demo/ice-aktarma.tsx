@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * Demo — Veri Girişi: WhatsApp sohbet dosyalarını toplu içe aktarma + güvene göre ayırma + toplu onay.
  *
  * Akış (uzun sohbetlerde kullanıcının her mesajı tek tek onaylamaması için):

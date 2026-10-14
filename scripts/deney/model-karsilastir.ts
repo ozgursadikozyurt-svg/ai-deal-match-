@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * MODEL DENEYİ — eşleştirme puanlamasının varyasyonlarını etiketli senaryolarla karşılaştırır.
  * Çalıştır: npx tsx scripts/deney/model-karsilastir.ts        (ayrıntı için: … --ayrinti)
  *
@@ -7,6 +7,8 @@
  * Her grupta ayrıca "sıra" beklentileri var: a > b = a'nın skoru b'den yüksek olmalı.
  * Etiketler saha mantığına göre elle konuldu (Özgür'ün v3.10'da bildirdiği Fener/Çağlayan ↔ Doğuyaka örneği dahil);
  * gerçek eşleşmeler biriktikçe buraya eklenip model yeniden ayarlanır.
+ * v3.28 — etiketler Özgür'ün gerçek kararlarıyla güncellendi (14 Eki 2026: 34 "yanlış / fiyat", 11 "sunuldu"): sunulanların 10/11'i
+ * aynı mahallede → komşu / yakın mahalle artık "K" (sorulur), başka ilçede komşu olmayan "U", konutta oda eksiği / iki fazla "U".
  * Taban (V0) = v3.10 motorunun dondurulmuş kopyası (onizleme_v310.ts).
  */
 import { eslesmeOnizle, MODEL, type ModelAyar, type OnizlemeKayit } from "../../src/lib/eslestirme/onizleme";
@@ -28,39 +30,39 @@ const G: Grup[] = [
     p: {
       a: [P("Muratpaşa / Fener", { odaSayisi: "2+1", fiyat: 8_500_000 }), "S", "istenen mahalle, istenen oda"],
       b: [P("Muratpaşa / Çağlayan", { odaSayisi: "2+1", fiyat: 9_000_000 }), "S", "istenen diğer mahalle"],
-      c: [P("Muratpaşa / Güzeloluk", { odaSayisi: "2+1", fiyat: 8_500_000 }), "S", "Çağlayan'ın sınır komşusu"],
-      d: [P("Muratpaşa / Şirinyalı", { odaSayisi: "2+1", fiyat: 8_000_000 }), "S", "Fener'in sınır komşusu"],
+      c: [P("Muratpaşa / Güzeloluk", { odaSayisi: "2+1", fiyat: 8_500_000 }), "K", "Çağlayan'ın sınır komşusu (v3.28: sorulur)"],
+      d: [P("Muratpaşa / Şirinyalı", { odaSayisi: "2+1", fiyat: 8_000_000 }), "K", "Fener'in sınır komşusu (v3.28: sorulur)"],
       e: [P("Muratpaşa / Doğuyaka", { odaSayisi: "3+1", fiyat: 5_650_000, m2: 115 }), "U", "3,9 km uzak + oda fazla + bütçenin %57'si (v3.10: 92 puan, Sunulabilir)"],
-      f: [P("Muratpaşa / Fener", { odaSayisi: "3+1", fiyat: 9_500_000 }), "S", "bir oda fazla — sunulur ama (a)'nın altında"],
-      g: [P("Muratpaşa / Fener", { odaSayisi: "4+1", fiyat: 9_800_000 }), "K", "iki oda fazla"],
+      f: [P("Muratpaşa / Fener", { odaSayisi: "3+1", fiyat: 9_500_000 }), "K", "bir oda fazla — sorulur (v3.28: 2+1 kiralığa 3+1 'yanlış' işaretlendi)"],
+      g: [P("Muratpaşa / Fener", { odaSayisi: "4+1", fiyat: 9_800_000 }), "U", "iki oda fazla (v3.28: konutta oda öldürücü)"],
       h: [P("Muratpaşa / Meltem", { odaSayisi: "2+1", fiyat: 8_000_000 }), "U", "şehrin öbür ucu"],
       i: [P("Muratpaşa / Fener", { odaSayisi: "2+1", fiyat: 3_500_000 }), "S", "bütçenin %35'i — sunulur ama (a)'nın altında"],
-      j: [P("Muratpaşa / Fener", { odaSayisi: "1+1", fiyat: 6_000_000 }), "K", "oda eksik"],
+      j: [P("Muratpaşa / Fener", { odaSayisi: "1+1", fiyat: 6_000_000 }), "U", "oda eksik (v3.28: 2+1 talebine 1+1 'yanlış' işaretlendi)"],
       k: [P("Muratpaşa / Fener", { odaSayisi: "2+1", fiyat: 11_500_000 }), "U", "bütçeyi %15 aşıyor"],
-      l: [P("Muratpaşa / Yeşilbahçe", { odaSayisi: "2+1", fiyat: 9_000_000 }), "S", "Fener'e 1,2 km (komşu değil)"],
+      l: [P("Muratpaşa / Yeşilbahçe", { odaSayisi: "2+1", fiyat: 9_000_000 }), "K", "Fener'e 1,2 km (komşu değil; v3.28: Fener talebine Güzeloba 1,4 km 'yanlış')"],
       m: [P("Muratpaşa / Zerdalilik", { odaSayisi: "2+1", fiyat: 9_000_000 }), "K", "Fener'e 3 km — sormadan sunulmaz"],
       n: [P("Muratpaşa", { odaSayisi: "2+1", fiyat: 9_000_000 }), "K", "portföyün mahallesi girilmemiş"],
     },
-    sira: [["a", "c"], ["a", "f"], ["a", "i"], ["c", "l"], ["d", "l"], ["l", "m"], ["m", "e"], ["f", "g"], ["c", "f"], ["a", "n"]],
+    sira: [["a", "c"], ["a", "f"], ["a", "i"], ["c", "l"], ["d", "l"], ["l", "m"], ["m", "e"], ["f", "g"], ["f", "c"], ["a", "n"]],
   },
   {
     ad: "2 · İlçe sınırı — kiralık dükkan, Meltem (Muratpaşa), 100–200 m², ≤ 100 bin TL",
     talep: T("Muratpaşa / Meltem", { mulkTipi: "DUKKAN_MAGAZA", islemTipi: "KIRALIK", minM2: 100, maxM2: 200, maxFiyat: 100_000, fiyatPeriyodu: "AYLIK" }),
     p: {
       a: [P("Muratpaşa / Meltem", { mulkTipi: "DUKKAN_MAGAZA", islemTipi: "KIRALIK", m2: 150, fiyat: 90_000, fiyatPeriyodu: "AYLIK" }), "S", "istenen mahalle"],
-      b: [P("Konyaaltı / Arapsuyu", { mulkTipi: "DUKKAN_MAGAZA", islemTipi: "KIRALIK", m2: 150, fiyat: 90_000, fiyatPeriyodu: "AYLIK" }), "S", "başka ilçe ama sınır komşusu"],
-      c: [P("Muratpaşa / Bahçelievler", { mulkTipi: "DUKKAN_MAGAZA", islemTipi: "KIRALIK", m2: 150, fiyat: 90_000, fiyatPeriyodu: "AYLIK" }), "S", "sınır komşusu"],
+      b: [P("Konyaaltı / Arapsuyu", { mulkTipi: "DUKKAN_MAGAZA", islemTipi: "KIRALIK", m2: 150, fiyat: 90_000, fiyatPeriyodu: "AYLIK" }), "K", "başka ilçe ama sınır komşusu (sorulur)"],
+      c: [P("Muratpaşa / Bahçelievler", { mulkTipi: "DUKKAN_MAGAZA", islemTipi: "KIRALIK", m2: 150, fiyat: 90_000, fiyatPeriyodu: "AYLIK" }), "K", "sınır komşusu (sorulur)"],
       d: [P("Muratpaşa / Güzeloba", { mulkTipi: "DUKKAN_MAGAZA", islemTipi: "KIRALIK", m2: 150, fiyat: 90_000, fiyatPeriyodu: "AYLIK" }), "U", "aynı ilçe ama 10 km uzak"],
       e: [P("Konyaaltı / Hurma", { mulkTipi: "DUKKAN_MAGAZA", islemTipi: "KIRALIK", m2: 150, fiyat: 90_000, fiyatPeriyodu: "AYLIK" }), "U", "3,9 km uzak"],
     },
-    sira: [["a", "b"], ["a", "c"], ["b", "d"], ["b", "e"], ["c", "d"]],
+    sira: [["a", "b"], ["a", "c"], ["c", "b"], ["b", "d"], ["b", "e"], ["c", "d"]],
   },
   {
     ad: "3 · Yalnızca ilçe — kiralık ofis, Muratpaşa, ≤ 50 bin TL",
     talep: T("Muratpaşa", { mulkTipi: "BURO_OFIS", islemTipi: "KIRALIK", maxFiyat: 50_000, fiyatPeriyodu: "AYLIK", minM2: 80, maxM2: 150 }),
     p: {
       a: [P("Muratpaşa / Kızıltoprak", { mulkTipi: "BURO_OFIS", islemTipi: "KIRALIK", m2: 100, fiyat: 40_000, fiyatPeriyodu: "AYLIK" }), "S", "istenen ilçenin içinde — tam uyum"],
-      b: [P("Konyaaltı / Arapsuyu", { mulkTipi: "BURO_OFIS", islemTipi: "KIRALIK", m2: 100, fiyat: 40_000, fiyatPeriyodu: "AYLIK" }), "S", "ilçe sınırına bitişik"],
+      b: [P("Konyaaltı / Arapsuyu", { mulkTipi: "BURO_OFIS", islemTipi: "KIRALIK", m2: 100, fiyat: 40_000, fiyatPeriyodu: "AYLIK" }), "K", "ilçe sınırına bitişik (başka ilçe — sorulur)"],
       c: [P("Kepez / Varsak Karşıyaka", { mulkTipi: "BURO_OFIS", islemTipi: "KIRALIK", m2: 100, fiyat: 40_000, fiyatPeriyodu: "AYLIK" }), "U", "ilçeden uzak"],
     },
     sira: [["a", "b"], ["b", "c"]],
@@ -70,8 +72,8 @@ const G: Grup[] = [
     talep: T("Lara", { mulkTipi: "DAIRE", islemTipi: "KIRALIK", odaSayisi: "3+1", maxFiyat: 60_000, fiyatPeriyodu: "AYLIK" }),
     p: {
       a: [P("Muratpaşa / Güzeloba", { islemTipi: "KIRALIK", odaSayisi: "3+1", fiyat: 55_000, fiyatPeriyodu: "AYLIK" }), "S", "Lara'nın içinde"],
-      b: [P("Muratpaşa / Güzeloluk", { islemTipi: "KIRALIK", odaSayisi: "3+1", fiyat: 55_000, fiyatPeriyodu: "AYLIK" }), "S", "Lara mahallelerine sınır komşusu (v3.10: bölge dışı)"],
-      c: [P("Muratpaşa / Kızıltoprak", { islemTipi: "KIRALIK", odaSayisi: "3+1", fiyat: 55_000, fiyatPeriyodu: "AYLIK" }), "S", "Lara'ya (Yeşilbahçe sınırına) 1,2 km"],
+      b: [P("Muratpaşa / Güzeloluk", { islemTipi: "KIRALIK", odaSayisi: "3+1", fiyat: 55_000, fiyatPeriyodu: "AYLIK" }), "K", "Lara mahallelerine sınır komşusu (sorulur)"],
+      c: [P("Muratpaşa / Kızıltoprak", { islemTipi: "KIRALIK", odaSayisi: "3+1", fiyat: 55_000, fiyatPeriyodu: "AYLIK" }), "K", "Lara'ya (Yeşilbahçe sınırına) 1,2 km (sorulur)"],
       d: [P("Muratpaşa / Meltem", { islemTipi: "KIRALIK", odaSayisi: "3+1", fiyat: 55_000, fiyatPeriyodu: "AYLIK" }), "U", "uzak"],
     },
     sira: [["a", "b"], ["b", "c"], ["c", "d"]],
@@ -81,19 +83,19 @@ const G: Grup[] = [
     talep: T("Kepez / Altınova Sinan", { mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", minM2: 1000, maxM2: 2000, maxFiyat: 300_000, fiyatPeriyodu: "AYLIK" }),
     p: {
       a: [P("Kepez / Altınova Sinan", { mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", m2: 1500, fiyat: 250_000, fiyatPeriyodu: "AYLIK" }), "S", "istenen mahalle"],
-      b: [P("Aksu / Cihadiye", { mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", m2: 1500, fiyat: 250_000, fiyatPeriyodu: "AYLIK" }), "S", "başka ilçe, sınır komşusu"],
-      c: [P("Aksu / Hacıaliler", { mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", m2: 1500, fiyat: 250_000, fiyatPeriyodu: "AYLIK" }), "K", "2 km"],
+      b: [P("Aksu / Cihadiye", { mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", m2: 1500, fiyat: 250_000, fiyatPeriyodu: "AYLIK" }), "K", "başka ilçe, sınır komşusu (sorulur)"],
+      c: [P("Aksu / Hacıaliler", { mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", m2: 1500, fiyat: 250_000, fiyatPeriyodu: "AYLIK" }), "U", "başka ilçe, 2 km, komşu değil (v3.28: Yenigöl talebine Düden 1,3 km 'uzak' dendi)"],
       d: [P("Kepez / Altınova Sinan", { mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", m2: 1500, fiyat: 120_000, fiyatPeriyodu: "AYLIK" }), "S", "ucuz (bütçenin %40'ı) — ticaride engel değil"],
       e: [P("Kepez / Varsak Karşıyaka", { mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", m2: 1500, fiyat: 250_000, fiyatPeriyodu: "AYLIK" }), "U", "aynı ilçe, uzak"],
     },
-    sira: [["a", "b"], ["b", "c"], ["c", "e"], ["a", "d"]],
+    sira: [["a", "b"], ["b", "c"], ["b", "e"], ["a", "d"]],
   },
   {
     ad: "6 · “Bölge esnek” — 2+1, Fener, komşu bölgeler de olur",
     talep: T("Muratpaşa / Fener", { ...daire, odaSayisi: "2+1", maxFiyat: 10_000_000, ozellik: { esnekKriterler: ["LOKASYON"] } }),
     p: {
       a: [P("Muratpaşa / Doğuyaka", { odaSayisi: "2+1", fiyat: 9_000_000 }), "K", "3,9 km — esnek olduğu için elenmez, sorulur"],
-      b: [P("Muratpaşa / Çağlayan", { odaSayisi: "2+1", fiyat: 9_000_000 }), "S", "komşu"],
+      b: [P("Muratpaşa / Çağlayan", { odaSayisi: "2+1", fiyat: 9_000_000 }), "K", "komşu (sorulur)"],
       c: [P("Muratpaşa / Meltem", { odaSayisi: "2+1", fiyat: 9_000_000 }), "K", "çok uzak — esnek, elenmez ama en altta"],
     },
     sira: [["b", "a"], ["a", "c"]],
@@ -113,7 +115,7 @@ const G: Grup[] = [
     talep: T("İzmir Bornova Kazımdirik", { ...daire, odaSayisi: "2+1", maxFiyat: 6_000_000 }),
     p: {
       a: [P("İzmir Bornova Kazımdirik", { odaSayisi: "2+1", fiyat: 5_500_000 }), "S", "aynı mahalle"],
-      b: [P("İzmir Bornova Erzene", { odaSayisi: "2+1", fiyat: 5_500_000 }), "S", "aynı ilçe — veri yok, eski kural"],
+      b: [P("İzmir Bornova Erzene", { odaSayisi: "2+1", fiyat: 5_500_000 }), "K", "aynı ilçe, başka mahalle — uzaklık bilinmiyor, sorulur"],
       c: [P("Muratpaşa / Fener", { odaSayisi: "2+1", fiyat: 5_500_000 }), "U", "başka il"],
     },
     sira: [["a", "b"], ["b", "c"]],
@@ -125,13 +127,14 @@ type Motor = (t: OnizlemeKayit, p: OnizlemeKayit) => { skor: number; uygunluk: k
 const yeni = (a: ModelAyar): Motor => (t, p) => eslesmeOnizle(t, p, BAGLAM, a);
 const VARYASYONLAR: [string, string, Motor][] = [
   ["V0", "v3.10 (taban)", (t, p) => eski(t as any, p as any, BAGLAM)],
-  ["A", "SEÇİLEN: komşu 0,85 · ≤1,5 km 0,65 · ≤3 km 0,40 (koşullu) · oda+1 0,6 · bütçe altı hafif", yeni(MODEL)],
+  ["A", "SEÇİLEN (v3.28): komşu 0,75 / ilçe dışı 0,6 · ≤1,5 km 0,45 · ≤3 km 0,30 · tam konum dışı Koşullu · oda+1 0,5 · konutta oda öldürücü", yeni(MODEL)],
   ["B", "konum dik: komşu 0,70 · yakın 0,45 · orta 0,20", yeni(M({ lok: { komsu: 0.7, yakin: 0.45, orta: 0.2 } }))],
   ["C", "konum yumuşak: komşu 0,95 · yakın 0,80 · orta 0,60", yeni(M({ lok: { komsu: 0.95, yakin: 0.8, orta: 0.6 } }))],
+  ["C2", "ilçe sınırı yok sayılır (v3.27): başka ilçedeki komşu = komşu", yeni(M({ lok: { komsuIlceDisi: 0.75 } }))],
   ["D", "konum sıkı: 1,5 km'den uzağı bölge dışı", yeni(M({ lok: { ortaM: 1500 } }))],
   ["E", "konum geniş: 5 km'ye kadar koşullu", yeni(M({ lok: { ortaM: 5000 } }))],
   ["F", "oda gevşek: fazla oda tam puan (v3.10 davranışı)", yeni(M({ oda: { fazla1: 1, fazla2: 1 } }))],
-  ["G", "oda sıkı: bir oda fazla da koşullu (0,3)", yeni(M({ oda: { fazla1: 0.3 } }))],
+  ["G", "oda yumuşak: bir oda fazla 0,6 (v3.27)", yeni(M({ oda: { fazla1: 0.6 } }))],
   ["H", "bütçe altı cezası yok", yeni(M({ fiyatAlt: null }))],
   ["I", "bütçe altı sert: < %60 → 0,5 (koşullu)", yeni(M({ fiyatAlt: { esik1: 0.6, puan1: 0.5, esik2: 0.4, puan2: 0.2 } }))],
   ["J", "koşullu eşiği 0,5", yeni(M({ kosulluAlti: 0.5 }))],

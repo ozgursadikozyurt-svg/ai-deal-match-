@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.27";
-export const TARIH = "13 Ekim 2026";
+export const SURUM = "3.28";
+export const TARIH = "14 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.27_13Ekim2026";
+export const DOSYA_EKI = "v3.28_14Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,32 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.28",
+    tarih: "14 Ekim 2026",
+    baslik: "Eşleştirme sizin kararlarınızla yeniden ayarlandı: ilçe sınırı, konum tavanı, konutta oda şartı, aynı kişi, birim kira; 'Bağlantı koptu' kaydetme hatası giderildi",
+    degisenler: [
+      "Ölçüm: koparıp 'yanlış' dediğiniz 34 ve müşteriye sunduğunuz 11 eşleşme motordan yeniden geçirildi. Sunulan 11'in 10'u aynı mahallede; 'yanlış'ların çoğu yakın mahalle ya da başka ilçe. Sonuç: 'yanlış'lardan Sunulabilir görünen 19 → 6, elenen 5 → 13; sunduklarınızın listedeki ortalama sırası 2,1 → 1,3.",
+      "Konum: 'Sunulabilir' yalnızca istenen mahallede / alt bölgede / ilçede. Komşu mahalle en fazla 80 puan ve Koşullu; 1,5 km'ye kadar yakın mahalle en fazla 70; başka ilçedeki komşu mahalle 72. Başka ilçede komşu olmayan mahalle (Güzeloba talebine Altıntaş, Meltem talebine Kepez Dokuma) artık bölge dışı — 'bölge esnek' denirse gelir.",
+      "Yalnızca ilçe isteyen talep ('Konyaaltı'): başka ilçeden yalnızca o ilçeye sınır komşusu mahalle (Koşullu). Talep hem ilçeyi hem o ilçeden mahalle saymışsa, sayılan mahalle ilçenin geri kalanından önde.",
+      "Konutta oda sayısı olmazsa olmaz: 2+1 isteyene 1+1 ya da 4+1 gelmez; bir oda fazlası Koşullu. 'Oda esnek' denirse eski davranış.",
+      "Aynı kişinin talebi ile portföyü eşleşmez (bir emlakçının kendi talebi ve kendi ilanı): 63 çift; biri 92 puanla birinci sıradaydı.",
+      "Kirada m² başına 10 TL'nin altındaki fiyat (oda / birim fiyatı: '1000 m² depo · 1.200 TL') karşılaştırılmaz, 'toplam kirayı sorun' uyarısı çıkar.",
+      "Kapalı alan: talebin alt m²'siyle aynıysa ayrı satır açılmaz ('Alan uygun · Kapalı alan uymuyor' çelişkisi); ayrı kapalı alan talebin alan toleransıyla karşılaştırılır.",
+      "Puan: 'Koşullu' en fazla 84 — 85 ve üstü yalnızca sorulmadan sunulabilecek eşleşmede. Konutta talep m² vermemişse Alan 'istenmedi' (kırmızı %40 görünmüyordu).",
+      "Bütçe aralığı: '6.500-7 milyon', '6 ila 7.500.000', '40-45 bin' alt sınırı da okunur; '15 mil' 15 milyon. Mevcut 7 talebin boş alt bütçesi kendi metninden dolduruldu.",
+      "Antalya OSB alt bölgesi OSB 1–3. Kısım mahallelerine bağlandı (boştu).",
+      "Kaydetme: 'Kaydedilemedi: Connection terminated unexpectedly' — kayıtlar 100'lük yerine 10'luk, kişiler 100'lük parçalarla gider (tek istek 30–40 sn sürüyor, Cloudflare'de kesiliyordu); sunucu bağlantı kopmasında kaydı bir kez kendisi yeniden dener; veritabanında olmayan konum (Antalya dışı ilçe) işlemi bozmadan anlaşılır mesajla reddedilir; arayüz 'Bağlantı koptu — yeniden deneniyor' yazar ve 3 sn'de yeniden dener.",
+    ],
+    testEt: [
+      "Bir Fener talebi açın: Çağlayan'daki portföy 'Koşullu' ve en fazla 80; Güzeloba en fazla 70; Altıntaş (Aksu) listede yok.",
+      "2+1 talebinin eşleşmelerinde 1+1 ve 4+1 yok; 3+1 'Koşullu' ve 84 ya da altı.",
+      "Eşleşmeler ekranında 85 üstü puanların hepsi 'Sunulabilir'.",
+      "Depo eşleşmesi detayında 'Alan (±%10) uygun · Kapalı alan uymuyor' çelişkisi görünmüyor.",
+      "Birkaç kayıt düzenleyip arka arkaya kaydedin: 'Kaydedilemedi: Connection terminated' çıkmamalı; çıkarsa 'Bağlantı koptu — yeniden deneniyor' ve birkaç saniyede 'Kaydedildi'.",
+      "TCPZ2H24 (Şirinyalı/Fener 2+1, 6,5–7 milyon) talebinin bütçesinde alt sınır görünüyor.",
+    ],
+  },
   {
     surum: "3.27",
     tarih: "13 Ekim 2026",

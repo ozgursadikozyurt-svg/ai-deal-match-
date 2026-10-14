@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * MAHALLE KOMŞULUĞU ve MESAFESİ — "Fener'de arayan müşteriye Çağlayan da olur, Doğuyaka olmaz."
  * Veri: antalya-komsuluk.json (scripts/build_komsuluk.py üretir; Antalya'nın 19 ilçesi, 914 mahalle).
  *   mesafe = iki mahallenin SINIRLARI arasındaki en kısa mesafe (m); komşu = en az 100 m ortak sınır.
@@ -19,6 +19,8 @@ export interface KomsulukIndeksi {
   ilceye(mahalleId: number, ilceId: number): MahalleYakinligi | null;
   /** Sınır komşuları (mahalle kimlikleri) — filtre ve "komşuları da ekle" için */
   komsular(mahalleId: number): number[];
+  /** v3.28 — mahallenin ilçesi (ilçe sınırı kuralı için) */
+  ilceOf?(mahalleId: number): number | undefined;
   /** Mahallenin harita noktası (ileride harita görünümü için) */
   nokta(mahalleId: number): { enlem: number; boylam: number; km2: number } | null;
 }
@@ -62,5 +64,6 @@ export function komsulukKur(kimlik: (ilceAdi: string, slug: string) => { id: num
     ilceye: (id, ilceId) => (ilceOf.get(id) === ilceId ? { komsu: false, mesafeM: 0 } : ilceEnYakin.get(id)?.get(ilceId) ?? null),
     komsular: (id) => [...(cift.get(id) ?? [])].filter(([, y]) => y.komsu).map(([b]) => b),
     nokta: (id) => bilgi.get(id) ?? null,
+    ilceOf: (id) => ilceOf.get(id),
   };
 }

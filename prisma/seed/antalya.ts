@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * Antalya'ya özel piyasa katmanı: alt bölgeler, komşu ilçeler, alias sözlüğü.
  * Kaynak: Özgür'ün Notion CRM "Bölge" seçenekleri + WhatsApp grup kullanımları.
  * `dogrulandi: false` olanlar ilk kullanımda Ayarlar > Lokasyon ekranından onaylanmalı.
@@ -49,8 +49,9 @@ export const ANTALYA_ALT_BOLGELER: AltBolgeSeed[] = [
     aciklama: "Mahalle eşlemesi kullanıcı tarafından tamamlanacak",
   },
   {
-    ad: "Antalya OSB", slug: "antalya-osb", ilce: "Döşemealtı", tip: "OSB", dogrulandi: false,
-    mahalleler: [],
+    ad: "Antalya OSB", slug: "antalya-osb", ilce: "Döşemealtı", tip: "OSB", dogrulandi: true,
+    // v3.28 — OSB 1., 2. ve 3. Kısım resmî mahallelerdir (eşleme boştu: "OSB" talebi hiçbir portföye konumla bağlanamıyordu)
+    mahalleler: [["Döşemealtı", "aosb1kisim"], ["Döşemealtı", "aosb2kisim"], ["Döşemealtı", "aosb3kisim"]],
   },
 ];
 

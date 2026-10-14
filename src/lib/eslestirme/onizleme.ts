@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026
+ * Anahtar CRM v3.28 · 14 Ekim 2026
  * EŞLEŞTİRME MOTORU v3 (v3.11; v2 = v3.5) — veritabanı ve yapay zekâ gerektirmeyen saf fonksiyon.
  * Metin benzerliği değil, ticari gayrimenkulün katı kuralları (Killer Criteria):
  *  1. Talep DNA'sı (talep-dna.ts): öldürücü kriterler = talepte "şart" denenler + kullanım amacının doğası
@@ -54,6 +54,14 @@ export const ISTENMEYEBILIR: ReadonlySet<string> = new Set(["siteIcinde", "havuz
  * cadde dükkanında birim kira geniş aralıkta, eşik güvenilir değil.
  */
 export const KIRA_BIRIM_UST: Partial<Record<"SANAYI" | "TICARI" | "KONUT" | "ARSA", number>> = { SANAYI: 600 };
+/**
+ * v3.28 — kirada m² başına aylık bu tutarın altı akla yatkın değildir (oda / birim fiyatı, eksik sıfır): fiyat "bilinmiyor" sayılır.
+ * Ölçüm (14 Eki 2026): "1000 m² depo · 1.200 TL/ay" ilanı aslında oda başı eşya deposuydu (1,2 TL/m²); 150–200 bin bütçeli üç depo
+ * talebine öneriliyordu ("yanlış" işaretlendi). Gerçek en düşük depo kirası ~17 TL/m² (açık alanlı).
+ */
+export const KIRA_BIRIM_ALT = 10;
+/** v3.28 — "Koşullu" eşleşmenin skor tavanı: 85+ = sorulmadan sunulabilir (2+1 talebine 3+1 daire 91 alıyordu) */
+export const KOSULLU_SKOR_TAVANI = 84;
 /** v3.27 — güven: ölçülen kriter sayısı bunun altındaysa (≤) güven DÜŞÜK; bu ve üstüyse YÜKSEK olabilir */
 export const GUVEN_DUSUK_EN_COK = 3, GUVEN_YUKSEK_EN_AZ = 6;
 /**
@@ -67,6 +75,7 @@ export const BILINMEYEN_ISTEK_CEZASI = 4, BILINMEYEN_ISTEK_TAVAN = 12;
 export const BILINMEYEN_ISTEK_SKOR_TAVANI = 85;
 /** v3.27 — istenen özellik portföyde açıkça YOK ise (ör. ofis yok): engel değilse bile bilinmeyenden daha aşağı sıralanır */
 export const KARSILANMAYAN_ISTEK_CEZASI = 8, KARSILANMAYAN_ISTEK_TAVAN = 16;
+export const KARSILANMAYAN_ISTEK_SKOR_TAVANI = 80;
 export type GuvenSeviye = "YUKSEK" | "ORTA" | "DUSUK";
 export interface Guven { seviye: GuvenSeviye; olculen: number; toplam: number; aciklama: string }
 
@@ -93,11 +102,14 @@ import { arananLok, haricLok, haricteMi } from "../lokasyon/haric";
 /** v3.11 — puanlama modeli. Değerler etiketli senaryo deneyinde seçildi (scripts/deney/model-karsilastir.ts). */
 export interface ModelAyar {
   lok: {
-    /** sınır komşusu mahalle */ komsu: number;
-    /** sınırdan ≤ yakinM */ yakin: number; yakinM: number;
+    /** sınır komşusu mahalle (aynı ilçe) */ komsu: number;
+    /** v3.28 — sınır komşusu ama başka ilçede (Güzeloba ↔ Altıntaş) */ komsuIlceDisi: number;
+    /** sınırdan ≤ yakinM (aynı ilçe) */ yakin: number; yakinM: number;
     /** sınırdan ≤ ortaM (koşullu) */ orta: number; ortaM: number;
     /** sınırdan ≤ uzakM — yalnızca "bölge esnek" talepte sayılır */ uzak: number; uzakM: number;
     /** talep yalnızca ilçe demiş, portföy o ilçede */ ilce: number;
+    /** v3.28 — talep hem ilçeyi hem o ilçeden mahalleleri saymış; portföy ilçede ama sayılan mahallelerde değil */ ilceGenel: number;
+    /** v3.28 — talep yalnızca ilçe demiş; portföy o ilçeye sınır komşusu bir mahallede (başka ilçede) */ ilceKomsu: number;
     /** sınır verisi yokken: aynı ilçe / komşu ilçe */ ilceVerisiz: number; komsuIlce: number;
     /** alt bölgenin mahalleleri tanımlı değil, portföy aynı ilçede */ altBolgeTanimsiz: number;
     ilGeneli: number;
@@ -109,12 +121,22 @@ export interface ModelAyar {
   kosulluAlti: number;
 }
 export const MODEL: ModelAyar = {
-  lok: { komsu: 0.85, yakin: 0.65, yakinM: 1500, orta: 0.4, ortaM: 3000, uzak: 0.15, uzakM: 5000, ilce: 1, ilceVerisiz: 0.75, komsuIlce: 0.4, altBolgeTanimsiz: 0.5, ilGeneli: 0.8 },
-  oda: { fazla1: 0.6, fazla2: 0.25 },
+  // v3.28 — kullanıcı geri bildirimiyle yeniden ayarlandı (13–14 Eki 2026: 34 "yanlış / fiyat" ve 11 "sunuldu" eşleşmesi).
+  // Sunulan 11 eşleşmenin 10'u aynı mahallede; "yanlış" denenlerin çoğu yakın mahalle (500 m–1,4 km) ya da başka ilçe.
+  lok: { komsu: 0.75, komsuIlceDisi: 0.6, yakin: 0.45, yakinM: 1500, orta: 0.3, ortaM: 3000, uzak: 0.15, uzakM: 5000, ilce: 1, ilceGenel: 0.85, ilceKomsu: 0.5, ilceVerisiz: 0.75, komsuIlce: 0.4, altBolgeTanimsiz: 0.5, ilGeneli: 0.8 },
+  // v3.28 — bir oda fazla 0,5 (Koşullu): "2+1 kiralık" talebine 3+1 "yanlış" işaretlendi
+  oda: { fazla1: 0.5, fazla2: 0.25 },
   fiyatAlt: { esik1: 0.6, puan1: 0.8, esik2: 0.4, puan2: 0.6, taban: 0.3 },
   kosulluAlti: 0.6,
 };
-export type LokasyonKademe = "AYNI_MAHALLE" | "ALT_BOLGE" | "ILCE" | "KOMSU_MAHALLE" | "YAKIN" | "ORTA" | "UZAK" | "ILCE_VERISIZ" | "KOMSU_ILCE" | "IL_GENELI" | "BILINMIYOR" | "DISINDA";
+export type LokasyonKademe = "AYNI_MAHALLE" | "ALT_BOLGE" | "ILCE" | "ILCE_GENEL" | "KOMSU_MAHALLE" | "YAKIN" | "ORTA" | "UZAK" | "ILCE_VERISIZ" | "KOMSU_ILCE" | "IL_GENELI" | "BILINMIYOR" | "DISINDA";
+/**
+ * v3.28 — konum kademesine göre skor tavanı. Ağırlıklı ortalamada konum tek başına skoru yeterince düşürmüyordu: "yanlış" işaretlenen
+ * yakın mahalle eşleşmeleri 86–88 alıyordu. Tavanla ekrandaki sayı "Koşullu" ile tutarlı olur: istenen yer 85–100, komşu ≤ 80, yakın ≤ 70.
+ */
+export const KONUM_SKOR_TAVANI: Partial<Record<LokasyonKademe, number>> = { KOMSU_MAHALLE: 80, YAKIN: 70, ILCE_VERISIZ: 75, KOMSU_ILCE: 65, ORTA: 60, UZAK: 50, BILINMIYOR: 70, DISINDA: 45 }; // DISINDA: "bölge esnek" talepte 5 km ötesi uzaktan aşağıda
+/** v3.28 — "Sunulabilir" yalnızca istenen yerin kendisinde: komşu / yakın mahalle en fazla "Koşullu" (müşteriye sorulur) */
+export const TAM_KONUM: ReadonlySet<LokasyonKademe> = new Set(["AYNI_MAHALLE", "ALT_BOLGE", "ILCE", "ILCE_GENEL", "IL_GENELI"]);
 
 export type Uygunluk = "SUNULABILIR" | "KOSULLU" | "UYGUN_DEGIL";
 export type KriterSonuc = "SAGLANDI" | "SAGLANMADI" | "BILINMIYOR";
@@ -150,6 +172,8 @@ export interface OnizlemeKayit {
   aciliyet?: string | null;
   lokasyonlar: OnizlemeLokasyon[];
   ozellik?: Record<string, unknown> & { kritikKriterler?: string[]; esnekKriterler?: string[]; eksikBilgiler?: string[]; kullanimAmaclari?: string[] };
+  /** v3.28 — aynı kişi denetimi: kayda bağlı kişiler ve gönderenin telefonu */
+  kisiler?: { kisiId: string }[] | null; kisiId?: string | null; gondeTelefon?: string | null;
   /** v3.27 — tip çelişkisi denetimi için (yoksa denetim atlanır) */
   baslik?: string | null; aciklama?: string | null; hamMetin?: string | null; ozet?: string | null;
 }
@@ -212,7 +236,7 @@ export interface OnizlemeSonucu {
 
 // ───────── Anahtar Uyum Matrisi ─────────
 type MatrisAdi = "SANAYI" | "TICARI" | "KONUT" | "ARSA";
-const MATRISLER: Record<MatrisAdi, { ad: string; b: [string, string, number][] }> = {
+export const MATRISLER: Record<MatrisAdi, { ad: string; b: [string, string, number][] }> = {
   SANAYI: { ad: "Sanayi / depo", b: [["BOLGE", "Bölge", 15], ["ALAN", "Alan", 15], ["FIYAT", "Fiyat", 15], ["TIP", "Mülk tipi", 10], ["ELEKTRIK", "Elektrik", 10], ["KULLANIM", "Kullanım", 10], ["YAPI", "Yapı / yükseklik", 5], ["RUHSAT", "Ruhsat / iskan", 5], ["ACIK_ALAN", "Açık alan", 5], ["ARAC", "Araç erişimi", 5], ["DIGER", "Diğer", 5]] },
   TICARI: { ad: "Ticari", b: [["BOLGE", "Bölge", 20], ["ALAN", "Alan", 15], ["FIYAT", "Fiyat", 15], ["TIP", "Mülk tipi", 10], ["CEPHE", "Cephe / trafik", 15], ["RUHSAT", "Ruhsat / iskan", 5], ["OTOPARK", "Otopark", 5], ["KULLANIM", "Kullanım", 5], ["DIGER", "Diğer", 10]] },
   KONUT: { ad: "Konut", b: [["BOLGE", "Bölge", 20], ["FIYAT", "Fiyat", 20], ["ALAN", "Alan", 10], ["TIP", "Mülk tipi", 10], ["ODA", "Oda sayısı", 15], ["KONUT", "Konut özellikleri", 15], ["DIGER", "Diğer", 10]] },
@@ -246,10 +270,24 @@ const fmt = (v: unknown): string => {
  * v3.3: tip uyumu src/lib/domain/kategori.ts'deki aile/benzerlik tablosundan gelir
  * (Depo ↔ Fabrika/İmalathane benzer, Dükkan ↔ Restoran benzer, Daire ↔ Depo asla).
  */
+/**
+ * v3.28 — talep ile portföy aynı kişiye mi ait? (kayda bağlı kişi ya da gönderenin telefonu)
+ * Bir emlakçının kendi talebini kendi portföyüyle eşleştirmek fırsat değildir; o eşleşmeyi kendisi zaten yapar.
+ * Ölçüm (14 Eki 2026): 63 çift (çoğu "Ayşegül emlak" ve "Nilgün Özçelebi"); biri birinci sırada 92 puandı ve "yanlış" işaretlendi.
+ */
+export function ayniKisi(t: Pick<OnizlemeKayit, "kisiler" | "kisiId" | "gondeTelefon">, p: Pick<OnizlemeKayit, "kisiler" | "kisiId" | "gondeTelefon">): boolean {
+  const kimler = (k: typeof t) => new Set([k.kisiId, ...(k.kisiler ?? []).map((x) => x.kisiId)].filter((x): x is string => !!x));
+  const a = kimler(t);
+  for (const x of kimler(p)) if (a.has(x)) return true;
+  const tel = (v?: string | null) => { const d = (v ?? "").replace(/\D/g, ""); return d.length >= 10 ? d.slice(-10) : null; };
+  const ta = tel(t.gondeTelefon), pa = tel(p.gondeTelefon);
+  return !!ta && ta === pa;
+}
+
 export function temelUyum(t: OnizlemeKayit, p: OnizlemeKayit): boolean {
   const islemler = new Set([t.islemTipi, ...(t.alternatifIslemTipleri ?? [])]);
   const tip = enIyiTipBenzerligi([t.mulkTipi, ...(t.alternatifMulkTipleri ?? [])] as any, p.mulkTipi as any);
-  return tipGecerli(tip) && islemler.has(p.islemTipi);
+  return tipGecerli(tip) && islemler.has(p.islemTipi) && !ayniKisi(t, p);
 }
 
 interface LokSonuc { puan: number | null; oran: number; kademe: LokasyonKademe; mesafeM: number | null; aciklama: string; /** portföyün mahallesi bilinmiyor → sunmadan önce sor */ belirsiz?: boolean; /** v3.22 — portföy talebin hariç tuttuğu yerde */ haric?: boolean }
@@ -281,38 +319,64 @@ function lokasyonPuani(t0: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBaglami, 
   const K = b.komsuluk;
   const ad = (id?: number | null) => (id && b.mahalleAdi?.(id)) || null;
   const pVeri = !!(K && pl.mahalleId && K.veriVar(pl.mahalleId));
-  /** Mesafe kademesi: komşu → yakın → orta → (esnekse) uzak → bölge dışı */
-  const kademele = (y: MahalleYakinligi | null, hedef: string | null) => {
+  const disari = (y: MahalleYakinligi, neye: string, neden: string) => {
+    if (enIyi.puan == null && (enIyi.mesafeM == null || y.mesafeM < enIyi.mesafeM)) enIyi = { ...enIyi, mesafeM: y.mesafeM, aciklama: `Bölge dışı · ${neden}${neye}${kmYaz(y.mesafeM)}` };
+  };
+  /**
+   * Mesafe kademesi: komşu → yakın → orta → (esnekse) uzak → bölge dışı.
+   * v3.28 — ilçe sınırı artık önemli: başka ilçedeki komşu mahalle daha düşük; başka ilçede komşu olmayan mahalle bölge dışı
+   * (Güzeloba talebine Altıntaş, Meltem talebine Kepez Dokuma "yanlış" işaretlendi). Talep yalnızca ilçe demişse başka ilçeden
+   * yalnızca o ilçeye sınır komşusu mahalle sayılır ("Konyaaltı" talebine Muratpaşa Yıldız 1,3 km "yanlış" işaretlendi).
+   */
+  const kademele = (y: MahalleYakinligi | null, hedef: string | null, ayniIlce: boolean, ilceSeviyesi = false) => {
     if (!y) return;
     const neye = hedef ? `${hedef} sınırına ` : "sınıra ";
-    if (y.komsu) dene({ puan: 0, oran: L.komsu, kademe: "KOMSU_MAHALLE", mesafeM: 0, aciklama: hedef ? `Komşu mahalle · ${hedef} ile sınır` : "Komşu mahalle" });
+    if (ilceSeviyesi) {
+      if (y.komsu) dene({ puan: 0, oran: L.ilceKomsu, kademe: "KOMSU_MAHALLE", mesafeM: 0, aciklama: "İstenen ilçeye sınır komşusu (başka ilçe)" });
+      else if (esnek && y.mesafeM <= L.uzakM) dene({ puan: 0, oran: L.uzak, kademe: "UZAK", mesafeM: y.mesafeM, aciklama: `Başka ilçe · ${neye}${kmYaz(y.mesafeM)}` });
+      else disari(y, neye, "başka ilçe · ");
+      return;
+    }
+    if (y.komsu) dene({ puan: 0, oran: ayniIlce ? L.komsu : L.komsuIlceDisi, kademe: "KOMSU_MAHALLE", mesafeM: 0, aciklama: (hedef ? `Komşu mahalle · ${hedef} ile sınır` : "Komşu mahalle") + (ayniIlce ? "" : " (başka ilçe)") });
+    else if (!ayniIlce) {
+      if (esnek && y.mesafeM <= L.uzakM) dene({ puan: 0, oran: L.uzak, kademe: "UZAK", mesafeM: y.mesafeM, aciklama: `Başka ilçe · ${neye}${kmYaz(y.mesafeM)}` });
+      else disari(y, neye, "başka ilçe · ");
+    }
     else if (y.mesafeM <= L.yakinM) dene({ puan: 0, oran: L.yakin, kademe: "YAKIN", mesafeM: y.mesafeM, aciklama: `Yakın mahalle · ${neye}${kmYaz(y.mesafeM)}` });
     else if (y.mesafeM <= L.ortaM) dene({ puan: 0, oran: L.orta, kademe: "ORTA", mesafeM: y.mesafeM, aciklama: `Biraz uzak · ${neye}${kmYaz(y.mesafeM)}` });
     else if (y.mesafeM <= L.uzakM) {
       // Uzak: yalnızca "bölge esnek" denmişse sayılır; değilse bölge dışıdır (mesafe yine de açıklamaya yazılır)
       if (esnek) dene({ puan: 0, oran: L.uzak, kademe: "UZAK", mesafeM: y.mesafeM, aciklama: `Uzak · ${neye}${kmYaz(y.mesafeM)}` });
-      else if (enIyi.puan == null && (enIyi.mesafeM == null || y.mesafeM < enIyi.mesafeM)) enIyi = { ...enIyi, mesafeM: y.mesafeM, aciklama: `Bölge dışı · ${neye}${kmYaz(y.mesafeM)}` };
+      else disari(y, neye, "");
     }
   };
+  // v3.28 — talep hem "Muratpaşa"yı hem Muratpaşa'dan mahalleleri saymışsa ilçe geneli eşleşme mahalle eşleşmesinin altında kalır
+  const detayIlceleri = new Set(t.lokasyonlar.filter((l) => (l.mahalleId || l.altBolgeId) && l.ilceId).map((l) => l.ilceId!));
   for (const tl of t.lokasyonlar) {
     // 1) Tam istenen yer
     if (tl.mahalleId && pl.mahalleId === tl.mahalleId) { dene({ puan: 20, oran: 1, kademe: "AYNI_MAHALLE", mesafeM: 0, aciklama: "Aynı mahalle (+20)" }); continue; }
     const set = tl.altBolgeId ? b.altBolgeMahalleleri.get(tl.altBolgeId) : undefined;
     if (tl.altBolgeId && ((pl.altBolgeId && pl.altBolgeId === tl.altBolgeId) || (pl.mahalleId && set?.has(pl.mahalleId)))) { dene({ puan: 10, oran: 1, kademe: "ALT_BOLGE", mesafeM: 0, aciklama: "Aynı alt bölge (+10)" }); continue; }
-    if (!tl.mahalleId && !tl.altBolgeId && tl.ilceId && pl.ilceId === tl.ilceId) { dene({ puan: 0, oran: L.ilce, kademe: "ILCE", mesafeM: 0, aciklama: "Aynı ilçe (0)" }); continue; }
+    if (!tl.mahalleId && !tl.altBolgeId && tl.ilceId && pl.ilceId === tl.ilceId) {
+      if (detayIlceleri.has(tl.ilceId)) dene({ puan: 0, oran: L.ilceGenel, kademe: "ILCE_GENEL", mesafeM: 0, aciklama: "Aynı ilçe · sayılan mahallelerin dışında" });
+      else dene({ puan: 0, oran: L.ilce, kademe: "ILCE", mesafeM: 0, aciklama: "Aynı ilçe (0)" });
+      continue;
+    }
     // 2) Mahalle komşuluğu / mesafesi (sınır verisi olan yerde)
     let olculdu = false;
     if (K && pVeri) {
-      if (tl.mahalleId && K.veriVar(tl.mahalleId)) { olculdu = true; kademele(K.mahalle(tl.mahalleId, pl.mahalleId!), ad(tl.mahalleId)); }
+      if (tl.mahalleId && K.veriVar(tl.mahalleId)) { olculdu = true; kademele(K.mahalle(tl.mahalleId, pl.mahalleId!), ad(tl.mahalleId), tl.ilceId == null || pl.ilceId == null || tl.ilceId === pl.ilceId); }
       else if (tl.altBolgeId && set?.size) {
         const olc = [...set].filter((m) => K.veriVar(m));
         if (olc.length) {
           olculdu = true;
           let y: MahalleYakinligi | null = null, hedef: number | null = null;
           for (const m of olc) { const x = K.mahalle(m, pl.mahalleId!); if (x && (!y || (x.komsu && !y.komsu) || (x.komsu === y.komsu && x.mesafeM < y.mesafeM))) { y = x; hedef = m; } }
-          kademele(y, ad(hedef));
+          // alt bölge ilçe sınırını aşabilir (Havalimanı çevresi): hedef mahallenin ilçesine bakılır
+          const hIlce = hedef != null ? K.ilceOf?.(hedef) ?? tl.ilceId : tl.ilceId;
+          kademele(y, ad(hedef), hIlce == null || pl.ilceId == null || hIlce === pl.ilceId);
         }
-      } else if (!tl.mahalleId && !tl.altBolgeId && tl.ilceId) { olculdu = true; kademele(K.ilceye(pl.mahalleId!, tl.ilceId), null); }
+      } else if (!tl.mahalleId && !tl.altBolgeId && tl.ilceId) { olculdu = true; kademele(K.ilceye(pl.mahalleId!, tl.ilceId), null, false, true); }
     }
     if (olculdu) continue;
     // 3) Sınır verisi yok (başka il, mahallesi girilmemiş portföy, mahalleleri tanımsız alt bölge) → ilçe kuralı
@@ -439,8 +503,12 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
     const per = periyotlar(t, p);
     const pf = p.fiyat != null ? p.fiyat * per.carpan : null;
     const periyotFarkli = per.farkli;
+    // v3.28 — kirada m² başına akla yatkın olmayan düşük fiyat (oda / birim fiyatı): karşılaştırılamaz
+    const birimKira = pf != null && /KIRALIK/.test(p.islemTipi) && !/GUNLUK/.test(p.islemTipi) && p.m2 && p.m2 > 0 && per.tPer === "AYLIK" ? pf / p.m2 : null;
+    const birimDusuk = birimKira != null && birimKira < KIRA_BIRIM_ALT;
+    if (birimDusuk) uyarilar.push(`Fiyat m² başına çok düşük (${birimKira!.toLocaleString("tr-TR", { maximumFractionDigits: 1 })} TL/m²) — oda / birim fiyatı olabilir; toplam kirayı sorun`);
     const ust = t.maxFiyat * (1 + dna.fiyatTolerans / 100);
-    const sonuc: KriterSonuc = pf == null || periyotFarkli ? "BILINMIYOR" : pf <= ust ? "SAGLANDI" : "SAGLANMADI";
+    const sonuc: KriterSonuc = pf == null || periyotFarkli || birimDusuk ? "BILINMIYOR" : pf <= ust ? "SAGLANDI" : "SAGLANMADI";
     // v3.11 — bütçe altı: fiyat bütçenin çok altındaysa mülk büyük olasılıkla müşterinin aradığı segmentte değildir.
     // Engel değildir (sonuç "sağlandı" kalır), yalnızca puanı düşürür. Talepte alt sınır (minFiyat) varsa o esas alınır.
     let altPuan = 1, altNot = "", segmentDisi = false;
@@ -470,12 +538,19 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
     }
     // v3.27 — depo / sanayide kapalı alan girilmemişse ilanın m²'si kapalı alan sayılır (portal ilanlarında ayrı alan yok)
     const kapaliYedek = alan === "kapaliAlanM2" && p.ozellik?.[alan] == null && p.m2 != null && matrisOf(p.mulkTipi) === "SANAYI";
+    // v3.28 — talepteki kapalı alan, talebin alt m² sınırıyla aynıysa (yapay zekâ aynı bilgiyi iki kez yazıyor) ve portföyde ayrı
+    // kapalı alan yoksa satır açılmaz: "Alan (±%10) uygun · Kapalı alan uymuyor" çelişkisi (900 m²'lik depo, 1000 m² talep) giderildi.
+    if (kapaliYedek && t.minM2 != null && Math.abs(Number(tv) - t.minM2) <= t.minM2 * 0.05) continue;
     const pv = kapaliYedek ? p.m2 : p.ozellik?.[alan];
     const kr = "kriter" in meta ? (meta.kriter as string | undefined) : undefined;
+    // v3.28 — alan türü "en az" karşılaştırmaları (kapalı / açık / arsa alanı) talebin alan toleransıyla yapılır (tutarlılık)
+    const alanTuru = meta.karsilastirma === "min" && /AlanM2$/.test(alan);
+    let sonuc = karsilastir(alan as MulkOzellikAlani, tv, pv), puan: number | undefined;
+    if (alanTuru && pv != null && sonuc === "SAGLANMADI" && Number(pv) >= Number(tv) * (1 - dna.m2Tolerans / 100)) { sonuc = "SAGLANDI"; puan = 0.75; }
     satirlar.push({
-      anahtar: alan, etiket: meta.etiket + ("birim" in meta && meta.birim ? ` (${meta.birim})` : ""),
+      anahtar: alan, etiket: meta.etiket + ("birim" in meta && meta.birim ? ` (${meta.birim})` : "") + (alanTuru ? ` (±%${dna.m2Tolerans})` : ""),
       talep: meta.karsilastirma === "min" ? `≥ ${fmt(tv)}` : meta.karsilastirma === "max" ? `≤ ${fmt(tv)}` : meta.karsilastirma === "sirali" ? `en az ${fmt(tv)}` : fmt(tv),
-      portfoy: fmt(pv) + (kapaliYedek ? " (ilan m²'si)" : ""), sonuc: karsilastir(alan as MulkOzellikAlani, tv, pv),
+      portfoy: fmt(pv) + (kapaliYedek ? " (ilan m²'si)" : ""), sonuc, ...(puan != null ? { puan } : {}),
       kritik: !!kr && kritik.has(kr), bilesen: kr ? BILESEN[kr] ?? "DIGER" : "DIGER",
     });
   }
@@ -484,6 +559,7 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   const lok = lokasyonPuani(t, p, b, A, !lokKritik);
   const kritikEngeller = satirlar.filter((s) => s.kritik && s.sonuc === "SAGLANMADI").map((s) => s.etiket);
   if (!tipIzinli) kritikEngeller.push("Mülk tipi uymuyor");
+  if (ayniKisi(t, p)) kritikEngeller.push("Aynı kişinin kendi talebi ve portföyü");
   if (lok.haric) kritikEngeller.push("Hariç tutulan bölge");
   else if (lok.puan == null && lokKritik) kritikEngeller.push("Lokasyon");
   const bilinmeyenKritikler = satirlar.filter((s) => s.kritik && s.sonuc === "BILINMIYOR").map((s) => s.etiket);
@@ -502,7 +578,9 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   // v3.19 — ölçülemeyen ÇEKİRDEK bileşen (alan, oda, fiyat) artık "yok sayılıp ağırlığı dağıtılmaz":
   // bilinmeyen bilgi lehe sayılmaz. Ağırlığı korunur, puanı BILINMEYEN_PUAN alınır → skor doğal olarak düşer.
   const CEKIRDEK = new Set(["ALAN", "ODA", "FIYAT"]);
-  const eksikCekirdek = bilesenler.filter((x) => x.puan == null && CEKIRDEK.has(x.kod));
+  // v3.28 — konutta talep m² vermemiş ama oda vermişse ölçü odadır: Alan "istenmedi" (ekranda kırmızı %40 görünüyordu)
+  const konutOdaliAlansiz = mAdi === "KONUT" && t.minM2 == null && t.maxM2 == null && odaListesi(t.odaSayisi).length > 0;
+  const eksikCekirdek = bilesenler.filter((x) => x.puan == null && CEKIRDEK.has(x.kod) && !(x.kod === "ALAN" && konutOdaliAlansiz));
   for (const x of eksikCekirdek) (x as { puan: number | null }).puan = BILINMEYEN_PUAN;
   const sayilan = bilesenler.filter((x) => x.puan != null);
   const toplamW = sayilan.reduce((a, x) => a + x.agirlik, 0);
@@ -530,7 +608,12 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   if (bilinmeyenIstekler.length) skor = Math.min(skor, BILINMEYEN_ISTEK_SKOR_TAVANI);
   const karsilanmayanIstekler = satirlar.filter((x) => x.sonuc === "SAGLANMADI" && !x.kritik && !ISTEK_DISI.includes(x.anahtar));
   skor -= Math.min(KARSILANMAYAN_ISTEK_TAVAN, KARSILANMAYAN_ISTEK_CEZASI * karsilanmayanIstekler.length);
+  // v3.28 — istenen özelliğin OLMADIĞI biliniyorsa en fazla 80 (komşu mahalleyle aynı): "bilinmiyor" (≤ 84) her zaman önünde kalır
+  if (karsilanmayanIstekler.length) skor = Math.min(skor, KARSILANMAYAN_ISTEK_SKOR_TAVANI);
   if (fiyatBilinmiyor) skor = Math.round(skor * FIYATSIZ_CARPAN);
+  // v3.28 — konum tavanı (başka ilçedeki komşu mahalle komşudan 8 puan aşağıda)
+  const konumTavani = KONUM_SKOR_TAVANI[lok.kademe];
+  if (konumTavani != null) skor = Math.min(skor, konumTavani - (lok.kademe === "KOMSU_MAHALLE" && lok.oran < A.lok.komsu ? 8 : 0));
   skor = Math.max(0, Math.min(100, skor));
 
   // v3.27 — güven: talepte istenen kriterlerden kaçı portföyde gerçekten ölçülebildi (bölge ve tip dahil)
@@ -546,9 +629,11 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   const uygunluk: Uygunluk = kritikEngeller.length ? "UYGUN_DEGIL"
     : guvenSeviye === "DUSUK" || uyarilar.length || bilinmeyenKritikler.length || bilinmeyenIstekler.length || talepEksikleri.length || cekirdekKosullu || tipUyumu.oran < 0.9 || satirlar.some((s) => s.sonuc === "SAGLANMADI")
       // v3.11 — zayıf bileşen: konum "biraz uzak / bilinmiyor" ya da bir satırın puanı eşiğin altında → sunmadan önce sor
-      || lok.belirsiz || (lok.kademe !== "IL_GENELI" && lok.kademe !== "BILINMIYOR" && lok.oran < A.kosulluAlti) || satirlar.some((s) => s.sonuc === "SAGLANDI" && s.puan != null && s.puan < A.kosulluAlti) ? "KOSULLU" : "SUNULABILIR";
+      // v3.28 — komşu / yakın mahalle ve konumu bilinmeyen portföy en fazla Koşullu (TAM_KONUM)
+      || lok.belirsiz || !TAM_KONUM.has(lok.kademe) || satirlar.some((s) => s.sonuc === "SAGLANDI" && s.puan != null && s.puan < A.kosulluAlti) ? "KOSULLU" : "SUNULABILIR";
   return {
-    uygunluk, tipUyumu, skor: uygunluk === "UYGUN_DEGIL" ? Math.min(skor, 40) : skor, lokasyonPuani: lok.puan, lokasyonOrani: lok.oran, lokasyonKademe: lok.kademe, lokasyonMesafeM: lok.mesafeM, lokasyonAciklama: lok.aciklama,
+    // v3.28 — "Koşullu" en fazla 84: ekranda 85 ve üstü yalnızca sorulmadan sunulabilecek eşleşmelerde görünür
+    uygunluk, tipUyumu, skor: uygunluk === "UYGUN_DEGIL" ? Math.min(skor, 40) : uygunluk === "KOSULLU" ? Math.min(skor, KOSULLU_SKOR_TAVANI) : skor, lokasyonPuani: lok.puan, lokasyonOrani: lok.oran, lokasyonKademe: lok.kademe, lokasyonMesafeM: lok.mesafeM, lokasyonAciklama: lok.aciklama,
     kriterler: satirlar, kritikEngeller, bilinmeyenKritikler, matris: { ad: M.ad, bilesenler }, talepEksikleri, veriEksikleri, uyarilar, guven, dna,
   };
 }

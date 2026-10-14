@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.27 · 13 Ekim 2026 — eşleştirme kalitesi: tip ailesi (otomatik / seçmeli), satışta bütçe tabanı,
+ * Anahtar CRM v3.28 · 14 Ekim 2026 — eşleştirme kalitesi: tip ailesi (otomatik / seçmeli), satışta bütçe tabanı,
  * yıllık girilmiş kira, güven göstergesi, tip çelişkisi, mükerrer ilan; içe aktarmada yıllık kira okuma.
  * Senaryolar 13 Ekim 2026 canlı veri incelemesinden (62 talep × 410 portföy) alındı.
  */
@@ -16,7 +16,7 @@ import { dosyaSatirlari, satirDonustur, satirHazirla } from "../src/lib/ingest/t
 import { csvOku } from "../src/lib/ingest/xlsx";
 import { ornekRevyCsv } from "../demo/ornek-gelen";
 import { INDEKS } from "../demo/lokasyon";
-import { SURUM, SURUM_GECMISI } from "../src/lib/surum";
+import { SURUM_GECMISI } from "../src/lib/surum";
 
 const B: LokasyonBaglami = { komsuIlceler: new Set(), altBolgeMahalleleri: new Map() };
 const MURATPASA = [{ ilId: 7, ilceId: 108, birincil: true }];
@@ -25,8 +25,8 @@ const talep = (x: Partial<OnizlemeKayit>): OnizlemeKayit => ({ tip: "TALEP", mul
 const portfoy = (x: Partial<OnizlemeKayit>): OnizlemeKayit => ({ tip: "PORTFOY", mulkTipi: "DAIRE", islemTipi: "SATILIK", lokasyonlar: MURATPASA, ...x });
 
 test("sürüm 3.27 kaydı", () => {
-  assert.equal(SURUM, "3.27"); assert.equal(SURUM_GECMISI[0].surum, "3.27"); assert.equal(SURUM_GECMISI[1].surum, "3.26");
-  assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 5);
+  const i = SURUM_GECMISI.findIndex((k) => k.surum === "3.27"); // v3.28 öne eklenir
+  assert.ok(i >= 0 && (SURUM_GECMISI[i].testEt ?? []).length >= 5); assert.equal(SURUM_GECMISI[i + 1].surum, "3.26");
 });
 
 test("tip ailesi: Daire ↔ Ofis kendiliğinden eşleşmez; Depo ↔ Üretim eşleşir; talep alternatif seçerse Daire de gelir", () => {
@@ -137,8 +137,11 @@ test("istenen ama bilinmeyen özellik: eleme yok, skor 85'i geçmez ve Koşullu;
   assert.notEqual(bilinmiyor.uygunluk, "UYGUN_DEGIL"); assert.equal(bilinmiyor.uygunluk, "KOSULLU");
   assert.ok(bilinmiyor.skor <= BILINMEYEN_ISTEK_SKOR_TAVANI);
   assert.ok(var_.skor > bilinmiyor.skor && bilinmiyor.skor > yok.skor, `${var_.skor} > ${bilinmiyor.skor} > ${yok.skor}`);
-  // depoda kapalı alan girilmemişse ilanın m²'si sayılır
-  const ka = var_.kriterler.find((k) => k.anahtar === "kapaliAlanM2")!;
+  // v3.28 — talepteki kapalı alan alt m² ile aynıysa ayrı satır açılmaz (çift sayım)
+  assert.equal(var_.kriterler.find((k) => k.anahtar === "kapaliAlanM2"), undefined);
+  // talep yalnızca kapalı alan verdiyse depoda kapalı alan girilmemişse ilanın m²'si sayılır
+  const yalnizKapali = eslesmeOnizle(talep({ mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", fiyatPeriyodu: "AYLIK", maxFiyat: 150_000, lokasyonlar: KEPEZ, ozellik: { kapaliAlanM2: 1000 } as any }), depo(true), B);
+  const ka = yalnizKapali.kriterler.find((k) => k.anahtar === "kapaliAlanM2")!;
   assert.equal(ka.sonuc, "SAGLANDI"); assert.match(ka.portfoy, /ilan m²'si/);
 });
 

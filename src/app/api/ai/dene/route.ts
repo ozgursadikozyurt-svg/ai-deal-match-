@@ -1,4 +1,4 @@
-// Anahtar CRM v3.27 · 13 Ekim 2026
+// Anahtar CRM v3.28 · 14 Ekim 2026
 // POST /api/ai/dene { ai? } — Ayarlar › Yapay zekâ ekranındaki "Bağlantıyı dene" düğmesi.
 //   Gövdede `ai` verilirse KAYDETMEDEN o ayarla, verilmezse kayıtlı ayarla küçük bir deneme çağrısı yapar.
 //   → { tamam: true, model, sureMs } ya da { tamam: false, kod, mesaj }   (anahtar: AI_API_KEY ortam değişkeni)
