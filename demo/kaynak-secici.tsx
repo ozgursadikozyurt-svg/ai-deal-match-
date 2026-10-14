@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026
+ * Anahtar CRM v3.30 · 14 Ekim 2026
  * Kaynak seçici — Emlak grubu · Sahibinden · Portal · Kendi portföyüm. Yapay zekâ / kurallar tahmin eder, kullanıcı değiştirir.
  * Seçim kaydın havuz / ilan sahibi / kanal alanlarına yazılır (src/lib/domain/kaynak.ts).
  *  - kucuk: liste kartlarında açılır menü (yer kaplamaz)

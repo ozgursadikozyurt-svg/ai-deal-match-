@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026
+ * Anahtar CRM v3.30 · 14 Ekim 2026
  * GELEN KUTUSU — "onay bekleyenler". E-postayla ya da yüklemeyle gelen dosyalardaki (Revy Excel dökümü, WhatsApp sohbet .zip / .txt)
  * her ilan / talep burada tek havuzda bekler; kullanıcı ekler ya da atlar. Hiçbir kayıt onaysız havuza girmez.
  *

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026 — Benim süresiz, süresi yaklaşanlar (+30), gelen kutusu gün süzgeci, kart yanında paylaşım seçimi,
+ * Anahtar CRM v3.30 · 14 Ekim 2026 — Benim süresiz, süresi yaklaşanlar (+30), gelen kutusu gün süzgeci, kart yanında paylaşım seçimi,
  * açıklama, kartta kişi tekrarı, Görevler ekranı, açık kayıt (kayıt ol) şeması
  */
 import { test as nodeTest } from "node:test";
@@ -60,8 +60,9 @@ test("Ana Sayfa: uzun 'Süresi yaklaşanlar' listesi yok, tek satır özet; ekra
   let git: any = null;
   const c = ctx(durum({ kayitlar }), (e) => (git = e));
   let e = await ac(React.createElement(AnaSayfa), c);
-  const oz = e.q(".sure-ozet")!; assert.ok(oz); assert.match(oz.textContent!, /Süresi yaklaşanlar \(3\)/);
-  await e.tikla(oz); assert.deepEqual(git, { ad: "suresi" });
+  // v3.30: özet en alttan en üste — Dikkat şeridi
+  const oz = e.q(".dikkat")!; assert.ok(oz); assert.match(oz.textContent!, /2 kayıt 5 gün içinde bitiyor/); assert.match(oz.textContent!, /1 kayıt 14 gün içinde bitiyor/);
+  await e.tikla(e.dugme("Gözden geçir")); assert.deepEqual(git, { ad: "suresi" });
   await e.kapat();
   e = await ac(React.createElement(SuresiYaklasanlar), c);
   assert.equal(e.qa(".kayit-kart").length, 3);

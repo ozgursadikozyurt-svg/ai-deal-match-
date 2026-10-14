@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026
+ * Anahtar CRM v3.30 · 14 Ekim 2026
  * v3.11 — veritabanlı: sunucu konum bağlamı mahalle komşuluğunu veritabanı kimlikleriyle kurar.
  */
 import { test } from "node:test";

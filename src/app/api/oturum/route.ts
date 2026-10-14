@@ -1,4 +1,4 @@
-// Anahtar CRM v3.29 · 14 Ekim 2026
+// Anahtar CRM v3.30 · 14 Ekim 2026
 // GET /api/oturum → kim giriş yaptı, hangi ofis, hangi rol, hangi plan, hangi yetkiler.
 // Arayüz açılışta bunu çağırır ve ekranları buna göre kurar (yönetici bölümleri, fotoğraf kilidi…).
 import { prisma } from "@/lib/db";

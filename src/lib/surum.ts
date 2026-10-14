@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026
+ * Anahtar CRM v3.30 · 14 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.29";
+export const SURUM = "3.30";
 export const TARIH = "14 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.29_14Ekim2026";
+export const DOSYA_EKI = "v3.30_14Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,26 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.30",
+    tarih: "14 Ekim 2026",
+    baslik: "Ana Sayfa'da Dikkat şeridi: süresi dolan ve yaklaşan kayıtlar en üstte, tek dokunuşla +30 ve Geri al; Benim ve ofisim tek satır; Acil talepler kısaldı",
+    degisenler: [
+      "Dikkat şeridi: selamlamanın hemen altında. Kırmızı = süresi dolan (eşleşmeden düşmüş), sarı = 5 gün içinde, gri = 14 gün içinde bitecek kayıt sayısı. Uyarı yoksa görünmez. Eskiden en alttaki özet gözden kaçıyordu.",
+      "\"Dolanlara +30 gün\" düğmesi şeridin içinde: süresi dolan kayıtlar tek dokunuşla eşleşmeye geri döner; yanlışlıkla basılırsa \"Geri al\" eski tarih ve durumu geri yükler. \"Gözden geçir\" Süresi yaklaşanlar ekranını açar.",
+      "Eşitleme çakışması uyarısı da şeride taşındı (ayrı sarı kutu kalktı).",
+      "★ Benim ve ofisim: telefonda dört kutu tek satır (eskiden 2×2) — Bugün panosu ekranın üst yarısına çıktı.",
+      "Acil talepler: ilk 3 görünür, başlıkta sayı ve \"Tümü\" düğmesi.",
+      "Geliştirme fikir raporu: docs/ANAHTAR_CRM_FIKIR_RAPORU_v3.30_14Ekim2026.md (araştırma ve öncelik sırası).",
+      "Veritabanı değişikliği yok.",
+    ],
+    testEt: [
+      "Ana Sayfa: en üstte sarı/kırmızı Dikkat şeridi; sayılar Süresi yaklaşanlar ekranıyla aynı olmalı.",
+      "Süresi dolan kayıt varken \"Dolanlara +30 gün\" → şerit kırmızıdan sarıya döner; \"Geri al\" → eski hâl.",
+      "Telefonda Benim ve ofisim kutuları tek satırda.",
+      "Acil talepler: 3 kart ve \"Tümü\".",
+    ],
+  },
   {
     surum: "3.29",
     tarih: "14 Ekim 2026",

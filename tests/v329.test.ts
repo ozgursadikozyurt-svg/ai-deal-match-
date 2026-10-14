@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026 — fazla oda bütçe içindeyse sunulur; "asansör / havuz şart" öldürücü; Barınaklar Bulvarı
+ * Anahtar CRM v3.30 · 14 Ekim 2026 — fazla oda bütçe içindeyse sunulur; "asansör / havuz şart" öldürücü; Barınaklar Bulvarı
  * (cadde / bulvar alt bölgesi şerittir); veritabanı yolu (Hyperdrive + yerleşim); Vercel otomatik yayını kapalı.
  */
 import { test } from "node:test";
@@ -21,8 +21,9 @@ const portfoy = (x: Partial<OnizlemeKayit>): OnizlemeKayit => ({ tip: "PORTFOY",
 const s = (t: OnizlemeKayit, p: OnizlemeKayit) => eslesmeOnizle(t, p, BAGLAM);
 
 test("sürüm 3.29 kaydı", () => {
-  assert.equal(SURUM, "3.29"); assert.equal(SURUM_GECMISI[0].surum, "3.29"); assert.equal(SURUM_GECMISI[1].surum, "3.28");
-  assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 4);
+  const k = SURUM_GECMISI.find((x) => x.surum === "3.29")!; // v3.30'dan beri en üstte değil
+  assert.ok(k); assert.equal(SURUM_GECMISI[SURUM_GECMISI.indexOf(k) + 1].surum, "3.28");
+  assert.ok((k.testEt ?? []).length >= 4);
 });
 
 test("oda: 3+1 talebe bütçe içindeki 4+1 / 5+1 Sunulabilir ama tam 3+1'in altında; eksik oda elenir", () => {

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.30 · 14 Ekim 2026 (v3.13'ten)
  * Demo veri deposu: örnek veriyi gerçek doğrulama + konum çözücüden geçirerek yükler,
  * kullanıcının değişikliklerini tarayıcıda (localStorage) saklar.
  */

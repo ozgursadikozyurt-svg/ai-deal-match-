@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026
+ * Anahtar CRM v3.30 · 14 Ekim 2026
  * Süre işleri: kartta "+30 gün" (süresi 5 gün ve altı kalanlarda), Ana Sayfa'da kısa "Süresi yaklaşanlar" özeti ve
  * ayrı "Süresi yaklaşanlar" ekranı (başında Toplu +30). ★ Benim kayıtlar süresizdir, bu listelere girmez.
  * Ayrıca kart açıklaması (kısaca, açılır kapanır).
@@ -39,6 +39,48 @@ export function SureOzeti() {
     <span><b>Süresi yaklaşanlar ({liste.length})</b><br /><small className="ipucu">{[dolan && `${dolan} süresi doldu`, bes - dolan > 0 && `${bes - dolan} kaydın 5 günden az süresi var`, "14 gün içinde"].filter(Boolean).join(" · ")}</small></span>
     <span className="btn kucuk">Listeyi aç · Toplu +30</span>
   </button>;
+}
+
+
+/**
+ * v3.30 — Dikkat şeridi: Ana Sayfa'nın en üstünde (selamlamanın hemen altında). Süresi dolan kayıtlar eşleşmeden düşer;
+ * en alttaki özet gözden kaçıyordu. Kırmızı = doldu, sarı = 5 gün içinde, gri = 14 gün içinde. "Dolanlara +30" tek dokunuşla,
+ * "Geri al" ile aynı oturumda eski tarihlerine döner. Uyarı yoksa hiç görünmez.
+ */
+export function DikkatSeridi({ ek }: { ek?: React.ReactNode }) {
+  const { d, guncelle, bildir, git } = useDepo();
+  const [geri, setGeri] = useState<Map<string, Kayit["veri"]> | null>(null);
+  const liste = sureListesi(d.kayitlar, 14);
+  const dolan = liste.filter((k) => (kalanGun(k.veri) ?? 1) <= 0);
+  const bes = liste.filter((k) => { const g = kalanGun(k.veri) ?? 99; return g > 0 && g <= 5; });
+  const ondort = liste.length - dolan.length - bes.length;
+  if (!liste.length && !ek && !geri) return null;
+  const dolanlaraUzat = () => {
+    const eski = new Map(dolan.map((k) => [k.id, k.veri]));
+    guncelle((x) => ({ ...x, kayitlar: x.kayitlar.map((k) => (eski.has(k.id) ? { ...k, veri: sureUzat(k.veri, UZAT) } : k)) }));
+    setGeri(eski); bildir(`${eski.size} kaydın süresi ${UZAT} gün uzatıldı — eşleşmeye geri döndüler`);
+  };
+  const geriAl = () => {
+    const eski = geri!; setGeri(null);
+    guncelle((x) => ({ ...x, kayitlar: x.kayitlar.map((k) => (eski.has(k.id) ? { ...k, veri: eski.get(k.id)! } : k)) }));
+    bildir("Uzatma geri alındı");
+  };
+  return <section className={cx("kart dikkat", dolan.length ? "kotu" : bes.length ? "uyari" : "notr")} aria-label="Dikkat">
+    <div className="dikkat-ust">
+      <b>{dolan.length ? "Süresi dolan kayıtlar eşleşmeden düştü" : liste.length ? "Süresi yaklaşan kayıtlar var" : "Dikkat"}</b>
+      {liste.length > 0 && <button type="button" className="btn kucuk" onClick={() => git({ ad: "suresi" })}>Gözden geçir</button>}
+    </div>
+    <div className="dikkat-cipler">
+      {dolan.length > 0 && <button type="button" className="dikkat-cip kotu" onClick={() => git({ ad: "suresi" })}><b>{dolan.length}</b> kaydın süresi doldu</button>}
+      {bes.length > 0 && <button type="button" className="dikkat-cip uyari" onClick={() => git({ ad: "suresi" })}><b>{bes.length}</b> kayıt 5 gün içinde bitiyor</button>}
+      {ondort > 0 && <button type="button" className="dikkat-cip" onClick={() => git({ ad: "suresi" })}><b>{ondort}</b> kayıt 14 gün içinde bitiyor</button>}
+      {ek}
+    </div>
+    {(dolan.length > 0 || geri) && <div className="satir sar">
+      {dolan.length > 0 && <button type="button" className="btn kucuk birincil" onClick={dolanlaraUzat}>Dolanlara +{UZAT} gün ({dolan.length})</button>}
+      {geri && <button type="button" className="btn kucuk" onClick={geriAl}>Geri al ({geri.size})</button>}
+    </div>}
+  </section>;
 }
 
 const ESIKLER: [number, string][] = [[5, "5 gün"], [14, "14 gün"], [30, "30 gün"]];

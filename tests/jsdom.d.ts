@@ -1,2 +1,2 @@
-// Anahtar CRM v3.29 · 14 Ekim 2026
+// Anahtar CRM v3.30 · 14 Ekim 2026
 declare module "jsdom";

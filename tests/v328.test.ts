@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026 — eşleştirme, kullanıcı geri bildirimiyle yeniden ayarlandı (34 "yanlış / fiyat", 11 "sunuldu"):
+ * Anahtar CRM v3.30 · 14 Ekim 2026 — eşleştirme, kullanıcı geri bildirimiyle yeniden ayarlandı (34 "yanlış / fiyat", 11 "sunuldu"):
  * ilçe sınırı ve konum tavanı, konutta oda öldürücü, aynı kişi, birim kira, kapalı alan tutarlılığı, Koşullu ≤ 84, bütçe aralığı;
  * kaydetme: küçük parçalar, geçici bağlantı hatasında yeniden deneme, konum ön denetimi.
  */

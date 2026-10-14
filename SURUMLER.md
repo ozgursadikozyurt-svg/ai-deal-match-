@@ -5,6 +5,23 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.30 · 14 Ekim 2026 — Ana Sayfa'da Dikkat şeridi: süresi dolan ve yaklaşan kayıtlar en üstte, tek dokunuşla +30 ve Geri al; Benim ve ofisim tek satır; Acil talepler kısaldı
+
+- Dikkat şeridi: selamlamanın hemen altında. Kırmızı = süresi dolan (eşleşmeden düşmüş), sarı = 5 gün içinde, gri = 14 gün içinde bitecek kayıt sayısı. Uyarı yoksa görünmez. Eskiden en alttaki özet gözden kaçıyordu.
+- "Dolanlara +30 gün" düğmesi şeridin içinde: süresi dolan kayıtlar tek dokunuşla eşleşmeye geri döner; yanlışlıkla basılırsa "Geri al" eski tarih ve durumu geri yükler. "Gözden geçir" Süresi yaklaşanlar ekranını açar.
+- Eşitleme çakışması uyarısı da şeride taşındı (ayrı sarı kutu kalktı).
+- ★ Benim ve ofisim: telefonda dört kutu tek satır (eskiden 2×2) — Bugün panosu ekranın üst yarısına çıktı.
+- Acil talepler: ilk 3 görünür, başlıkta sayı ve "Tümü" düğmesi.
+- Geliştirme fikir raporu: docs/ANAHTAR_CRM_FIKIR_RAPORU_v3.30_14Ekim2026.md (araştırma ve öncelik sırası).
+- Veritabanı değişikliği yok.
+
+**Demo'da test edilecekler**
+
+- [ ] Ana Sayfa: en üstte sarı/kırmızı Dikkat şeridi; sayılar Süresi yaklaşanlar ekranıyla aynı olmalı.
+- [ ] Süresi dolan kayıt varken "Dolanlara +30 gün" → şerit kırmızıdan sarıya döner; "Geri al" → eski hâl.
+- [ ] Telefonda Benim ve ofisim kutuları tek satırda.
+- [ ] Acil talepler: 3 kart ve "Tümü".
+
 ## v3.29 · 14 Ekim 2026 — Fazla oda bütçe içindeyse sunulur; 'asansör şart' / 'havuz şart' olmazsa olmaz; Barınaklar Bulvarı bağlandı; veritabanı bağlantısı Hyperdrive havuzundan
 
 - Oda: fazla oda artık elemez — fiyat bütçe içindeyse sunulur ('3+1 talebe 5+1, aynı bütçedeyse fazla odanın zararı yok'). Tam oda yine önde (bir fazla 0,9 · iki ve üstü 0,8 puan). Fiyatı bilinmiyorsa ya da talepte bütçe yoksa Koşullu: 'N oda fazla — bütçe içinde olduğu doğrulanamadı'. Eksik oda hâlâ elenir.

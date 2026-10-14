@@ -1,4 +1,4 @@
-// Anahtar CRM v3.29 · 14 Ekim 2026
+// Anahtar CRM v3.30 · 14 Ekim 2026
 // GET   /api/kisiler/:id → kişi kartı (bilgiler + bağlı talepler / portföyler)
 // PATCH /api/kisiler/:id → bilgileri güncelle
 import { prisma } from "@/lib/db";

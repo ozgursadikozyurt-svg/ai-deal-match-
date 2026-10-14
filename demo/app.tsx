@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026
+ * Anahtar CRM v3.30 · 14 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -22,7 +22,7 @@ import { KayitFormu } from "./form";
 import { VeriGirisi } from "./ice-aktarma";
 import { Konumlar } from "./konumlar";
 import { GorusmeNotlari } from "./notlar";
-import { SuresiYaklasanlar, SureOzeti, UzatDugmesi, Aciklama } from "./sure";
+import { DikkatSeridi, SuresiYaklasanlar, UzatDugmesi, Aciklama } from "./sure";
 import { GorevlerEkrani } from "./gorevler";
 import { kimOf } from "../src/lib/domain/kim";
 import { suresizMi, UZAT_ESIK_GUN } from "../src/lib/domain/gecerlilik";
@@ -80,9 +80,13 @@ function AnaSayfa({ donus }: { donus?: boolean } = {}) {
   const sahip = useSahiplik();
   const benimSay = (tip: "TALEP" | "PORTFOY", s: "BENIM" | "OFIS") => aktif.filter((k) => k.veri.tip === tip && sahip(k.veri).tur === s).length;
   const kisayol = (tip: "TALEP" | "PORTFOY", s: "BENIM" | "OFISIM") => git({ ad: "liste", tip, filtre: bosFiltre({ durumlar: ["ACTIVE"], sahiplik: s }) });
+  const cakismaSay = (d.cakismalar ?? []).filter((c) => notionAcik() || c.saglayici !== "NOTION").length;
+  const [acilHepsi, setAcilHepsi] = useState(false);
   const benimToplam = benimSay("TALEP", "BENIM") + benimSay("PORTFOY", "BENIM"), ofisToplam = benimSay("TALEP", "OFIS") + benimSay("PORTFOY", "OFIS");
   return <div className="yigin">
     <div className="karsilama"><h1>{(() => { const h = new Date().getHours(); return h < 11 ? "Günaydın" : h < 18 ? "İyi günler" : "İyi akşamlar"; })()} Özgür</h1></div>
+    {/* v3.30 — gözden kaçmasın: süre ve eşitleme uyarıları en üstte */}
+    <DikkatSeridi ek={cakismaSay > 0 ? <button type="button" className="dikkat-cip uyari" onClick={() => git({ ad: "baglantilar" })}><b>{cakismaSay}</b> eşitleme çakışması</button> : undefined} />
     <section className="kart benim-kisayol" aria-label="Benim ve ofisim">
       <div className="satir-ara"><h3>★ Benim ve ofisim</h3><button className="btn kucuk" onClick={() => git({ ad: "ayarlar" })}>{benimToplam + ofisToplam ? "Ayarla" : "Tanıt"}</button></div>
       {benimToplam + ofisToplam > 0 ? <div className="bk-izgara">
@@ -104,7 +108,6 @@ function AnaSayfa({ donus }: { donus?: boolean } = {}) {
         <Ikon ad="baglanti" /></button></Kapanir>;
     })()}
     <GelenKutusuKarti />
-    {(d.cakismalar ?? []).filter((c) => notionAcik() || c.saglayici !== "NOTION").length > 0 && <button className="uyari-kutu" onClick={() => git({ ad: "baglantilar" })} style={{ border: 0, cursor: "pointer", textAlign: "left" }}><b>{d.cakismalar.filter((c) => notionAcik() || c.saglayici !== "NOTION").length} eşitleme çakışması</b> seçiminizi bekliyor — Bağlantılar'da karar verin.</button>}
     <div className="istat">
       {([[aktif.filter((k) => k.veri.tip === "TALEP").length, "Aktif talep", () => git({ ad: "liste", tip: "TALEP" })], [aktif.filter((k) => k.veri.tip === "PORTFOY").length, "Aktif portföy", () => git({ ad: "liste", tip: "PORTFOY" })], [sunulabilir.length, "Sunulabilir eşleşme", () => git({ ad: "eslesmeler" })], [yaklasan.length, "14 gün içinde süresi dolacak", () => git({ ad: "suresi" })]] as const).map(([n, l, f]) =>
         <button key={l} className="istat-kutu" onClick={f}><b>{n}</b><span>{l}</span></button>)}
@@ -117,11 +120,10 @@ function AnaSayfa({ donus }: { donus?: boolean } = {}) {
     </section>
 
     {acil.length > 0 && <section>
-      <div className="bolum-bas"><h3>Acil talepler</h3></div>
-      {acil.map((k) => <KayitKart key={k.id} k={k} />)}
+      <div className="bolum-bas"><h3>Acil talepler ({acil.length})</h3>{acil.length > 3 && <button className="btn kucuk" onClick={() => setAcilHepsi(!acilHepsi)}>{acilHepsi ? "Daralt" : "Tümü"}</button>}</div>
+      {(acilHepsi ? acil : acil.slice(0, 3)).map((k) => <KayitKart key={k.id} k={k} />)}
     </section>}
 
-    <SureOzeti />
   </div>;
 }
 

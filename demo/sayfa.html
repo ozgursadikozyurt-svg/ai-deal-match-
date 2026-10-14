@@ -1082,6 +1082,18 @@ main.sarici>.genel-geri+*>h2:first-child{display:flex;align-items:center}
 .cip-ayrac{width:1px;align-self:stretch;background:var(--line);margin:0 2px}
 .d-aciklama{margin:4px 0 8px;white-space:pre-wrap;color:var(--fg);line-height:1.45}
 .gorev-grup .gorev-liste{margin-top:8px}
+/* ───── v3.30 · 14 Ekim 2026 — Dikkat şeridi ───── */
+.dikkat{display:flex;flex-direction:column;gap:8px;border-left:5px solid var(--line)}
+.dikkat.kotu{border-left-color:#d93636;background:color-mix(in srgb,#d93636 7%,var(--panel))}
+.dikkat.uyari{border-left-color:#e0a100;background:color-mix(in srgb,#e0a100 8%,var(--panel))}
+.dikkat-ust{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dikkat-cipler{display:flex;flex-wrap:wrap;gap:6px}
+.dikkat-cip{border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:99px;padding:4px 11px;font:inherit;font-size:.82rem;cursor:pointer}
+.dikkat-cip b{font-size:.95rem;margin-right:3px}
+.dikkat-cip.kotu{border-color:#d93636;color:#a31515}.dikkat-cip.uyari{border-color:#e0a100;color:#8a5200}
+@media (prefers-color-scheme:dark){.dikkat-cip.kotu{color:#ffb4b4}.dikkat-cip.uyari{color:#ffd98a}}
+/* v3.30 — Benim ve ofisim kutuları telefonda da tek satır (dört kutu): Bugün panosu ekranın üst yarısına çıkar */
+@media (max-width:520px){.benim-kisayol .bk-izgara{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.benim-kisayol .bk-oge{padding:7px 5px;align-items:center;text-align:center}.benim-kisayol .bk-oge b{font-size:1.1rem}.benim-kisayol .bk-oge span{font-size:.68rem;line-height:1.15}}
 </style>
 <div id="kok"></div>
 <noscript>Bu demo için JavaScript gereklidir.</noscript>

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026
+ * Anahtar CRM v3.30 · 14 Ekim 2026
  * v3.24 — veritabanlı: fotoğraf DOĞRUDAN yükleme. Sunucu yalnızca künyeyi yazar ve tek kullanımlık yükleme bağlantısı verir;
  * dosya baytları Worker'dan geçmez (Cloudflare ücretsiz plan 10 ms işlemci → 503). Depo taklit edilir.
  */

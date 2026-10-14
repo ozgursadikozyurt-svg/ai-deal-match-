@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026
+ * Anahtar CRM v3.30 · 14 Ekim 2026
  * "Bugün" panosu (görevler) ve İlgilenenler — SAF kurallar: arayüz, sunucu ve testler aynı kodu kullanır (ağ, depo, React yok).
  *
  * Fikir: danışman sisteme eşleşme aramak için değil, önündeki sıcak görevleri eritmek için girer. Görevlerin çoğunu sistem üretir:

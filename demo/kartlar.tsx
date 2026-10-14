@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.29 · 14 Ekim 2026
+ * Anahtar CRM v3.30 · 14 Ekim 2026
  * Demo — eşleşme kartı, eşleştirme tercihleri (eski "Talep DNA" kartı), kapatılabilir bilgi kutusu.
  */
 import React, { useState } from "react";
