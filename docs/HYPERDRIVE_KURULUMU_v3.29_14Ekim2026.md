@@ -1,6 +1,6 @@
 # Anahtar CRM — Hyperdrive kurulumu · v3.29 · 14 Ekim 2026
 
-**Amaç:** Worker ile Supabase arasındaki bağlantıyı Cloudflare Hyperdrive'ın bağlantı havuzundan geçirmek. Böylece her istekte yeniden TLS + kimlik doğrulama yapılmaz. Ayrıca Worker, veritabanının yanında (Frankfurt, AWS eu-central-1) çalışır. Hedef, kayıt süresini ve "Connection terminated unexpectedly" kopmalarını azaltmak.
+**Amaç:** Worker ile Supabase arasındaki bağlantıyı Cloudflare Hyperdrive'ın bağlantı havuzundan geçirmek. Böylece her istekte yeniden TLS + kimlik doğrulama yapılmaz. Hedef, kayıt süresini ve "Connection terminated unexpectedly" kopmalarını azaltmak.
 
 ## Yapılanlar
 
@@ -8,7 +8,7 @@
 |---|---|
 | Veritabanı rolü `hyperdrive_app` | Açıldı. Yalnızca `public` şemasında okuma ve yazma yetkisi var. RLS'yi `postgres` gibi atlar. En fazla 30 bağlantı. Şifre SCRAM özetiyle verildi; açık metin veritabanı günlüğüne düşmez. Sonradan açılan tablolar da varsayılan yetkilerle bu role açılır. |
 | Kod: `src/canli/veritabani.ts` | `HYPERDRIVE` bağlaması varsa onun bağlantı dizesini, yoksa `DATABASE_URL`'i kullanır. Hyperdrive hata verirse o Worker örneği 10 dakika doğrudan bağlantıya döner. Bu hatalar SQLSTATE 58000, "Failed to acquire a connection" ya da günlük sorgu sınırı olabilir. |
-| `wrangler.jsonc` › `placement.region: aws:eu-central-1` | Worker veritabanının yanında çalışır. Sorgu başına gidiş-dönüş ~30–50 ms'den ~1–3 ms'ye iner. Statik arayüz yine kullanıcıya en yakın merkezden gelir. |
+| `wrangler.jsonc` › `placement.region: aws:eu-central-1` | **Denendi, kaldırıldı.** Worker'ı veritabanının yanında çalıştırırdı (sorgu başına ~30–50 ms → ~1–3 ms) ama Cloudflare derlemesi bu ayarla düştü; ücretsiz planda desteklenmiyor olmalı. Ücretli plana geçilirse yeniden denenmeli. |
 | Hyperdrive yapılandırması `anahtarcrm-db` | Cloudflare panelinde oluşturulur (aşağıda). Önbellek **kapalı** olmalı. |
 | `wrangler.jsonc` › `hyperdrive` bağlaması | Yapılandırma kimliği belli olunca eklenir. Bağlama yokken uygulama eskisi gibi çalışır. |
 

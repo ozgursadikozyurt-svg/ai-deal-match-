@@ -5,12 +5,12 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
-## v3.29 · 14 Ekim 2026 — Fazla oda bütçe içindeyse sunulur; 'asansör şart' / 'havuz şart' olmazsa olmaz; Barınaklar Bulvarı bağlandı; veritabanı yolu hızlandı (Hyperdrive + Frankfurt)
+## v3.29 · 14 Ekim 2026 — Fazla oda bütçe içindeyse sunulur; 'asansör şart' / 'havuz şart' olmazsa olmaz; Barınaklar Bulvarı bağlandı; veritabanı bağlantısı Hyperdrive havuzundan
 
 - Oda: fazla oda artık elemez — fiyat bütçe içindeyse sunulur ('3+1 talebe 5+1, aynı bütçedeyse fazla odanın zararı yok'). Tam oda yine önde (bir fazla 0,9 · iki ve üstü 0,8 puan). Fiyatı bilinmiyorsa ya da talepte bütçe yoksa Koşullu: 'N oda fazla — bütçe içinde olduğu doğrulanamadı'. Eksik oda hâlâ elenir.
 - 'Asansör şart', 'havuz olmazsa olmaz', 'mutlaka asansörlü': talepte olmazsa olmaz işaretlenir (yeni kriterler: Asansör, Havuz). Asansörü olmadığı bilinen portföy elenir, bilinmeyen Koşullu. Talep formundaki 'şart / esnek / sorulacak' düğmelerine de eklendi. Yalnızca 'asansörlü' yazan talepte şart sayılmaz.
 - Barınaklar Bulvarı alt bölgesi Çağlayan ve Güzeloba'yı kapsıyor. Cadde / bulvar (Barınaklar, Işıklar) bir şerittir: portföy bulvarı kendisi belirtmişse tam uyum, yalnızca geçtiği mahallede ise Koşullu ve en fazla 80 ('bulvara yakınlığını sorun'). 'Fener, Barınaklar' talebine 'yanlış' dediğiniz üç Güzeloba dairesi bu yüzden 100 puan almıyor.
-- Veritabanı yolu: Cloudflare Hyperdrive (bağlantı havuzu, önbellek kapalı) ve Worker'ın veritabanının yanında (Frankfurt) çalışması. Hyperdrive hata verirse uygulama 10 dakika eski doğrudan bağlantıyla devam eder.
+- Veritabanı bağlantısı: Cloudflare Hyperdrive (bağlantı havuzu, önbellek kapalı) — her istekte yeniden bağlantı kurulmaz. Hyperdrive hata verirse uygulama 10 dakika eski doğrudan bağlantıyla devam eder.
 - Vercel: uygulama 3 Ekim'den (v3.14) beri Cloudflare'de; depoya bağlı eski Vercel projeleri her gönderimde derlemeye çalışıp başarısız oluyor ve e-posta atıyordu. Depoda Vercel otomatik yayını kapatıldı.
 
 **Demo'da test edilecekler**

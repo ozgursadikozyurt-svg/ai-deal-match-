@@ -1,6 +1,6 @@
 # Anahtar CRM — EK v3.29 · 14 Ekim 2026
 
-**Konu:** v3.28 sonrası geri bildirim. Fazla oda kuralı, "asansör / havuz şart", Barınaklar Bulvarı, Hyperdrive ve yerleşim, Vercel hata e-postaları.
+**Konu:** v3.28 sonrası geri bildirim. Fazla oda kuralı, "asansör / havuz şart", Barınaklar Bulvarı, Hyperdrive, Vercel hata e-postaları.
 
 ## 1. Kararlar (Özgür, 14 Eki 2026)
 
@@ -19,7 +19,7 @@
 | Asansör / havuz | `TeknikAlan` enum'una `ASANSOR`, `HAVUZ` eklendi (göç `20261014100000_v329_asansor_havuz`, canlıda uygulandı). Meta: `asansor → ASANSOR`, `havuz → HAVUZ`. "Şart" işaretlenip alan boş bırakılmışsa "istiyor" sayılır. Hızlı ayrıştırıcı "asansör şart / olmazsa olmaz / olmalı / zorunlu", "mutlaka / kesinlikle asansörlü" kalıplarını şart sayar; yalnızca "asansörlü" şart değildir. Yapay zekâ talimatı ve formdaki şart düğmeleri güncellendi. |
 | Barınaklar Bulvarı | Alt bölge 7 → Çağlayan (837) + Güzeloba (840); doğrulandı. Antalya OSB de doğrulandı. Canlı veri + tohum dosyası. |
 | Cadde / bulvar (TICARI_AKS) | Aks bir şerittir. Portföy aksı kendi konumunda ya da ilan metninde anıyorsa `ALT_BOLGE` (tam uyum). Yalnızca geçtiği mahalledeyse `AKS_MAHALLE`: oran 0,75, Koşullu, en fazla 80, "aksa yakınlığını sorun". Semt alt bölgeleri (Lara, Altınova…) değişmedi. |
-| Veritabanı yolu | `src/canli/veritabani.ts`: `HYPERDRIVE` bağlıysa o kullanılır, Hyperdrive hatasında 10 dakika `DATABASE_URL`. `placement.region: aws:eu-central-1`. Ayrı rol `hyperdrive_app`. Ayrıntı: `HYPERDRIVE_KURULUMU_v3.29_14Ekim2026.md`. |
+| Veritabanı yolu | `src/canli/veritabani.ts`: `HYPERDRIVE` bağlıysa o kullanılır, Hyperdrive hatasında 10 dakika `DATABASE_URL`. Ayrı rol `hyperdrive_app`. Ayrıntı: `HYPERDRIVE_KURULUMU_v3.29_14Ekim2026.md`. Worker'ı veritabanının yanına koyan `placement.region: aws:eu-central-1` denendi; Cloudflare derlemesi bu ayarla düştü (ücretsiz planda desteklenmiyor olmalı), kaldırıldı. |
 | Vercel | Uygulama v3.14'ten (3 Eki) beri Cloudflare'de. Depoya bağlı 5 eski Vercel projesi her gönderimde derlemeye çalışıp başarısız oluyor ve e-posta atıyordu (en az 5 Eki'den beri her işlemede). `vercel.json` → `git.deploymentEnabled: false`. |
 
 ## 3. Ölçüm (etiketli 62 eşleşme, v3.28 → v3.29)
