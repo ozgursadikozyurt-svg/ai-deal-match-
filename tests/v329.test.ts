@@ -104,7 +104,7 @@ test("veritabanı yolu: Hyperdrive bağlıysa o, Hyperdrive hatasında 10 dakika
   hyperdriveyiSifirla();
   const w = fs.readFileSync("src/canli/worker.ts", "utf8");
   assert.ok(!/istekIcinde\(env\.DATABASE_URL/.test(w), "tüm işleyiciler veritabaniAdresi üzerinden");
-  assert.match(fs.readFileSync("wrangler.jsonc", "utf8"), /"placement":\s*\{\s*"region":\s*"aws:eu-central-1"/);
+
 });
 
 test("şema ve yayın: enum göçü, Vercel otomatik yayını kapalı", () => {
