@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
+ * Anahtar CRM v3.31 · 15 Ekim 2026
  * GELEN KUTUSU — saf yardımcılar (ağ, veritabanı ve arayüz yok; sunucu, tarayıcı ve testler aynı kodu kullanır).
  *
  * Akış: dosya (WhatsApp .zip / .txt, Revy .xlsx, ya da bunları taşıyan e-posta) ham hâliyle saklanır →
@@ -32,7 +32,8 @@ const ZIP = [0x50, 0x4b, 0x03, 0x04];
 export function gelenTurOf(ad: string | null | undefined, bas?: Uint8Array | null, icerikTuru?: string | null): GelenTur | null {
   const u = (ad ?? "").toLowerCase().match(/\.([a-z0-9]{2,5})$/)?.[1];
   if (u === "xlsx" || u === "zip" || u === "csv" || u === "eml") return u;
-  if (u === "txt" || u === "md" || u === "tsv") return u === "tsv" ? "csv" : "txt";
+  // v3.31 — .html / .json WhatsApp dışa aktarımları metin olarak saklanır; biçimi ayrıştırıcı içerikten tanır
+  if (u === "txt" || u === "md" || u === "tsv" || u === "html" || u === "htm" || u === "json") return u === "tsv" ? "csv" : "txt";
   if (u) return null; // .jpg, .pdf, .opus, .vcf …
   const t = (icerikTuru ?? "").toLowerCase();
   if (/message\/rfc822/.test(t)) return "eml";
@@ -125,7 +126,7 @@ var ADRES = ${JSON.stringify(adres)};
 var ANAHTAR = ${JSON.stringify(kod)};
 var ETIKET = "AnahtarCRM";
 var KLASOR = "AnahtarCRM Gelen";
-var TURLER = /\\.(zip|txt|xlsx|csv)$/i;
+var TURLER = /\\.(zip|txt|md|html?|json|xlsx|csv)$/i;
 
 function kur() {
   ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === "anahtarCrmGonder") ScriptApp.deleteTrigger(t); });

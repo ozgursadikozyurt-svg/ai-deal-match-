@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
+ * Anahtar CRM v3.31 · 15 Ekim 2026
  * Gelen kutusu — veri katmanı. Ekran (demo/gelen-kutusu.tsx) yalnızca bu arayüzü bilir:
  *   canlıda dosyalar sunucudadır (/api/gelen; ham dosya Supabase Storage'da), demoda bu tarayıcıdadır (örnek dosyalarla başlar).
  * Atlananlar (aynı ilan yeniden sorulmasın diye hatırlanan anahtarlar) da buradan okunur / yazılır.
@@ -81,7 +81,7 @@ function demoDepo(): GelenDepo {
       const veri = new Uint8Array(await f.arrayBuffer());
       if (veri.length > GELEN_SINIR) throw new Error("Dosya 15 MB'tan büyük. WhatsApp'ta “Medya olmadan” dışa aktarın.");
       const tur = gelenTurOf(f.name, veri.subarray(0, 512), f.type);
-      if (!tur) throw new Error("Bu dosya türü okunmuyor. Desteklenenler: .zip, .txt, .xlsx, .csv, .eml");
+      if (!tur) throw new Error("Bu dosya türü okunmuyor. Desteklenenler: .zip, .txt, .html, .json, .xlsx, .csv, .eml");
       const s = demoOku(), kod = b64(veri);
       const var_ = s.dosyalar.find((x) => x.b64 === kod);
       if (var_) return { dosya: var_.kunye, yeni: false };

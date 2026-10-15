@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
+ * Anahtar CRM v3.31 · 15 Ekim 2026
  * v3.6 — veritabanlı uçtan uca senkron testleri (PGlite + sahte Google/Notion API'si):
  * ilk içe aktarma, tekrar çalıştırmada kopya oluşmaması, artımlı değişiklik, çakışma kaydı ve çözümü,
  * Notion'a geri yazım (yalnız uygulama alanları), Google'da silinen kişinin korunması, kilit.

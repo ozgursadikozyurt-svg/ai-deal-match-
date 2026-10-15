@@ -5,6 +5,26 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.31 · 15 Ekim 2026 — WhatsApp sohbeti artık .html ve .json dosyasıyla da içeri alınıyor; Kişiler'de birkaç harfle arama (sırasız kelimeler, Türkçe harf duyarsız, notlar ve telefon)
+
+- WhatsApp HTML dışa aktarımı (tarayıcı eklentisinin "Sohbet Dışa Aktarımı" sayfası) okunuyor: yazar, mesaj, fotoğraf açıklaması, zaman, konum. Grup adı dosyanın içindeki başlıktan alınır. Medyalı / silinen mesajlar ön filtrede ayıklanır, yazarı yazılmayan art arda mesajlar önceki yazara bağlanır, alıntılanan eski mesaj yanıtın metnine karışmaz.
+- WhatsApp JSON dışa aktarımı okunuyor: mesaj dizisi ya da { messages: [...] }; gövde / gönderen / zaman alanları farklı adlarla da tanınır (body, text, author, sender, timestamp, date…), "905…@c.us" numaraya çevrilir, kendi mesajlarınız "Ben" olarak görünür.
+- .html ve .json; Veri girişi › Dosya yükle › WhatsApp, Gelen kutusu (yükleme ve e-posta eki), .zip içi ve Gmail köprüsünde kabul edilir. Biçim dosya adından değil içerikten tanınır.
+- Örnek: 846 mesajlık "EMLAKÇILAR GRUBU ANTALYA" HTML dosyasından 817 mesaj okundu; 420 medya, 20 silinen, 75 kısa / emlak dışı, 71 tekrar ayıklandı, 231 ilan / talep adayı yapay zekâya gider.
+- Kişiler araması: birkaç harf yeter ve kelimeler ayrı ayrı aranır ("meh dep" → notunda "depo" geçen Mehmet). Türkçe harf duyarsız ("ozgur" = "Özgür", "kirdar" = "Kırdar").
+- Telefon: boşluk, tire, +90 ve baştaki 0 fark etmez ("0532 41", "532 41", "+90 532 41" aynı). Yalnız rakam yazılıp telefonda yoksa notlardaki sayıya bakılır ("2000" → "2000 m² depo").
+- Aranan alanlar: ad, şirket, telefonlar, e-posta, referans, kişi notu, WhatsApp grupları, roller ve talep / portföy görüşme notları ("kiminle" bu kişi seçilmişse).
+- Eşleşme kişi notunda ya da görüşme notundaysa kartta 📝 ile o cümleden kısa bir alıntı görünür.
+- Kayıt formundaki kişi seçici de aynı aramayı kullanır.
+- Veritabanı değişikliği yok.
+
+**Demo'da test edilecekler**
+
+- [ ] Veri girişi › Dosya yükle › WhatsApp sohbet dosyası › Dosya seç: EMLAKÇILAR GRUBU ANTALYA .html dosyasını seçin. Grup adı dosyadaki başlık olmalı; ön filtre tablosunda yaklaşık 817 mesaj / 231 aday.
+- [ ] Aynı dosyayı Gelen kutusuna bırakın: WhatsApp kaynaklı adaylar listelenmeli, "Yapay zekâyla oku" düğmesi çıkmalı.
+- [ ] Kişiler › Ara kutusuna bir kişinin adından 2–3 harf ve notundan bir kelime yazın (ör. "meh dep"): kişi listede, kartta 📝 alıntı.
+- [ ] Telefonun son 4–5 hanesini boşluklu yazın: kişi bulunmalı. "ozgur" yazın: "Özgür" bulunmalı.
+
 ## v3.30 · 14 Ekim 2026 — Ana Sayfa'da Dikkat şeridi: süresi dolan ve yaklaşan kayıtlar en üstte, tek dokunuşla +30 ve Geri al; Benim ve ofisim tek satır; Acil talepler kısaldı
 
 - Dikkat şeridi: selamlamanın hemen altında. Kırmızı = süresi dolan (eşleşmeden düşmüş), sarı = 5 gün içinde, gri = 14 gün içinde bitecek kayıt sayısı. Uyarı yoksa görünmez. Eskiden en alttaki özet gözden kaçıyordu.

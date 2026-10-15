@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
+ * Anahtar CRM v3.31 · 15 Ekim 2026
  * MulkOzellik kolonlarının meta sözlüğü.
  * - UI form/filtre bileşenleri, Gemini çıktı şeması ve eşleştirme motoru buradan beslenir.
  * - `karsilastirma`: talep ↔ portföy kıyas yönü

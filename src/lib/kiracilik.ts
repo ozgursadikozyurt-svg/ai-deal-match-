@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
+ * Anahtar CRM v3.31 · 15 Ekim 2026
  * ÇOK OFİSLİ ÇEKİRDEK (kiracılık / multi-tenancy).
  *
  * Tek Supabase veritabanında birden çok emlak ofisi barınır. Her ofise ait satırda "ofisId" vardır.

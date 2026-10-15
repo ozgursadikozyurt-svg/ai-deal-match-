@@ -1,6 +1,6 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
- * WhatsApp "Sohbeti dışa aktar" (.txt) ayrıştırıcı + ön filtre + tekrar ayıklama.
+ * Anahtar CRM v3.31 · 15 Ekim 2026
+ * WhatsApp "Sohbeti dışa aktar" (.txt / .md / v3.31: .html / .json) ayrıştırıcı + ön filtre + tekrar ayıklama.
  * Yapay zekâya gitmeden ÖNCE çalışır: gürültüyü ve aynı ilanın başka gruplardaki kopyalarını ayıklar,
  * böylece AI maliyeti ve kullanıcının onaylayacağı kayıt sayısı düşer.
  * Desteklenen satır biçimleri:
@@ -8,6 +8,8 @@
  *   iOS        : "[14.09.2026 09:15:23] Havva Erçelik: mesaj"
  *   İngilizce  : "9/14/26, 9:15 AM - Name: msg"  |  "14/09/2026, 09:15 - Name: msg"
  * Birden çok satıra yayılan mesajlar birleştirilir.
+ * v3.31 — tarayıcı eklentilerinin HTML dışa aktarımı (`<div class="message …">` blokları: yazar, gövde, açıklama, zaman damgası)
+ * ve JSON dışa aktarımı (mesaj dizisi; alan adları esnek okunur) aynı işleve verilir: biçim içerikten tanınır.
  */
 
 export type MesajDurumu = "ADAY" | "GURULTU" | "TEKRAR" | "ONCEKI"; // ONCEKI (v3.4): daha önce yapay zekâya gönderilmiş
@@ -72,7 +74,7 @@ function tarihYap(g: string, a: string, y: string, s: string, d: string, ampm: s
 
 /** Dosya adından grup adı: "WhatsApp Sohbeti - EMLAK BORSASI.txt" → "EMLAK BORSASI" */
 export function grupAdiOf(dosya: string): string {
-  const ad = dosya.replace(/\.(txt|zip)$/i, "").replace(/^.*[\\/]/, "");
+  const ad = dosya.replace(/\.(txt|md|zip|html?|json)$/i, "").replace(/^.*[\\/]/, "");
   const m = ad.match(/(?:WhatsApp (?:Sohbeti|Chat)(?: with)?\s*-?\s*)(.+)$/i);
   return (m ? m[1] : ad).replace(/^_chat$/i, "WhatsApp grubu").trim() || "WhatsApp grubu";
 }
@@ -81,6 +83,17 @@ export const metinParmakIzi = (m: string) => m.toLocaleLowerCase("tr").replace(/
 
 /** Tek bir dışa aktarım dosyasını mesajlara böler (durum henüz atanmamış) */
 export function sohbetiAyristir(icerik: string, dosya: string, grup = grupAdiOf(dosya)): Omit<WaMesaj, "durum" | "kopyalar">[] {
+  // v3.31 — HTML ve JSON dışa aktarımları içerikten tanınır (dosya uzantısına bakılmaz: e-posta eki / zip içi de olabilir)
+  const bas = icerik.replace(/^\uFEFF/, "").trimStart();
+  if (/^</.test(bas) && /<(html|body|div)\b/i.test(bas.slice(0, 5000))) {
+    if (/<div class="message\b/.test(icerik)) return htmlSohbetiAyristir(icerik, dosya, grup);
+    return sohbetiAyristir(htmlMetne(icerik), dosya, grup); // başka biçimli HTML: düz metne çevrilip satır satır okunur
+  }
+  if (/^[[{]/.test(bas)) {
+    let veri: unknown = undefined;
+    try { veri = JSON.parse(bas); } catch { /* JSON değil: düz metin olarak devam */ }
+    if (veri !== undefined) return jsonSohbetiAyristir(veri, dosya, grup);
+  }
   const satirlar = icerik.replace(/\r\n?/g, "\n").split("\n");
   // v3.18 — Markdown dışa aktarımı ayrı biçimde: "## 1 Haziran 2026" + "[9:42] **Ad:** metin"
   if (satirlar.filter((l) => MD_SATIR.test(l)).length >= 3) return mdSohbetiAyristir(satirlar, dosya, grup);
@@ -133,6 +146,122 @@ function mdSohbetiAyristir(satirlar: string[], dosya: string, grup: string): Omi
     }
     if (/^(#|---|Dışa aktarma)/.test(l)) { son = null; continue; }
     if (son && l.trim()) son.metin += "\n" + l;
+  }
+  for (const x of out) if (!x.telefon) { const t = x.metin.match(METIN_TEL); if (t) x.telefon = telNormalize(t[0]); }
+  return out;
+}
+
+// ───────── v3.31 — HTML ve JSON dışa aktarımları ─────────
+type HamMesaj = Omit<WaMesaj, "durum" | "kopyalar">;
+const VARLIK: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+/** HTML parçasını düz metne çevirir: <br> ve blok sonları satır olur, etiketler atılır, &amp; vb. çözülür */
+export function htmlMetne(h: string): string {
+  return h
+    .replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(div|p|li|tr|h\d)>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (t, k: string) => {
+      if (k[0] === "#") { const n = k[1] === "x" || k[1] === "X" ? parseInt(k.slice(2), 16) : Number(k.slice(1)); return Number.isFinite(n) ? String.fromCodePoint(n) : t; }
+      return VARLIK[k.toLowerCase()] ?? t;
+    })
+    .replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+/** "15.09.2026 14:35:38" | "2026-09-15T14:35:38Z" | 1757946938 (sn) | 1757946938000 (ms) → ISO */
+function tarihCoz(v: unknown): string | null {
+  if (v == null || v === "") return null;
+  if (typeof v === "number" || (typeof v === "string" && /^\d{9,13}$/.test(v.trim()))) {
+    const n = Number(v); if (!Number.isFinite(n) || n <= 0) return null;
+    return new Date(n < 1e11 ? n * 1000 : n).toISOString();
+  }
+  const s = String(v).trim();
+  const m = s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{2,4}),?\s+(\d{1,2}):(\d{2})(?::\d{2})?(?:\s?([AP]M))?/i);
+  if (m) return tarihYap(m[1], m[2], m[3], m[4], m[5], m[6]?.toUpperCase(), false);
+  const t = Date.parse(s);
+  return Number.isNaN(t) ? null : new Date(t).toISOString();
+}
+const MEDYA_TURU = /^(image|video|album|ptt|audio|document|sticker|gif|photo|voice)/i;
+/** Mesaj türüne göre ön filtrenin tanıdığı metin: medya → "<Medya dahil edilmedi>", silinen → "Bu mesaj silindi". null = atla (sistem mesajı) */
+function turMetni(tur: string, govde: string, konum?: string | null): string | null {
+  if (govde.trim()) return govde.trim();
+  if (/revoked|deleted/i.test(tur)) return "Bu mesaj silindi";
+  if (/location/i.test(tur) && konum) return `📍 Konum: ${konum}`;
+  if (MEDYA_TURU.test(tur)) return "<Medya dahil edilmedi>";
+  return null; // call_log, notification_template, unknown, e2e … ve boş mesajlar
+}
+/** "905335923008@c.us" → "+905335923008"; ad ise olduğu gibi */
+const gonderenTemizle = (s: string) => { const t = s.trim().replace(/@(c\.us|s\.whatsapp\.net|g\.us|lid)$/i, ""); return /^\d{10,13}$/.test(t) ? "+" + t : t; };
+
+/** v3.31 — HTML dışa aktarımı ("EMLAKÇILAR GRUBU ANTALYA - Sohbet Dışa Aktarımı" biçimi): her mesaj bir `<div class="message received|sent" data-type="…">` bloğu */
+function htmlSohbetiAyristir(icerik: string, dosya: string, grup: string): HamMesaj[] {
+  const baslik = icerik.match(/<title>([\s\S]*?)<\/title>/i)?.[1] ?? icerik.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1];
+  const ic = baslik ? htmlMetne(baslik).replace(/\s*-\s*(Sohbet Dışa Aktarımı|Chat Export).*$/i, "").trim() : "";
+  if (ic) grup = ic;
+  const parcalar = icerik.split(/<div class="message\b/).slice(1);
+  const out: HamMesaj[] = [];
+  let sonYazar = "";
+  let n = 0;
+  for (const ham of parcalar) {
+    const p = ham.replace(/<div class="quoted">[\s\S]*?<\/div>\s*<\/div>/g, ""); // alıntılanan eski mesaj bu mesajın metni değildir
+    const gonderildi = /^\s*sent\b/.test(p);
+    const tur = p.match(/data-type="([^"]*)"/)?.[1] ?? "chat";
+    const yazarH = p.match(/<div class="author">([\s\S]*?)<\/div>/)?.[1];
+    const yazar = gonderildi ? "Ben" : yazarH ? gonderenTemizle(htmlMetne(yazarH)) : sonYazar; // art arda mesajlarda yazar tekrar yazılmıyor
+    if (yazar && !gonderildi) sonYazar = yazar;
+    const govde = [p.match(/<div class="body">([\s\S]*?)<\/div>/)?.[1], p.match(/<div class="caption">([\s\S]*?)<\/div>/)?.[1]].filter(Boolean).map((x) => htmlMetne(x!)).join("\n");
+    const konum = p.match(/<div class="location">[\s\S]*?href="([^"]+)"/)?.[1] ?? null;
+    const metin = turMetni(tur, govde, konum);
+    if (metin == null) continue;
+    const tarih = tarihCoz(htmlMetne(p.match(/<div class="timestamp">([\s\S]*?)<\/div>/)?.[1] ?? ""));
+    out.push({ id: `${grup}#${++n}`, grup, dosya, tarih, gonderen: yazar || "Bilinmeyen", telefon: telNormalize(yazar), metin });
+  }
+  for (const x of out) if (!x.telefon) { const t = x.metin.match(METIN_TEL); if (t) x.telefon = telNormalize(t[0]); }
+  return out;
+}
+
+const ilkDeger = (o: Record<string, unknown>, anahtarlar: string[]): unknown => {
+  for (const a of anahtarlar) {
+    const v = a.split(".").reduce<unknown>((x, k) => (x && typeof x === "object" ? (x as Record<string, unknown>)[k] : undefined), o);
+    if (v != null && v !== "") return v;
+  }
+  return undefined;
+};
+/** Telegram tarzı parçalı metin: ["Merhaba ", { type: "bold", text: "3+1" }] → "Merhaba 3+1" */
+const metinBirlestir = (v: unknown): string => (typeof v === "string" ? v : Array.isArray(v) ? v.map((x) => (typeof x === "string" ? x : x && typeof x === "object" ? String((x as any).text ?? "") : "")).join("") : v == null ? "" : typeof v === "object" ? String((v as any).text ?? (v as any).body ?? "") : String(v));
+
+/**
+ * v3.31 — JSON dışa aktarımı. Kabul edilen kökler: mesaj dizisi · { messages | mesajlar | chat.messages | data | items: [...] }.
+ * Alanlar esnek okunur: gövde (body | text | message | content | caption | metin), gönderen (author | sender | from | senderName | name …),
+ * zaman (timestamp | time | date | datetime | t | tarih; saniye / milisaniye / "gg.aa.yyyy ss:dd" / ISO), fromMe → "Ben".
+ */
+function jsonSohbetiAyristir(veri: unknown, dosya: string, grup: string): HamMesaj[] {
+  const kok = (veri && typeof veri === "object" && !Array.isArray(veri) ? veri : {}) as Record<string, unknown>;
+  const dizi = (Array.isArray(veri) ? veri : ilkDeger(kok, ["messages", "mesajlar", "chat.messages", "data.messages", "data", "items", "msgs"])) as unknown;
+  if (!Array.isArray(dizi)) return [];
+  const ad = ilkDeger(kok, ["title", "chatName", "chat.name", "chat.title", "groupName", "group", "subject", "name", "grup"]);
+  if (typeof ad === "string" && ad.trim()) grup = ad.trim().replace(/\s*-\s*(Sohbet Dışa Aktarımı|Chat Export).*$/i, "");
+  const out: HamMesaj[] = [];
+  let sonYazar = "";
+  let n = 0;
+  for (const m of dizi) {
+    if (typeof m === "string") { if (m.trim()) out.push({ id: `${grup}#${++n}`, grup, dosya, tarih: null, gonderen: "Bilinmeyen", telefon: null, metin: m.trim() }); continue; }
+    if (!m || typeof m !== "object") continue;
+    const o = m as Record<string, unknown>;
+    const tur = String(ilkDeger(o, ["type", "tur", "messageType", "msgType"]) ?? "chat");
+    if (/^(service|system|notification|e2e|gp2|call_log|protocol)/i.test(tur) && !/notification_template/i.test(tur)) continue;
+    const benim = o.fromMe === true || o.isFromMe === true || o.sent === true || o.direction === "sent" || o.direction === "outgoing";
+    const yazarH = ilkDeger(o, ["author.name", "author.pushname", "sender.name", "sender.pushname", "senderName", "authorName", "pushname", "notifyName", "author", "sender", "from", "name", "gonderen"]);
+    const telH = ilkDeger(o, ["authorPhone", "senderPhone", "phone", "number", "author.number", "sender.number", "sender.phone", "author.id", "sender.id", "from_id"]);
+    const yazar = benim ? "Ben" : typeof yazarH === "string" && yazarH.trim() ? gonderenTemizle(yazarH) : sonYazar;
+    if (yazar && !benim) sonYazar = yazar;
+    const govde = [metinBirlestir(ilkDeger(o, ["body", "text", "message", "content", "metin", "mesaj"])), metinBirlestir(ilkDeger(o, ["caption", "aciklama"]))]
+      .map((x) => x.trim()).filter((x, i, a) => x && a.indexOf(x) === i).join("\n");
+    const konum = ilkDeger(o, ["location.url", "locationUrl", "mapsUrl"]) as string | undefined;
+    const lat = ilkDeger(o, ["lat", "latitude", "location.latitude"]), lng = ilkDeger(o, ["lng", "longitude", "location.longitude"]);
+    const metin = turMetni(tur, govde, konum ?? (lat != null && lng != null ? `https://www.google.com/maps?q=${lat},${lng}` : null));
+    if (metin == null) continue;
+    const tarih = tarihCoz(ilkDeger(o, ["timestamp", "time", "date", "datetime", "dateTime", "t", "tarih", "createdAt", "date_unixtime"]));
+    out.push({ id: `${grup}#${++n}`, grup, dosya, tarih, gonderen: yazar || "Bilinmeyen", telefon: telNormalize(typeof telH === "string" || typeof telH === "number" ? String(telH) : null) ?? telNormalize(yazar), metin });
   }
   for (const x of out) if (!x.telefon) { const t = x.metin.match(METIN_TEL); if (t) x.telefon = telNormalize(t[0]); }
   return out;

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
+ * Anahtar CRM v3.31 · 15 Ekim 2026
  * GELEN KUTUSU — "onay bekleyenler". E-postayla ya da yüklemeyle gelen dosyalardaki (Revy Excel dökümü, WhatsApp sohbet .zip / .txt)
  * her ilan / talep burada tek havuzda bekler; kullanıcı ekler ya da atlar. Hiçbir kayıt onaysız havuza girmez.
  *
@@ -321,7 +321,7 @@ export function GelenKutusu({ gomulu = false }: { gomulu?: boolean } = {}) {
         {k.dosyalar.length > 0 && !yukleniyor && <button className="btn gk-temizle" disabled={!!mesgul || temizle} onClick={() => setTemizle(true)}>Tümünü temizle…</button>}
       </div>
     </div>
-    <p className="ipucu gk-aciklama">Revy'den aldığınız Excel dökümü ve WhatsApp sohbet dosyaları burada <b>onayınızı bekler</b>. Dosyayı e-postayla gönderin ya da bu ekrana bırakın (.xlsx · .zip · .txt · .csv). Onaylamadığınız hiçbir kayıt havuza girmez.</p>
+    <p className="ipucu gk-aciklama">Revy'den aldığınız Excel dökümü ve WhatsApp sohbet dosyaları burada <b>onayınızı bekler</b>. Dosyayı e-postayla gönderin ya da bu ekrana bırakın (.xlsx · .zip · .txt · .html · .json · .csv). Onaylamadığınız hiçbir kayıt havuza girmez.</p>
     {kurulum && <EpostaKurulumu kapat={() => setKurulum(false)} />}
     {!k.depoAcik && <div className="uyari-kutu">Dosya deposu bu kurulumda kapalı; e-postayla gelen ve yüklenen dosyalar saklanamaz. (Cloudflare › SUPABASE_SERVICE_ROLE_KEY)</div>}
     {(hata || k.hata) && <div className="hata-kutu" role="alert">{hata ?? k.hata}{k.asama === "hata" && <> <button className="btn kucuk" onClick={() => void kutuYukle(d)}>Yeniden dene</button></>}</div>}

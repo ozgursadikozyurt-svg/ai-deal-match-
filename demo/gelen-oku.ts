@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
+ * Anahtar CRM v3.31 · 15 Ekim 2026
  * Gelen kutusu — HAM dosyayı tarayıcıda açar: e-posta (.eml) → ekler, .zip → içindeki sohbet / tablo dosyaları,
  * .txt → WhatsApp sohbeti (ya da başlıklı liste), .xlsx / .csv → tablo. Sonuç "parça" listesidir; adaylar demo/gelen-aday.ts'te çıkar.
  * Sunucu dosyayı açmaz (Cloudflare ücretsiz plan: 10 ms işlemci); bu dosya o işi kullanıcının cihazında yapar.
@@ -16,7 +16,7 @@ export type GelenParca =
   | { tur: "TABLO"; dosya: string; sayfalar: Sayfa[] };
 export interface AcilanDosya { parcalar: GelenParca[]; uyarilar: string[] }
 
-const OKUNUR = /\.(txt|md|xlsx|csv|tsv)$/i;
+const OKUNUR = /\.(txt|md|html?|json|xlsx|csv|tsv)$/i; // v3.31: .html / .json WhatsApp dışa aktarımı
 /** Açılmış hâli bu boyutu geçen tek dosya okunmaz (zip bombası / yanlışlıkla eklenmiş dev dosya) */
 const ACIK_SINIR = 60 * 1024 * 1024;
 const metinCoz = (v: Uint8Array) => new TextDecoder("utf-8").decode(v).replace(/^﻿/, "");
@@ -40,7 +40,7 @@ export async function gelenDosyayiAc(ad: string, tur: GelenTur, veri: Uint8Array
       if (excel) parcalar.push({ tur: "TABLO", dosya: ad, sayfalar: dosyaOku(ad.replace(/\.zip$/i, "") + ".xlsx", veri) }); // adı .zip olan Excel
       else {
         for (const [ic, bayt] of Object.entries(z)) {
-          if (/\.(txt|md)$/i.test(ic)) parcalar.push(metniAc(`${ad} › ${ic}`, strFromU8(bayt).replace(/^﻿/, ""), grupAdiOf(/_chat\.txt$/i.test(ic) ? ad : ic)));
+          if (/\.(txt|md|html?|json)$/i.test(ic)) parcalar.push(metniAc(`${ad} › ${ic}`, strFromU8(bayt).replace(/^﻿/, ""), grupAdiOf(/_chat\.txt$/i.test(ic) ? ad : ic)));
           else if (/\.(xlsx|csv|tsv)$/i.test(ic)) parcalar.push({ tur: "TABLO", dosya: `${ad} › ${ic}`, sayfalar: dosyaOku(ic, bayt) });
         }
         if (!parcalar.length) uyarilar.push(atlanan ? `Zip içinde okunacak sohbet / tablo yok (${atlanan} medya dosyası atlandı)` : "Zip boş");

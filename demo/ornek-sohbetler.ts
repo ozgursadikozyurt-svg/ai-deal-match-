@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
+ * Anahtar CRM v3.31 · 15 Ekim 2026
  * Demo için iki örnek WhatsApp dışa aktarım dosyası (kurgusal kişiler) ve bu mesajlar için
  * hazır yapay zekâ çıktıları. Yapay zekâ kullanılamayan görünümlerde içe aktarma akışını
  * uçtan uca denemek için kullanılır. Gerçek dosyalarda ayrıştırmayı yapay zekâ yapar.

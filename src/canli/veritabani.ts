@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
+ * Anahtar CRM v3.31 · 15 Ekim 2026
  * VERİTABANI YOLU — Cloudflare Hyperdrive bağlıysa (wrangler.jsonc › hyperdrive, bağlama adı HYPERDRIVE) sorgular onun bağlantı
  * havuzundan geçer; bağlı değilse eskisi gibi DATABASE_URL (Supabase Supavisor). Hyperdrive kendi hatasını verirse (SQLSTATE 58000,
  * günlük sorgu sınırı — ücretsiz planda 100.000 / gün —, havuz dolu, köken bağlantısı reddedildi) bu Worker örneği 10 dakika doğrudan

@@ -1,5 +1,6 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026 (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
+ * Anahtar CRM v3.31 · 15 Ekim 2026 (v3.31: hoşgörülü arama — birkaç harf, sırasız kelimeler, Türkçe harf duyarsız, notlar ve telefon rakamları)
+ * (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
  * v3.21 — çift yönlü Google: elle eklenen kişi ve bağlı kişideki düzeltme "Google'a gönderilecek" olur; silinen kişi Google'dan silinmez.
  * Demo — Kişiler: kişi seçici (yazdıkça arama, çoklu seçim, rol, + ile anında ekleme), kişi listesi ve kişi kartı.
  * Alanlar Notion "Müşteri-Yatırımcılar-Kişiler" tablosuna göre (ROL, Phone, Açıklama, Referans, ilişkili talep/portföy).
@@ -20,6 +21,7 @@ import { demoGoogleSenkron, demoGoogleSilinenler } from "./senkron-demo";
 import { gonderimAlaniDegisti } from "../src/lib/google/kisiler";
 import { notionAcik } from "../src/lib/ozellikler";
 import { googleEsitle, ozetCumlesi } from "./google-baglanti";
+import { aramaIndeksi, aramaSorgusu, aramaEslesir, aramaNormalize, alintiBul, type AramaIndeksi, type AramaSorgusu } from "../src/lib/arama";
 import { SiralaDugmesi, kisiSiralama, siralaUygula, type Siralama } from "./filtre";
 
 /** v3.7 — Ara + WhatsApp (WhatsApp Business kuruluysa onunla açılır) */
@@ -85,8 +87,8 @@ export function KisiSecici({ secili, degis, varsayilanRol = "DIGER", oneri }: { 
   const [acik, setAcik] = useState(false);
   const [yeni, setYeni] = useState<{ adSoyad: string; telefon: string; rol: string } | null>(null);
   const kutu = useRef<HTMLInputElement>(null);
-  const ql = q.toLocaleLowerCase("tr"), qt = q.replace(/\D/g, "");
-  const liste = useMemo(() => q.trim().length < 1 ? d.kisiler.slice(0, 6) : d.kisiler.filter((k) => k.adSoyad.toLocaleLowerCase("tr").includes(ql) || (k.sirket ?? "").toLocaleLowerCase("tr").includes(ql) || (qt.length >= 3 && (k.telefon ?? "").includes(qt))).slice(0, 8), [q, d.kisiler]);
+  // v3.31 — birkaç harf yeter, kelime sırası önemsiz, Türkçe harf duyarsız; ad, şirket, telefon, not ve referansta aranır
+  const liste = useMemo(() => { const s = aramaSorgusu(q); return s.bos ? d.kisiler.slice(0, 6) : d.kisiler.filter((k) => aramaEslesir(ixOf(k), s)).slice(0, 8); }, [q, d.kisiler]);
   const ekle = (kisiId: string, rol = varsayilanRol) => { if (!secili.some((b) => b.kisiId === kisiId)) degis([...secili, { kisiId, rol }]); setQ(""); setAcik(false); };
   const oneriKisi = oneri?.telefon ? d.kisiler.find((k) => k.telefon === telNormalize(oneri.telefon)) : undefined;
   return <div className="kisi-secici">
@@ -141,7 +143,14 @@ export function Kisiler() {
   const [sr, setSr] = useKalici<Siralama>("kisiler.sr", { alan: "ad", yon: "artan" });
   const [limit, setLimit] = useKalici<number>("kisiler.limit", KISI_SAYFA);
   const qGec = useDeferredValue(q);                 // yazarken kutu anında, 7.800 kişilik süzme arkadan gelir
-  const ql = qGec.toLocaleLowerCase("tr");
+  const sorgu = useMemo(() => aramaSorgusu(qGec), [qGec]);   // v3.31
+  // v3.31 — talep / portföy görüşme notlarında "kiminle" seçilmiş kişi bu notlarla da bulunur
+  const gorusme = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const ky of d.kayitlar) for (const n of ky.notlar ?? []) if (n.kisiId && n.metin) m.set(n.kisiId, (m.get(n.kisiId) ?? "") + " \n " + n.metin);
+    return m;
+  }, [d.kayitlar]);
+  const gorusmeNorm = useMemo(() => new Map([...gorusme].map(([id, t]) => [id, aramaNormalize(t)])), [gorusme]);
   const sayilar = useMemo(() => {
     const m = new Map<string, { n: number; t: number; p: number }>();
     for (const ky of d.kayitlar) {
@@ -158,18 +167,21 @@ export function Kisiler() {
   const kSay = (id: string) => kayitSay(id);
   const kaynakTutar = (k: Kisi, x: string) => (x === "GOOGLE" ? !!k.googleResourceName : x === "NOTION" ? !!k.notionId : kaynakOf(k) === x);
   const liste = useMemo(() => d.kisiler.filter((k) => {
-    if (qGec) {
+    if (!sorgu.bos) {
       // v3.15: arama ad, şirket, telefonlar, e-posta, referans, not ve rol adlarında (v3.22.2: kişi başına metin bir kez üretilir)
-      const ham = k.roller.length ? `${hamOf(k)} ${k.roller.map((r) => rolAd(r)).join(" ").toLocaleLowerCase("tr")}` : hamOf(k);
-      const rakam = qGec.replace(/\D/g, "");
-      if (!ham.includes(ql) && !(rakam.length >= 3 && `${k.telefon ?? ""}${k.ikincilTelefon ?? ""}`.includes(rakam))) return false;
+      // v3.31: her kelime ayrı ayrı (sırasız, birkaç harf yeter), Türkçe harf duyarsız; görüşme notları ve WhatsApp grupları da dahil
+      const ix = ixOf(k);
+      if (!aramaEslesir(ix, sorgu)) {
+        const ek = `${k.roller.length ? aramaNormalize(k.roller.map((r) => rolAd(r)).join(" ")) : ""} ${gorusmeNorm.get(k.id) ?? ""}`;
+        if (ek.length < 3 || !aramaEslesir({ metin: `${ix.metin} ${ek}`, rakam: ix.rakam }, sorgu)) return false;
+      }
     }
     if (roller.length) { const rolsuz = roller.includes(ROLSUZ) && !k.roller.length; if (!rolsuz && !k.roller.some((r) => roller.includes(r))) return false; }
     if (kaynaklar.length && !kaynaklar.some((x) => kaynakTutar(k, x))) return false;
     if (bag === "YOK" ? kayitSay(k.id) > 0 : bag ? kayitSay(k.id, bag) === 0 : false) return false;
     if ((tel === "VAR" && !k.telefon) || (tel === "YOK" && k.telefon)) return false;
     return true;
-  }), [d.kisiler, qGec, roller, kaynaklar, bag, tel, sayilar]); // eslint-disable-line react-hooks/exhaustive-deps
+  }), [d.kisiler, sorgu, gorusmeNorm, roller, kaynaklar, bag, tel, sayilar]); // eslint-disable-line react-hooks/exhaustive-deps
   const siralamaSecenekleri = useMemo(() => kisiSiralama((id) => sayilar.get(id)?.n ?? 0), [sayilar]);
   const sirali = useMemo(() => siralaUygula(liste, sr, siralamaSecenekleri), [liste, sr, siralamaSecenekleri]);
   const gorunen = sirali.length > limit ? sirali.slice(0, limit) : sirali;
@@ -219,7 +231,7 @@ export function Kisiler() {
       <div className="alan"><label htmlFor="nk-tel">Telefon</label><TelGirdisi id="nk-tel" deger={yeni.telefon} onChange={(v) => setYeni({ ...yeni, telefon: v })} /></div>
       <div className="alan"><label htmlFor="nk-rol">Rol</label><select id="nk-rol" value={yeni.rol} onChange={(e) => setYeni({ ...yeni, rol: e.target.value })}><option value="">—</option>{KISI_ROLLERI.map(([r, l]) => <option key={r} value={r}>{l}</option>)}</select></div>
     </div><div className="satir"><button className="btn birincil" disabled={yeni.adSoyad.trim().length < 2 || !!telUyarisi(yeni.telefon)} onClick={() => { const id = kisiEkle(guncelle, d, { elle: true, adSoyad: yeni.adSoyad, telefon: yeni.telefon, roller: yeni.rol ? [yeni.rol] : [] }); setYeni({ adSoyad: "", telefon: "", rol: "" }); setYeniAcik(false); git({ ad: "kisi", id }); }}>Ekle ve kartı aç</button></div></div>}
-    <div className="fc"><div className="fc-ara"><span aria-hidden="true">⌕</span><input type="search" aria-label="Kişi ara" placeholder="Ara: ad, şirket, telefon, e-posta, rol, not…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+    <div className="fc"><div className="fc-ara"><span aria-hidden="true">⌕</span><input type="search" aria-label="Kişi ara" placeholder="Ara: birkaç harf yeter — ad, telefon, not, şirket…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       <button type="button" className={cx("fc-btn", filtreSayisi > 0 && "on")} onClick={() => setFiltreAcik(!filtreAcik)} aria-expanded={filtreAcik}>Filtrele{filtreSayisi > 0 && <b className="fc-rozet">{filtreSayisi}</b>}</button>
       <SiralaDugmesi secenekler={kisiSiralama(kSay)} s={sr} set={setSr} /></div>
     {/* v3.16 — dağınık çip satırları tek "Filtrele" menüsünde toplandı (rol · kaynak · kayıt · telefon) */}
@@ -260,6 +272,7 @@ export function Kisiler() {
         {secimModu && <input type="checkbox" aria-label={`${k.adSoyad} seç`} checked={secili.has(k.id)} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} onChange={() => degisSec(k.id)} />}
         <div className="avatar">{k.adSoyad[0]?.toLocaleUpperCase("tr")}</div>
         <div className="kisi-bilgi"><b>{k.adSoyad}</b>{k.sirket && <div className="kk-alt">{k.sirket}</div>}<div className="kk-alt">{telYaz(k.telefon)}</div>
+          <NotAlintisi k={k} sorgu={sorgu} gorusme={gorusme.get(k.id)} />
           <div className="pill-satir"><KaynakRozeti k={k} />{k.roller.map((r) => <Pill key={r}>{rolAd(r)}</Pill>)}{!!sy?.t && <Pill ton="mavi">{sy.t} talep</Pill>}{!!sy?.p && <Pill ton="yesil">{sy.p} portföy</Pill>}</div></div>
         <button className="btn kucuk" aria-label={`${k.adSoyad} hızlı düzenle`} onKeyDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setDuzenId(duzenId === k.id ? null : k.id); }}><span aria-hidden="true">✎</span><span className="kisi-duzen-yazi"> Düzenle</span></button>
         <IletisimDugmeleri tel={k.telefon} ad={k.adSoyad} kucuk />
@@ -275,9 +288,21 @@ export function Kisiler() {
 const ROLSUZ = "__ROLSUZ";
 /** v3.22.2 — Kişiler listesi bu kadarlık parçalarla çizilir (7.800 kartın hepsi birden DOM'a girince telefon donuyordu) */
 const KISI_SAYFA = 60;
-/** Arama metni kişi başına bir kez üretilir (kişi nesnesi değişmedikçe); rol adları ayrıca eklenir (özel roller yeniden adlandırılabilir) */
-const HAM_METIN = new WeakMap<Kisi, string>();
-const hamOf = (k: Kisi): string => { let h = HAM_METIN.get(k); if (h === undefined) { h = `${k.adSoyad} ${k.telefon ?? ""} ${k.ikincilTelefon ?? ""} ${k.sirket ?? ""} ${k.email ?? ""} ${k.referans ?? ""} ${k.notlar ?? ""}`.toLocaleLowerCase("tr"); HAM_METIN.set(k, h); } return h; };
+/** Arama dizini kişi başına bir kez üretilir (kişi nesnesi değişmedikçe); rol adları ve görüşme notları ayrıca eklenir (özel roller yeniden adlandırılabilir) */
+const ARAMA_IX = new WeakMap<Kisi, AramaIndeksi>();
+const ixOf = (k: Kisi): AramaIndeksi => {
+  let h = ARAMA_IX.get(k);
+  if (h === undefined) { h = aramaIndeksi([k.adSoyad, k.sirket, k.email, k.referans, k.notlar, k.telefon, k.ikincilTelefon, ...(k.whatsappGruplari ?? [])], [k.telefon, k.ikincilTelefon]); ARAMA_IX.set(k, h); }
+  return h;
+};
+/** v3.31 — arama ad / şirkette değil de kişi notunda ya da görüşme notunda bulunduysa kartta o cümleden kısa bir alıntı gösterilir */
+function NotAlintisi({ k, sorgu, gorusme }: { k: Kisi; sorgu: AramaSorgusu; gorusme?: string }) {
+  if (sorgu.bos || !sorgu.kelimeler.length) return null;
+  const ust = aramaNormalize(`${k.adSoyad} ${k.sirket ?? ""}`);
+  if (sorgu.kelimeler.every((w) => ust.includes(w))) return null;
+  const a = alintiBul(k.notlar, sorgu) ?? alintiBul(k.referans, sorgu) ?? alintiBul(gorusme, sorgu);
+  return a ? <div className="kk-alt kk-alinti" style={{ fontStyle: "italic", opacity: 0.85 }}>📝 {a}</div> : null;
+}
 
 /** v3.15 — listeden çıkmadan hızlı düzenleme: ad, telefon, şirket, e-posta, roller */
 function HizliDuzen({ k, kapat }: { k: Kisi; kapat: () => void }) {

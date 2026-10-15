@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
+ * Anahtar CRM v3.31 · 15 Ekim 2026
  * GELEN KUTUSU — sunucu tarafı. Sunucu dosyayı AÇMAZ: türüne bakar, özetini alır, depoya koyar, künyesini yazar.
  * Ayrıştırma (zip açma, Excel okuma, e-posta eklerini çıkarma, mükerrer denetimi) tarayıcıda yapılır —
  * Cloudflare ücretsiz planda istek başına 10 ms işlemci süresi vardır; 1.000 satırlık bir Excel'i sunucuda okumak 503 üretir.
@@ -36,7 +36,7 @@ export async function gelenKaydet(prisma: PrismaClient, g: GelenGirdi, depo: Gel
   if (!g.veri.byteLength) throw new GelenHatasi("BOS", "Dosya boş", 422);
   if (g.veri.byteLength > GELEN_SINIR) throw new GelenHatasi("BUYUK", `Dosya ${Math.round(GELEN_SINIR / 1048576)} MB'tan büyük. WhatsApp'ta “Medya olmadan” dışa aktarın.`, 413);
   const tur = gelenTurOf(g.ad, g.veri.subarray(0, 512), g.icerikTuru);
-  if (!tur) throw new GelenHatasi("TUR", "Bu dosya türü okunmuyor. Desteklenenler: .zip, .txt, .xlsx, .csv, .eml", 415);
+  if (!tur) throw new GelenHatasi("TUR", "Bu dosya türü okunmuyor. Desteklenenler: .zip, .txt, .html, .json, .xlsx, .csv, .eml", 415);
   const ozet = onaltilik(await crypto.subtle.digest("SHA-256", g.veri as BufferSource));
   const var_ = await prisma.gelenDosya.findFirst({ where: { ozet } });
   if (var_) return { dosya: kunye(var_), yeni: false };

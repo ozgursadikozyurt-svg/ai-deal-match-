@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026
+ * Anahtar CRM v3.31 · 15 Ekim 2026
  * v3.23 — GELEN KUTUSU (onay bekleyenler): dosya türü, e-posta / zip / Excel açma, Revy dökümü eşlemesi, mükerrer denetimi,
  * tarihe göre gruplama, toplu ekle / atla / temizle, Gmail köprüsü betiği; ekran (JSDOM).
  * Yan düzeltmeler: "otoparklı" / "müstakil tapu" şemadan dönmez; arsa "Mülk türü" imardır; başlıkta "devren" → devir bedeli.

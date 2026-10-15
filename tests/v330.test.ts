@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.30 · 14 Ekim 2026 — Dikkat şeridi (Ana Sayfa en üstü): süresi dolan / 5 gün / 14 gün, Dolanlara +30 ve Geri al
+ * Anahtar CRM v3.31 · 15 Ekim 2026 — Dikkat şeridi (Ana Sayfa en üstü): süresi dolan / 5 gün / 14 gün, Dolanlara +30 ve Geri al
  */
 import { test as nodeTest } from "node:test";
 import assert from "node:assert/strict";
@@ -22,7 +22,7 @@ const ctx = (d0: DepoDurumu) => { const c: any = { d: d0, guncelle: (f: any) => 
 const test = (ad: string, f: () => unknown | Promise<unknown>) => nodeTest(ad, async () => { kaliciHepsiniSil(); await f(); });
 const kayitlar = () => ornek.kayitlar.map((k, i) => ({ ...k, veri: { ...k.veri, durum: (i < 2 ? "EXPIRED" : "ACTIVE") as any, validUntil: i < 2 ? gun(-3) : i === 2 ? gun(4) : gun(200) } }));
 
-test("sürüm 3.30 ve fikir raporu", () => { assert.equal(SURUM, "3.30"); assert.equal(SURUM_GECMISI[0].surum, "3.30"); assert.ok(fs.existsSync("docs/ANAHTAR_CRM_FIKIR_RAPORU_v3.30_14Ekim2026.md")); });
+test("sürüm 3.30 ve fikir raporu", () => { assert.ok(SURUM >= "3.30"); assert.ok(SURUM_GECMISI.some((x) => x.surum === "3.30")); /* v3.31'den beri en üstte değil */ assert.ok(fs.existsSync("docs/ANAHTAR_CRM_FIKIR_RAPORU_v3.30_14Ekim2026.md")); });
 
 test("Dikkat şeridi en üstte: selamlamanın hemen ardından, Benim kartından önce; dolan + 5 gün sayıları", async () => {
   const e = await ac(React.createElement(AnaSayfa), ctx(durum(kayitlar())));
