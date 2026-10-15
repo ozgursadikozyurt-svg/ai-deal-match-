@@ -8,6 +8,9 @@
   "assets": { "directory": "dist/canli", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"], "binding": "ASSETS" },
   // v3.22.2 — üçüncü zamanlayıcı GÜNDE BİR: 05:00 UTC (TR 08:00) Google Kişiler eşitlemesi (Google'ı bağlı ofisler; bağlı ofis yoksa hiçbir şey yapmaz).
   // Eskiden her 15 dakikaydı; Cloudflare ücretsiz planda CPU sınırını aşıp 503 veriyordu. Anlık ihtiyaç: Kişiler › "Google ile eşitle".
+  // v3.29 — Hyperdrive bağlantı havuzu (yapılandırma "anahtarcrm-db", önbellek KAPALI). Kaynak: Supabase Session pooler (5432).
+  // Hata olursa src/canli/veritabani.ts 10 dakika DATABASE_URL'e döner; bu satırı silmek de eski yola döndürür.
+  "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "70c7b0afc33d412cb0ecb4a612096c88" }],
   "triggers": { "crons": ["0 3 * * *", "0 4 * * sun", "0 5 * * *"] },
   "observability": { "enabled": true },
   // v3.17 — Cloudflare panelinden (Settings → Variables and Secrets) elle girilen değişkenler her yayında silinmesin.

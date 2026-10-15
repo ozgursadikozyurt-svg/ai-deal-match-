@@ -9,8 +9,8 @@
 | Veritabanı rolü `hyperdrive_app` | Açıldı. Yalnızca `public` şemasında okuma ve yazma yetkisi var. RLS'yi `postgres` gibi atlar. En fazla 30 bağlantı. Şifre SCRAM özetiyle verildi; açık metin veritabanı günlüğüne düşmez. Sonradan açılan tablolar da varsayılan yetkilerle bu role açılır. |
 | Kod: `src/canli/veritabani.ts` | `HYPERDRIVE` bağlaması varsa onun bağlantı dizesini, yoksa `DATABASE_URL`'i kullanır. Hyperdrive hata verirse o Worker örneği 10 dakika doğrudan bağlantıya döner. Bu hatalar SQLSTATE 58000, "Failed to acquire a connection" ya da günlük sorgu sınırı olabilir. |
 | `wrangler.jsonc` › `placement.region: aws:eu-central-1` | **Denendi, kaldırıldı.** Worker'ı veritabanının yanında çalıştırırdı (sorgu başına ~30–50 ms → ~1–3 ms) ama Cloudflare derlemesi bu ayarla düştü; ücretsiz planda desteklenmiyor olmalı. Ücretli plana geçilirse yeniden denenmeli. |
-| Hyperdrive yapılandırması `anahtarcrm-db` | Cloudflare panelinde oluşturulur (aşağıda). Önbellek **kapalı** olmalı. |
-| `wrangler.jsonc` › `hyperdrive` bağlaması | Yapılandırma kimliği belli olunca eklenir. Bağlama yokken uygulama eskisi gibi çalışır. |
+| Hyperdrive yapılandırması `anahtarcrm-db` | Oluşturuldu (15 Eki 2026), kimlik `70c7b0af…`. Kaynak: Supabase Session pooler (`aws-1-eu-central-1.pooler.supabase.com:5432`), kullanıcı `postgres.<proje>` (`hyperdrive_app` değil; paneldeki form bu kullanıcıyla kaydedildi, bağlantı doğrulandı). Önbellek **kapatıldı**. |
+| `wrangler.jsonc` › `hyperdrive` bağlaması | Eklendi (15 Eki 2026). Silinirse uygulama eskisi gibi çalışır. |
 
 ## Paneldeki adım
 
