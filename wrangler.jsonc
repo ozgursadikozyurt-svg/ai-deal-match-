@@ -10,7 +10,9 @@
   // Eskiden her 15 dakikaydı; Cloudflare ücretsiz planda CPU sınırını aşıp 503 veriyordu. Anlık ihtiyaç: Kişiler › "Google ile eşitle".
   // v3.29 — Hyperdrive bağlantı havuzu (yapılandırma "anahtarcrm-db", önbellek KAPALI). Kaynak: Supabase Session pooler (5432).
   // Hata olursa src/canli/veritabani.ts 10 dakika DATABASE_URL'e döner; bu satırı silmek de eski yola döndürür.
-  "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "70c7b0afc33d412cb0ecb4a612096c88" }],
+  // 17 Ekim 2026 — KALDIRILDI: 12:33'ten sonra Hyperdrive kökene (Session pooler) yeni bağlantı açmadı, oturum açılışı 503 verdi.
+  // Uygulama yeniden doğrudan DATABASE_URL (Supavisor) ile çalışıyor. Yapılandırma (anahtarcrm-db) Cloudflare'de duruyor;
+  // yeniden denemek için: "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "70c7b0afc33d412cb0ecb4a612096c88" }],
   "triggers": { "crons": ["0 3 * * *", "0 4 * * sun", "0 5 * * *"] },
   "observability": { "enabled": true },
   // v3.17 — Cloudflare panelinden (Settings → Variables and Secrets) elle girilen değişkenler her yayında silinmesin.
