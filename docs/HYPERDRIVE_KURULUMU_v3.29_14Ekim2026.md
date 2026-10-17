@@ -47,3 +47,9 @@
    drop owned by hyperdrive_app;
    drop role hyperdrive_app;
    ```
+
+---
+## 17 Ekim 2026 — GERİ ALINDI (503 arızası)
+- 12:33'ten (TR) sonra Hyperdrive, Supabase Session pooler'a (5432) yeni bağlantı açmadı; Supabase sağlıklıydı ama uygulamadan veritabanına hiç sorgu gelmedi. Oturum açılışı yaklaşık 20 dakika 503 verdi ("Veritabanı bağlantısı koptu (Hyperdrive)").
+- Çözüm: `wrangler.jsonc` içindeki `hyperdrive` bağlaması kaldırıldı (commit d7dbec9). Uygulama yeniden doğrudan `DATABASE_URL` ile çalışıyor; 13:11'de giriş doğrulandı (kullanici.sonGiris güncellendi).
+- `anahtarcrm-db` yapılandırması Cloudflare'de duruyor. Yeniden denenecekse önce: (1) Hyperdrive hatasında aynı istek içinde `DATABASE_URL` ile yeniden denensin (şu an ilk istek 503 dönüyor), (2) köken olarak Session pooler yerine doğrudan veritabanı bağlantısı (db.<proje>.supabase.co:5432) ya da Transaction pooler değerlendirilsin, (3) Worker günlüğünde Hyperdrive hata metni incelensin.
