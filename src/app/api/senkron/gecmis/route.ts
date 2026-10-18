@@ -1,4 +1,4 @@
-// Anahtar CRM v3.31 · 15 Ekim 2026
+// Anahtar CRM v3.32 · 18 Ekim 2026
 // GET /api/senkron/gecmis?saglayici=NOTION → son 50 senkron çalışması
 import { prisma } from "@/lib/db";
 import { hata, ok, sorgu } from "@/lib/http/yanit";

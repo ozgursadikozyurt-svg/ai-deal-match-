@@ -1,4 +1,4 @@
-// Anahtar CRM v3.31 · 15 Ekim 2026
+// Anahtar CRM v3.32 · 18 Ekim 2026
 // POST /api/lokasyon/coz  { "metin": "Aksu, Yenigöl / Altınova olur", "ilId": 7 }
 // v3.10: metinde başka il adı geçerse ("İzmir Bornova") o ilde çözülür; ilId = çalışma ili (verilmezse Ayarlar'daki).
 // → { lokasyonlar: [{ilceId, mahalleId, altBolgeId, etiket, guven, belirsiz?}], cozulemeyen: [...] }

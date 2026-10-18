@@ -1,11 +1,12 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * API giriş modelleri (Zod) — Kayit + MulkOzellik + Lokasyon.
  * AI çıktısı da, manuel form da, Notion importu da AYNI şemadan geçer.
  * Enum dışı değer, serbest paragraf veya birim hatası DB'ye ulaşamaz.
  */
 import { kirayiAyligaCevir } from "../domain/kira-periyot";
 import { z } from "zod";
+import { ILK_KAYNAKLAR } from "../domain/ilk-kaynak";
 import {
   KayitTipi, Durum, Aciliyet, AnaKategori, MulkTipi, IslemTipi, ParaBirimi, FiyatPeriyodu,
   ImarDurumu, IlanSahibiTipi, VeriKanali, Havuz, PortfoyAlinabilirlik, MusteriKaynagi,
@@ -168,6 +169,11 @@ export const KayitTemel = z.object({
   yetkili: z.boolean().default(false), // v3.5 — yetki belgeli portföy
   yetkiBitis: z.coerce.date().nullish(),
   musteriKaynagi: en(MusteriKaynagi).nullish(),
+  // v3.32 — ilk kaynak (kilitli; kurallar src/lib/domain/ilk-kaynak.ts). Tarih ve ilk yanıtı sunucu yazar, istemcinin değeri yok sayılır.
+  ilkKaynak: z.enum(ILK_KAYNAKLAR).nullish(),
+  ilkKaynakDetay: kisaMetin(200),
+  ilkKaynakTarihi: z.coerce.date().nullish(),
+  ilkYanit: z.coerce.date().nullish(),
   portfoyAlinabilirlik: en(PortfoyAlinabilirlik).default("BILINMIYOR"),
   kisiId: z.string().cuid().nullish(),
 

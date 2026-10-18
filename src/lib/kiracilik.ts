@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * ÇOK OFİSLİ ÇEKİRDEK (kiracılık / multi-tenancy).
  *
  * Tek Supabase veritabanında birden çok emlak ofisi barınır. Her ofise ait satırda "ofisId" vardır.
@@ -16,13 +16,15 @@
  */
 import { AsyncLocalStorage } from "node:async_hooks";
 
-export type Rol = "PLATFORM_YONETICISI" | "OFIS_YONETICISI" | "DANISMAN";
+export type Rol = "PLATFORM_YONETICISI" | "OFIS_YONETICISI" | "DANISMAN" | "ASISTAN";
 
 export interface Baglam {
   ofisId: string;
   kullaniciId: string;
   rol: Rol;
   eposta: string;
+  /** v3.32 — rol ASISTAN ise yardım ettiği kullanıcı: onun özel kayıt ve kişilerini de görür */
+  yardimEdilenId?: string | null;
 }
 
 /** Ofise ait tablolar: her sorguya ofisId süzgeci eklenir, her oluşturmaya ofisId yazılır. */
@@ -128,11 +130,16 @@ const OKUMA = new Set(["findFirst", "findFirstOrThrow", "findMany", "count", "ag
 const WHERE_YAZMA = new Set(["update", "delete", "updateMany", "deleteMany"]);
 const OLUSTURMA = new Set(["create", "createMany", "createManyAndReturn"]);
 
-/** Danışman, ofis ortak kayıtlarını ve kendi kayıtlarını görür; meslektaşının özel kaydını görmez. */
+/**
+ * Danışman, ofis ortak kayıtlarını ve kendi kayıtlarını görür; meslektaşının özel kaydını görmez.
+ * v3.32 — Asistan bunlara ek olarak yardım ettiği kullanıcının özel kayıt ve kişilerini görür (ör. Özgür'ün ~7.000 kişilik rehberi).
+ * Yardım ettiği kişi atanmamış asistan danışman gibi görür.
+ */
 export function gorunurlukSuzgeci(b: Baglam, model: string): object | undefined {
-  if (b.rol !== "DANISMAN") return undefined;
+  if (b.rol !== "DANISMAN" && b.rol !== "ASISTAN") return undefined;
   if (model !== "kayit" && model !== "kisi") return undefined;
-  return { OR: [{ gorunurluk: "OFIS" }, { sahipKullaniciId: b.kullaniciId }] };
+  const sahipler = [b.kullaniciId, ...(b.rol === "ASISTAN" && b.yardimEdilenId ? [b.yardimEdilenId] : [])];
+  return { OR: [{ gorunurluk: "OFIS" }, sahipler.length === 1 ? { sahipKullaniciId: sahipler[0] } : { sahipKullaniciId: { in: sahipler } }] };
 }
 
 const suzgecEkle = (where: unknown, ek: object[]): object => {

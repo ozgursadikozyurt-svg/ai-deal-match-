@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Canlı — sağ üstteki kayıt göstergesi. "Kaydedildi ✓" yalnızca bir kayıt işleminden sonra 3 saniye görünür, sonra kendiliğinden kaybolur
  * (önceden ekranda kalıyordu). "Kaydedilecek… / Kaydediliyor…" ve hata mesajları ise çözülene kadar kalır.
  */

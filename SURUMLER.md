@@ -5,6 +5,27 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.32 · 18 Ekim 2026 — Asistan rolü; kaydın ilk kaynağı kilitli (reklam ve asistan performansı ölçülebilsin); ilk yanıt süresi
+
+- Yeni rol: Asistan. Yardım ettiği danışmanın (ör. Özgür) talep, portföy ve kişileriyle çalışır: kayıt açar, günceller, not ve görev girer, eşleştirir. Açtığı kayıt ve kişiler yardım ettiği kişiye ait olur.
+- Asistan kayıt ve kişi silemez, dışa aktaramaz, ofis ayarlarını (süreler, yapay zekâ, imza, roller, Benim ve ofisim) ve ilk kaynağı değiştiremez. Sunucu da reddeder; ekranda düğmeler gizli ya da kilitli.
+- Yönetim › Kullanıcılar: rol listesinde Asistan; asistanın yanında "Yardım ettiği" seçimi. Asistan daveti kabul edilince daveti üreten kişiye yardım eder.
+- İlk kaynak: kaydın işletmeye ilk geldiği kanal (Meta reklamı, Google reklamı, sahibinden ilan sahibini aradık, eski müşteri, referans, emlak grubu, portal…) ve kampanya / liste adı. Formda Kaynak'ın altında.
+- İlk kaynak kayıt açılırken yazılır ve kilitlenir; boş kalmışsa bir kez doldurulabilir. Doluysa yalnızca ofis yöneticisi düzeltir ve her düzeltme eski değeriyle kayda geçer. Danışman ve asistan değiştiremez.
+- İlk yanıt: kayda ilk arama / WhatsApp / görüşme / gösterim notu düştüğü an. Detay › Kaynak'ta ilk kaynak ve ilk yanıt süresi (ör. 12 dk) görünür.
+- Eski kayıtların ilk kaynağı mevcut bilgilerden dolduruldu (müşteri kaynağı, kanal, havuz); tahmin edilemeyenler boş kaldı ve bir kez seçilebilir. Eski kayıtların ilk yanıtı en erken temas notunun tarihi.
+- Arayüzden eklenmiş, sahibi boş kalmış özel kişiler ofis yöneticisine bağlandı (asistan, yardım ettiği kişinin rehberini görebilsin).
+- Veritabanı değişikliği var: yayından sonra "Kurulumu tamamla" gerekir.
+
+**Demo'da test edilecekler**
+
+- [ ] Ayarlar › Yönetim › Demo: rol olarak görüntüle › Asistan. Kişiler'de birkaç kişi seçin: "Toplu sil" düğmesi çıkmamalı. Ayarlar'da ayarlar kilitli, Dışa aktar kapalı olmalı.
+- [ ] Asistan rolündeyken reklamla gelen örnek talebi açıp Düzenle deyin: İlk kaynak 🔒 "Meta reklamı" olarak kilitli görünmeli; detayda İlk yanıt "12 dk".
+- [ ] Asistan rolünde Yeni talep açın, İlk kaynak'ta "Sahibinden ilan sahibini aradık" seçin, kaydedin. Tekrar düzenleyin: alan kilitli olmalı.
+- [ ] Platform yöneticisi rolüne dönün, aynı talebi düzenleyin: İlk kaynak değiştirilebilir olmalı ("düzeltme kayda geçer").
+- [ ] Talebe Arama notu ekleyin: detayda İlk yanıt süresi görünmeli.
+- [ ] Yönetim › Kullanıcılar: "Ofis asistanı" Asistan rolünde, yanında "Yardım ettiği: Özgür Özyurt".
+
 ## v3.31 · 15 Ekim 2026 — WhatsApp sohbeti artık .html ve .json dosyasıyla da içeri alınıyor; Kişiler'de birkaç harfle arama (sırasız kelimeler, Türkçe harf duyarsız, notlar ve telefon)
 
 - WhatsApp HTML dışa aktarımı (tarayıcı eklentisinin "Sohbet Dışa Aktarımı" sayfası) okunuyor: yazar, mesaj, fotoğraf açıklaması, zaman, konum. Grup adı dosyanın içindeki başlıktan alınır. Medyalı / silinen mesajlar ön filtrede ayıklanır, yazarı yazılmayan art arda mesajlar önceki yazara bağlanır, alıntılanan eski mesaj yanıtın metnine karışmaz.

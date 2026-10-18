@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Toplu girişte "Zaten var" kontrolü — talepler dahil.
  *  - Portal ilanı: ilan no / bağlantı (en güçlü kanıt).
  *  - Talep (ve bağlantısız portföy): aynı kişi + tip + mülk tipi + işlem + oda + bütçe/fiyat + m² + konum anahtarı.

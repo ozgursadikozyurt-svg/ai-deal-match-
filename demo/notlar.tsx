@@ -1,11 +1,12 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Demo — Talep / portföy içinde görüşme ve not akışı. Tür (görüşme, arama, WhatsApp, gösterim, not), kim ile, ne konuşuldu.
  * Not eklenince bağlı kişinin "son iletişim" tarihi güncellenir. Sunucuda: KayitNot tablosu, /api/kayit/:id/notlar.
  */
 import React, { useState } from "react";
 import { NOT_TURU, type Kayit, type KayitNotu, type NotTuru } from "./depo";
 import { useDepo, cx, tarihYaz } from "./ortak";
+import { TEMAS_NOT_TURLERI } from "../src/lib/domain/ilk-kaynak";
 
 const yeniNotId = () => "n" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
@@ -20,7 +21,8 @@ export function GorusmeNotlari({ k }: { k: Kayit }) {
     const n: KayitNotu = { id: yeniNotId(), tarih: new Date().toISOString(), tur, metin: metin.trim(), kisiId: kisiId || null };
     guncelle((x) => ({
       ...x,
-      kayitlar: x.kayitlar.map((y) => (y.id === k.id ? { ...y, notlar: [n, ...(y.notlar ?? [])] } : y)),
+      // v3.32 — ilk temas notu ilk yanıt zamanını yazar (bir kez; canlıda sunucu kendi saatini yazar)
+      kayitlar: x.kayitlar.map((y) => (y.id === k.id ? { ...y, notlar: [n, ...(y.notlar ?? [])], ...(!(y.veri as any).ilkYanit && (TEMAS_NOT_TURLERI as readonly string[]).includes(tur) ? { veri: { ...y.veri, ilkYanit: new Date(n.tarih) } as any } : {}) } : y)),
       kisiler: kisiId && tur !== "NOT" ? x.kisiler.map((y) => (y.id === kisiId ? { ...y, sonIletisim: n.tarih } : y)) : x.kisiler,
     }));
     setMetin(""); bildir("Not eklendi");

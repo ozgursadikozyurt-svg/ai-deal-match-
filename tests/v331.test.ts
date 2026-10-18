@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * v3.31 — WhatsApp sohbeti .html ve .json dışa aktarımlarından içe alma; Kişiler'de hoşgörülü arama
  *   (birkaç harf, sırasız kelimeler, Türkçe harf duyarsız, notlar / görüşme notları, telefon rakamları).
  */
@@ -28,7 +28,8 @@ const ctx = (d = durum()): Ctx => ({ d, guncelle: () => {}, kayitKaydet: () => {
 const test = (ad: string, f: () => unknown | Promise<unknown>) => nodeTest(ad, async () => { kaliciHepsiniSil(); await f(); });
 
 test("sürüm 3.31 ve ek belge", () => {
-  assert.equal(SURUM, "3.31"); assert.equal(SURUM_GECMISI[0].surum, "3.31"); assert.equal(DOSYA_EKI, "v3.31_15Ekim2026");
+  // v3.32'den sonra en son sürüm değişti; 3.31 kaydı geçmişte durmalı
+  assert.ok(SURUM >= "3.31" && !!DOSYA_EKI); assert.ok(SURUM_GECMISI.some((s) => s.surum === "3.31"));
   assert.ok(fs.existsSync("docs/ANAHTAR_CRM_EK_v3.31_15Ekim2026.md"));
 });
 

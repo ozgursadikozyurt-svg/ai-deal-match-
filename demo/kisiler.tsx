@@ -1,10 +1,11 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026 (v3.31: hoşgörülü arama — birkaç harf, sırasız kelimeler, Türkçe harf duyarsız, notlar ve telefon rakamları)
+ * Anahtar CRM v3.32 · 18 Ekim 2026 (v3.31: hoşgörülü arama — birkaç harf, sırasız kelimeler, Türkçe harf duyarsız, notlar ve telefon rakamları)
  * (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
  * v3.21 — çift yönlü Google: elle eklenen kişi ve bağlı kişideki düzeltme "Google'a gönderilecek" olur; silinen kişi Google'dan silinmez.
  * Demo — Kişiler: kişi seçici (yazdıkça arama, çoklu seçim, rol, + ile anında ekleme), kişi listesi ve kişi kartı.
  * Alanlar Notion "Müşteri-Yatırımcılar-Kişiler" tablosuna göre (ROL, Phone, Açıklama, Referans, ilişkili talep/portföy).
  */
+import { yetkiAktif } from "./yonetim";
 import { TelGirdisi } from "./girdi";
 import { telUyarisi } from "../src/lib/iletisim";
 import { GosterilenPortfoyler } from "./ilgilenenler";
@@ -261,7 +262,7 @@ export function Kisiler() {
       <span className="ipucu">{liste.length} kişi{gorunenSecili.length > 0 && ` · ${gorunenSecili.length} seçili`}</span>
       {!secimModu ? <button className="btn kucuk" onClick={() => setSecimModu(true)} disabled={!sirali.length}>Seç</button> : <div className="kisi-arac-sec">
         <label className="kisi-hepsi"><input type="checkbox" aria-label="Listedeki tüm kişileri seç" checked={hepsiSecili} onChange={(e) => setSecili(e.target.checked ? new Set([...secili, ...sirali.map((k) => k.id)]) : new Set([...secili].filter((id) => !sirali.some((k) => k.id === id))))} /> {filtreVar ? "Süzülenlerin" : "Tümünün"} seçimi ({sirali.length})</label>
-        {gorunenSecili.length > 0 && !silOnay && <><button className="btn kucuk" onClick={() => setSecili(new Set())}>Seçimi kaldır</button>{googleCiftYonlu(d) && gonderilebilir.length > 0 && <button className="btn kucuk" onClick={googleaGonder}>Google'a gönder ({gonderilebilir.length})</button>}<button className="btn kucuk tehlike" onClick={() => setSilOnay(true)}>Toplu sil ({gorunenSecili.length})</button></>}
+        {gorunenSecili.length > 0 && !silOnay && <><button className="btn kucuk" onClick={() => setSecili(new Set())}>Seçimi kaldır</button>{googleCiftYonlu(d) && gonderilebilir.length > 0 && <button className="btn kucuk" onClick={googleaGonder}>Google'a gönder ({gonderilebilir.length})</button>}{yetkiAktif("kayit.sil") && <button className="btn kucuk tehlike" onClick={() => setSilOnay(true)}>Toplu sil ({gorunenSecili.length})</button>}</>}
         <button className="btn kucuk" onClick={() => { setSecimModu(false); setSecili(new Set()); setSilOnay(false); }}>Bitti</button>
       </div>}
     </div>

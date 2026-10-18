@@ -1,8 +1,9 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.32 · 18 Ekim 2026 (v3.13'ten)
  * Demo veri deposu: örnek veriyi gerçek doğrulama + konum çözücüden geçirerek yükler,
  * kullanıcının değişikliklerini tarayıcıda (localStorage) saklar.
  */
+import { ilkKaynakKarari } from "../src/lib/domain/ilk-kaynak";
 import type { FotoMeta } from "../src/lib/domain/foto";
 import type { Gorev, Ilgilenen } from "../src/lib/domain/gorev";
 import { suresizMi, SURESIZ_TARIH } from "../src/lib/domain/gecerlilik";
@@ -151,6 +152,8 @@ export const CANLI: {
   /** v3.22.2 — artımlı kişi yenileme: yalnızca değişen kişileri birleştirir; kisiZamani = sunucunun son kişi okuma zamanı (bir sonraki `sonra`) */
   kisileriDegisenleriBirlestir?: ((d: DepoDurumu, degisen: Kisi[]) => DepoDurumu) | null;
   kisiZamani?: string | null;
+  /** v3.32 — arayüzün kısa bildirimi (ör. sunucunun kaydı yazıp bir alanı reddettiği uyarı) */
+  bildir?: ((m: string) => void) | null;
 } = { acik: CANLI_ORTAM, yuklu: null, kaydet: null, hemen: null, sample: null, api: null, oturum: null, kisileriBirlestir: null, googleDonus: null };
 
 export const BUGUN = CANLI_ORTAM ? new Date() : new Date(2026, 8, 30, 12, 0, 0); // demo "bugün" sabit (süre hesapları değişmesin); canlıda gerçek tarih
@@ -216,7 +219,10 @@ export function ornekVeriyiKur(): { kayitlar: Kayit[]; hatalar: OrnekHata[]; ada
     if (!p.success) { hatalar.push({ oid, hatalar: p.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`) }); continue; }
     // Tanınmayan konum ifadeleri konum öğrenme adaylarına düşer (ör. "Yeni Sanayi civarı")
     if (r.cozulemeyen.length) adaylar = adaylariGuncelle(adaylar, r.cozulemeyen, r.lokasyonlar, girdi.hamMetin ?? girdi.lokasyonHam ?? undefined, olusturma);
-    kayitlar.push({ id: oid, olusturma: olusturma.toISOString(), veri: p.data });
+    // v3.32 — ilk kaynak: sunucudaki kuralla aynı tahmin; reklamla gelen örnek talep Meta kampanyasından, 12 dakikada aranmış görünür
+    const ilk = ilkKaynakKarari(null, p.data, false, BUGUN, olusturma).yaz;
+    const reklam = p.data.musteriKaynagi === "REKLAM" ? { ilkKaynak: "META_REKLAM" as const, ilkKaynakDetay: "Meta – Yatırımlık arsa Ekim (örnek)", ilkYanit: new Date(olusturma.getTime() + 12 * 60_000) } : {};
+    kayitlar.push({ id: oid, olusturma: olusturma.toISOString(), veri: { ...p.data, ...ilk, ...reklam } as Veri });
   }
   return { kayitlar, hatalar, adaylar, kisiler };
 }

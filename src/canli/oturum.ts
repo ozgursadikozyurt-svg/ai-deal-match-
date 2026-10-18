@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * OTURUM ÇÖZÜMÜ — "bu e-posta kim, hangi ofiste, neler yapabilir?"
  *
  * Giriş akışı:
@@ -39,7 +39,7 @@ export async function oturumCoz(prisma: PrismaClient, eposta: string, env: Oturu
   return platformOlarak(async () => {
     const k = await prisma.kullanici.findFirst({
       where: { eposta: e },
-      select: { id: true, ofisId: true, rol: true, aktif: true, ofis: { select: { durum: true } } },
+      select: { id: true, ofisId: true, rol: true, aktif: true, yardimEdilenId: true, ofis: { select: { durum: true } } },
     });
 
     if (!k) {
@@ -64,7 +64,7 @@ export async function oturumCoz(prisma: PrismaClient, eposta: string, env: Oturu
     // Son giriş damgası isteği bekletmesin
     prisma.kullanici.update({ where: { id: k.id }, data: { sonGiris: new Date() } }).catch(() => {});
 
-    return { baglam: { ofisId: k.ofisId, kullaniciId: k.id, rol: k.rol as Rol, eposta: e } };
+    return { baglam: { ofisId: k.ofisId, kullaniciId: k.id, rol: k.rol as Rol, eposta: e, yardimEdilenId: k.rol === "ASISTAN" ? k.yardimEdilenId : null } };
   });
 }
 

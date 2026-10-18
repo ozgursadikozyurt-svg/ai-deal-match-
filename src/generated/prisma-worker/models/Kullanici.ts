@@ -32,6 +32,7 @@ export type KullaniciMinAggregateOutputType = {
   telefon: string | null
   rol: $Enums.Rol | null
   aktif: boolean | null
+  yardimEdilenId: string | null
   sonGiris: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -45,6 +46,7 @@ export type KullaniciMaxAggregateOutputType = {
   telefon: string | null
   rol: $Enums.Rol | null
   aktif: boolean | null
+  yardimEdilenId: string | null
   sonGiris: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -58,6 +60,7 @@ export type KullaniciCountAggregateOutputType = {
   telefon: number
   rol: number
   aktif: number
+  yardimEdilenId: number
   sonGiris: number
   createdAt: number
   updatedAt: number
@@ -73,6 +76,7 @@ export type KullaniciMinAggregateInputType = {
   telefon?: true
   rol?: true
   aktif?: true
+  yardimEdilenId?: true
   sonGiris?: true
   createdAt?: true
   updatedAt?: true
@@ -86,6 +90,7 @@ export type KullaniciMaxAggregateInputType = {
   telefon?: true
   rol?: true
   aktif?: true
+  yardimEdilenId?: true
   sonGiris?: true
   createdAt?: true
   updatedAt?: true
@@ -99,6 +104,7 @@ export type KullaniciCountAggregateInputType = {
   telefon?: true
   rol?: true
   aktif?: true
+  yardimEdilenId?: true
   sonGiris?: true
   createdAt?: true
   updatedAt?: true
@@ -185,6 +191,7 @@ export type KullaniciGroupByOutputType = {
   telefon: string | null
   rol: $Enums.Rol
   aktif: boolean
+  yardimEdilenId: string | null
   sonGiris: Date | null
   createdAt: Date
   updatedAt: Date
@@ -219,6 +226,7 @@ export type KullaniciWhereInput = {
   telefon?: Prisma.StringNullableFilter<"Kullanici"> | string | null
   rol?: Prisma.EnumRolFilter<"Kullanici"> | $Enums.Rol
   aktif?: Prisma.BoolFilter<"Kullanici"> | boolean
+  yardimEdilenId?: Prisma.StringNullableFilter<"Kullanici"> | string | null
   sonGiris?: Prisma.DateTimeNullableFilter<"Kullanici"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Kullanici"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Kullanici"> | Date | string
@@ -236,6 +244,7 @@ export type KullaniciOrderByWithRelationInput = {
   telefon?: Prisma.SortOrderInput | Prisma.SortOrder
   rol?: Prisma.SortOrder
   aktif?: Prisma.SortOrder
+  yardimEdilenId?: Prisma.SortOrderInput | Prisma.SortOrder
   sonGiris?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -256,6 +265,7 @@ export type KullaniciWhereUniqueInput = Prisma.AtLeast<{
   telefon?: Prisma.StringNullableFilter<"Kullanici"> | string | null
   rol?: Prisma.EnumRolFilter<"Kullanici"> | $Enums.Rol
   aktif?: Prisma.BoolFilter<"Kullanici"> | boolean
+  yardimEdilenId?: Prisma.StringNullableFilter<"Kullanici"> | string | null
   sonGiris?: Prisma.DateTimeNullableFilter<"Kullanici"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Kullanici"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Kullanici"> | Date | string
@@ -273,6 +283,7 @@ export type KullaniciOrderByWithAggregationInput = {
   telefon?: Prisma.SortOrderInput | Prisma.SortOrder
   rol?: Prisma.SortOrder
   aktif?: Prisma.SortOrder
+  yardimEdilenId?: Prisma.SortOrderInput | Prisma.SortOrder
   sonGiris?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -292,6 +303,7 @@ export type KullaniciScalarWhereWithAggregatesInput = {
   telefon?: Prisma.StringNullableWithAggregatesFilter<"Kullanici"> | string | null
   rol?: Prisma.EnumRolWithAggregatesFilter<"Kullanici"> | $Enums.Rol
   aktif?: Prisma.BoolWithAggregatesFilter<"Kullanici"> | boolean
+  yardimEdilenId?: Prisma.StringNullableWithAggregatesFilter<"Kullanici"> | string | null
   sonGiris?: Prisma.DateTimeNullableWithAggregatesFilter<"Kullanici"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Kullanici"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Kullanici"> | Date | string
@@ -304,6 +316,7 @@ export type KullaniciCreateInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -321,6 +334,7 @@ export type KullaniciUncheckedCreateInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -336,6 +350,7 @@ export type KullaniciUpdateInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -353,6 +368,7 @@ export type KullaniciUncheckedUpdateInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -369,6 +385,7 @@ export type KullaniciCreateManyInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -381,6 +398,7 @@ export type KullaniciUpdateManyMutationInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -394,6 +412,7 @@ export type KullaniciUncheckedUpdateManyInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -417,6 +436,7 @@ export type KullaniciCountOrderByAggregateInput = {
   telefon?: Prisma.SortOrder
   rol?: Prisma.SortOrder
   aktif?: Prisma.SortOrder
+  yardimEdilenId?: Prisma.SortOrder
   sonGiris?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -430,6 +450,7 @@ export type KullaniciMaxOrderByAggregateInput = {
   telefon?: Prisma.SortOrder
   rol?: Prisma.SortOrder
   aktif?: Prisma.SortOrder
+  yardimEdilenId?: Prisma.SortOrder
   sonGiris?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -443,6 +464,7 @@ export type KullaniciMinOrderByAggregateInput = {
   telefon?: Prisma.SortOrder
   rol?: Prisma.SortOrder
   aktif?: Prisma.SortOrder
+  yardimEdilenId?: Prisma.SortOrder
   sonGiris?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -554,6 +576,7 @@ export type KullaniciCreateWithoutOfisInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -569,6 +592,7 @@ export type KullaniciUncheckedCreateWithoutOfisInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -614,6 +638,7 @@ export type KullaniciScalarWhereInput = {
   telefon?: Prisma.StringNullableFilter<"Kullanici"> | string | null
   rol?: Prisma.EnumRolFilter<"Kullanici"> | $Enums.Rol
   aktif?: Prisma.BoolFilter<"Kullanici"> | boolean
+  yardimEdilenId?: Prisma.StringNullableFilter<"Kullanici"> | string | null
   sonGiris?: Prisma.DateTimeNullableFilter<"Kullanici"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Kullanici"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Kullanici"> | Date | string
@@ -626,6 +651,7 @@ export type KullaniciCreateWithoutOlusturduguDavetlerInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -642,6 +668,7 @@ export type KullaniciUncheckedCreateWithoutOlusturduguDavetlerInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -672,6 +699,7 @@ export type KullaniciUpdateWithoutOlusturduguDavetlerInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -688,6 +716,7 @@ export type KullaniciUncheckedUpdateWithoutOlusturduguDavetlerInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -702,6 +731,7 @@ export type KullaniciCreateWithoutSahipKayitlarInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -718,6 +748,7 @@ export type KullaniciUncheckedCreateWithoutSahipKayitlarInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -748,6 +779,7 @@ export type KullaniciUpdateWithoutSahipKayitlarInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -764,6 +796,7 @@ export type KullaniciUncheckedUpdateWithoutSahipKayitlarInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -778,6 +811,7 @@ export type KullaniciCreateWithoutSahipKisilerInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -794,6 +828,7 @@ export type KullaniciUncheckedCreateWithoutSahipKisilerInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -824,6 +859,7 @@ export type KullaniciUpdateWithoutSahipKisilerInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -840,6 +876,7 @@ export type KullaniciUncheckedUpdateWithoutSahipKisilerInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -854,6 +891,7 @@ export type KullaniciCreateManyOfisInput = {
   telefon?: string | null
   rol?: $Enums.Rol
   aktif?: boolean
+  yardimEdilenId?: string | null
   sonGiris?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -866,6 +904,7 @@ export type KullaniciUpdateWithoutOfisInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -881,6 +920,7 @@ export type KullaniciUncheckedUpdateWithoutOfisInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -896,6 +936,7 @@ export type KullaniciUncheckedUpdateManyWithoutOfisInput = {
   telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.EnumRolFieldUpdateOperationsInput | $Enums.Rol
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  yardimEdilenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sonGiris?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -958,6 +999,7 @@ export type KullaniciSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   telefon?: boolean
   rol?: boolean
   aktif?: boolean
+  yardimEdilenId?: boolean
   sonGiris?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -976,6 +1018,7 @@ export type KullaniciSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   telefon?: boolean
   rol?: boolean
   aktif?: boolean
+  yardimEdilenId?: boolean
   sonGiris?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -990,6 +1033,7 @@ export type KullaniciSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   telefon?: boolean
   rol?: boolean
   aktif?: boolean
+  yardimEdilenId?: boolean
   sonGiris?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1004,12 +1048,13 @@ export type KullaniciSelectScalar = {
   telefon?: boolean
   rol?: boolean
   aktif?: boolean
+  yardimEdilenId?: boolean
   sonGiris?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type KullaniciOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "eposta" | "adSoyad" | "telefon" | "rol" | "aktif" | "sonGiris" | "createdAt" | "updatedAt", ExtArgs["result"]["kullanici"]>
+export type KullaniciOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "eposta" | "adSoyad" | "telefon" | "rol" | "aktif" | "yardimEdilenId" | "sonGiris" | "createdAt" | "updatedAt", ExtArgs["result"]["kullanici"]>
 export type KullaniciInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   sahipKayitlar?: boolean | Prisma.Kullanici$sahipKayitlarArgs<ExtArgs>
@@ -1043,6 +1088,10 @@ export type $KullaniciPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     telefon: string | null
     rol: $Enums.Rol
     aktif: boolean
+    /**
+     * v3.32 — rol ASISTAN ise yardım ettiği kullanıcı (o kişinin özel kayıt ve kişilerini de görür)
+     */
+    yardimEdilenId: string | null
     sonGiris: Date | null
     createdAt: Date
     updatedAt: Date
@@ -1480,6 +1529,7 @@ export interface KullaniciFieldRefs {
   readonly telefon: Prisma.FieldRef<"Kullanici", 'String'>
   readonly rol: Prisma.FieldRef<"Kullanici", 'Rol'>
   readonly aktif: Prisma.FieldRef<"Kullanici", 'Boolean'>
+  readonly yardimEdilenId: Prisma.FieldRef<"Kullanici", 'String'>
   readonly sonGiris: Prisma.FieldRef<"Kullanici", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Kullanici", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Kullanici", 'DateTime'>

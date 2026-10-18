@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.32 · 18 Ekim 2026 (v3.14'ten)
  * AŞAMA 7 — Canlı sürümün veri köprüsü. Arayüz (demo ile aynı ekranlar) tüm durumu tek seferde okur
  * (`durumGetir`), değişiklikleri parça parça yazar (`degisiklikUygula`). Veritabanı ilişkisel kalır:
  * Notion/Google senkronu, toplu giriş, dışa aktarma ve eşleştirme servisleri aynı tablolarla çalışmaya devam eder.
@@ -16,6 +16,11 @@ import { SahiplikAyarSchema, sahiplikNormalize } from "../domain/sahiplik";
 import { GOREV_SINIRI, ILGILENEN_SINIRI, gorevlerNormalize, ilgilenenlerNormalize } from "../domain/gorev";
 import { gonderimAlaniDegisti } from "../google/kisiler";
 import { googleSilinenleriIsaretle, googleGonderimAcik } from "./senkron";
+import { yetkiVar } from "../guvenlik/yetki";
+import { ilkKaynakKarari, ilkYanitKarari } from "../domain/ilk-kaynak";
+import { istekSahibi } from "./istek";
+export { istekSahibi } from "./istek";
+const AYAR_YONETIM = ["ttl", "ai", "paylasim", "calismaIli", "roller", "sahiplik"] as const;
 
 const KAYIT_ALANLARI = [...new Set([...Object.keys(KayitTemel.shape), "anaKategori"])].filter((k) => !["lokasyonlar", "kisiler", "ozellik", "kisiId"].includes(k)); // kisiId: kayıtta kisiler[0]'dan türetilir; arayüzdeki kişi kimlikleri cuid değildir
 const OZELLIK_ALANLARI = Object.keys((MulkOzellikObje as any).shape ?? (MulkOzellikObje as any)._def?.schema?.shape ?? {});
@@ -124,6 +129,10 @@ export async function konumKimlikleri(prisma: PrismaClient, kayitlar: { veri: Re
 
 export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
   const hatalar: { id: string; mesaj: string }[] = [];
+  /** v3.32 — kaydı reddetmeyen ama kullanıcıya söylenmesi gereken durumlar (ör. kilitli ilk kaynak değiştirilmek istendi) */
+  const uyarilar: { id: string; mesaj: string }[] = [];
+  const { rol, sahipId } = istekSahibi();
+  const simdi = new Date();
   const ttl = await ttlAyarlari(prisma);
   // 1) Kişiler önce (kayıtlar kişilere bağlanır)
   // v3.21 — çift yönlü Google: bağlantı açıksa (a) elle eklenen yeni kişi, (b) Google'a bağlı kişide ad / telefon / e-posta / şirket
@@ -134,7 +143,7 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
     const eski = eskiler.get(k.id);
     const isaret = !gonder ? false : eski?.googleResourceName ? gonderimAlaniDegisti(eski, { adSoyad: k.adSoyad, telefon: k.telefon, ikincilTelefon: k.ikincilTelefon, email: k.email, sirket: k.sirket }) : !!k.googleaGonder && !!k.telefon;
     const veri = { adSoyad: k.adSoyad, telefon: k.telefon || null, ikincilTelefon: k.ikincilTelefon || null, email: k.email || null, sirket: k.sirket || null, roller: k.roller as any, uzmanlikAileleri: k.uzmanlikAileleri, referans: k.referans ?? null, notlar: k.notlar ?? null, whatsappGruplari: k.whatsappGruplari, sonIletisim: k.sonIletisim ? new Date(k.sonIletisim) : null, ...(k.ilanSahibiTipi ? { ilanSahibiTipi: k.ilanSahibiTipi as any } : {}), ...(isaret ? { googleBekliyor: new Date() } : {}) };
-    try { await prisma.kisi.upsert({ where: { id: k.id }, update: veri, create: { id: k.id, ...veri, kaynak: (["WHATSAPP", "GOOGLE", "NOTION", "MANUEL"].includes(k.kaynak ?? "") ? k.kaynak : "MANUEL") as any, ...(k.olusturma ? { createdAt: new Date(k.olusturma) } : {}) } }); }
+    try { await prisma.kisi.upsert({ where: { id: k.id }, update: veri, create: { id: k.id, ...veri, ...(sahipId ? { sahipKullaniciId: sahipId } : {}), kaynak: (["WHATSAPP", "GOOGLE", "NOTION", "MANUEL"].includes(k.kaynak ?? "") ? k.kaynak : "MANUEL") as any, ...(k.olusturma ? { createdAt: new Date(k.olusturma) } : {}) } }); }
     catch (e: any) { hatalar.push({ id: k.id, mesaj: e?.code === "P2002" ? "Bu telefon numarası başka bir kişide kayıtlı" : String(e?.message ?? e).slice(0, 200) }); }
   }
   // 2) Kayıtlar: alt tablolar (konum, özellik, kişi bağları, notlar) silinip yeniden yazılır
@@ -146,22 +155,30 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
     if (eksikKonum) { hatalar.push({ id: k.id, mesaj: eksikKonum }); continue; }
     const p = KayitCreateSchema.safeParse(k.veri);
     if (!p.success) { hatalar.push({ id: k.id, mesaj: p.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ").slice(0, 300) }); continue; }
-    const { lokasyonlar, ozellik, validUntil, kisiler, ...alanlar } = p.data;
+    // v3.32 — ilk kaynak zamanı ve ilk yanıt istemciden alınmaz (sunucu yazar); ilk kaynak / ayrıntısı kilit kuralından geçer
+    const { lokasyonlar, ozellik, validUntil, kisiler, ilkKaynakTarihi: _t, ilkYanit: _y, ilkKaynak: _k, ilkKaynakDetay: _d, ...alanlar } = p.data as typeof p.data & { ilkKaynakTarihi?: unknown; ilkYanit?: unknown; ilkKaynak?: unknown; ilkKaynakDetay?: unknown };
     // v3.22: isaret açıkça yazılır — "Otomatik"e dönülünce (alan yok) eski elle işaret veritabanında kalmasın
     const veri = { ...alanlar, isaret: p.data.isaret ?? null, validUntil: validUntil ?? vu(p.data.tip, p.data.islemTipi, p.data.aciliyet, new Date(), ttl), kisiId: kisiler[0]?.kisiId ?? null };
+    const gelenVeri = k.veri as Record<string, unknown>; // ilk kaynak alanlarının "hiç gönderilmedi" ile "boş gönderildi" farkı ham veriden okunur
+    let kUyari: string | undefined;
     try {
       await geciciyseTekrarla(() => prisma.$transaction(async (tx) => {
-        const var_ = await tx.kayit.findUnique({ where: { id: k.id }, select: { id: true } });
+        const var_ = await tx.kayit.findUnique({ where: { id: k.id }, select: { id: true, ilkKaynak: true, ilkKaynakDetay: true, ilkKaynakTarihi: true, ilkYanit: true } });
+        const karar = ilkKaynakKarari(var_ ?? null, { ...p.data, ilkKaynak: gelenVeri.ilkKaynak as string | null | undefined, ilkKaynakDetay: gelenVeri.ilkKaynakDetay as string | null | undefined }, yetkiVar(rol, "kaynak.duzelt"), simdi, k.olusturma ? new Date(k.olusturma) : null);
+        const yanit = k.notlar ? ilkYanitKarari(var_?.ilkYanit, k.notlar.map((n) => n.tur), simdi) : var_?.ilkYanit ?? null;
+        const tamVeri = { ...veri, ...karar.yaz, ilkYanit: yanit };
         if (var_) {
           await tx.kayitLokasyon.deleteMany({ where: { kayitId: k.id } });
           await tx.kayitKisi.deleteMany({ where: { kayitId: k.id } });
           await tx.mulkOzellik.deleteMany({ where: { kayitId: k.id } });
-          await tx.kayit.update({ where: { id: k.id }, data: veri as any });
+          await tx.kayit.update({ where: { id: k.id }, data: tamVeri as any });
+          if (karar.degisiklikler.length) await tx.auditLog.createMany({ data: karar.degisiklikler.map((d) => ({ kayitId: k.id, alan: d.alan, eskiDeger: d.eski as any, yeniDeger: d.yeni as any, kaynak: "kullanici" })) });
         } else {
           let fp = fingerprint(p.data);
           if (await tx.kayit.findFirst({ where: { fingerprint: fp }, select: { id: true } })) fp = fp.slice(0, 24) + k.id.slice(0, 16);
-          await tx.kayit.create({ data: { id: k.id, ...(veri as any), fingerprint: fp, ...(k.olusturma ? { createdAt: new Date(k.olusturma) } : {}) } });
+          await tx.kayit.create({ data: { id: k.id, ...(tamVeri as any), ...(sahipId ? { sahipKullaniciId: sahipId } : {}), fingerprint: fp, ...(k.olusturma ? { createdAt: new Date(k.olusturma) } : {}) } });
         }
+        kUyari = karar.uyari; // işlem yeniden denenirse üzerine yazılır (uyarı iki kez düşmez)
         if (lokasyonlar.length) await tx.kayitLokasyon.createMany({ data: lokasyonlar.map((l, sira) => ({ ...l, sira, kayitId: k.id })) });
         if (kisiler.length) await tx.kayitKisi.createMany({ data: kisiler.map((b, i) => ({ kisiId: b.kisiId, rol: b.rol as any, birincil: i === 0, kayitId: k.id })) });
         if (ozellik) await tx.mulkOzellik.create({ data: { ...(Object.fromEntries(Object.entries(ozellik).filter(([, v]) => v !== undefined)) as any), kayitId: k.id } });
@@ -170,9 +187,14 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
           if (k.notlar.length) await tx.kayitNot.createMany({ data: k.notlar.map((n) => ({ id: n.id, kayitId: k.id, tur: n.tur, metin: n.metin, kisiId: n.kisiId ?? null, tarih: new Date(n.tarih) })) });
         }
       }));
+      if (kUyari) uyarilar.push({ id: k.id, mesaj: kUyari });
     } catch (e: any) { hatalar.push({ id: k.id, mesaj: String(e?.message ?? e).slice(0, 300) }); }
   }
-  // 3) Silmeler
+  // 3) Silmeler — v3.32: silme yetkisi olmayan (asistan) silemez; kayıtlar yerinde kalır, arayüz yeniden yüklenince geri gelir
+  if ((g.kayitSil.length || g.kisiSil.length) && !yetkiVar(rol, "kayit.sil")) {
+    for (const id of [...g.kayitSil, ...g.kisiSil]) hatalar.push({ id, mesaj: "Silme yetkiniz yok — silinmesi gerekeni not düşüp yöneticinize bildirin" });
+    g = { ...g, kayitSil: [], kisiSil: [] };
+  }
   if (g.kayitSil.length) await prisma.kayit.deleteMany({ where: { id: { in: g.kayitSil } } });
   if (g.kisiSil.length) {
     // v3.21 — Anahtar'dan silinen kişi Google'dan SİLİNMEZ; yalnızca "geri gelmesin" listesine yazılır (Google bağlıysa)
@@ -192,6 +214,11 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
     catch (e: any) { hatalar.push({ id: anahtar, mesaj: String(e?.message ?? e).slice(0, 200) }); }
   }
   // 5) Ayarlar ve arayüz durumu (öğrenilen konumlar, test işaretleri, içe aktarma geçmişi…)
+  if (g.ayarlar && !yetkiVar(rol, "ofis.ayarlar") && AYAR_YONETIM.some((a) => (g.ayarlar as any)[a] !== undefined)) {
+    // v3.32 — ofis ayarlarını (süreler, yapay zekâ, imza, roller, Benim ve ofisim) yalnızca ofis yöneticisi değiştirir; görevler ve ilgilenenler herkesin
+    uyarilar.push({ id: "ayarlar", mesaj: "Ofis ayarlarını yalnızca ofis yöneticisi değiştirebilir; ayar değişikliği kaydedilmedi" });
+    g = { ...g, ayarlar: Object.fromEntries(Object.entries(g.ayarlar).filter(([a]) => !(AYAR_YONETIM as readonly string[]).includes(a))) as Degisiklik["ayarlar"] };
+  }
   if (g.ayarlar) {
     const yaz = (anahtar: string, deger: unknown) => ayarYaz(prisma, anahtar, deger);
     if (g.ayarlar.ttl) await yaz("ttl", TtlAyarSchema.parse(g.ayarlar.ttl));
@@ -204,5 +231,5 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
     if (g.ayarlar.ilgilenenler) await yaz("ilgilenenler", ilgilenenlerNormalize(g.ayarlar.ilgilenenler)); // v3.25: İlgilenenler
   }
   if (g.arayuz) await ayarYaz(prisma, ARAYUZ, g.arayuz);
-  return { tamam: hatalar.length === 0, hatalar };
+  return { tamam: hatalar.length === 0, hatalar, uyarilar };
 }

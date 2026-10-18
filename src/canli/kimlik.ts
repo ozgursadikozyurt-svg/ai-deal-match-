@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Canlı API'nin kapısı — İKİ ADIM:
  *   1. kimlikDogrula: Supabase oturum anahtarı (JWT) doğrulanır → e-posta. Veritabanı gerekmez.
  *      Supabase'in yeni projelerdeki asimetrik anahtarları (JWKS) ve eski HS256 sırrı desteklenir.

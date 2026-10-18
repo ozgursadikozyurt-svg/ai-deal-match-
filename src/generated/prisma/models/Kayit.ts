@@ -87,6 +87,10 @@ export type KayitMinAggregateOutputType = {
   yetkili: boolean | null
   yetkiBitis: Date | null
   musteriKaynagi: $Enums.MusteriKaynagi | null
+  ilkKaynak: string | null
+  ilkKaynakDetay: string | null
+  ilkKaynakTarihi: Date | null
+  ilkYanit: Date | null
   portfoyAlinabilirlik: $Enums.PortfoyAlinabilirlik | null
   kisiId: string | null
   gondeAdi: string | null
@@ -150,6 +154,10 @@ export type KayitMaxAggregateOutputType = {
   yetkili: boolean | null
   yetkiBitis: Date | null
   musteriKaynagi: $Enums.MusteriKaynagi | null
+  ilkKaynak: string | null
+  ilkKaynakDetay: string | null
+  ilkKaynakTarihi: Date | null
+  ilkYanit: Date | null
   portfoyAlinabilirlik: $Enums.PortfoyAlinabilirlik | null
   kisiId: string | null
   gondeAdi: string | null
@@ -215,6 +223,10 @@ export type KayitCountAggregateOutputType = {
   yetkili: number
   yetkiBitis: number
   musteriKaynagi: number
+  ilkKaynak: number
+  ilkKaynakDetay: number
+  ilkKaynakTarihi: number
+  ilkYanit: number
   portfoyAlinabilirlik: number
   kisiId: number
   gondeAdi: number
@@ -310,6 +322,10 @@ export type KayitMinAggregateInputType = {
   yetkili?: true
   yetkiBitis?: true
   musteriKaynagi?: true
+  ilkKaynak?: true
+  ilkKaynakDetay?: true
+  ilkKaynakTarihi?: true
+  ilkYanit?: true
   portfoyAlinabilirlik?: true
   kisiId?: true
   gondeAdi?: true
@@ -373,6 +389,10 @@ export type KayitMaxAggregateInputType = {
   yetkili?: true
   yetkiBitis?: true
   musteriKaynagi?: true
+  ilkKaynak?: true
+  ilkKaynakDetay?: true
+  ilkKaynakTarihi?: true
+  ilkYanit?: true
   portfoyAlinabilirlik?: true
   kisiId?: true
   gondeAdi?: true
@@ -438,6 +458,10 @@ export type KayitCountAggregateInputType = {
   yetkili?: true
   yetkiBitis?: true
   musteriKaynagi?: true
+  ilkKaynak?: true
+  ilkKaynakDetay?: true
+  ilkKaynakTarihi?: true
+  ilkYanit?: true
   portfoyAlinabilirlik?: true
   kisiId?: true
   gondeAdi?: true
@@ -594,6 +618,10 @@ export type KayitGroupByOutputType = {
   yetkili: boolean
   yetkiBitis: Date | null
   musteriKaynagi: $Enums.MusteriKaynagi | null
+  ilkKaynak: string | null
+  ilkKaynakDetay: string | null
+  ilkKaynakTarihi: Date | null
+  ilkYanit: Date | null
   portfoyAlinabilirlik: $Enums.PortfoyAlinabilirlik
   kisiId: string | null
   gondeAdi: string | null
@@ -686,6 +714,10 @@ export type KayitWhereInput = {
   yetkili?: Prisma.BoolFilter<"Kayit"> | boolean
   yetkiBitis?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
   musteriKaynagi?: Prisma.EnumMusteriKaynagiNullableFilter<"Kayit"> | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  ilkKaynakDetay?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  ilkKaynakTarihi?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
+  ilkYanit?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFilter<"Kayit"> | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.StringNullableFilter<"Kayit"> | string | null
   gondeAdi?: Prisma.StringNullableFilter<"Kayit"> | string | null
@@ -767,6 +799,10 @@ export type KayitOrderByWithRelationInput = {
   yetkili?: Prisma.SortOrder
   yetkiBitis?: Prisma.SortOrderInput | Prisma.SortOrder
   musteriKaynagi?: Prisma.SortOrderInput | Prisma.SortOrder
+  ilkKaynak?: Prisma.SortOrderInput | Prisma.SortOrder
+  ilkKaynakDetay?: Prisma.SortOrderInput | Prisma.SortOrder
+  ilkKaynakTarihi?: Prisma.SortOrderInput | Prisma.SortOrder
+  ilkYanit?: Prisma.SortOrderInput | Prisma.SortOrder
   portfoyAlinabilirlik?: Prisma.SortOrder
   kisiId?: Prisma.SortOrderInput | Prisma.SortOrder
   gondeAdi?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -853,6 +889,10 @@ export type KayitWhereUniqueInput = Prisma.AtLeast<{
   yetkili?: Prisma.BoolFilter<"Kayit"> | boolean
   yetkiBitis?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
   musteriKaynagi?: Prisma.EnumMusteriKaynagiNullableFilter<"Kayit"> | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  ilkKaynakDetay?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  ilkKaynakTarihi?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
+  ilkYanit?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFilter<"Kayit"> | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.StringNullableFilter<"Kayit"> | string | null
   gondeAdi?: Prisma.StringNullableFilter<"Kayit"> | string | null
@@ -934,6 +974,10 @@ export type KayitOrderByWithAggregationInput = {
   yetkili?: Prisma.SortOrder
   yetkiBitis?: Prisma.SortOrderInput | Prisma.SortOrder
   musteriKaynagi?: Prisma.SortOrderInput | Prisma.SortOrder
+  ilkKaynak?: Prisma.SortOrderInput | Prisma.SortOrder
+  ilkKaynakDetay?: Prisma.SortOrderInput | Prisma.SortOrder
+  ilkKaynakTarihi?: Prisma.SortOrderInput | Prisma.SortOrder
+  ilkYanit?: Prisma.SortOrderInput | Prisma.SortOrder
   portfoyAlinabilirlik?: Prisma.SortOrder
   kisiId?: Prisma.SortOrderInput | Prisma.SortOrder
   gondeAdi?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -1011,6 +1055,10 @@ export type KayitScalarWhereWithAggregatesInput = {
   yetkili?: Prisma.BoolWithAggregatesFilter<"Kayit"> | boolean
   yetkiBitis?: Prisma.DateTimeNullableWithAggregatesFilter<"Kayit"> | Date | string | null
   musteriKaynagi?: Prisma.EnumMusteriKaynagiNullableWithAggregatesFilter<"Kayit"> | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
+  ilkKaynakDetay?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
+  ilkKaynakTarihi?: Prisma.DateTimeNullableWithAggregatesFilter<"Kayit"> | Date | string | null
+  ilkYanit?: Prisma.DateTimeNullableWithAggregatesFilter<"Kayit"> | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikWithAggregatesFilter<"Kayit"> | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
   gondeAdi?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
@@ -1078,6 +1126,10 @@ export type KayitCreateInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -1158,6 +1210,10 @@ export type KayitUncheckedCreateInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -1234,6 +1290,10 @@ export type KayitUpdateInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1314,6 +1374,10 @@ export type KayitUncheckedUpdateInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1392,6 +1456,10 @@ export type KayitCreateManyInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -1459,6 +1527,10 @@ export type KayitUpdateManyMutationInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1527,6 +1599,10 @@ export type KayitUncheckedUpdateManyInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1645,6 +1721,10 @@ export type KayitCountOrderByAggregateInput = {
   yetkili?: Prisma.SortOrder
   yetkiBitis?: Prisma.SortOrder
   musteriKaynagi?: Prisma.SortOrder
+  ilkKaynak?: Prisma.SortOrder
+  ilkKaynakDetay?: Prisma.SortOrder
+  ilkKaynakTarihi?: Prisma.SortOrder
+  ilkYanit?: Prisma.SortOrder
   portfoyAlinabilirlik?: Prisma.SortOrder
   kisiId?: Prisma.SortOrder
   gondeAdi?: Prisma.SortOrder
@@ -1725,6 +1805,10 @@ export type KayitMaxOrderByAggregateInput = {
   yetkili?: Prisma.SortOrder
   yetkiBitis?: Prisma.SortOrder
   musteriKaynagi?: Prisma.SortOrder
+  ilkKaynak?: Prisma.SortOrder
+  ilkKaynakDetay?: Prisma.SortOrder
+  ilkKaynakTarihi?: Prisma.SortOrder
+  ilkYanit?: Prisma.SortOrder
   portfoyAlinabilirlik?: Prisma.SortOrder
   kisiId?: Prisma.SortOrder
   gondeAdi?: Prisma.SortOrder
@@ -1788,6 +1872,10 @@ export type KayitMinOrderByAggregateInput = {
   yetkili?: Prisma.SortOrder
   yetkiBitis?: Prisma.SortOrder
   musteriKaynagi?: Prisma.SortOrder
+  ilkKaynak?: Prisma.SortOrder
+  ilkKaynakDetay?: Prisma.SortOrder
+  ilkKaynakTarihi?: Prisma.SortOrder
+  ilkYanit?: Prisma.SortOrder
   portfoyAlinabilirlik?: Prisma.SortOrder
   kisiId?: Prisma.SortOrder
   gondeAdi?: Prisma.SortOrder
@@ -2222,6 +2310,10 @@ export type KayitCreateWithoutOfisInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -2300,6 +2392,10 @@ export type KayitUncheckedCreateWithoutOfisInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -2407,6 +2503,10 @@ export type KayitScalarWhereInput = {
   yetkili?: Prisma.BoolFilter<"Kayit"> | boolean
   yetkiBitis?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
   musteriKaynagi?: Prisma.EnumMusteriKaynagiNullableFilter<"Kayit"> | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  ilkKaynakDetay?: Prisma.StringNullableFilter<"Kayit"> | string | null
+  ilkKaynakTarihi?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
+  ilkYanit?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFilter<"Kayit"> | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.StringNullableFilter<"Kayit"> | string | null
   gondeAdi?: Prisma.StringNullableFilter<"Kayit"> | string | null
@@ -2474,6 +2574,10 @@ export type KayitCreateWithoutSahipKullaniciInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -2552,6 +2656,10 @@ export type KayitUncheckedCreateWithoutSahipKullaniciInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -2654,6 +2762,10 @@ export type KayitCreateWithoutLokasyonlarInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -2733,6 +2845,10 @@ export type KayitUncheckedCreateWithoutLokasyonlarInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -2824,6 +2940,10 @@ export type KayitUpdateWithoutLokasyonlarInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2903,6 +3023,10 @@ export type KayitUncheckedUpdateWithoutLokasyonlarInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2978,6 +3102,10 @@ export type KayitCreateWithoutOzellikInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -3057,6 +3185,10 @@ export type KayitUncheckedCreateWithoutOzellikInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -3148,6 +3280,10 @@ export type KayitUpdateWithoutOzellikInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3227,6 +3363,10 @@ export type KayitUncheckedUpdateWithoutOzellikInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3302,6 +3442,10 @@ export type KayitCreateWithoutKisiInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -3381,6 +3525,10 @@ export type KayitUncheckedCreateWithoutKisiInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -3482,6 +3630,10 @@ export type KayitCreateWithoutKisiBaglariInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -3561,6 +3713,10 @@ export type KayitUncheckedCreateWithoutKisiBaglariInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -3652,6 +3808,10 @@ export type KayitUpdateWithoutKisiBaglariInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3731,6 +3891,10 @@ export type KayitUncheckedUpdateWithoutKisiBaglariInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3806,6 +3970,10 @@ export type KayitCreateWithoutTalepMatchleriInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -3885,6 +4053,10 @@ export type KayitUncheckedCreateWithoutTalepMatchleriInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -3965,6 +4137,10 @@ export type KayitCreateWithoutPortfoyMatchleriInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -4044,6 +4220,10 @@ export type KayitUncheckedCreateWithoutPortfoyMatchleriInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -4135,6 +4315,10 @@ export type KayitUpdateWithoutTalepMatchleriInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4214,6 +4398,10 @@ export type KayitUncheckedUpdateWithoutTalepMatchleriInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4300,6 +4488,10 @@ export type KayitUpdateWithoutPortfoyMatchleriInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4379,6 +4571,10 @@ export type KayitUncheckedUpdateWithoutPortfoyMatchleriInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4454,6 +4650,10 @@ export type KayitCreateWithoutPortalKaynagiInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -4533,6 +4733,10 @@ export type KayitUncheckedCreateWithoutPortalKaynagiInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -4624,6 +4828,10 @@ export type KayitUpdateWithoutPortalKaynagiInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4703,6 +4911,10 @@ export type KayitUncheckedUpdateWithoutPortalKaynagiInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4778,6 +4990,10 @@ export type KayitCreateWithoutAuditLoglariInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -4857,6 +5073,10 @@ export type KayitUncheckedCreateWithoutAuditLoglariInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -4948,6 +5168,10 @@ export type KayitUpdateWithoutAuditLoglariInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5027,6 +5251,10 @@ export type KayitUncheckedUpdateWithoutAuditLoglariInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5102,6 +5330,10 @@ export type KayitCreateWithoutGorusmeNotlariInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -5181,6 +5413,10 @@ export type KayitUncheckedCreateWithoutGorusmeNotlariInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -5272,6 +5508,10 @@ export type KayitUpdateWithoutGorusmeNotlariInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5351,6 +5591,10 @@ export type KayitUncheckedUpdateWithoutGorusmeNotlariInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5426,6 +5670,10 @@ export type KayitCreateWithoutFotolarInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -5505,6 +5753,10 @@ export type KayitUncheckedCreateWithoutFotolarInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -5596,6 +5848,10 @@ export type KayitUpdateWithoutFotolarInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5675,6 +5931,10 @@ export type KayitUncheckedUpdateWithoutFotolarInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5751,6 +6011,10 @@ export type KayitCreateManyOfisInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -5818,6 +6082,10 @@ export type KayitUpdateWithoutOfisInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5896,6 +6164,10 @@ export type KayitUncheckedUpdateWithoutOfisInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5973,6 +6245,10 @@ export type KayitUncheckedUpdateManyWithoutOfisInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6041,6 +6317,10 @@ export type KayitCreateManySahipKullaniciInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   kisiId?: string | null
   gondeAdi?: string | null
@@ -6108,6 +6388,10 @@ export type KayitUpdateWithoutSahipKullaniciInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6186,6 +6470,10 @@ export type KayitUncheckedUpdateWithoutSahipKullaniciInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6263,6 +6551,10 @@ export type KayitUncheckedUpdateManyWithoutSahipKullaniciInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6332,6 +6624,10 @@ export type KayitCreateManyKisiInput = {
   yetkili?: boolean
   yetkiBitis?: Date | string | null
   musteriKaynagi?: $Enums.MusteriKaynagi | null
+  ilkKaynak?: string | null
+  ilkKaynakDetay?: string | null
+  ilkKaynakTarihi?: Date | string | null
+  ilkYanit?: Date | string | null
   portfoyAlinabilirlik?: $Enums.PortfoyAlinabilirlik
   gondeAdi?: string | null
   gondeTelefon?: string | null
@@ -6398,6 +6694,10 @@ export type KayitUpdateWithoutKisiInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6477,6 +6777,10 @@ export type KayitUncheckedUpdateWithoutKisiInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6554,6 +6858,10 @@ export type KayitUncheckedUpdateManyWithoutKisiInput = {
   yetkili?: Prisma.BoolFieldUpdateOperationsInput | boolean
   yetkiBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   musteriKaynagi?: Prisma.NullableEnumMusteriKaynagiFieldUpdateOperationsInput | $Enums.MusteriKaynagi | null
+  ilkKaynak?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakDetay?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ilkKaynakTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ilkYanit?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfoyAlinabilirlik?: Prisma.EnumPortfoyAlinabilirlikFieldUpdateOperationsInput | $Enums.PortfoyAlinabilirlik
   gondeAdi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gondeTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6707,6 +7015,10 @@ export type KayitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   yetkili?: boolean
   yetkiBitis?: boolean
   musteriKaynagi?: boolean
+  ilkKaynak?: boolean
+  ilkKaynakDetay?: boolean
+  ilkKaynakTarihi?: boolean
+  ilkYanit?: boolean
   portfoyAlinabilirlik?: boolean
   kisiId?: boolean
   gondeAdi?: boolean
@@ -6789,6 +7101,10 @@ export type KayitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   yetkili?: boolean
   yetkiBitis?: boolean
   musteriKaynagi?: boolean
+  ilkKaynak?: boolean
+  ilkKaynakDetay?: boolean
+  ilkKaynakTarihi?: boolean
+  ilkYanit?: boolean
   portfoyAlinabilirlik?: boolean
   kisiId?: boolean
   gondeAdi?: boolean
@@ -6861,6 +7177,10 @@ export type KayitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   yetkili?: boolean
   yetkiBitis?: boolean
   musteriKaynagi?: boolean
+  ilkKaynak?: boolean
+  ilkKaynakDetay?: boolean
+  ilkKaynakTarihi?: boolean
+  ilkYanit?: boolean
   portfoyAlinabilirlik?: boolean
   kisiId?: boolean
   gondeAdi?: boolean
@@ -6933,6 +7253,10 @@ export type KayitSelectScalar = {
   yetkili?: boolean
   yetkiBitis?: boolean
   musteriKaynagi?: boolean
+  ilkKaynak?: boolean
+  ilkKaynakDetay?: boolean
+  ilkKaynakTarihi?: boolean
+  ilkYanit?: boolean
   portfoyAlinabilirlik?: boolean
   kisiId?: boolean
   gondeAdi?: boolean
@@ -6965,7 +7289,7 @@ export type KayitSelectScalar = {
   updatedAt?: boolean
 }
 
-export type KayitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "sahipKullaniciId" | "gorunurluk" | "isaret" | "tip" | "durum" | "aciliyet" | "anaKategori" | "mulkTipi" | "alternatifMulkTipleri" | "islemTipi" | "alternatifIslemTipleri" | "fiyat" | "minFiyat" | "maxFiyat" | "paraBirimi" | "fiyatPeriyodu" | "krediyeUygun" | "takasaAcik" | "m2" | "netM2" | "minM2" | "maxM2" | "m2ToleransYuzde" | "odaSayisi" | "lokasyonHam" | "adres" | "enlem" | "boylam" | "veriKanali" | "ilanSahibiTipi" | "havuz" | "yetkili" | "yetkiBitis" | "musteriKaynagi" | "portfoyAlinabilirlik" | "kisiId" | "gondeAdi" | "gondeTelefon" | "gondeSirket" | "kayitGrubu" | "mesajTarihi" | "kaynakDosya" | "ingestionId" | "portalUrl" | "portalIlanNo" | "portalIlanSahibi" | "baslik" | "ozet" | "aciklama" | "hamMetin" | "operasyonNotu" | "arsivNotu" | "ozelSartlar" | "validUntil" | "ttlUyariGonderildi" | "fingerprint" | "notionId" | "notionSonSync" | "notionSnapshot" | "notionGeriYazim" | "alanGuvenleri" | "aiModelVersiyon" | "createdAt" | "updatedAt", ExtArgs["result"]["kayit"]>
+export type KayitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "sahipKullaniciId" | "gorunurluk" | "isaret" | "tip" | "durum" | "aciliyet" | "anaKategori" | "mulkTipi" | "alternatifMulkTipleri" | "islemTipi" | "alternatifIslemTipleri" | "fiyat" | "minFiyat" | "maxFiyat" | "paraBirimi" | "fiyatPeriyodu" | "krediyeUygun" | "takasaAcik" | "m2" | "netM2" | "minM2" | "maxM2" | "m2ToleransYuzde" | "odaSayisi" | "lokasyonHam" | "adres" | "enlem" | "boylam" | "veriKanali" | "ilanSahibiTipi" | "havuz" | "yetkili" | "yetkiBitis" | "musteriKaynagi" | "ilkKaynak" | "ilkKaynakDetay" | "ilkKaynakTarihi" | "ilkYanit" | "portfoyAlinabilirlik" | "kisiId" | "gondeAdi" | "gondeTelefon" | "gondeSirket" | "kayitGrubu" | "mesajTarihi" | "kaynakDosya" | "ingestionId" | "portalUrl" | "portalIlanNo" | "portalIlanSahibi" | "baslik" | "ozet" | "aciklama" | "hamMetin" | "operasyonNotu" | "arsivNotu" | "ozelSartlar" | "validUntil" | "ttlUyariGonderildi" | "fingerprint" | "notionId" | "notionSonSync" | "notionSnapshot" | "notionGeriYazim" | "alanGuvenleri" | "aiModelVersiyon" | "createdAt" | "updatedAt", ExtArgs["result"]["kayit"]>
 export type KayitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   sahipKullanici?: boolean | Prisma.Kayit$sahipKullaniciArgs<ExtArgs>
@@ -7072,6 +7396,17 @@ export type $KayitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     yetkili: boolean
     yetkiBitis: Date | null
     musteriKaynagi: $Enums.MusteriKaynagi | null
+    /**
+     * v3.32 — İLK KAYNAK (değiştirilemez): kaydın ilk geldiği kanal (src/lib/domain/ilk-kaynak.ts kodları), ayrıntısı ve zamanı.
+     * Kayıt oluşturulurken sunucu yazar; sonradan yalnızca "kaynak.duzelt" yetkisi değiştirebilir ve her değişiklik audit_log'a düşer.
+     */
+    ilkKaynak: string | null
+    ilkKaynakDetay: string | null
+    ilkKaynakTarihi: Date | null
+    /**
+     * v3.32 — ilk temas (arama / WhatsApp / görüşme / gösterim notu) sunucuya ilk düştüğü an; ilk yanıt süresi buradan ölçülür
+     */
+    ilkYanit: Date | null
     portfoyAlinabilirlik: $Enums.PortfoyAlinabilirlik
     kisiId: string | null
     gondeAdi: string | null
@@ -7588,6 +7923,10 @@ export interface KayitFieldRefs {
   readonly yetkili: Prisma.FieldRef<"Kayit", 'Boolean'>
   readonly yetkiBitis: Prisma.FieldRef<"Kayit", 'DateTime'>
   readonly musteriKaynagi: Prisma.FieldRef<"Kayit", 'MusteriKaynagi'>
+  readonly ilkKaynak: Prisma.FieldRef<"Kayit", 'String'>
+  readonly ilkKaynakDetay: Prisma.FieldRef<"Kayit", 'String'>
+  readonly ilkKaynakTarihi: Prisma.FieldRef<"Kayit", 'DateTime'>
+  readonly ilkYanit: Prisma.FieldRef<"Kayit", 'DateTime'>
   readonly portfoyAlinabilirlik: Prisma.FieldRef<"Kayit", 'PortfoyAlinabilirlik'>
   readonly kisiId: Prisma.FieldRef<"Kayit", 'String'>
   readonly gondeAdi: Prisma.FieldRef<"Kayit", 'String'>

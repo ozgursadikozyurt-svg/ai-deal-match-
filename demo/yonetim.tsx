@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * YÖNETİM ekranı — kullanıcılar, davetler, ofisler (çok ofisli altyapının arayüzü).
  *
  *  - Ofis yöneticisi: kendi ofisinin kullanıcıları (rol, aç/kapat) ve davet bağlantıları.
@@ -16,7 +16,7 @@ import { CANLI } from "./depo";
 import { PLANLAR, ROL_ETIKETLERI, YETKILER, type Plan } from "../src/lib/guvenlik/yetki";
 
 type Rol = keyof typeof ROL_ETIKETLERI;
-interface Kullanici { id: string; eposta: string; adSoyad?: string | null; rol: Rol; aktif: boolean; sonGiris?: string | null }
+interface Kullanici { id: string; eposta: string; adSoyad?: string | null; rol: Rol; aktif: boolean; sonGiris?: string | null; yardimEdilenId?: string | null }
 interface Davet { id: string; eposta?: string | null; rol: Rol; durum: "BEKLIYOR" | "KULLANILDI" | "IPTAL"; sonKullanma: string; kullananEposta?: string | null }
 interface Ofis { id: string; ad: string; durum: "AKTIF" | "ASKIDA"; plan: Plan; sinirsiz: boolean; denemeBitis?: string | null; sehir?: string | null; _count: { kullanicilar: number; kayitlar: number } }
 
@@ -27,7 +27,7 @@ export const DEMO_YONETIM = {
   plan: "PRO" as Plan,
   kullanicilar: [
     { id: "k1", eposta: "ozgur@ozyurtlar.com", adSoyad: "Özgür Özyurt", rol: "PLATFORM_YONETICISI", aktif: true, sonGiris: gun(0) },
-    { id: "k2", eposta: "asistan@ozyurtlar.com", adSoyad: "Ofis asistanı", rol: "DANISMAN", aktif: true, sonGiris: gun(-1) },
+    { id: "k2", eposta: "asistan@ozyurtlar.com", adSoyad: "Ofis asistanı", rol: "ASISTAN", aktif: true, sonGiris: gun(-1), yardimEdilenId: "k1" },
   ] as Kullanici[],
   davetler: [{ id: "d1", eposta: "yeni.danisman@ornek.com", rol: "DANISMAN", durum: "BEKLIYOR", sonKullanma: gun(12) }] as Davet[],
   ofisler: [
@@ -36,6 +36,16 @@ export const DEMO_YONETIM = {
     { id: "o3", ad: "Konyaaltı Gayrimenkul (örnek)", durum: "AKTIF", plan: "UCRETSIZ", sinirsiz: false, sehir: "Antalya", _count: { kullanicilar: 1, kayitlar: 0 } },
   ] as Ofis[],
 };
+
+/**
+ * v3.32 — arayüzde yetki sorusu tek yerden: canlıda oturumun yetkileri, demoda "rol olarak görüntüle" ile seçilen rolün yetkileri.
+ * Sunucu aynı kuralı ayrıca uygular; bu yalnızca düğmeleri gizlemek / kilitlemek içindir.
+ */
+export function yetkiAktif(y: string): boolean {
+  if (CANLI.acik) return (CANLI.oturum?.bilgi?.yetkiler ?? []).includes(y);
+  return (YETKILER[DEMO_YONETIM.rol] as readonly string[]).includes(y);
+}
+export const aktifRolEtiketi = (): string => ROL_ETIKETLERI[(CANLI.acik ? CANLI.oturum?.bilgi?.kullanici.rol : DEMO_YONETIM.rol) as Rol] ?? "";
 
 /** Menüde "Yönetim" görünsün mü? Canlıda oturumdaki yetkiden, demoda seçili rolden. */
 export function yonetimGorunur(): boolean {
@@ -87,7 +97,7 @@ export function Yonetim() {
 
   const kullaniciDegis = (k: Kullanici, veri: Partial<Kullanici>) => calis(async () => {
     if (canli) await istek(`/api/kullanicilar?id=${k.id}`, { method: "PATCH", json: veri });
-    setKullanicilar((l) => l.map((x) => (x.id === k.id ? { ...x, ...veri } : x)));
+    setKullanicilar((l) => l.map((x) => (x.id === k.id ? { ...x, ...veri, ...(veri.rol && veri.rol !== "ASISTAN" ? { yardimEdilenId: null } : {}) } : x)));
   }, "Kullanıcı güncellendi");
 
   const davetUret = () => calis(async () => {
@@ -119,7 +129,9 @@ export function Yonetim() {
     bildir(`${ad} açıldı — aşağıdan ofis yöneticisi için davet bağlantısı üretin`);
   });
 
-  const rolSecenekleri: Rol[] = platform ? ["DANISMAN", "OFIS_YONETICISI", "PLATFORM_YONETICISI"] : ["DANISMAN", "OFIS_YONETICISI"];
+  const rolSecenekleri: Rol[] = platform ? ["ASISTAN", "DANISMAN", "OFIS_YONETICISI", "PLATFORM_YONETICISI"] : ["ASISTAN", "DANISMAN", "OFIS_YONETICISI"];
+  // v3.32 — asistanın yardım edebileceği kişiler: aynı ofisteki asistan olmayan aktif kullanıcılar
+  const yardimAdaylari = kullanicilar.filter((x) => x.rol !== "ASISTAN" && x.aktif);
   const sinir = PLANLAR[plan];
 
   return <div className="yigin">
@@ -127,7 +139,7 @@ export function Yonetim() {
     {!canli && <section className="kart yigin" aria-label="Demo görünümü">
       <b>Demo: rol olarak görüntüle</b>
       <p className="ipucu">Canlıda bu seçim yoktur; girişteki e-postanın rolü kullanılır. Burada her rolün ne gördüğünü deneyin.</p>
-      <div className="satir sar">{(["PLATFORM_YONETICISI", "OFIS_YONETICISI", "DANISMAN"] as Rol[]).map((r) =>
+      <div className="satir sar">{(["PLATFORM_YONETICISI", "OFIS_YONETICISI", "DANISMAN", "ASISTAN"] as Rol[]).map((r) =>
         <button key={r} className={"btn kucuk" + (demoRol === r ? " birincil" : "")} onClick={() => { DEMO_YONETIM.rol = r; setDemoRol(r); }}>{ROL_ETIKETLERI[r]}</button>)}</div>
       <div className="satir sar">{(["UCRETSIZ", "PRO", "PRO_PLUS"] as Plan[]).map((p) =>
         <button key={p} className={"btn kucuk" + (demoPlan === p ? " birincil" : "")} onClick={() => { DEMO_YONETIM.plan = p; setDemoPlan(p); }}>Plan: {PLANLAR[p].etiket}</button>)}</div>
@@ -146,7 +158,7 @@ export function Yonetim() {
 
     {hata && <div className="hata-kutu" role="alert">{hata}</div>}
 
-    {!yetkiler.includes("ofis.kullanicilar") ? <section className="kart"><p>Bu ekran yalnızca ofis yöneticileri içindir. Danışman olarak kendi talep, portföy ve kişilerinizi ve ofisin ortak portföyünü görürsünüz.</p></section> : <>
+    {!yetkiler.includes("ofis.kullanicilar") ? <section className="kart"><p>Bu ekran yalnızca ofis yöneticileri içindir. {rol === "ASISTAN" ? "Asistan olarak yardım ettiğiniz danışmanın talep, portföy ve kişileriyle ve ofisin ortak portföyüyle çalışırsınız. Kayıt silme, dışa aktarma, ofis ayarları ve ilk kaynağı değiştirme yetkiniz yoktur; gerekeni not düşüp yöneticinize bildirin." : "Danışman olarak kendi talep, portföy ve kişilerinizi ve ofisin ortak portföyünü görürsünüz."}</p></section> : <>
       {platform && <section className="kart yigin">
         <h3>Ofisler</h3>
         <p className="ipucu">Tüm ofisler. Yeni ofis açın, Pro deneme verin ya da erişimi askıya alın. Ofisler birbirinin verisini göremez.</p>
@@ -177,9 +189,15 @@ export function Yonetim() {
             <select aria-label={`${k.eposta} rolü`} value={k.rol} onChange={(e) => kullaniciDegis(k, { rol: e.target.value as Rol })} disabled={k.rol === "PLATFORM_YONETICISI" && !platform}>
               {(rolSecenekleri.includes(k.rol) ? rolSecenekleri : [...rolSecenekleri, k.rol]).map((r) => <option key={r} value={r}>{ROL_ETIKETLERI[r]}</option>)}
             </select>
+            {k.rol === "ASISTAN" && <select aria-label={`${k.eposta} kime yardım ediyor`} value={k.yardimEdilenId ?? ""} onChange={(e) => kullaniciDegis(k, { yardimEdilenId: e.target.value || null })}>
+              <option value="">Kime yardım ediyor? —</option>
+              {yardimAdaylari.filter((x) => x.id !== k.id).map((x) => <option key={x.id} value={x.id}>Yardım ettiği: {x.adSoyad || x.eposta}</option>)}
+            </select>}
             <button className="btn kucuk" onClick={() => kullaniciDegis(k, { aktif: !k.aktif })}>{k.aktif ? "Kapat" : "Aç"}</button>
           </div>
+          {k.rol === "ASISTAN" && !k.yardimEdilenId && <span className="ipucu" style={{ flexBasis: "100%" }}>Yardım ettiği kişi seçilmezse asistan yalnızca ofisin ortak kayıtlarını görür.</span>}
         </div>)}
+        <p className="ipucu">Asistan: yardım ettiği kişinin kayıt ve kişileriyle çalışır; açtığı kayıtlar o kişiye ait olur. Silemez, dışa aktaramaz, ofis ayarlarını ve kayıtların ilk kaynağını değiştiremez.</p>
       </section>
 
       <section className="kart yigin" id="yon-davet">

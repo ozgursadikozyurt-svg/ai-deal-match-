@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Demo — ortak giriş alanları: binlik ayraçlı sayı (1.500.000) ve standart telefon (+90 5XX XXX XX XX).
  */
 import React, { useEffect, useState } from "react";

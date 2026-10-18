@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * v3.6 — veritabanısız testler: üç yönlü birleştirme, Google Kişiler dönüştürücü + planlayıcı, Notion dönüştürücü
  * (gerçek alan adlarıyla) + planlayıcı, geri yazım, şifreleme, Notion istemcisi hız sınırı / 429 tekrarı.
  */

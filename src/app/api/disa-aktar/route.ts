@@ -1,14 +1,18 @@
-// Anahtar CRM v3.31 · 15 Ekim 2026
+// Anahtar CRM v3.32 · 18 Ekim 2026
+// v3.32 — yetki: kayit.disaAktar (asistan dışa aktaramaz — iş tanımı: "CRM dışına veri çıkarılması için işletme onayı alınır")
 // GET /api/disa-aktar?tablo=talepler|portfoyler|kisiler|eslesmeler|notlar&bicim=csv   → Excel'de açılan CSV
 // GET /api/disa-aktar?bicim=json                                                      → tam yedek (tüm tablolar, her alan)
 // Arşiv, yedek ya da başka bir CRM'e taşıma için. Tam veritabanı yedeği için ayrıca: Supabase → Database → Backups / pg_dump.
 import { prisma } from "@/lib/db";
 import { hata } from "@/lib/http/yanit";
+import { yetkiGerek } from "@/lib/guvenlik/yetki";
+import { istekSahibi } from "@/lib/services/istek";
 import { csvYaz, kayitSutunlari, kisiSutunlari, eslesmeSutunlari, notSutunlari } from "@/lib/disa-aktar";
 
 const dosya = (ad: string, govde: string, tur: string) => new Response(govde, { headers: { "content-type": `${tur}; charset=utf-8`, "content-disposition": `attachment; filename="${ad}"` } });
 export async function GET(req: Request) {
   try {
+    yetkiGerek(istekSahibi().rol, "kayit.disaAktar");
     const q = new URL(req.url).searchParams;
     const tarih = new Date().toISOString().slice(0, 10);
     if (q.get("bicim") === "json") {

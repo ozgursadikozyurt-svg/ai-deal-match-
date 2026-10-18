@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Üç yönlü alan birleştirme — Google Kişiler ve Notion senkronunun ortak çekirdeği.
  *
  * Her senkronda dış kaynaktan (Google / Notion) gelen alanların bir "fotoğrafı" (snapshot) kayda yazılır.

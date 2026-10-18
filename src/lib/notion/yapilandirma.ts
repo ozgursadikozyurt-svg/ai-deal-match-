@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Notion "Gayrimenkul CRM" sayfasındaki üç tablonun kimlikleri ve alan adları.
  * Kaynak: Notion API ile 30.09.2026'da okunan gerçek şema (alan adları birebir; "Talep " sonundaki boşluk dahil).
  * Başka bir çalışma alanı bağlanırsa kimlikler ortam değişkenleriyle değiştirilir:

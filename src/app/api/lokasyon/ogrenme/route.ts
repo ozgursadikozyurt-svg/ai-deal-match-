@@ -1,4 +1,4 @@
-// Anahtar CRM v3.31 · 15 Ekim 2026
+// Anahtar CRM v3.32 · 18 Ekim 2026
 // Konum öğrenme (bkz. src/lib/lokasyon/ogrenme.ts)
 // GET  /api/lokasyon/ogrenme?durum=BEKLIYOR   → adaylar + en olası konum önerisi (güçlü/zayıf)
 // POST /api/lokasyon/ogrenme { ifade, hedef: { ilceId, mahalleId?, altBolgeId? }, tip? }  → onayla: sözlüğe (alias) ekle

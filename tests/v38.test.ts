@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * v3.8 — talepte "zaten var" (tekrar anahtarları), kartlarda "kim" etiketi, eşleşmeyi kopar (demo ekranları), dışa aktarma CSV.
  */
 import { test } from "node:test";

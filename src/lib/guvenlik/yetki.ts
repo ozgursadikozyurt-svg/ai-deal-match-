@@ -1,11 +1,14 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * ROLLER VE YETKİLER — tek kaynak.
  *
- * Üç rol var:
+ * Dört rol var:
  *   PLATFORM_YONETICISI — Özgür. Tüm ofisleri görür, ofis açar, davet eder, plan verir, askıya alır.
  *   OFIS_YONETICISI     — ofisin sahibi. Kendi ofisinin kullanıcılarını, ayarlarını ve tüm kayıtlarını yönetir.
  *   DANISMAN            — kendi kayıtlarını ve ofisin ortak portföyünü görür.
+ *   ASISTAN (v3.32)     — yardım ettiği danışmanın kayıt ve kişileriyle çalışır (kayıt açar, günceller, not ve görev girer,
+ *                         eşleştirir). Silemez, dışa aktaramaz, ofis ayarlarını ve ilk kaynağı değiştiremez
+ *                         (iş tanımı › yetki matrisi: "kaynak, işlem, komisyon ve prim kayıtlarını değiştirmek yetkisi dışında").
  *
  * Yetkiler kodda durur; ekrandan düzenlenmez (v3.20 kararı — gereksiz karmaşa).
  * Veri ayrımı (hangi ofis) buradan DEĞİL src/lib/kiracilik.ts'ten zorlanır; burası "ne yapabilir".
@@ -24,10 +27,12 @@ export type Yetki =
   | "ofis.entegrasyon" // Google / Notion bağlantısı
   | "ofis.disaAktar" // ofisin tüm verisini dışa aktar
   | "ofis.tumKayitlar" // ofisteki herkesin kaydını gör
+  | "kaynak.duzelt" // v3.32 — kilitli ilk kaynağı değiştir (her değişiklik audit_log'a düşer)
   // --- günlük iş ---
   | "kayit.oku"
   | "kayit.yaz"
-  | "kayit.sil"
+  | "kayit.sil" // talep / portföy ve kişi silme
+  | "kayit.disaAktar" // v3.32 — kendi görebildiği kayıtları CSV / JSON indir
   | "kisi.oku"
   | "kisi.yaz"
   | "eslesme.oku"
@@ -35,20 +40,14 @@ export type Yetki =
   | "ai.kullan"
   | "foto.yukle";
 
-const DANISMAN: Yetki[] = [
-  "kayit.oku",
-  "kayit.yaz",
-  "kayit.sil",
-  "kisi.oku",
-  "kisi.yaz",
-  "eslesme.oku",
-  "eslesme.yaz",
-  "ai.kullan",
-  "foto.yukle",
-];
+/** v3.32 — asistanın günlük işi: kayıt / kişi / eşleşme okuma-yazma, yapay zekâ, fotoğraf. Silme ve dışa aktarma yok. */
+const ASISTAN: Yetki[] = ["kayit.oku", "kayit.yaz", "kisi.oku", "kisi.yaz", "eslesme.oku", "eslesme.yaz", "ai.kullan", "foto.yukle"];
+
+const DANISMAN: Yetki[] = [...ASISTAN, "kayit.sil", "kayit.disaAktar"];
 
 const OFIS_YONETICISI: Yetki[] = [
   ...DANISMAN,
+  "kaynak.duzelt",
   "ofis.kullanicilar",
   "ofis.davet",
   "ofis.ayarlar",
@@ -60,6 +59,7 @@ const OFIS_YONETICISI: Yetki[] = [
 const PLATFORM_YONETICISI: Yetki[] = [...OFIS_YONETICISI, "platform.ofisler", "platform.plan", "platform.kullanim"];
 
 export const YETKILER: Record<Rol, readonly Yetki[]> = {
+  ASISTAN,
   DANISMAN,
   OFIS_YONETICISI,
   PLATFORM_YONETICISI,
@@ -69,6 +69,7 @@ export const ROL_ETIKETLERI: Record<Rol, string> = {
   PLATFORM_YONETICISI: "Platform yöneticisi",
   OFIS_YONETICISI: "Ofis yöneticisi",
   DANISMAN: "Danışman",
+  ASISTAN: "Asistan",
 };
 
 export const yetkiVar = (rol: Rol, y: Yetki): boolean => YETKILER[rol].includes(y);

@@ -1,13 +1,14 @@
-// Anahtar CRM v3.31 · 15 Ekim 2026
+// Anahtar CRM v3.32 · 18 Ekim 2026
 // GET   /api/kullanicilar        → ofisin kullanıcıları (ofis yöneticisi)
-// PATCH /api/kullanicilar?id=…   → { rol?, aktif?, adSoyad?, telefon? }
+// PATCH /api/kullanicilar?id=…   → { rol?, aktif?, adSoyad?, telefon?, yardimEdilenId? (v3.32 — asistanın yardım ettiği kullanıcı) }
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { ok, hata, sorgu } from "@/lib/http/yanit";
 import { kullaniciListesi, kullaniciGuncelle } from "@/lib/services/ofis";
 
 const Guncelle = z.object({
-  rol: z.enum(["PLATFORM_YONETICISI", "OFIS_YONETICISI", "DANISMAN"]).optional(),
+  rol: z.enum(["PLATFORM_YONETICISI", "OFIS_YONETICISI", "DANISMAN", "ASISTAN"]).optional(),
+  yardimEdilenId: z.string().max(64).nullable().optional(),
   aktif: z.boolean().optional(),
   adSoyad: z.string().max(120).optional(),
   telefon: z.string().max(40).optional(),

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Hızlı, hoşgörülü arama (Kişiler ekranı ve kişi seçici).
  *  - Birkaç harf yeter: her kelime metnin HERHANGİ bir yerinde geçmesi yeterli ("ahm yıl" → "Ahmet Yılmaz").
  *  - Kelimelerin sırası önemsiz; hepsi bulunmalı (ad + not + şirket karışık yazılabilir: "mehmet depo").

@@ -1,12 +1,13 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
  * Dosyalar: ortak.tsx (ortak parçalar) · form.tsx · ice-aktarma.tsx · konumlar.tsx · bu dosya (ekranlar + kabuk)
  */
+import { IlkKaynakSatirlari } from "./ilk-kaynak";
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Yonetim, yonetimGorunur } from "./yonetim";
+import { Yonetim, yonetimGorunur, yetkiAktif, aktifRolEtiketi } from "./yonetim";
 import { createRoot } from "react-dom/client";
 import { MULK_OZELLIK_META, SIRALAMA, katYaz } from "../src/lib/domain/teknik-alanlar";
 import { MULK_AILELERI, aileOf } from "../src/lib/domain/kategori";
@@ -340,6 +341,7 @@ function Detay({ id }: { id: string }) {
         {v.kaynakDosya && <div><span>Dosya</span><b>{v.kaynakDosya}</b></div>}
         {v.portalUrl && <div><span>İlan</span><b><a href={v.portalUrl} target="_blank" rel="noreferrer">{v.portalIlanNo ?? "Bağlantı"}</a></b></div>}
         <div><span>Sisteme giriş</span><b>{tarihYaz(k.olusturma)}</b></div>
+        <IlkKaynakSatirlari v={v as any} />
       </div>
       {v.hamMetin ? <><button className="btn kucuk" onClick={() => setHamAcik(!hamAcik)}>{hamAcik ? "Orijinal mesajı gizle" : "Orijinal mesajı göster"}</button>
         {hamAcik && <div className="wa-balon"><div className="wa-ust">{v.gondeAdi ?? telYaz(v.gondeTelefon) ?? "Gönderen"}{v.mesajTarihi ? ` · ${tarihYaz(v.mesajTarihi, true)}` : ""}{v.kayitGrubu ? ` · ${v.kayitGrubu}` : ""}</div><div className="wa-metin">{v.hamMetin}</div></div>}</> : <p className="ipucu">Orijinal mesaj yok (elle girildi).</p>}
@@ -567,12 +569,17 @@ function Ayarlar() {
         <span className="ayar-gecis-ok" aria-hidden="true">›</span>
       </button>)}
     </section>
+    {/* v3.32 — ofis ayarlarını yalnızca ofis yöneticisi değiştirir (asistan ve danışman görür, düzenleyemez); sunucu da reddeder */}
+    {!yetkiAktif("ofis.ayarlar") && <section className="kart"><p className="ipucu">🔒 {aktifRolEtiketi()} olarak ayarları görebilirsiniz; değiştirmek ofis yöneticisine aittir.</p></section>}
+    <fieldset className="yigin" disabled={!yetkiAktif("ofis.ayarlar")} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
     <SahiplikAyarlari />
     <AiAyarlari />
     <PaylasimAyarlari />
     <CalismaIliAyari />
     <RolYonetimi />
-    <DisaAktar />
+    </fieldset>
+    {yetkiAktif("kayit.disaAktar") ? <DisaAktar /> : <section className="kart"><h3>Dışa aktar</h3><p className="ipucu">🔒 Verilerin CRM dışına çıkarılması yöneticinin onayıyla yapılır; dışa aktarma bu rolde kapalı.</p></section>}
+    <fieldset className="yigin" disabled={!yetkiAktif("ofis.ayarlar")} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
     <section className="kart">
       <h3>Varsayılan geçerlilik süreleri</h3>
       <p className="ipucu">Yeni kayıtlar bu süre sonunda pasife düşer. Her kaydın süresi kendi ekranından uzatılabilir.</p>
@@ -582,6 +589,7 @@ function Ayarlar() {
       <div className="satir"><button className="btn birincil" onClick={() => { guncelle((x) => ({ ...x, ayarlar: { ...x.ayarlar, ttl } })); bildir("Süreler kaydedildi"); }}>Kaydet</button>
         <button className="btn" onClick={() => { const n = d.kayitlar.filter((k) => (kalanGun(k.veri) ?? 1) <= 0).length; guncelle((x) => ({ ...x, kayitlar: x.kayitlar.map((k) => ((kalanGun(k.veri) ?? 1) <= 0 ? { ...k, veri: sureUzat(k.veri, ttlGun(k.veri.tip, k.veri.islemTipi, k.veri.aciliyet, ttl)) } : k)) })); bildir(`${n} süresi dolmuş kayıt uzatıldı`); }}>Süresi dolanları uzat</button></div>
     </section>
+    </fieldset>
     {CANLI.acik && <CanliAyarKarti />}
     {!CANLI.acik && <>
     <section className="kart">
@@ -658,6 +666,7 @@ export function Uygulama() {
   useEffect(() => { const s = sahiplikCozucu(d); const y = benimSuresiz(d, (v) => s(v).tur === "BENIM"); if (y !== d) setD(y); }, [d.kayitlar, d.kisiler, d.ayarlar.sahiplik]);
   useEffect(() => { let iptal = false; (async () => { try { const s = CANLI.acik ? CANLI.sample : await (window as any).claude?.use("sample"); if (!iptal) setSample(() => s ?? null); /* fonksiyon doğrudan verilirse React onu güncelleyici sanıp çağırıyordu → v3.3 hatası "n.json is not a function" */ } catch { if (!iptal) setSample(null); } })(); return () => { iptal = true; }; }, []);
   useEffect(() => { if (!mesaj) return; const t = setTimeout(() => setMesaj(null), 2600); return () => clearTimeout(t); }, [mesaj]);
+  useEffect(() => { CANLI.bildir = setMesaj; return () => { CANLI.bildir = null; }; }, []); // v3.32 — sunucu uyarıları (kilitli ilk kaynak, yetki)
   useEffect(() => { void kutuOzetYukle(); }, []); // v3.23 — gelen kutusu: açılışta yalnızca dosya listesi (tek küçük istek); dosyalar ekran açılınca okunur
   const gelenRozet = useGelenRozet(d);
   useEffect(() => googleOtomatik((f) => setD((x) => f(x))), []); // v3.22.2 canlı: açılışta yalnızca Google bağlantı DURUMU okunur; eşitleme günde bir sunucuda ya da elle (eskiden açılışta + 5 dk'da bir)

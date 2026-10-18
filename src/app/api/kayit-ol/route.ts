@@ -1,4 +1,4 @@
-// Anahtar CRM v3.31 · 15 Ekim 2026
+// Anahtar CRM v3.32 · 18 Ekim 2026
 // POST /api/kayit-ol { ofisAd, adSoyad, telefon?, sehir?, onay: true } → davetsiz gelen danışman kendi ofisini açar
 // (ofis yöneticisi, 14 gün Pro deneme). Yalnızca Cloudflare'de ACIK_KAYIT=1 ise açıktır (src/canli/worker.ts).
 // Ofis bağlamı GEREKTİRMEZ ama giriş şarttır: e-posta doğrulanmış oturum anahtarından gelir, istekten değil.

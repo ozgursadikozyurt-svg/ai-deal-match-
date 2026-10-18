@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Ekranlar arası devir: Gelen Kutusu › "✦ Yapay zekâyla oku" WhatsApp sohbet parçalarını Veri Girişi › WhatsApp içe aktarmaya bırakır.
  * (v3.23'te ice-aktarma.tsx içindeydi; Gelen Kutusu Veri Girişi'nin sekmesi olunca döngüsel içe aktarma olmasın diye ayrıldı.)
  */

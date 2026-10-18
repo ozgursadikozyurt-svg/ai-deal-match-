@@ -633,7 +633,8 @@ export type CakismaDurum = (typeof CakismaDurum)[keyof typeof CakismaDurum]
 export const Rol = {
   PLATFORM_YONETICISI: 'PLATFORM_YONETICISI',
   OFIS_YONETICISI: 'OFIS_YONETICISI',
-  DANISMAN: 'DANISMAN'
+  DANISMAN: 'DANISMAN',
+  ASISTAN: 'ASISTAN'
 } as const
 
 export type Rol = (typeof Rol)[keyof typeof Rol]

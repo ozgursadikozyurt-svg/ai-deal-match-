@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Canlı — Supabase girişi (e-posta ile tek kullanımlık bağlantı / kod). Ek kütüphane yok: Supabase Auth (GoTrue) REST uçları doğrudan çağrılır.
  * Oturum bu tarayıcıda (localStorage) tutulur; erişim anahtarı süresi dolmadan yenilenir. Yeni kayıt açılmaz (create_user: false);
  * sunucu ayrıca e-postayı IZINLI_EPOSTALAR listesiyle denetler.

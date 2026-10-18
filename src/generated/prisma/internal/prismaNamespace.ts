@@ -2833,6 +2833,7 @@ export const KullaniciScalarFieldEnum = {
   telefon: 'telefon',
   rol: 'rol',
   aktif: 'aktif',
+  yardimEdilenId: 'yardimEdilenId',
   sonGiris: 'sonGiris',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -3022,6 +3023,10 @@ export const KayitScalarFieldEnum = {
   yetkili: 'yetkili',
   yetkiBitis: 'yetkiBitis',
   musteriKaynagi: 'musteriKaynagi',
+  ilkKaynak: 'ilkKaynak',
+  ilkKaynakDetay: 'ilkKaynakDetay',
+  ilkKaynakTarihi: 'ilkKaynakTarihi',
+  ilkYanit: 'ilkYanit',
   portfoyAlinabilirlik: 'portfoyAlinabilirlik',
   kisiId: 'kisiId',
   gondeAdi: 'gondeAdi',

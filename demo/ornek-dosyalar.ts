@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Demo — toplu veri girişi örnekleri. Portal listesi: Özgür'ün gönderdiği portal dosyasının ilk satırlarından alınan
  * mülk bilgileri; danışman, ofis, sahip adları ve ilan bağlantıları KURGUSAL. Haftalık talep tablosu: aynı biçim
  * (3. haftada tablo E sütunundan başlar), kişiler KURGUSAL.

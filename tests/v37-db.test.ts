@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * v3.7 — veritabanlı: dosyadan toplu ekleme (kişi adla/telefonla tekilleşir, aynı ilan ikinci kez eklenmez),
  * dosya önizlemesinde "zaten var" işareti, görüşme notu + kişinin son iletişim tarihi.
  */

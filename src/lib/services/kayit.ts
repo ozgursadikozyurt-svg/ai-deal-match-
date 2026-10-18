@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Kayıt servis katmanı — API route'ları, WhatsApp ingest ve Notion import aynı fonksiyonları kullanır.
  */
 import { createHash } from "node:crypto";
@@ -7,6 +7,9 @@ import type { Prisma, PrismaClient } from "../../generated/prisma/client";
 import type { KayitCreateData, KayitListeFiltre, MulkOzellikData } from "../validation/kayit";
 import { KayitUpdateSchema } from "../validation/kayit";
 import { z } from "zod";
+import { ilkKaynakKarari } from "../domain/ilk-kaynak";
+import { istekSahibi } from "./istek";
+import { yetkiVar } from "../guvenlik/yetki";
 
 /** TTL (gün): kurallar src/lib/domain/gecerlilik.ts'te; ekrandan değiştirilen değerler `ayar` tablosunda ("ttl"). */
 export { TTL_VARSAYILAN, TtlAyarSchema, varsayilanValidUntil, type TtlAyar } from "../domain/gecerlilik";
@@ -38,10 +41,15 @@ function ozellikData(o: Partial<MulkOzellikData>): Prisma.MulkOzellikCreateWitho
 }
 
 export async function kayitOlustur(prisma: PrismaClient, k: KayitCreateData) {
-  const { lokasyonlar, ozellik, validUntil, kisiler, ...alanlar } = k;
+  const { lokasyonlar, ozellik, validUntil, kisiler, ilkKaynakTarihi: _t, ilkYanit: _y, ...alanlar } = k;
+  // v3.32 — ilk kaynak: seçildiyse o, değilse tahmin; zamanı sunucu yazar
+  const { sahipId } = istekSahibi();
+  const ilk = ilkKaynakKarari(null, k, false, new Date()).yaz;
   return prisma.kayit.create({
     data: {
       ...alanlar,
+      ...ilk,
+      ...(sahipId ? { sahipKullaniciId: sahipId } : {}),
       validUntil: validUntil ?? vu(k.tip, k.islemTipi, k.aciliyet, new Date(), await ttlAyarlari(prisma)),
       fingerprint: fingerprint(k),
       lokasyonlar: { create: lokasyonlar.map((l, sira) => ({ ...l, sira })) },
@@ -118,7 +126,13 @@ export async function kayitListele(prisma: PrismaClient, f: KayitListeFiltre) {
 export async function kayitGuncelle(prisma: PrismaClient, id: string, veri: z.output<typeof KayitUpdateSchema>, kaynak = "kullanici") {
   return prisma.$transaction(async (tx) => {
     const eski = await tx.kayit.findUniqueOrThrow({ where: { id }, include: { ozellik: true } });
-    const { ozellik, lokasyonlar, ...alanlar } = veri;
+    const { ozellik, lokasyonlar, ilkKaynakTarihi: _t, ilkYanit: _y, ilkKaynak, ilkKaynakDetay, ...digerAlanlar } = veri as typeof veri & { ilkKaynakTarihi?: unknown; ilkYanit?: unknown; ilkKaynak?: string | null; ilkKaynakDetay?: string | null };
+    // v3.32 — ilk kaynak kilidi: gönderildiyse kuraldan geçer (değişiklik aşağıdaki genel audit döngüsünde loglanır)
+    const kilit = ilkKaynak !== undefined || ilkKaynakDetay !== undefined
+      ? ilkKaynakKarari(eski as any, { ...eski, ilkKaynak, ilkKaynakDetay } as any, yetkiVar(istekSahibi().rol, "kaynak.duzelt"), new Date())
+      : null;
+    if (kilit?.uyari) throw Object.assign(new Error(kilit.uyari), { durum: 403 });
+    const alanlar = { ...digerAlanlar, ...(kilit ? { ilkKaynak: kilit.yaz.ilkKaynak, ilkKaynakDetay: kilit.yaz.ilkKaynakDetay, ilkKaynakTarihi: kilit.yaz.ilkKaynakTarihi } : {}) };
     const loglar: Prisma.AuditLogCreateManyInput[] = [];
     for (const [k, v] of Object.entries(alanlar))
       if (v !== undefined && JSON.stringify((eski as Record<string, unknown>)[k]) !== JSON.stringify(v))

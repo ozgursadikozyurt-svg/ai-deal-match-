@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Demo — kayıt formu. Şemadan üretilir; mülk grubuna göre yalnızca anlamlı alanlar,
  * önce "önemli alanlar", gerisi "Tüm alanlar" altında. Bölümler varsayılan kapalı.
  */
@@ -9,6 +9,9 @@ import { talepDnasi } from "../src/lib/eslestirme/talep-dna";
 import { EksikUyarisi } from "./motor-ui";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { KaynakSecici } from "./kaynak-secici";
+import { IlkKaynakAlani } from "./ilk-kaynak";
+import { ilkKaynakKarari } from "../src/lib/domain/ilk-kaynak";
+import { yetkiAktif } from "./yonetim";
 import { kaynakOf, kaynakUygula } from "../src/lib/domain/kaynak";
 import { KayitCreateSchema, MulkOzellikSchema } from "../src/lib/validation/kayit";
 import { MULK_OZELLIK_META, alanGruptaMi, KAT_SECENEKLERI, odaListesi, odaYaz, type MulkOzellikAlani } from "../src/lib/domain/teknik-alanlar";
@@ -244,6 +247,10 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
     temiz.alternatifMulkTipleri = (temiz.alternatifMulkTipleri ?? []).filter((t: string) => t !== temiz.mulkTipi).slice(0, 5);
     delete temiz.anaKategori; // her zaman mülk tipinden türetilir
     if (SATIS_ISLEMLERI.has(temiz.islemTipi)) temiz.fiyatPeriyodu = "TOPLAM"; // v3.22.1 — satışta periyot her zaman toplam
+    // v3.32 — ilk kaynak kilidi (sunucu da aynı kuralı uygular): yeni kayıtta seçim ya da tahmin + zaman; kilitliyse eski değer kalır
+    const ilk = ilkKaynakKarari(mevcut ? (mevcut.veri as any) : null, temiz, yetkiAktif("kaynak.duzelt"), new Date(), null);
+    Object.assign(temiz, ilk.yaz, { ilkYanit: (mevcut?.veri as any)?.ilkYanit ?? null });
+    if (ilk.uyari) bildir(ilk.uyari);
     const p = KayitCreateSchema.safeParse(temiz);
     if (!p.success) { setHatalar(p.error.issues.map((i) => ({ yer: hataEtiketi(i.path as any), mesaj: i.message }))); ust.current?.scrollIntoView({ behavior: "smooth" }); return; }
     const kayit: Kayit = { id: mevcut?.id ?? yeniId(tip), olusturma: mevcut?.olusturma ?? BUGUN.toISOString(), veri: p.data };
@@ -289,6 +296,8 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
         <div className="alan"><label htmlFor="f-per">Fiyat periyodu</label><select id="f-per" value={f.fiyatPeriyodu} onChange={(e) => set("fiyatPeriyodu", e.target.value)}>{["TOPLAM", "AYLIK", "YILLIK", "GUNLUK"].map((x) => <option key={x} value={x}>{etiket(x)}</option>)}</select></div>
         {/* v3.24 — tek bakışta kaynak: seçim aşağıdaki İlan sahibi / Havuz / Geldiği kanal alanlarını birlikte ayarlar */}
         <div className="alan genis"><label>Kaynak</label><KaynakSecici deger={kaynakOf({ ...f, tip })} degis={(k) => setF((x: any) => kaynakUygula({ ...x, tip }, k))} /></div>
+        {/* v3.32 — ilk kaynak: yeni kayıtta seçilir, kayıttan sonra kilitlenir (yalnızca ofis yöneticisi düzeltir) */}
+        <IlkKaynakAlani f={f} set={set} kayitliDeger={mevcut?.veri as any} />
         <div className="alan"><label htmlFor="f-sahip">İlan sahibi</label><select id="f-sahip" value={f.ilanSahibiTipi} onChange={(e) => set("ilanSahibiTipi", e.target.value)}>{Object.entries(ILAN_SAHIBI_ETIKET).map(([k, e]) => <option key={k} value={k}>{e}</option>)}</select></div>
         {!talep && <div className="alan"><label htmlFor="f-havuz">Havuz</label><select id="f-havuz" value={f.havuz} onChange={(e) => set("havuz", e.target.value)}>{Object.entries(HAVUZ_ETIKET).map(([k, e]) => <option key={k} value={k}>{e}</option>)}</select></div>}
         {!talep && f.havuz === "KENDI_PORTFOY" && <div className="alan"><label htmlFor="f-yetki">Yetki belgesi</label><div className="satir"><button type="button" id="f-yetki" className={cx("bool-cip", f.yetkili && "evet")} onClick={() => set("yetkili", !f.yetkili)}><span className="isaret">{f.yetkili ? "✓" : "+"}</span>Yetkili portföy</button>{f.yetkili && <input type="date" aria-label="Yetki bitiş" value={f.yetkiBitis ? new Date(f.yetkiBitis).toISOString().slice(0, 10) : ""} onChange={(e) => set("yetkiBitis", e.target.value ? new Date(e.target.value + "T12:00:00") : null)} />}</div></div>}

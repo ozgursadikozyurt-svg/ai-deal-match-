@@ -1,4 +1,4 @@
-// Anahtar CRM v3.31 · 15 Ekim 2026
+// Anahtar CRM v3.32 · 18 Ekim 2026
 // ============================================================================
 //  Anahtar.ai — Prisma Şeması (AŞAMA 2 v3.1; v3.3: konut, kaynak, konum öğrenme, ayarlar; v3.4: kişi bağları, işlenmiş mesaj; v3.5: yetkili portföy)
 //  Tarih: 30 Eylül 2026  |  Önceki: v2.0 (14–18 Eylül 2026)
@@ -592,6 +592,8 @@ enum Rol {
   PLATFORM_YONETICISI
   OFIS_YONETICISI
   DANISMAN
+  /// v3.32 — asistan: yardım ettiği danışmanın kayıtlarıyla çalışır; silemez, dışa aktaramaz, ayar ve ilk kaynağı değiştiremez
+  ASISTAN
 }
 
 enum Plan {
@@ -710,6 +712,8 @@ model Kullanici {
   telefon String?
   rol     Rol     @default(DANISMAN)
   aktif   Boolean @default(true)
+  /// v3.32 — rol ASISTAN ise yardım ettiği kullanıcı (o kişinin özel kayıt ve kişilerini de görür)
+  yardimEdilenId String?
   sonGiris DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1006,6 +1010,13 @@ model Kayit {
   yetkili         Boolean        @default(false)
   yetkiBitis      DateTime?
   musteriKaynagi  MusteriKaynagi?
+  /// v3.32 — İLK KAYNAK (değiştirilemez): kaydın ilk geldiği kanal (src/lib/domain/ilk-kaynak.ts kodları), ayrıntısı ve zamanı.
+  /// Kayıt oluşturulurken sunucu yazar; sonradan yalnızca "kaynak.duzelt" yetkisi değiştirebilir ve her değişiklik audit_log'a düşer.
+  ilkKaynak       String?
+  ilkKaynakDetay  String?
+  ilkKaynakTarihi DateTime?
+  /// v3.32 — ilk temas (arama / WhatsApp / görüşme / gösterim notu) sunucuya ilk düştüğü an; ilk yanıt süresi buradan ölçülür
+  ilkYanit        DateTime?
   portfoyAlinabilirlik PortfoyAlinabilirlik @default(BILINMIYOR)
   kisiId          String?
   kisi            Kisi?          @relation(fields: [kisiId], references: [id])
@@ -1078,6 +1089,7 @@ model Kayit {
   @@index([validUntil])
   @@index([gondeTelefon])
   @@index([kisiId])
+  @@index([ofisId, ilkKaynak]) // v3.32 — kaynak raporları
   @@map("kayit")
   @@index([portalIlanNo]) // v3.7 — toplu içe aktarmada aynı ilanı tanımak için
 }

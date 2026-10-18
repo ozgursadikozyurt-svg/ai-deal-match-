@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * OFİS, KULLANICI VE DAVET işlemleri.
  *
  * Hesap açma davetle olur: yönetici bir bağlantı üretir, bağlantıdaki gizli kodun yalnızca
@@ -14,7 +14,7 @@ import { PLANLAR, planSinirlari, yetkiGerek } from "../guvenlik/yetki";
 
 export const DAVET_GUN = 14;
 
-const ROL = z.enum(["PLATFORM_YONETICISI", "OFIS_YONETICISI", "DANISMAN"]);
+const ROL = z.enum(["PLATFORM_YONETICISI", "OFIS_YONETICISI", "DANISMAN", "ASISTAN"]);
 
 export const OfisSchema = z.object({
   ad: z.string().min(2).max(120),
@@ -204,7 +204,8 @@ export async function davetiKabulEt(prisma: PrismaClient, kod: string, eposta: s
       return { hata: `Bu ofisin planında en çok ${sinir.kullanici} kullanıcı olabilir (${sinir.etiket}). Pro'ya geçmek gerekiyor.`, durum: 402 as const };
 
     const k = await prisma.kullanici.create({
-      data: { ofisId: d.ofisId, eposta: e, rol: d.rol, sonGiris: new Date() },
+      // v3.32 — asistan daveti: asistan, daveti üreten kişiye yardım eder (Yönetim ekranından değiştirilebilir)
+      data: { ofisId: d.ofisId, eposta: e, rol: d.rol, sonGiris: new Date(), ...(d.rol === "ASISTAN" && d.olusturanId ? { yardimEdilenId: d.olusturanId } : {}) },
       select: { id: true, ofisId: true, rol: true },
     });
     await prisma.davet.update({
@@ -224,21 +225,29 @@ export async function kullaniciListesi(prisma: PrismaClient) {
   yetkiGerek(b.rol, "ofis.kullanicilar");
   return prisma.kullanici.findMany({
     orderBy: { createdAt: "asc" },
-    select: { id: true, eposta: true, adSoyad: true, telefon: true, rol: true, aktif: true, sonGiris: true, createdAt: true },
+    select: { id: true, eposta: true, adSoyad: true, telefon: true, rol: true, aktif: true, yardimEdilenId: true, sonGiris: true, createdAt: true },
   });
 }
 
-export async function kullaniciGuncelle(prisma: PrismaClient, id: string, veri: { rol?: Rol; aktif?: boolean; adSoyad?: string; telefon?: string }) {
+export async function kullaniciGuncelle(prisma: PrismaClient, id: string, veri: { rol?: Rol; aktif?: boolean; adSoyad?: string; telefon?: string; yardimEdilenId?: string | null }) {
   const b = ofisBaglami();
   yetkiGerek(b.rol, "ofis.kullanicilar");
   if (veri.rol === "PLATFORM_YONETICISI") yetkiGerek(b.rol, "platform.ofisler");
   if (id === b.kullaniciId && (veri.aktif === false || (veri.rol && veri.rol !== b.rol)))
     throw Object.assign(new Error("Kendi rolünüzü düşüremez ya da hesabınızı kapatamazsınız"), { durum: 400 });
+  // v3.32 — asistanın yardım ettiği kişi: aynı ofisten, asistan olmayan, kendisi olmayan bir kullanıcı
+  const data: Record<string, unknown> = { ...veri };
+  if (veri.yardimEdilenId) {
+    if (veri.yardimEdilenId === id) throw Object.assign(new Error("Asistan kendisine yardım edemez"), { durum: 400 });
+    const h = await prisma.kullanici.findFirst({ where: { id: veri.yardimEdilenId }, select: { rol: true } }); // ofis süzgeci kiracılıktan
+    if (!h || h.rol === "ASISTAN") throw Object.assign(new Error("Yardım edilecek kişi bu ofiste bir danışman ya da yönetici olmalı"), { durum: 400 });
+  }
+  if (veri.rol && veri.rol !== "ASISTAN") data.yardimEdilenId = null; // rol değişince asistan bağı kalkar
   // where'e ofisId süzgeci kiracilik katmanında eklenir → başka ofisin kullanıcısı güncellenemez
   return prisma.kullanici.update({
     where: { id },
-    data: veri,
-    select: { id: true, eposta: true, rol: true, aktif: true },
+    data: data as any,
+    select: { id: true, eposta: true, rol: true, aktif: true, yardimEdilenId: true },
   });
 }
 

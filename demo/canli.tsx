@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.32 · 18 Ekim 2026 (v3.14'ten)
  * v3.20: davet bağlantısıyla katılma (?davet=KOD), açılışta /api/oturum (rol, plan, yetkiler), hesabı olmayana anlaşılır mesaj.
  * Canlı giriş noktası (dist/canli/index.html): giriş → ilk kurulum denetimi → sunucudan durum → aynı demo ekranları, veri sunucuda.
  */
@@ -134,7 +134,7 @@ function Canli({ cfg }: { cfg: Yapilandirma }) {
       const sunucu = await r.json();
       const durum = sunucudanDurum(sunucu);
       fotoEsle(durum.kayitlar as any);
-      const k = kaydediciKur({ api, baslangic: durum, durum: setKaydet, yedekAnahtari: `anahtar.canli.bekleyen.${o.eposta ?? "?"}` });
+      const k = kaydediciKur({ api, baslangic: durum, durum: setKaydet, yedekAnahtari: `anahtar.canli.bekleyen.${o.eposta ?? "?"}`, uyari: (m) => CANLI.bildir?.(m) });
       kaydedici.current = k;
       // v3.22.1 — açılışta onarım (demo/onarim.ts) + önceki oturumda sunucuya ulaşamamış yeni kayıtlar (yerel yedek):
       // ikisi de sunucudaki hâlden farklı olduğu için kayıt kuyruğu onları kendiliğinden sunucuya yazar

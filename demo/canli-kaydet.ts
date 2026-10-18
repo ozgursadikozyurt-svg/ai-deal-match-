@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * Canlı — kaydetme kuyruğu. Arayüzdeki her değişiklikte `kuyrugaAl(durum)` çağrılır; kısa bir bekleyişten sonra (arka arkaya değişiklikler birleşir)
  * yalnızca değişenler POST /api/durum ile sunucuya yazılır. Sunucunun reddettiği kayıtlar (doğrulama hatası) "değişmemiş" sayılmaz, hata listesinde görünür.
  * Ağ koparsa değişiklikler bellekte durur, aralıklarla yeniden denenir; sekme kapatılırken bekleyen iş varsa tarayıcı uyarır.
@@ -16,7 +16,7 @@ export interface KaydetDurumu { ad: KaydetAdi; hatalar: { id: string; mesaj: str
 type Api = (yol: string, init?: { method?: string; json?: unknown }) => Promise<Response>;
 
 export const RED_YENIDEN_MS = 60_000;
-export function kaydediciKur(a: { api: Api; baslangic: DepoDurumu; durum: (s: KaydetDurumu) => void; bekleMs?: number; yenidenMs?: number; yedekAnahtari?: string; simdi?: () => number }) {
+export function kaydediciKur(a: { api: Api; baslangic: DepoDurumu; durum: (s: KaydetDurumu) => void; bekleMs?: number; yenidenMs?: number; yedekAnahtari?: string; simdi?: () => number; /** v3.32 — kaydı reddetmeyen sunucu uyarıları */ uyari?: (mesaj: string) => void }) {
   const simdi = a.simdi ?? (() => Date.now());
   const sunucuda = { kayit: new Set(a.baslangic.kayitlar.map((k) => k.id)), kisi: new Set(a.baslangic.kisiler.map((k) => k.id)) };
   const redZamani = new Map<string, number>();
@@ -59,6 +59,7 @@ export function kaydediciKur(a: { api: Api; baslangic: DepoDurumu; durum: (s: Ka
         const j: any = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(j?.mesaj ?? (j?.alanlar ? "Doğrulama hatası" : `Sunucu ${r.status}`));
         for (const h of (j?.hatalar ?? []) as { id: string; mesaj: string }[]) yeniHatalar.push(h);
+        for (const u of [...new Set(((j?.uyarilar ?? []) as { mesaj: string }[]).map((x) => x.mesaj))]) a.uyari?.(u);
       }
       // başarıyla yazılanlar kaydedilmiş sayılır; reddedilenler eski imzada kalır (bir sonraki değişiklikte yeniden denenir)
       const kabul = new Map(p.imza.kayit), kisiK = new Map(p.imza.kisi);

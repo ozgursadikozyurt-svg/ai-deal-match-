@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.31 · 15 Ekim 2026
+ * Anahtar CRM v3.32 · 18 Ekim 2026
  * GELEN KUTUSU — sunucu tarafı. Sunucu dosyayı AÇMAZ: türüne bakar, özetini alır, depoya koyar, künyesini yazar.
  * Ayrıştırma (zip açma, Excel okuma, e-posta eklerini çıkarma, mükerrer denetimi) tarayıcıda yapılır —
  * Cloudflare ücretsiz planda istek başına 10 ms işlemci süresi vardır; 1.000 satırlık bir Excel'i sunucuda okumak 503 üretir.
