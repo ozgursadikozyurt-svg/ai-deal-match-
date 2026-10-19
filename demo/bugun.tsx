@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * "Bugün" panosu — Ana Sayfa'da "★ Benim ve ofisim" kartının içinde. Danışmana her gün ne yapması gerektiğini söyler:
  * geciken + bugünkü görevler (en çok 15; ilk 5'i açık), her görevde üç düğme (Ulaşılamadı · Görüşüldü · İlgilenmiyor),
  * "Bu hafta" kapalı. Kurallar src/lib/domain/gorev.ts, durum işlemleri demo/bugun-eylem.ts.

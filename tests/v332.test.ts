@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * v3.32 — veritabanısız: ilk kaynak tahmini ve kilidi, ilk yanıt, asistan rolünün yetkileri ve görünürlük süzgeci.
  */
 import { test } from "node:test";
@@ -121,6 +121,6 @@ test("arayüz: asistan kilitli ilk kaynağı yalnızca görür; yönetici seçic
 
 test("sürüm 3.32 ve ek belge", async () => {
   const { SURUM, SURUM_GECMISI } = await import("../src/lib/surum");
-  assert.equal(SURUM, "3.32"); assert.equal(SURUM_GECMISI[0].surum, "3.32"); assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 3);
+  assert.ok(SURUM >= "3.32"); const k332 = SURUM_GECMISI.find((x) => x.surum === "3.32")!; assert.ok((k332.testEt ?? []).length >= 3); /* v3.33den beri en üstte değil */
   assert.ok(readFileSync("docs/ANAHTAR_CRM_EK_v3.32_18Ekim2026.md", "utf8").includes("kaynak.duzelt"));
 });

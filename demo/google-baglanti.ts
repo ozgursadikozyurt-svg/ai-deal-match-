@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * Canlı — Google Kişiler bağlantısının arayüz tarafı (ağ çağrıları). Ekran: demo/baglantilar.tsx.
  *
  *  googleDurumYenile  → GET /api/entegrasyon (+ açık çakışmalar): bağlı mı, hangi hesap, son eşitleme, sayılar

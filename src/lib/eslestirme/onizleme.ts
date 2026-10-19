@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * EŞLEŞTİRME MOTORU v3 (v3.11; v2 = v3.5) — veritabanı ve yapay zekâ gerektirmeyen saf fonksiyon.
  * Metin benzerliği değil, ticari gayrimenkulün katı kuralları (Killer Criteria):
  *  1. Talep DNA'sı (talep-dna.ts): öldürücü kriterler = talepte "şart" denenler + kullanım amacının doğası
@@ -75,7 +75,27 @@ export const BILINMEYEN_ISTEK_CEZASI = 4, BILINMEYEN_ISTEK_TAVAN = 12;
 export const BILINMEYEN_ISTEK_SKOR_TAVANI = 85;
 /** v3.27 — istenen özellik portföyde açıkça YOK ise (ör. ofis yok): engel değilse bile bilinmeyenden daha aşağı sıralanır */
 export const KARSILANMAYAN_ISTEK_CEZASI = 8, KARSILANMAYAN_ISTEK_TAVAN = 16;
-export const KARSILANMAYAN_ISTEK_SKOR_TAVANI = 80;
+export const KARSILANMAYAN_ISTEK_SKOR_TAVANI = 70; // v3.33: 80 → 70 (şartı bilinmeyenin, 74, altında)
+/**
+ * v3.33 — talepte ŞART olan bir kriter portföyde bilinmiyorsa (elektrik gücü yazılmamış depo, m²'si olmayan ilan) her biri için
+ * düşülen puan ve skor tavanı. Ölçüm (19 Eki 2026, Özgür): "50 kW şart" talebine elektriği bilinmeyen depolar 83–84 alıyordu —
+ * bilinmeyen şart, sıradan bir bilinmeyen gibi yalnızca −4 sayılıyordu; 105 depo portföyünün 22'sinde güç doğrulanmışken onlar öne
+ * geçemiyordu. Elenmez (Koşullu, "Sorulacak"), ama doğrulanmış eşleşmelerin (85+) ve şartsız bilinmeyenlerin (≤ 84) altına iner.
+ * Sıralama merdiveni: doğrulanmış 85–100 · şartsız bilinmeyen ≤ 84 · şartı bilinmeyen ≤ 74 · karşılanmayan istek ≤ 70 · kat uymuyor ≤ 60 · uygun değil ≤ 40.
+ */
+export const SART_BILINMEYEN_CEZASI = 15, SART_BILINMEYEN_SKOR_TAVANI = 74;
+/**
+ * v3.33 — istenen kat tutmuyorsa (talep "katta" / ara kat, portföy giriş · zemin · son kat): elenmez ama listenin sonuna iner.
+ * Özgür (19 Eki 2026): "katta" diyen müşteriye giriş, zemin, son kat sunulmaz; yine de tercih değişebileceği için düşük puanla görünsün.
+ */
+export const KAT_UYMUYOR_SKOR_TAVANI = 60;
+/** v3.33 — portföyde elektrik gücü alanı boşsa ilan metninden okunur ("40 kVA", "60 kw"); kW = kVA = kwa (eşit sayılır) */
+export function metindenGuc(k: Pick<OnizlemeKayit, "baslik" | "aciklama" | "hamMetin" | "ozet">): number | null {
+  const m = [k.baslik, k.aciklama, k.hamMetin, k.ozet].filter(Boolean).join(" ").toLocaleLowerCase("tr").match(/(\d{1,5})\s*(?:k\.?v\.?a\b|kwa\b|kw\b|kilovat)/u);
+  const n = m ? Number(m[1]) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+const sayiMi = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : typeof v === "string" && v.trim() && Number.isFinite(Number(v)) ? Number(v) : null);
 export type GuvenSeviye = "YUKSEK" | "ORTA" | "DUSUK";
 export interface Guven { seviye: GuvenSeviye; olculen: number; toplam: number; aciklama: string }
 
@@ -557,21 +577,33 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   // v3.29 — tek alanlı evet/hayır şartı (asansör, havuz) "şart" işaretlenmiş ama alanı boş bırakılmışsa "istiyor" sayılır
   const tOzellik: Record<string, unknown> = { ...(t.ozellik ?? {}) };
   for (const [kr, alan] of Object.entries(KRITIK_EVET_ALANI)) if (kritik.has(kr) && tOzellik[alan] == null) tOzellik[alan] = true;
+  // v3.33 — elektrik gücü: kW, kVA ("kwa") ve (trafo kelimesi geçmeden okunmuş) trafo kVA'sı aynı ölçü sayılır, tek satırda karşılaştırılır
+  const pOzellik: Record<string, unknown> = { ...(p.ozellik ?? {}) };
+  let gucMetinden = false;
+  const tGuc = sayiMi(tOzellik.elektrikGucuKw) ?? sayiMi(tOzellik.elektrikGucuKva) ?? (kritik.has("TRAFO") ? null : sayiMi(tOzellik.trafoGucuKva));
+  if (tGuc != null) {
+    tOzellik.elektrikGucuKw = tGuc;
+    if (!kritik.has("TRAFO")) delete tOzellik.trafoGucuKva;
+    if (sayiMi(pOzellik.elektrikGucuKw) == null) {
+      const pg = sayiMi(pOzellik.elektrikGucuKva) ?? sayiMi(pOzellik.trafoGucuKva) ?? metindenGuc(p);
+      if (pg != null) { gucMetinden = sayiMi(pOzellik.elektrikGucuKva) == null && sayiMi(pOzellik.trafoGucuKva) == null; pOzellik.elektrikGucuKw = pg; }
+    }
+  }
   for (const [alan, tv] of Object.entries(tOzellik)) {
     const meta = MULK_OZELLIK_META[alan as MulkOzellikAlani];
     if (!meta || meta.karsilastirma === "bilgi" || tv == null || (Array.isArray(tv) && !tv.length)) continue;
     if (meta.karsilastirma === "bool" && tv === false) {
       // v3.22.1 — "Site içi olmayan", "havuz istemiyor": portföyde varsa yumuşak uyumsuzluk (Koşullu; engel değil).
       // Diğer evet/hayır alanlarında "istemiyor" hâlâ kısıt sayılmaz.
-      if (ISTENMEYEBILIR.has(alan) && p.ozellik?.[alan] === true) satirlar.push({ anahtar: alan, etiket: meta.etiket, talep: "İstemiyor", portfoy: "Var", sonuc: "SAGLANMADI", kritik: false, puan: 0.3, bilesen: "KONUT" });
+      if (ISTENMEYEBILIR.has(alan) && pOzellik[alan] === true) satirlar.push({ anahtar: alan, etiket: meta.etiket, talep: "İstemiyor", portfoy: "Var", sonuc: "SAGLANMADI", kritik: false, puan: 0.3, bilesen: "KONUT" });
       continue;
     }
     // v3.27 — depo / sanayide kapalı alan girilmemişse ilanın m²'si kapalı alan sayılır (portal ilanlarında ayrı alan yok)
-    const kapaliYedek = alan === "kapaliAlanM2" && p.ozellik?.[alan] == null && p.m2 != null && matrisOf(p.mulkTipi) === "SANAYI";
+    const kapaliYedek = alan === "kapaliAlanM2" && pOzellik[alan] == null && p.m2 != null && matrisOf(p.mulkTipi) === "SANAYI";
     // v3.28 — talepteki kapalı alan, talebin alt m² sınırıyla aynıysa (yapay zekâ aynı bilgiyi iki kez yazıyor) ve portföyde ayrı
     // kapalı alan yoksa satır açılmaz: "Alan (±%10) uygun · Kapalı alan uymuyor" çelişkisi (900 m²'lik depo, 1000 m² talep) giderildi.
     if (kapaliYedek && t.minM2 != null && Math.abs(Number(tv) - t.minM2) <= t.minM2 * 0.05) continue;
-    const pv = kapaliYedek ? p.m2 : p.ozellik?.[alan];
+    const pv = kapaliYedek ? p.m2 : pOzellik[alan];
     const kr = "kriter" in meta ? (meta.kriter as string | undefined) : undefined;
     // v3.28 — alan türü "en az" karşılaştırmaları (kapalı / açık / arsa alanı) talebin alan toleransıyla yapılır (tutarlılık)
     const alanTuru = meta.karsilastirma === "min" && /AlanM2$/.test(alan);
@@ -580,7 +612,7 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
     satirlar.push({
       anahtar: alan, etiket: meta.etiket + ("birim" in meta && meta.birim ? ` (${meta.birim})` : "") + (alanTuru ? ` (±%${dna.m2Tolerans})` : ""),
       talep: meta.karsilastirma === "min" ? `≥ ${fmt(tv)}` : meta.karsilastirma === "max" ? `≤ ${fmt(tv)}` : meta.karsilastirma === "sirali" ? `en az ${fmt(tv)}` : fmt(tv),
-      portfoy: fmt(pv) + (kapaliYedek ? " (ilan m²'si)" : ""), sonuc, ...(puan != null ? { puan } : {}),
+      portfoy: fmt(pv) + (kapaliYedek ? " (ilan m²'si)" : alan === "elektrikGucuKw" && gucMetinden ? " (ilan metninden)" : ""), sonuc, ...(puan != null ? { puan } : {}),
       kritik: !!kr && kritik.has(kr), bilesen: kr ? BILESEN[kr] ?? "DIGER" : "DIGER",
     });
   }
@@ -635,13 +667,18 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   // v3.27 — istenen ama portföyde bilinmeyen özellik (çekirdek alan / fiyat / oda ve tip hariç; onların kendi kuralı var)
   // kullanım amacı müşterinin niyetidir, portföyde doğrulanacak bir özellik değil (portföylerde neredeyse hiç dolu değil)
   const ISTEK_DISI = ["odaSayisi", "m2", "fiyat", "mulkTipi", "kullanimAmaclari"];
-  const bilinmeyenIstekler = satirlar.filter((x) => x.sonuc === "BILINMIYOR" && !ISTEK_DISI.includes(x.anahtar)).map((x) => x.etiket);
+  // v3.33 — şart olanlar ayrı ve daha ağır sayılır (bkz. SART_BILINMEYEN_CEZASI); fiyatın kendi çarpanı var
+  const sartBilinmeyenler = satirlar.filter((x) => x.kritik && x.sonuc === "BILINMIYOR" && x.anahtar !== "fiyat" && x.anahtar !== "kullanimAmaclari" && x.anahtar !== "mulkTipi");
+  skor -= SART_BILINMEYEN_CEZASI * sartBilinmeyenler.length;
+  if (sartBilinmeyenler.length) skor = Math.min(skor, SART_BILINMEYEN_SKOR_TAVANI);
+  const bilinmeyenIstekler = satirlar.filter((x) => x.sonuc === "BILINMIYOR" && !x.kritik && !ISTEK_DISI.includes(x.anahtar)).map((x) => x.etiket);
   skor -= Math.min(BILINMEYEN_ISTEK_TAVAN, BILINMEYEN_ISTEK_CEZASI * bilinmeyenIstekler.length);
   if (bilinmeyenIstekler.length) skor = Math.min(skor, BILINMEYEN_ISTEK_SKOR_TAVANI);
   const karsilanmayanIstekler = satirlar.filter((x) => x.sonuc === "SAGLANMADI" && !x.kritik && !ISTEK_DISI.includes(x.anahtar));
   skor -= Math.min(KARSILANMAYAN_ISTEK_TAVAN, KARSILANMAYAN_ISTEK_CEZASI * karsilanmayanIstekler.length);
   // v3.28 — istenen özelliğin OLMADIĞI biliniyorsa en fazla 80 (komşu mahalleyle aynı): "bilinmiyor" (≤ 84) her zaman önünde kalır
   if (karsilanmayanIstekler.length) skor = Math.min(skor, KARSILANMAYAN_ISTEK_SKOR_TAVANI);
+  if (satirlar.some((x) => x.anahtar === "istenenKatlar" && x.sonuc === "SAGLANMADI")) skor = Math.min(skor, KAT_UYMUYOR_SKOR_TAVANI); // v3.33
   if (fiyatBilinmiyor) skor = Math.round(skor * FIYATSIZ_CARPAN);
   // v3.28 — konum tavanı (başka ilçedeki komşu mahalle komşudan 8 puan aşağıda)
   const konumTavani = KONUM_SKOR_TAVANI[lok.kademe];

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -387,8 +387,13 @@ function Eslesmeler() {
   const es = hepsi.filter((e) => {
     const ara = f.ara.toLocaleLowerCase("tr");
     if (ara && !`${baslikOf(e.t.veri)} ${baslikOf(e.p.veri)} ${e.t.veri.gondeAdi ?? ""} ${e.p.veri.gondeAdi ?? ""} ${[...e.t.veri.lokasyonlar, ...e.p.veri.lokasyonlar].map(lokEtiket).join(" ")}`.toLocaleLowerCase("tr").includes(ara)) return false;
-    // v3.16: filtre artık iki tarafa birden uygulanır (eski "Filtre neye uygulansın" seçimi kaldırıldı)
-    if (!filtreUygula(e.p.veri, { ...f, ara: "" }, kisiAd, kisiRol) && !filtreUygula(e.t.veri, { ...f, ara: "" }, kisiAd, kisiRol)) return false;
+    // v3.33 — mülk türü ve işlem PORTFÖYE (önerilen mülke) uygulanır: "Daire / Dükkan" seçiliyken "Depo/Mağaza" talebine önerilen depo
+    // görünüyordu (talebin alternatif tipi Dükkan olduğu için talep tarafı süzgeçten geçiyordu). Portföyün kendi tipi esas alınır.
+    if (f.aileler.length && !f.aileler.includes(aileOf(e.p.veri.mulkTipi as any).kod)) return false;
+    if (f.islemler.length && !f.islemler.some((i) => String(e.p.veri.islemTipi).includes(i))) return false;
+    // v3.16: diğer süzgeçler iki tarafa birden uygulanır (talep ya da portföy tutarsa)
+    const f2 = { ...f, ara: "", aileler: [], islemler: [] };
+    if (!filtreUygula(e.p.veri, f2, kisiAd, kisiRol) && !filtreUygula(e.t.veri, f2, kisiAd, kisiRol)) return false;
     if (e.s.skor < minSkor) return false;
     if (takip.length && !takip.includes(d.eslesmeNotlari[eKey(e.t.id, e.p.id)]?.durum ?? "YENI")) return false;
     return true;

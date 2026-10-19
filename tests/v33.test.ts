@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * v3.3 — veritabanısız testler: WhatsApp ayrıştırıcı + ön filtre, mülk tipi benzerliği, konut eşleştirmesi,
  * konum öğrenme, alan-grup tutarlılığı.  Çalıştır: npx tsx --test tests/v33.test.ts
  */

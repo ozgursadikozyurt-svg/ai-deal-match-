@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * Kayıt servis katmanı — API route'ları, WhatsApp ingest ve Notion import aynı fonksiyonları kullanır.
  */
 import { createHash } from "node:crypto";

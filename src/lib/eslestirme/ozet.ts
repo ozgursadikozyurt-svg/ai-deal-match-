@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * Kayıt başına eşleşme özeti (en iyi skor, uygun eşleşme sayısı, en iyi karşı kayıt).
  * Notion'a geri yazımda ve senkron raporunda ("bu içe aktarma N yeni eşleşme getirdi") kullanılır.
  */

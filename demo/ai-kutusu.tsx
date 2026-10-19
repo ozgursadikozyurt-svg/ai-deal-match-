@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * Demo — Akıllı giriş kutusu ("Anahtar AI"). Ana sayfanın en üstünde ve Veri girişi › Yapıştır'da aynı bileşen.
  *   1) Metin önce yorumlanır (src/lib/ai/yorumlayici.ts): portal ilan sayfası, WhatsApp sohbet dökümü, toplu liste,
  *      tek talep / ilan, yalnızca bağlantı, kişi / telefon ya da soru.

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * HIZLI AYRIŞTIRICI — yapay zekâdan ÖNCE çalışan kural tabanlı (regex + sözlük) çözümleyici. Ücretsizdir.
  * Amaç: yapıştırılan WhatsApp mesajı / portal ilanı ya da doğal dil sorusunun çoğunu yapay zekâ
  * çağırmadan anlamak; yapay zekâ yalnızca kural tabanlı sonuç "yeterli" değilse çağrılır.
@@ -277,9 +277,9 @@ export function hizliAyristir(metin0: string): HizliSonuc {
 
   const kayitAlanlari: Record<string, unknown> = {}; // v3.17 — jargondan gelen kayıt alanları (krediyeUygun, takasaAcik)
   // Teknik alanlar
-  const kw = m.match(/(\d[\d.,]*)\s*(kw|kilovat)/), kva = m.match(/(\d[\d.,]*)\s*kva/);
-  if (kw) ozellik.elektrikGucuKw = sayiOku(kw[1]);
-  if (kva) ozellik.trafoGucuKva = sayiOku(kva[1]);
+  // v3.33 — "40 kw", "40 kva", "40 kwa", "40 kilovat" hepsi elektrik gücü (eşit sayılır); trafo gücü yalnızca "trafo" geçiyorsa
+  const guc = m.match(/(\d[\d.,]*)\s*(?:k\.?v\.?a\b|kwa\b|kw\b|kilovat|kilo\s*volt)/);
+  if (guc) { if (/trafo/.test(m)) ozellik.trafoGucuKva = sayiOku(guc[1]); else ozellik.elektrikGucuKw = sayiOku(guc[1]); }
   const yuk = m.match(/(?:y[üu]kseklik|tavan|makas\s*alt[ıi])[^\d]{0,12}(\d[\d.,]*)\s*(?:m|metre)?|(\d[\d.,]*)\s*(?:m|metre)\s*(?:y[üu]kseklik|tavan|net\s*y[üu]kseklik|makas)/);
   if (yuk) ozellik[/makas/.test(yuk[0]) ? "makasAltiYukseklikM" : "netYukseklikM"] = sayiOku(yuk[1] ?? yuk[2]);
   if (/\bt[ıi]r\b/.test(m)) ozellik.aracErisimi = "TIR"; else if (/kamyon\b/.test(m)) ozellik.aracErisimi = "KAMYON";

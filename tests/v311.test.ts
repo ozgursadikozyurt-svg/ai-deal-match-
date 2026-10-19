@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * v3.11 — mahalle komşuluğu ve eşleştirme motoru v3 (konum kademeleri, oda, bütçe altı, belirsiz mahalle adı).
  */
 import { test } from "node:test";

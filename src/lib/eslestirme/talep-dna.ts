@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * TALEP DNA'SI — bir talebin eşleştirmeden önce çıkarılan "genetiği":
  *  - Aciliyet
  *  - Kritik (öldürücü) kriterler: karşılanmazsa portföy UYGUN_DEGIL

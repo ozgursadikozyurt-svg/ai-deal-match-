@@ -1,4 +1,4 @@
-// Anahtar CRM v3.32 · 18 Ekim 2026
+// Anahtar CRM v3.33 · 19 Ekim 2026
 import { ZodError } from "zod";
 
 export const ok = (data: unknown, status = 200) => Response.json(data, { status });

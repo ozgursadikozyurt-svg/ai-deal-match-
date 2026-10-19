@@ -1,4 +1,4 @@
-// Anahtar CRM v3.32 · 18 Ekim 2026
+// Anahtar CRM v3.33 · 19 Ekim 2026
 // Gelen kutusunun adresi ve Gmail köprüsünün anahtarı.
 // GET  /api/gelen/adres                 → { kod, eposta, kopru }   eposta: alan adı bağlıysa "<kod>@<GELEN_ALAN_ADI>", değilse null
 // POST /api/gelen/adres { yenile: true } → yeni kod üretir (eski adres ve köprü anahtarı çalışmaz olur) — yalnızca ofis yöneticisi

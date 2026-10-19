@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * Notion CRM → Anahtar.ai enum eşlemesi (tek yönlü import için).
  * Kaynak tablolar: "💯 CRM Listesi / Talepler Tablosu", "Mülkler ve Satış Tüneli",
  * "Müşteri-Yatırımcılar-Kişiler". Seçenek adları 30.09.2026 itibarıyla birebir alındı.

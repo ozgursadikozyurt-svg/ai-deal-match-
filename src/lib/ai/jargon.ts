@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * Emlak jargonu sözlüğü — WhatsApp / ilan metinlerindeki kısaltma ve deyimleri teknik alanlara çevirir.
  * Sözlüğün insan tarafından okunur hali: docs/emlak_jargon.md (ikisi birlikte güncellenir, tests/v317.test.ts ikisini de denetler).
  * Buradaki kurallar yapay zekâdan ÖNCE çalışır: ne kadar çok jargon kuralla çözülürse o kadar az yapay zekâ çağrısı yapılır.
@@ -93,6 +93,10 @@ export function katOku(m: string): { bulunduguKat?: number; katSayisi?: number }
 
 /** "SIFIR" = 0 yaş · "15 yıllık" = 15 yaş */
 export function binaYasiOku(m: string): number | undefined {
+  // v3.33 — aralık / üst sınır önce: "sıfırdan 7-8 yaşına kadar" → 8 (eskiden "sıfır" görülüp 0 okunuyordu), "en fazla 10 yaş", "10 yaş altı"
+  const ust = m.match(/(?:(\d{1,2})\s*[-–/]\s*)?(\d{1,2})\s*ya[şs][ıi]?(?:na|ndan)?\s*(?:kadar|alt[ıi]|ve\s*alt[ıi])/u)
+    ?? m.match(/(?:en\s*fazla|maks(?:imum)?|max)()\s*(\d{1,2})\s*ya[şs]/u);
+  if (ust) return Number(ust[2]);
   if (/\bs[ıi]f[ıi]r\b|\bs[ıi]f[ıi]r\s*bina|yeni\s*bina|yap[ıi]m[ıi]\s*yeni/u.test(m)) return 0;
   const g = m.match(/(\d{1,3})\s*(?:y[ıi]ll[ıi]k|ya[şs][ıi]nda|ya[şs][ıi]\b)/u);
   return g ? Number(g[1]) : undefined;

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * MÜKERRER PORTFÖY — aynı ilan farklı kaynaktan (portal + WhatsApp grubu, iki emlakçı) iki kez girildiğinde eşleşme
  * listesinde iki satır olarak çıkıyordu. Ölçüm (13 Eki 2026): 410 aktif portföyde 9 grup / 19 kayıt (ör. Hurma 3+1 140 m² 9,1 milyon).
  * Kayıtlar silinmez ve birleştirilmez; yalnızca bir talebin eşleşme listesinde tek satırda gösterilir ("+1 aynı ilan").

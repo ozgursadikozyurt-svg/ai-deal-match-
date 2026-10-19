@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * YÖNETİM ekranı — kullanıcılar, davetler, ofisler (çok ofisli altyapının arayüzü).
  *
  *  - Ofis yöneticisi: kendi ofisinin kullanıcıları (rol, aç/kapat) ve davet bağlantıları.

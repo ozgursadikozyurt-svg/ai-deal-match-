@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * Gemini "structured output" şeması — Zod şemalarından OTOMATİK üretilir.
  * Gemini'ye `generationConfig: { responseMimeType: "application/json", responseSchema }` verilir;
  * model enum dışı değer veya tanımsız alan üretemez. Dönen JSON yine de Zod'dan geçirilir (çift kilit).
@@ -110,7 +110,7 @@ Görevin: WhatsApp / portal metnini VERİLEN JSON ŞEMASINA göre alanlara ayır
 KURALLAR
 1. Gürültü (silinen mesaj, medya, katılım bildirimi, araç/malzeme satışı) → {"sinif":"GURULTU","kayitlar":[]}.
 2. Bilmediğin alanı null bırak. Tahmin etme. "Değerinde", "sorunuz" gibi fiyatlar → null.
-3. Elektrik: "60 kwa", "60 KVA" → elektrikGucuKva=60; "50 kw" → elektrikGucuKw=50. Ham ifadeyi elektrikGucuHam'a yaz.
+3. Elektrik: "60 kwa", "60 KVA", "60 kw" hepsi → elektrikGucuKw=60 (kW ve kVA eşit sayılır; trafoGucuKva yalnızca "trafo" kelimesi geçiyorsa). Ham ifadeyi elektrikGucuHam'a yaz.
    "Özel trafolu" → trafo=true. "Sanayi tipi elektrik / 3 faz sanayi" → sanayiElektrigi=true.
 4. Alan: "4000 m2 kapalı 2000 m2 açık" → kapaliAlanM2=4000, acikAlanM2=2000, m2=4000.
    "5-7 dönüm" → minM2=5000, maxM2=7000. "1000 üzeri" → minM2=1000.
@@ -137,7 +137,7 @@ KURALLAR
     "kombili/doğalgazlı" → isinmaTipi=DOGALGAZ_KOMBI; "yerden ısıtma" → YERDEN_ISITMA; "merkezi" → MERKEZI.
     "eşyalı" → esyaDurumu=ESYALI; "eşyasız/boş" → ESYASIZ. "site içi/sitede" → siteIcinde=true; "havuzlu" → havuz=true.
     "güney cephe" → cepheYonleri=["GUNEY"]; "güney-batı" → ["GUNEY","BATI"]. "3. kat" → bulunduguKat=3; "bahçe katı" → bulunduguKat=0, bahce=true.
-    "krediye uygun" → krediyeUygun=true. "deniz manzaralı" → denizManzarasi=true. "5 yaşında bina" → binaYasi=5; "sıfır" → binaYasi=0.
+    "krediye uygun" → krediyeUygun=true. "deniz manzaralı" → denizManzarasi=true. "5 yaşında bina" → binaYasi=5; "sıfır" → binaYasi=0; TALEPTE üst sınır: "sıfırdan 7-8 yaşına kadar" → binaYasi=8, "en fazla 10 yaş" → binaYasi=10.
     Talepte "asansör şart", "havuzlu olmalı", "en az 2 banyo" gibi şartlar kritikKriterler'e (ASANSOR, HAVUZ, BANYO, SITE_GUVENLIK, KAT, ISINMA…) yazılır; şart denmeden yalnızca "asansörlü" yazıyorsa kritik değildir (ozellik.asansor=true yeterli).
 16. TOPLU İŞLEM: Metin [#1], [#2] … diye numaralı mesajlardan oluşuyorsa her kayda çıktığı mesajın numarasını mesajNo olarak yaz.
     Bir mesajda birden fazla ilan/talep olabilir; ilan/talep içermeyen mesajları atla (kayıt üretme).

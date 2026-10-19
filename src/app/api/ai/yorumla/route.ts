@@ -1,4 +1,4 @@
-// Anahtar CRM v3.32 · 18 Ekim 2026
+// Anahtar CRM v3.33 · 19 Ekim 2026
 // POST /api/ai/yorumla { metin, ai?, istem? }  — Akıllı girişin sunucu tarafı.
 //   1) Kural tabanlı (ücretsiz): metnin NE olduğuna karar verir (portal ilan sayfası, WhatsApp sohbet dökümü, toplu liste, tek kayıt,
 //      bağlantı, kişi, soru), parçalara ayırır, her parçanın konum ifadelerini çözer, güven puanını hesaplar. Kayıt AÇMAZ.

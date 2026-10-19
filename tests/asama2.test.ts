@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * AŞAMA 2 uçtan uca doğrulama — gerçek Notion CRM kayıtlarıyla.
  * Çalıştır: DATABASE_URL=... npx tsx --test tests/asama2.test.ts
  */
@@ -83,7 +83,7 @@ test("PORTFÖY: '8000 M2 400 kwa depo Aksu Kundu Rampalı' — kVA→kW normaliz
     ozellik: { kapaliAlanM2: 8000, arsaAlanM2: 11000, makasAltiYukseklikM: 6, kapiSayisi: 4, rampaSayisi: 2, elektrikGucuKva: 400, trafoGucuKva: 400, ofis: true, wc: true, duvarTipi: "SANDVIC_PANEL", catiTipi: "SANDVIC_PANEL", aracErisimi: "TIR" },
   });
   const r = await kayitOlustur(prisma, k);
-  assert.equal(r.ozellik?.elektrikGucuKw, 320); // 400 kVA × 0.8
+  assert.equal(r.ozellik?.elektrikGucuKw, 400); // v3.33: kVA = kW (Özgür, 19 Eki 2026 — piyasada eşit kullanılıyor)
   assert.equal(r.ozellik?.rampa, true);
   assert.equal(r.ozellik?.trafo, true);
 });

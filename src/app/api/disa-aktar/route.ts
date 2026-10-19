@@ -1,4 +1,4 @@
-// Anahtar CRM v3.32 · 18 Ekim 2026
+// Anahtar CRM v3.33 · 19 Ekim 2026
 // v3.32 — yetki: kayit.disaAktar (asistan dışa aktaramaz — iş tanımı: "CRM dışına veri çıkarılması için işletme onayı alınır")
 // GET /api/disa-aktar?tablo=talepler|portfoyler|kisiler|eslesmeler|notlar&bicim=csv   → Excel'de açılan CSV
 // GET /api/disa-aktar?bicim=json                                                      → tam yedek (tüm tablolar, her alan)

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.32 · 18 Ekim 2026
+// Anahtar CRM v3.33 · 19 Ekim 2026
 // GET /api/lokasyon/mahalleler?ilceId=123[&q=alt][&tip=MAHALLE] → mahalle/köy listesi (autocomplete)
 import { z } from "zod";
 import { prisma } from "@/lib/db";

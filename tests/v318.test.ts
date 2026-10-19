@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * v3.18 — genişletilmiş jargon, portal bağlantısından okuma, WhatsApp gürültü temizliği, .md sohbet dosyası,
  * dosya içe aktarma ekranında işlem filtresi ve satır işlemleri.
  */

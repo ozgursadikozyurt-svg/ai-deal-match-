@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  */
 // Akıllı metin yorumlayıcı — yapıştırılan metnin NE olduğunu önce anlar, sonra ayrıştırır.
 //

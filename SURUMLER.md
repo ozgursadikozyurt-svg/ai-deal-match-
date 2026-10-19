@@ -5,6 +5,23 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.33 · 19 Ekim 2026 — Eşleştirme puanı: şartı bilinmeyen (ör. elektrik) alta iner, kat tutmuyorsa liste sonu; kW = kVA = kwa; mülk türü süzgeci portföye uygulanır
+
+- Talepte ŞART olan bir kriter portföyde bilinmiyorsa (elektrik gücü yazılmamış depo, m²'si olmayan ilan) her biri −15 puan ve en fazla 74. Örnek: "50 kW şart" talebine elektriği bilinmeyen 1.100 m² depo 83 → 72; elektriği 60 kW olan aynı depo 93 (Sunulabilir) ile en üstte. Eleme yok: "Sorulacak" etiketiyle listede kalır.
+- Sıralama merdiveni: doğrulanmış 85–100 · şartsız bilinmeyen ≤ 84 · şartı bilinmeyen ≤ 74 · karşılanmayan istek ≤ 70 (eskiden 80) · kat tutmuyor ≤ 60 · uygun değil ≤ 40.
+- Kat: "katta" / ara kat isteyen talebe giriş, zemin ya da son kat en fazla 60 (eskiden 80). Elenmez, listenin sonuna iner.
+- Elektrik: kW, kVA, "kwa" eşit sayılır (eskiden kVA × 0,8). Portföyde güç alanı boşsa ilan başlığından / metninden okunur ("60 KVA" → "60 (ilan metninden)"); trafo kVA'sı da güç sayılır.
+- Bina yaşı: "sıfırdan 7-8 yaşına kadar" artık ≤ 8 okunuyor (eskiden "sıfır" görülüp ≤ 0). "en fazla 10 yaş", "10 yaş altı" da üst sınır.
+- Eşleşmeler › Filtrele › Mülk türü ve İşlem artık önerilen PORTFÖYÜN tipine uygulanır: "Daire / Dükkan" seçiliyken "Depo/Mağaza" talebine önerilen depolar görünüyordu (talebin alternatif tipi Dükkan olduğu için).
+- Veri düzeltmesi (canlı): Kepez Dokuma dairesi 3+1 → 2+1; "sıfırdan 7-8 yaşına kadar" talebinde bina yaşı 0 → 8.
+- Veritabanı şeması değişmedi.
+
+**Demo'da test edilecekler**
+
+- [ ] Eşleşmeler: elektrik "Sorulacak" olan depo eşleşmeleri 70'ler bandında, elektriği bilinen depolar üstte olmalı.
+- [ ] Filtrele › Mülk türü: yalnızca Daire seçin → listede depo görünmemeli.
+- [ ] Kepez 3+1 talebinde giriş / son kattaki daireler listenin sonunda (≤ 60).
+
 ## v3.32 · 18 Ekim 2026 — Asistan rolü; kaydın ilk kaynağı kilitli (reklam ve asistan performansı ölçülebilsin); ilk yanıt süresi
 
 - Yeni rol: Asistan. Yardım ettiği danışmanın (ör. Özgür) talep, portföy ve kişileriyle çalışır: kayıt açar, günceller, not ve görev girer, eşleştirir. Açtığı kayıt ve kişiler yardım ettiği kişiye ait olur.

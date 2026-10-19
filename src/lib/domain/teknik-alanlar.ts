@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * MulkOzellik kolonlarının meta sözlüğü.
  * - UI form/filtre bileşenleri, Gemini çıktı şeması ve eşleştirme motoru buradan beslenir.
  * - `karsilastirma`: talep ↔ portföy kıyas yönü
@@ -187,7 +187,8 @@ export type MulkOzellikAlani = keyof typeof MULK_OZELLIK_META;
 export const alanGruptaMi = (alan: MulkOzellikAlani, grup: MulkGrubu) => (MULK_OZELLIK_META[alan].gruplar as readonly string[]).includes(grup);
 
 /** kVA → kW dönüşümü (güç faktörü varsayımı). Ticari ilanlarda "kW/kVA" sıkça karıştırılır. */
-export const GUC_FAKTORU = 0.8;
+// v3.33 — Özgür (19 Eki 2026): piyasada "kW", "kVA", "kwa" aynı anlamda kullanılıyor; hepsi eşit sayılır (eskiden kVA × 0,8)
+export const GUC_FAKTORU = 1;
 export function kvaToKw(kva: number): number {
   return Math.round(kva * GUC_FAKTORU * 10) / 10;
 }

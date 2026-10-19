@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * Kategori / işlem / kaynak enum'larının Türkçe etiketleri ve iş kuralları.
  * Tek kaynak: Prisma enum'ları (src/generated/prisma). UI dropdown'ları, Gemini şeması
  * ve Notion eşlemesi bu dosyadan beslenir — hiçbir yerde elle string yazılmaz.

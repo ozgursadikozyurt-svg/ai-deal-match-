@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * Demo — eşleşmeyi kopar / geri al, ve kartlardaki "kim" etiketi (emlakçı mı, doğrudan müşteri mi, web ilanı mı).
  */
 import React, { useState } from "react";

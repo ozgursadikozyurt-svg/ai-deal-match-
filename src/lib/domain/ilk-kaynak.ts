@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * İLK KAYNAK — kaydın (talep ya da portföy) işletmeye İLK hangi kanaldan geldiği. Değiştirilemez.
  *
  * Neden ayrı alan? "Kaynak" seçicisi (src/lib/domain/kaynak.ts) kaydın HAVUZUNU anlatır (emlak grubu / sahibinden / portal / kendi)

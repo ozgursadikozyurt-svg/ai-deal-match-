@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.32 · 18 Ekim 2026
+ * Anahtar CRM v3.33 · 19 Ekim 2026
  * ÖZELLİK ANAHTARLARI — ekranda görünen / gizlenen bölümlerin tek kaynağı.
  *
  * Bir özelliği gizlemek kodu silmek değildir: sunucu kodu, veritabanı tabloları ve testleri yerinde
