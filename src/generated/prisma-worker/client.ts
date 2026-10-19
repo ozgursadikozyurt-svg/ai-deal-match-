@@ -66,6 +66,17 @@ export type Kullanici = Prisma.KullaniciModel
  */
 export type Davet = Prisma.DavetModel
 /**
+ * Model Kampanya
+ * v3.34 — Reklam kampanyası (Meta / Google / diğer). Ad değişmez: kayıtlar kampanyaya `kayit.ilkKaynakDetay` = ad ile bağlanır
+ * (basit bağ; ileride kampanyaId'ye çevrilebilir). Bütçe ve harcama yalnızca ofis yöneticisine görünür.
+ */
+export type Kampanya = Prisma.KampanyaModel
+/**
+ * Model KampanyaHarcama
+ * v3.34 — Kampanyanın aylık harcaması (Meta / Google panelinden bakılıp elle girilir). Ay: "2026-10"
+ */
+export type KampanyaHarcama = Prisma.KampanyaHarcamaModel
+/**
  * Model Il
  * 
  */

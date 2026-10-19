@@ -49,6 +49,8 @@ export const OFIS_MODELLERI: ReadonlySet<string> = new Set([
   "davet",
   "gelenDosya", // v3.23 — gelen kutusu
   "gelenAtlanan",
+  "kampanya", // v3.34
+  "kampanyaHarcama",
 ]);
 
 /**

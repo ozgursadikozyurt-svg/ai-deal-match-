@@ -5,6 +5,20 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.34 · 19 Ekim 2026 — Reklam kampanyaları: kampanya listesi, elle aylık harcama, kayıt sayısı ve kayıt başına maliyet
+
+- Yönetim › Reklam kampanyaları (yalnızca ofis yöneticisi): Meta / Google / diğer kanal, kampanya adı ve isteğe bağlı bütçe ile kampanya açılır. Kampanya adı sonradan değişmez; bitince "Kapat" denir (geçmiş kayıt ve harcama kalır).
+- Aylık harcama: Meta ve Google panelinden bakıp ay ay elle girilir (aynı aya yeniden girmek üzerine yazar, boş bırakmak satırı siler). Kampanya satırında kayıt sayısı, toplam harcama ve kayıt başına maliyet görünür.
+- Kayıt formunda "Kampanya / liste" alanı açık kampanyaları önerir; kayıt kampanyaya ilk kaynak detayındaki ad ile bağlanır (ilk kaynak kilidi aynen geçerli). Reklam dışı kaynaklarda serbest metin kalır.
+- Eski kayıtlarda yazılı reklam kampanya adları migration ile otomatik kampanya olarak açıldı (bütçe ve harcama sonradan girilir).
+- Asistan kampanya adlarını seçebilir; bütçe ve harcamayı göremez, kampanya ekleyemez ya da değiştiremez (yeni yetki: kampanya.yonet).
+- Yeni tablolar: kampanya, kampanya_harcama (yalnızca ekleme; RLS açık). Yayından sonra "Kurulumu tamamla" düğmesine basılmalı.
+
+**Demo'da test edilecekler**
+
+- [ ] Yönetim › Reklam kampanyaları: yeni kampanya ekleyin, "Aylık harcama" ile bu ayın tutarını girin; satırda harcama ve kayıt başı maliyet güncellenmeli.
+- [ ] Yönetim › "rol olarak görüntüle" › Asistan: kampanya bölümü görünmemeli. Bir talep açıp İlk kaynak = Meta seçin: "Kampanya / liste" önerileri kampanya adlarını göstermeli.
+
 ## v3.33 · 19 Ekim 2026 — Eşleştirme puanı: şartı bilinmeyen (ör. elektrik) alta iner, kat tutmuyorsa liste sonu; kW = kVA = kwa; mülk türü süzgeci portföye uygulanır
 
 - Talepte ŞART olan bir kriter portföyde bilinmiyorsa (elektrik gücü yazılmamış depo, m²'si olmayan ilan) her biri −15 puan ve en fazla 74. Örnek: "50 kW şart" talebine elektriği bilinmeyen 1.100 m² depo 83 → 72; elektriği 60 kW olan aynı depo 93 (Sunulabilir) ile en üstte. Eleme yok: "Sorulacak" etiketiyle listede kalır.

@@ -639,6 +639,8 @@ model Ofis {
 
   kullanicilar Kullanici[]
   davetler     Davet[]
+  kampanyalar  Kampanya[]
+  kampanyaHarcamalari KampanyaHarcama[]
   kayitlar     Kayit[]
   kisiler      Kisi[]
   matchler     Match[]
@@ -746,6 +748,44 @@ model Davet {
 
   @@index([ofisId, durum])
   @@map("davet")
+}
+
+/// v3.34 — Reklam kampanyası (Meta / Google / diğer). Ad değişmez: kayıtlar kampanyaya `kayit.ilkKaynakDetay` = ad ile bağlanır
+/// (basit bağ; ileride kampanyaId'ye çevrilebilir). Bütçe ve harcama yalnızca ofis yöneticisine görünür.
+model Kampanya {
+  id        String   @id @default(cuid())
+  ofisId    String   @default("")
+  ofis      Ofis     @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  /// META_REKLAM | GOOGLE_REKLAM | REKLAM (diğer) — ilk kaynak kodlarıyla aynı
+  kanal     String
+  ad        String
+  butce     Decimal? @db.Decimal(14, 2)
+  baslangic DateTime?
+  bitis     DateTime?
+  aktif     Boolean  @default(true)
+  aciklama  String?
+  harcamalar KampanyaHarcama[]
+  createdAt DateTime @default(now())
+
+  @@unique([ofisId, ad])
+  @@index([ofisId, aktif])
+  @@map("kampanya")
+}
+
+/// v3.34 — Kampanyanın aylık harcaması (Meta / Google panelinden bakılıp elle girilir). Ay: "2026-10"
+model KampanyaHarcama {
+  id          String   @id @default(cuid())
+  ofisId      String   @default("")
+  ofis        Ofis     @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  kampanyaId  String
+  kampanya    Kampanya @relation(fields: [kampanyaId], references: [id], onDelete: Cascade)
+  ay          String
+  tutar       Decimal  @db.Decimal(14, 2)
+  updatedAt   DateTime @updatedAt
+
+  @@unique([kampanyaId, ay])
+  @@index([ofisId, ay])
+  @@map("kampanya_harcama")
 }
 
 // ============================================================================

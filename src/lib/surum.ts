@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.34 · 19 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.33";
+export const SURUM = "3.34";
 export const TARIH = "19 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.33_19Ekim2026";
+export const DOSYA_EKI = "v3.34_19Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,23 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.34",
+    tarih: "19 Ekim 2026",
+    baslik: "Reklam kampanyaları: kampanya listesi, elle aylık harcama, kayıt sayısı ve kayıt başına maliyet",
+    degisenler: [
+      "Yönetim › Reklam kampanyaları (yalnızca ofis yöneticisi): Meta / Google / diğer kanal, kampanya adı ve isteğe bağlı bütçe ile kampanya açılır. Kampanya adı sonradan değişmez; bitince \"Kapat\" denir (geçmiş kayıt ve harcama kalır).",
+      "Aylık harcama: Meta ve Google panelinden bakıp ay ay elle girilir (aynı aya yeniden girmek üzerine yazar, boş bırakmak satırı siler). Kampanya satırında kayıt sayısı, toplam harcama ve kayıt başına maliyet görünür.",
+      "Kayıt formunda \"Kampanya / liste\" alanı açık kampanyaları önerir; kayıt kampanyaya ilk kaynak detayındaki ad ile bağlanır (ilk kaynak kilidi aynen geçerli). Reklam dışı kaynaklarda serbest metin kalır.",
+      "Eski kayıtlarda yazılı reklam kampanya adları migration ile otomatik kampanya olarak açıldı (bütçe ve harcama sonradan girilir).",
+      "Asistan kampanya adlarını seçebilir; bütçe ve harcamayı göremez, kampanya ekleyemez ya da değiştiremez (yeni yetki: kampanya.yonet).",
+      "Yeni tablolar: kampanya, kampanya_harcama (yalnızca ekleme; RLS açık). Yayından sonra \"Kurulumu tamamla\" düğmesine basılmalı.",
+    ],
+    testEt: [
+      "Yönetim › Reklam kampanyaları: yeni kampanya ekleyin, \"Aylık harcama\" ile bu ayın tutarını girin; satırda harcama ve kayıt başı maliyet güncellenmeli.",
+      "Yönetim › \"rol olarak görüntüle\" › Asistan: kampanya bölümü görünmemeli. Bir talep açıp İlk kaynak = Meta seçin: \"Kampanya / liste\" önerileri kampanya adlarını göstermeli.",
+    ],
+  },
   {
     surum: "3.33",
     tarih: "19 Ekim 2026",

@@ -7,6 +7,7 @@ import React from "react";
 import { ILK_KAYNAKLAR, ILK_KAYNAK_ETIKET, ilkKaynakGecerli, tahminIlkKaynak, yanitDakika, type IlkKaynak } from "../src/lib/domain/ilk-kaynak";
 import { yetkiAktif } from "./yonetim";
 import { tarihYaz } from "./ortak";
+import { useKampanyaAdlari } from "./kampanyalar";
 
 const sureYaz = (dk: number) => (dk < 60 ? `${dk} dk` : dk < 1440 ? `${Math.floor(dk / 60)} sa ${dk % 60} dk` : `${Math.floor(dk / 1440)} gün`);
 
@@ -15,6 +16,8 @@ export function IlkKaynakAlani({ f, set, kayitliDeger }: { f: any; set: (k: stri
   const duzeltebilir = yetkiAktif("kaynak.duzelt");
   const kayitli = ilkKaynakGecerli(kayitliDeger?.ilkKaynak) ? (kayitliDeger!.ilkKaynak as IlkKaynak) : null;
   const tahmin = tahminIlkKaynak(f);
+  const kampanyalar = useKampanyaAdlari();
+  const reklamMi = ["META_REKLAM", "GOOGLE_REKLAM", "REKLAM"].includes(f.ilkKaynak ?? "");
   if (kayitli && !duzeltebilir) return <div className="alan genis">
     <label>İlk kaynak <span aria-hidden="true">🔒</span></label>
     <div><b>{ILK_KAYNAK_ETIKET[kayitli]}</b>{f.ilkKaynakDetay ? ` · ${f.ilkKaynakDetay}` : ""}{kayitliDeger?.ilkKaynakTarihi ? <span className="ipucu"> · {tarihYaz(kayitliDeger.ilkKaynakTarihi as any, true)}</span> : null}</div>
@@ -30,7 +33,8 @@ export function IlkKaynakAlani({ f, set, kayitliDeger }: { f: any; set: (k: stri
     </div>
     <div className="alan">
       <label htmlFor="f-ilk-detay">Kampanya / liste <small className="ipucu">· isteğe bağlı</small></label>
-      <input id="f-ilk-detay" maxLength={200} value={f.ilkKaynakDetay ?? ""} onChange={(e) => set("ilkKaynakDetay", e.target.value || null)} placeholder="Ör. Meta – Kiralık depo Ekim · FSBO Aksu listesi" />
+      <input id="f-ilk-detay" list="f-kampanyalar" maxLength={200} value={f.ilkKaynakDetay ?? ""} onChange={(e) => set("ilkKaynakDetay", e.target.value || null)} placeholder={reklamMi ? "Listeden kampanya seçin" : "Ör. FSBO Aksu listesi · Meta – Kiralık depo Ekim"} />
+      <datalist id="f-kampanyalar">{kampanyalar.filter((k) => !reklamMi || k.kanal === f.ilkKaynak || f.ilkKaynak === "REKLAM").map((k) => <option key={k.ad} value={k.ad} />)}</datalist>
     </div>
   </>;
 }

@@ -56,6 +56,8 @@ export const ModelName = {
   GelenAtlanan: 'GelenAtlanan',
   Kullanici: 'Kullanici',
   Davet: 'Davet',
+  Kampanya: 'Kampanya',
+  KampanyaHarcama: 'KampanyaHarcama',
   Il: 'Il',
   Ilce: 'Ilce',
   Mahalle: 'Mahalle',
@@ -177,6 +179,34 @@ export const DavetScalarFieldEnum = {
 } as const
 
 export type DavetScalarFieldEnum = (typeof DavetScalarFieldEnum)[keyof typeof DavetScalarFieldEnum]
+
+
+export const KampanyaScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  kanal: 'kanal',
+  ad: 'ad',
+  butce: 'butce',
+  baslangic: 'baslangic',
+  bitis: 'bitis',
+  aktif: 'aktif',
+  aciklama: 'aciklama',
+  createdAt: 'createdAt'
+} as const
+
+export type KampanyaScalarFieldEnum = (typeof KampanyaScalarFieldEnum)[keyof typeof KampanyaScalarFieldEnum]
+
+
+export const KampanyaHarcamaScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  kampanyaId: 'kampanyaId',
+  ay: 'ay',
+  tutar: 'tutar',
+  updatedAt: 'updatedAt'
+} as const
+
+export type KampanyaHarcamaScalarFieldEnum = (typeof KampanyaHarcamaScalarFieldEnum)[keyof typeof KampanyaHarcamaScalarFieldEnum]
 
 
 export const IlScalarFieldEnum = {

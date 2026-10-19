@@ -13,6 +13,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { C, Kopyala } from "./ortak";
 import { CANLI } from "./depo";
+import { KampanyaYonetimi } from "./kampanyalar";
 import { PLANLAR, ROL_ETIKETLERI, YETKILER, type Plan } from "../src/lib/guvenlik/yetki";
 
 type Rol = keyof typeof ROL_ETIKETLERI;
@@ -199,6 +200,8 @@ export function Yonetim() {
         </div>)}
         <p className="ipucu">Asistan: yardım ettiği kişinin kayıt ve kişileriyle çalışır; açtığı kayıtlar o kişiye ait olur. Silemez, dışa aktaramaz, ofis ayarlarını ve kayıtların ilk kaynağını değiştiremez.</p>
       </section>
+
+      {yetkiler.includes("kampanya.yonet") && <KampanyaYonetimi />}
 
       <section className="kart yigin" id="yon-davet">
         <h3>Davet bağlantısı</h3>

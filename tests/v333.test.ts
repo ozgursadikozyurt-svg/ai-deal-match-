@@ -17,7 +17,7 @@ const lok = [{ ilId: 7, ilceId: 100, mahalleId: 5000, birincil: true }];
 const depoTalep = (ek: Partial<OnizlemeKayit> = {}): OnizlemeKayit => ({ tip: "TALEP", mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", minM2: 1000, maxFiyat: 200_000, fiyatPeriyodu: "AYLIK", lokasyonlar: lok, ozellik: { kritikKriterler: ["ELEKTRIK"], elektrikGucuKw: 50 }, ...ek });
 const depo = (ek: Partial<OnizlemeKayit> = {}, oz: Record<string, unknown> = {}): OnizlemeKayit => ({ tip: "PORTFOY", mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", m2: 1100, fiyat: 195_000, fiyatPeriyodu: "AYLIK", lokasyonlar: lok, baslik: "DEEPOYA VE HAVALİMANINA ÇOK YAKIN 1100M2 KİRALIK DEPO", ozellik: oz, ...ek });
 
-test("sürüm 3.33", () => { assert.equal(SURUM, "3.33"); assert.equal(SURUM_GECMISI[0].surum, "3.33"); assert.ok(fs.existsSync("docs/ANAHTAR_CRM_EK_v3.33_19Ekim2026.md")); });
+test("sürüm 3.33", () => { assert.ok(SURUM >= "3.33"); assert.ok(SURUM_GECMISI.some((x) => x.surum === "3.33")); assert.ok(fs.existsSync("docs/ANAHTAR_CRM_EK_v3.33_19Ekim2026.md")); });
 
 test("şart elektrik bilinmiyor: Koşullu ve en fazla 74 (eskiden 83–84); doğrulanmış depo üstte", () => {
   const bilinmeyen = eslesmeOnizle(depoTalep(), depo(), B);
