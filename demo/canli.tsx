@@ -62,7 +62,7 @@ function Tanitim() {
       <li><b>Müşteri takibi:</b> kişiler, notlar, randevular ve Google Kişiler ile eşitleme.</li>
       <li><b>Ofis ve ekip:</b> danışmanlarınızı davet edin, yetkileri belirleyin; telefondan uygulama gibi kullanın.</li>
     </ul>
-    <p className="ipucu">{DENEME_GUN_YAZI}, kart bilgisi istenmez. · <a href="/gizlilik.html">Gizlilik</a> · <a href="/kosullar.html">Koşullar</a></p>
+    <p className="ipucu">{DENEME_GUN_YAZI}, kart bilgisi istenmez. · <a href="/emlak-crm">Ayrıntılı tanıtım</a> · <a href="/gizlilik.html">Gizlilik</a> · <a href="/kosullar.html">Koşullar</a></p>
   </section>;
 }
 
