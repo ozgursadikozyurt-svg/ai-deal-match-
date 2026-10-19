@@ -74,6 +74,10 @@ test("kaynak otomasyonu: WhatsApp portföyü 'Kendi portföyüm' olmaz; elle gir
   const elle = "Lara'da 2+1 satılık daire 5.500.000 TL";
   const t2 = taslakYap(elle, hizliAyristir(elle), null).taslak;
   assert.equal(t2.havuz, "KENDI_PORTFOY", "elle girişte kendi portföyü");
+  // v3.36 — WhatsApp'ta "sahibinden" yazan meslektaş ilanı da partner kalır (ilan sahibi bilgisi korunur); elle girilen malik ilanı kendi portföyü
   const malik = taslakYap(wa, { ...hizliAyristir(wa), ilanSahibiTipi: "MALIK" } as any, null).taslak;
-  assert.equal(malik.havuz, "KENDI_PORTFOY", "sahibinden olduğu belliyse kendi portföyü");
+  assert.equal(malik.havuz, "PARTNER", "WhatsApp'tan gelen 'sahibinden' ilan partner havuzuna düşer");
+  assert.equal(malik.ilanSahibiTipi, "MALIK");
+  const malikElle = taslakYap(elle, { ...hizliAyristir(elle), ilanSahibiTipi: "MALIK" } as any, null).taslak;
+  assert.equal(malikElle.havuz, "KENDI_PORTFOY", "elle girilen malik ilanı kendi portföyü");
 });

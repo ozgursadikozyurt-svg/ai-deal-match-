@@ -135,13 +135,13 @@ test("eşleşme detayı: kişiler Ara / WhatsApp düğmeleriyle; talepte orijina
 });
 
 // ───────── 5) Kurallar: üst satır, fotoğraf, sürüm ─────────
-test("üst satır: Geri başlık satırına biner; formda tek geri (Vazgeç) başlıkla aynı satırda", () => {
+test("üst satır: Geri başlık satırına biner; formda tek geri (v3.36: '← Geri', kaydetmeden döner) başlıkla aynı satırda", () => {
   const html = fs.readFileSync("demo/sayfa.html", "utf8");
   assert.match(html, /main\.sarici>\.genel-geri\{[^}]*margin:0 0 calc\(-1 \* var\(--geri-y\)\)/);
   assert.match(html, /main\.sarici>\.genel-geri\+\*>:first-child:not\(\.kart\)\{padding-left:var\(--geri-g\)/);
   const app = fs.readFileSync("demo/app.tsx", "utf8");
   assert.match(app, /ctx\.geriVar && ekran\.ad !== "form" &&/);
-  assert.match(fs.readFileSync("demo/form.tsx", "utf8"), /<div className="bas-satir"><button className="btn kucuk geri" onClick=\{vazgec\}>← Vazgeç<\/button>/);
+  assert.match(fs.readFileSync("demo/form.tsx", "utf8"), /<div className="bas-satir"><button className="btn kucuk geri" title="Kaydetmeden geri dön" onClick=\{vazgec\}>← Geri<\/button>/);
 });
 
 test("fotoğraf: istemci önce doğrudan yükler (dosya Worker'dan geçmez), olmazsa eski yol; 503 bir kez yinelenir", () => {

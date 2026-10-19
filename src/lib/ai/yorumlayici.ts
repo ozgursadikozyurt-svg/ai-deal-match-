@@ -139,10 +139,13 @@ export function konumBul(metin: string, ix: LokasyonIndeks): string[] {
   for (const hamSatir of metin.split("\n")) {
     // v3.10 — başka il / ilçe adları (İzmir Bornova, Bodrum'da…) önce ayrılır; kalan metin çalışma ili sözlüğüyle taranır
     // v3.12 — cadde / sokak / bulvar adları mahalle değildir ("Atatürk Caddesi üzerinde" → Atatürk Mahallesi sanılıyordu)
-    const dt = digerIlTara(caddeAdiniAyikla(hamSatir), ix);
+    // v3.36 — cephe yönü yer adı değildir: "Güney cephe", "GÜNEY-DOĞU CEPHELİ" Güney Mahallesi sanılıyordu
+    const yonsuz = hamSatir.replace(/(?<![\p{L}])(?:g[üu]ney|kuzey|do[ğg]u|bat[ıi])(?:\s*[-–\/]\s*(?:g[üu]ney|kuzey|do[ğg]u|bat[ıi]))*\s+cephe\p{L}*/giu, " ");
+    const dt = digerIlTara(caddeAdiniAyikla(yonsuz), ix);
     bulunan.push(...dt.ifadeler);
     const satir = dt.kalan;
-    const parcalar = satir.split(/[,;–—\/()•|]|\s-\s|\s+ve\s+|\s+veya\s+|\s+ya\s+da\s+/i).map((p) => p.trim()).filter(Boolean);
+    // v3.36 — tek başına "merkez" bir yer değildir ("Güzeloba(merkez)" → Kemer merkez okunuyordu)
+    const parcalar = satir.split(/[,;–—\/()•|]|\s-\s|\s+ve\s+|\s+veya\s+|\s+ya\s+da\s+/i).map((p) => p.trim()).filter((p) => p && !/^merkez\p{L}*$/iu.test(p));
     const satirda: string[] = [], bos: string[] = [];
     for (const p of parcalar) {
       const b = metindenKonumlar(p, ix);
@@ -617,6 +620,11 @@ Kurallar:
 - Aynı kaydın ayrıntı satırlarını (ödeme planı, depozito, özellik listesi) AYRI kayıt yapma; "notlar" dizisine kısa cümleler olarak yaz.
 - Metinde çelişen değer varsa (ör. ilanda 176 m², açıklamada 135 m²) yapılandırılmış alandakini yaz, çelişkiyi "notlar"a "KONTROL: …" diye ekle.
 - "X hariç / X dışında" denilen yerleri lokasyonIfadeleri'ne KOYMA; "haricKonumlar" dizisine yaz.
+- TALEPTE yalnızca müşterinin AÇIKÇA istediğini yaz. Bilinmeyen alana 0 ya da tahmin YAZMA (null bırak): "elektrikGucuKw": 0, "5 kW", çatı / duvar tipi, açık alan, ofis gibi değerleri metin söylemiyorsa uydurma.
+- Olumsuz cümledeki özellik istenmeyendir: "Giriş kat ve en üst kat düşünülmüyor" → istenenKatlar yalnızca ["ARA"]; "site olmasın" → siteIcinde false.
+- "Güney cephe", "doğu-batı cepheli" yön bilgisidir (cepheYonleri), yer adı DEĞİLDİR; "X mah / mahallesi" bir yerdir, mülk tipi değildir ("Fabrikalar mah" → konum, tip fabrika değil).
+- "N yaşa kadar" → binaYasi N; "yeni bina" → binaYasi 5; "sıfır" → 0. "80 m² ve üstü" → minM2 80. Kiralık konutta "boş" = eşyasız.
+- Bütçe dövizse (USD, EUR, €, $) sayıyı çevirme; paraBirimi alanına yaz.
 - "aciklama": Türkçe, en fazla 2 cümle, kullanıcıya "bunu şöyle anladım" de.
 Kural tabanlı ön okuma (yanlış olabilir, düzelt): tür=${kuralYorumu.tur}, ${kuralYorumu.parcalar.length} kayıt.
 

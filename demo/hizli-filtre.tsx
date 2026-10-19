@@ -64,22 +64,22 @@ export function HizliMenu({ ad, ogeler }: { ad: string; ogeler: HizliMenuOge[] }
  * satırın yüksekliğini değiştirmez. Kapatmak: ✕, Esc ya da şeridin dışına dokunmak.
  * (v3.21.2'deki sağ kenar çekmecesi telefonda kartların ve süzgeçlerin üstüne biniyordu.)
  */
-export const SKOR_HAZIR = [50, 60, 70, 80, 90] as const;
+/** v3.36 — skor yerine uyum seviyesi (1–5): "en az 4/5" gibi. Kaydırıcı yok; 5 kademe dokunarak seçilir. */
+export const SKOR_HAZIR = [2, 3, 4, 5] as const;
+const SEVIYE_KISA: Record<number, string> = { 2: "Zayıf+", 3: "Sorulacak+", 4: "Güçlü+", 5: "Sunulabilir" };
 export function SkorSecici({ deger, set, sayi }: { deger: number; set: (n: number) => void; sayi: number }) {
   const [acik, setAcik] = useState(false);
   return <div className={cx("hs skor-hs", acik && "acik")}>
     <button type="button" className={cx("hs-btn", deger > 0 && "on")} aria-expanded={acik} aria-controls="skor-serit" onClick={() => setAcik(!acik)}>
-      <small>Skor</small><b>{deger > 0 ? `≥ ${deger}` : "Tümü"}</b>
+      <small>Uyum</small><b>{deger > 0 ? `≥ ${deger}/5` : "Tümü"}</b>
     </button>
     {acik && <>
       <div className="sirala-perde" onClick={() => setAcik(false)} />
-      <div className="skor-serit" id="skor-serit" role="group" aria-label="Skor süzgeci" onKeyDown={(e) => { if (e.key === "Escape") setAcik(false); }}>
-        <b className="skor-serit-deger">{deger > 0 ? `≥ ${deger}` : "Tümü"}</b>
-        <input type="range" className="skor-aralik" min={0} max={100} step={5} value={deger} aria-label="En az skor" aria-valuetext={deger > 0 ? `en az ${deger}` : "tümü"}
-          style={{ ["--dolu" as any]: `${deger}%` }} onChange={(e) => set(Number(e.target.value))} />
-        <div className="skor-hazir">{SKOR_HAZIR.map((n) => <button key={n} type="button" className={cx(deger === n && "on")} onClick={() => set(deger === n ? 0 : n)}>{n}</button>)}</div>
+      <div className="skor-serit" id="skor-serit" role="group" aria-label="Uyum seviyesi süzgeci" onKeyDown={(e) => { if (e.key === "Escape") setAcik(false); }}>
+        <b className="skor-serit-deger">{deger > 0 ? `≥ ${deger}/5` : "Tümü"}</b>
+        <div className="skor-hazir">{SKOR_HAZIR.map((n) => <button key={n} type="button" className={cx(deger === n && "on")} title={SEVIYE_KISA[n]} onClick={() => set(deger === n ? 0 : n)}>{n}/5</button>)}</div>
         <small className="skor-say">{sayi}</small>
-        <button type="button" className="skor-kapat" aria-label="Skor süzgecini kapat" onClick={() => setAcik(false)}>✕</button>
+        <button type="button" className="skor-kapat" aria-label="Uyum süzgecini kapat" onClick={() => setAcik(false)}>✕</button>
       </div>
     </>}
   </div>;

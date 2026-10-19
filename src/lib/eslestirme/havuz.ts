@@ -25,7 +25,7 @@ export function havuzKatmani(v: HavuzGirdi): HavuzKatmani {
 export const katmanOf = (k: HavuzKatmani) => HAVUZ_KATMANLARI.find((x) => x.kod === k)!;
 
 /** Portföy edinme fırsatı: dış (web) ilan, en az `enAz` aktif talebe `esik` ve üzeri skorla uyuyorsa */
-export function portfoyEdinmeFirsati(skorlar: number[], esik = 80, enAz = 2): { var: boolean; sayi: number } {
+export function portfoyEdinmeFirsati(skorlar: number[], esik = 80 /* v3.36: güçlü eşleşme (4/5 üst bandı ya da 5/5); bütçesiz eşleşme en fazla 79 */, enAz = 2): { var: boolean; sayi: number } {
   const sayi = skorlar.filter((s) => s >= esik).length;
   return { var: sayi >= enAz, sayi };
 }

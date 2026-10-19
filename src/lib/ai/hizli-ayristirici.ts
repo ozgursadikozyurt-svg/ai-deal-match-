@@ -119,7 +119,7 @@ export function butceAltSiniri(m: string, ust: number): number | null {
   let x: RegExpExecArray | null;
   while ((x = re.exec(m))) {
     const [tum, a, b, birim] = x;
-    if (/^\s*(m2|m²|mt2|metre|metrekare|kw|kva|oda|kat|ya[şs])/.test(m.slice(x.index + tum.length, x.index + tum.length + 10))) continue;
+    if (/^\s*(m2|m²|mt2|mt²|metre|metrekare|kw|kva|oda|kat|ya[şs])/.test(m.slice(x.index + tum.length, x.index + tum.length + 10))) continue;
     const yorumlar = (s0: string) => { const n1 = sayiOku(s0), n2 = Number(s0.replace(",", ".")); return [...new Set([n1, n2].filter((v): v is number => v != null && Number.isFinite(v) && v > 0))]; };
     const carpanlar = [CARPAN(birim), 1, 1e3, 1e6];
     const ustOk = yorumlar(b).some((n) => carpanlar.some((c) => Math.abs(n * c - ust) <= ust * 0.02));
@@ -140,9 +140,9 @@ function paralar(m: string): { deger: number; acik: boolean; kadar: boolean; ayl
     const [tum, sayi, buyuk, birim, kadar] = x;
     const sonra = m.slice(x.index + tum.length, x.index + tum.length + 12);
     const once = m.slice(Math.max(0, x.index - 14), x.index);
-    if (/^\s*(m2|m²|mt2|metre|m\b|metrekare|kw|kva|ton|d[öo]n[üu]m|oda|kat|ya[şs]|y[ıi]l|\+|adet|ki[şs]i|yatak|dk|km|derece|°)/.test(sonra) && !birim) continue;
+    if (/^\s*(m2|m²|mt2|mt²|metre|m\b|metrekare|kw|kva|ton|d[öo]n[üu]m|oda|kat|ya[şs]|y[ıi]l|\+|adet|ki[şs]i|yatak|dk|km|derece|°)/.test(sonra) && !birim) continue;
     if (/\+\s*$/.test(once) || /\d\s*\+$/.test(sayi)) continue;
-    if (!birim && /^\s*[-–]\s*\d[\d.,]*\s*(m2|m²|mt2|metre|metrekare)/.test(sonra)) continue; // v3.22.1 — "2.000-3.000 M2" alan aralığıdır, bütçe değil
+    if (!birim && /^\s*[-–]\s*\d[\d.,]*\s*(m2|m²|mt2|mt²|metre|metrekare)/.test(sonra)) continue; // v3.22.1 — "2.000-3.000 M2" alan aralığıdır, bütçe değil
     if (/(\d{3})[\s-]?(\d{2})[\s-]?(\d{2})/.test(m.slice(x.index, x.index + 14)) && /^0?5/.test(sayi)) continue; // telefon
     if (/^\d{7,}$/.test(sayi)) continue; // ilan no / ayraçsız uzun sayı
     const n = sayiOku(sayi);
@@ -219,14 +219,16 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   if (islemTipi) bul("işlem");
 
   // Mülk tipi
-  let mulkTipi = TIP_SOZLUK.find(([re]) => re.test(m))?.[1] ?? null;
+  // v3.36 — mahalle adı mülk tipi sayılmaz: "Bayındır Fabrikalar mah" yazan DAİRE talebi Fabrika tipine düşüyordu
+  const mTip = m.replace(/[\p{L}]+\s+(?:mahalle\p{L}*|mah|mh)\.?(?![\p{L}])/gu, " ");
+  let mulkTipi = TIP_SOZLUK.find(([re]) => re.test(mTip))?.[1] ?? null;
   const oda = m.match(/\b(\d{1,2})\s*\+\s*(\d)\b/);
   let odaSayisi = oda ? `${oda[1]}+${oda[2]}` : /st[üu]dyo|1\s*\+\s*0/.test(m) ? "1+0" : null;
   // v3.19 — "2+1 veya 3+1", "2+1 / 3+1", "2+1, 3+1" → çoklu oda seçimi (virgülle ayrılmış)
   const odaZinciri = m.match(/\b\d{1,2}\s*\+\s*\d(?:\s*(?:veya|ya da|\/|,|-)\s*\d{1,2}\s*\+\s*\d)+\b/);
   if (odaZinciri) { const l = [...new Set([...odaZinciri[0].matchAll(/(\d{1,2})\s*\+\s*(\d)/g)].map((x) => `${x[1]}+${x[2]}`))]; if (l.length > 1) odaSayisi = l.slice(0, 4).join(", "); }
   if (!mulkTipi && odaSayisi) mulkTipi = "DAIRE";
-  let aileKodu = AILE_SOZLUK.find(([re]) => re.test(m))?.[1] ?? null;
+  let aileKodu = AILE_SOZLUK.find(([re]) => re.test(mTip))?.[1] ?? null;
   if (mulkTipi) bul("mülk tipi");
   if (odaSayisi) bul("oda");
 
@@ -237,8 +239,8 @@ export function hizliAyristir(metin0: string): HizliSonuc {
 
   // m²
   let m2: number | null = null, minM2: number | null = null, maxM2: number | null = null;
-  const aralik = m.match(/(\d[\d.,]*)\s*(?:-|–|ile|ila)\s*(\d[\d.,]*)\s*(?:m2|m²|mt2|metrekare|metre\s*kare)/);
-  const tek = [...m.matchAll(/(?:(min(?:imum)?|en\s*az|en\s*fazla|max(?:imum)?)\s*)?(\d[\d.,]*)\s*(?:m2|m²|mt2|metrekare|metre\s*kare|m\s*kare)(\s*(?:[üu]st[üu]|[üu]zeri|ve\s*[üu]zeri|alt[ıi]))?/g)];
+  const aralik = m.match(/(\d[\d.,]*)\s*(?:-|–|ile|ila)\s*(\d[\d.,]*)\s*(?:m2|m²|mt2|mt²|metrekare|metre\s*kare)/);
+  const tek = [...m.matchAll(/(?:(min(?:imum)?|en\s*az|en\s*fazla|max(?:imum)?)\s*)?(\d[\d.,]*)\s*(?:m2|m²|mt2|mt²|metrekare|metre\s*kare|m\s*kare)(\s*(?:[üu]st[üu]|[üu]zeri|ve\s*[üu]zeri|ve\s*[üu]st[üu]|alt[ıi]|ve\s*alt[ıi]))?/g)];
   const donum = m.match(/(\d[\d.,]*)\s*d[öo]n[üu]m/);
   if (aralik) { minM2 = sayiOku(aralik[1]); maxM2 = sayiOku(aralik[2]); }
   else if (tek.length) {
@@ -298,7 +300,10 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   const cephe = m.match(/(\d+[.,]?\d*)\s*(?:m|metre)\s*(?:vitrin|cephe)/);
   if (cephe) ozellik.cepheUzunluguM = sayiOku(cephe[1]);
   if (/ana\s*cadde/.test(m)) ozellik.anaCaddeUzeri = true;
-  if (/e[şs]yas[ıi]z/.test(m)) ozellik.esyaDurumu = "ESYASIZ"; else if (/e[şs]yal[ıi]/.test(m)) ozellik.esyaDurumu = "ESYALI";
+  // v3.36 — kiralık konutta "boş daire" eşyasızdır; "BOŞ / Eşyalı", "eşyalı-eşyasız" ikisi de olur demektir (alan yazılmaz)
+  const esyasiz = /e[şs]yas[ıi]z/.test(m) || (islemTipi === "KIRALIK" && /(?<![\p{L}])bo[şs](?![\p{L}])(?!\s*(?:arsa|alan|arazi|tarla|yer|zemin))/u.test(m) && !!odaSayisi);
+  const esyali = /e[şs]yal[ıi]/.test(m);
+  if (esyasiz && !esyali) ozellik.esyaDurumu = "ESYASIZ"; else if (esyali && !esyasiz) ozellik.esyaDurumu = "ESYALI";
   // v3.22.1 — olumsuz: "Site içi olmayan", "havuz istemiyor", "asansörsüz" → false (talepte "istemiyor")
   const evetHayir = (re: RegExp, olumsuzEk?: RegExp): boolean | undefined => {
     const x = m.match(re); if (!x) return undefined;
@@ -319,7 +324,8 @@ export function hizliAyristir(metin0: string): HizliSonuc {
   if (amac.length) ozellik.kullanimAmaclari = [...new Set(amac)];
   // ───── v3.17 — jargon sözlüğü (docs/emlak_jargon.md): kat, bina yaşı, emsal ve anahtar kelimeler
   const kat = katOku(m);
-  if (kat.bulunduguKat != null) ozellik.bulunduguKat = kat.bulunduguKat;
+  // v3.36 — talepte "1. kat üzeri ise asansörlü" gibi koşul cümlesi istenen kat değildir: talebe bulunduğu kat yazılmaz
+  if (kat.bulunduguKat != null && tip !== "TALEP") ozellik.bulunduguKat = kat.bulunduguKat;
   if (kat.katSayisi != null) ozellik.katSayisi = kat.katSayisi;
   const yas = binaYasiOku(m);
   if (yas != null) ozellik.binaYasi = yas;
@@ -335,6 +341,7 @@ export function hizliAyristir(metin0: string): HizliSonuc {
     if (k.kayitAlani) kayitAlanlari[k.alan!] = k.deger;
     else if (k.alan && ozellik[k.alan] == null) ozellik[k.alan] = k.deger;
   }
+  if (esyasiz && esyali) delete ozellik.esyaDurumu; // v3.36 — "BOŞ / Eşyalı": ikisi de olur (sözlük eşyalı yazmasın)
   // Alan karşılığı olmayan jargon kaybolmasın: "Notlar" alanına yazılır
   for (const k of JARGON_NOTLUK) if (k.re.test(m)) jargonNotlari.push(k.not);
 

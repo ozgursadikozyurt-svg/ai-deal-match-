@@ -3,7 +3,7 @@
  * Demo — ekranların ortak parçaları: depo bağlamı, küçük bileşenler, eşleşme hesabı, konum öneri kutusu.
  */
 import React, { createContext, useContext, useMemo, useRef, useState } from "react";
-import { eslesmeOnizle, temelUyum, type OnizlemeSonucu, type Uygunluk } from "../src/lib/eslestirme/onizleme";
+import { eslesmeOnizle, temelUyum, seviyeOf, SEVIYE_ETIKET, SEVIYE_ACIKLAMA, type OnizlemeSonucu, type Uygunluk, type Seviye } from "../src/lib/eslestirme/onizleme";
 import { mukerrerleriTopla } from "../src/lib/eslestirme/mukerrer";
 import { firsatDegerlendir, type FirsatSonuc } from "../src/lib/eslestirme/firsat";
 import { kimOf } from "../src/lib/domain/kim";
@@ -29,8 +29,14 @@ export interface Ctx {
   bildir: (m: string) => void;
   ornekHatalari: OrnekHata[];
   git: (s: Ekran) => void;
-  /** v3.16 — bir önceki ekrana dön (geçmiş boşsa Ana Sayfa) */
-  geri: () => void;
+  /**
+   * v3.16 — bir önceki ekrana dön (geçmiş boşsa `yedek`, o da yoksa Ana Sayfa).
+   * v3.36 — `donus`: dönülen ekran içe aktarma / veri girişi ise yüklü dosya ve seçimler korunur. Telefonun / tarayıcının geri
+   * tuşu da bunu çağırır (history.pushState ile eşlenir).
+   */
+  geri: (o?: { donus?: boolean; yedek?: Ekran }) => void;
+  /** v3.36 — bulunulan ekranı değiştir (geçmişe eklemeden): formdan Kaydet sonrası detay, Geri ile formun açıldığı yere döner */
+  degistir?: (s: Ekran) => void;
   /** v3.16 — geçmişte dönülebilecek ekran var mı (Ana Sayfa'da gizlenir) */
   geriVar: boolean;
   sample: any | null | undefined; // yapay zekâ (undefined = henüz bilinmiyor, null = yok)
@@ -62,7 +68,19 @@ export async function aiJson(sample: any, istem: string, secenek: Record<string,
   try { return JSON.parse(temiz.slice(bas, son + 1)); } catch { throw { code: "parse", message: "Yanıttaki JSON okunamadı", text: metin }; }
 }
 export const UYGUNLUK: Record<Uygunluk, { e: string; ton: string }> = { SUNULABILIR: { e: "Sunulabilir", ton: "iyi" }, KOSULLU: { e: "Koşullu", ton: "uyari" }, UYGUN_DEGIL: { e: "Uygun değil", ton: "kotu" } };
-export function Skor({ s, u }: { s: number; u: Uygunluk }) { return <div className={"skor s-" + UYGUNLUK[u].ton}><b>{s}</b><small>/100</small></div>; }
+/** v3.36 — uyum seviyesi 1–5 (yüzde yerine): ton 5 yeşil · 4 mavi · 3–2 sarı · 1 kırmızı */
+export const SEVIYE_TON: Record<Seviye, string> = { 5: "iyi", 4: "orta", 3: "uyari", 2: "uyari", 1: "kotu" };
+export const seviyeBaslik = (sv: Seviye) => `${sv}/5 · ${SEVIYE_ETIKET[sv]} — ${SEVIYE_ACIKLAMA[sv]}`;
+export function Skor({ s, u }: { s: number; u: Uygunluk }) {
+  const sv = seviyeOf(s, u);
+  return <div className={"skor s-" + SEVIYE_TON[sv]} title={seviyeBaslik(sv)} aria-label={`Uyum ${sv} / 5, ${SEVIYE_ETIKET[sv]}`}><b>{sv}</b><small>/5</small></div>;
+}
+/** v3.36 — "Neden 3/5?": seviyeyi düşüren nedenler (motorun gerekçe listesi) */
+export function Gerekceler({ s, kisa }: { s: OnizlemeSonucu; kisa?: boolean }) {
+  const g = s.gerekceler ?? [];
+  if (!g.length) return s.seviye === 5 ? <div className="gerekce-yok">Temel kriterlerin hepsi tuttu.</div> : null;
+  return <ul className={"gerekce-liste" + (kisa ? " kisa" : "")}>{(kisa ? g.slice(0, 2) : g).map((x) => <li key={x}>{x}</li>)}{kisa && g.length > 2 ? <li className="soluk">+{g.length - 2} neden daha</li> : null}</ul>;
+}
 export function TTL({ v }: { v: Veri }) {
   const g = kalanGun(v); if (g == null) return null;
   if (g <= 0) return <Pill ton="kotu">Süresi doldu</Pill>;
@@ -127,7 +145,7 @@ export function useEslesmeler(koparilanDahil = false): Eslesme[] {
     const sira: Record<Uygunluk, number> = { SUNULABILIR: 0, KOSULLU: 1, UYGUN_DEGIL: 2 };
     // v3.19 — önce uygunluk, sonra fırsat kademesi (sahibinden ↔ müşteri önde), sonra skor
     // v3.27 — aynı talebe düşen mükerrer portföyler tek satır ("+N aynı ilan")
-    return mukerrerleriTopla(r.sort((a, b) => sira[a.s.uygunluk] - sira[b.s.uygunluk] || b.f.sira - a.f.sira || b.s.skor - a.s.skor));
+    return mukerrerleriTopla(r.sort((a, b) => sira[a.s.uygunluk] - sira[b.s.uygunluk] || b.s.seviye - a.s.seviye /* v3.36 */ || b.f.sira - a.f.sira || b.s.skor - a.s.skor));
   }, [d.kayitlar, d.kisiler, d.ogrenilen, d.ayarlar.sahiplik, d.ayarlar.paylasim]);
   return useMemo(() => (koparilanDahil ? tum : tum.filter((e) => d.eslesmeNotlari[`${e.t.id}~${e.p.id}`]?.durum !== "REDDEDILDI")), [tum, d.eslesmeNotlari, koparilanDahil]);
 }

@@ -26,6 +26,8 @@ const KAYIT_ALANLARI = [...new Set([...Object.keys(KayitTemel.shape), "anaKatego
 const OZELLIK_ALANLARI = Object.keys((MulkOzellikObje as any).shape ?? (MulkOzellikObje as any)._def?.schema?.shape ?? {});
 const sade = (v: unknown): unknown => (v == null ? null : v instanceof Date ? v.toISOString() : typeof v === "object" && v && "toNumber" in (v as any) ? Number(v) : v);
 const ARAYUZ = "arayuz";
+/** v3.36 — kaydetme hata günlüğü (ayar anahtarı) */
+export const KAYIT_GUNLUGU = "kayitGunlugu";
 const AYAR_ANAHTARLARI = ["ttl", "ai", "paylasim", "calismaIli", "roller", "sahiplik", "gorevler", "ilgilenenler", ARAYUZ];
 
 // ───────── Okuma ─────────
@@ -91,6 +93,8 @@ export const DegisiklikSchema = z.object({
   eslesmeNotlari: z.record(EsNotZ).default({}),
   ayarlar: z.object({ ttl: z.record(z.number()).optional(), ai: AiAyarSchema.optional(), paylasim: PaylasimAyarSchema.optional(), calismaIli: z.number().int().optional(), roller: z.array(RolTanimSchema).max(ROL_SINIRI).optional(), sahiplik: SahiplikAyarSchema.optional(), /** v3.25 — Bugün panosu görevleri ve ilgilenenler (ofis ayarı olarak JSON) */ gorevler: z.array(z.unknown()).max(GOREV_SINIRI).optional(), ilgilenenler: z.array(z.unknown()).max(ILGILENEN_SINIRI).optional() }).optional(),
   arayuz: z.record(z.unknown()).optional(),
+  /** v3.36 — arayüzün yaşadığı kaydetme hataları (503, bağlantı kopması…): sunucu "kayitGunlugu" ayarına ekler; neden hata verdiği sonradan okunabilsin */
+  kayitHatalari: z.array(z.object({ zaman: z.string().max(40), mesaj: z.string().max(300), durum: z.number().int().optional(), kayit: z.number().int().optional() })).max(30).optional(),
 });
 export type Degisiklik = z.output<typeof DegisiklikSchema>;
 
@@ -231,5 +235,13 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
     if (g.ayarlar.ilgilenenler) await yaz("ilgilenenler", ilgilenenlerNormalize(g.ayarlar.ilgilenenler)); // v3.25: İlgilenenler
   }
   if (g.arayuz) await ayarYaz(prisma, ARAYUZ, g.arayuz);
+  // v3.36 — kaydetme günlüğü: reddedilen kayıtlar ve arayüzün bildirdiği ağ / sunucu hataları (son 60). Yalnızca hata varken yazılır.
+  if (hatalar.length || g.kayitHatalari?.length) {
+    try {
+      const eski = await prisma.ayar.findFirst({ where: { anahtar: KAYIT_GUNLUGU }, select: { deger: true } });
+      const yeni = [...(g.kayitHatalari ?? []).map((h) => ({ ...h, kaynak: "arayuz" })), ...hatalar.map((h) => ({ zaman: simdi.toISOString(), mesaj: h.mesaj.slice(0, 300), kimlik: h.id, kaynak: "sunucu" }))];
+      await ayarYaz(prisma, KAYIT_GUNLUGU, [...(Array.isArray(eski?.deger) ? (eski!.deger as unknown[]) : []), ...yeni].slice(-60));
+    } catch { /* günlük yazılamazsa kayıt sonucu etkilenmez */ }
+  }
   return { tamam: hatalar.length === 0, hatalar, uyarilar };
 }

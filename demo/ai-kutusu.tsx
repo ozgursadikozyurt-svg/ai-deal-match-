@@ -75,7 +75,9 @@ export function taslakYap(metin: string, h: HizliSonuc, ai: any | null, haricIfa
     veriKanali: kanal,
     // v3.16 — kaynak otomasyonu: "Kendi portföyüm" yalnızca elle girişte varsayılan. Portal ilanı → dış ilan;
     // WhatsApp / emlakçı kaynaklı ya da sahibi belli olmayan kayıtlar partner havuzuna düşer, kullanıcı isterse formda değiştirir.
-    havuz: talep ? "KENDI_PORTFOY" : h.portal ? "DIS_ILAN" : (ai?.ilanSahibiTipi ?? h.ilanSahibiTipi) === "MALIK" ? "KENDI_PORTFOY" : kanal === "MANUEL" ? "KENDI_PORTFOY" : "PARTNER",
+    // v3.36 — WhatsApp grubunda "SAHİBİNDEN SATILIK" yazan meslektaş ilanı "mülk sahibi" okunup Kendi portföyüm'e düşüyordu (Özgür, 19 Eki:
+    // "kendi portföyüm yazanları tek tek düzeltiyorum"). Artık yalnızca elle girilen kayıt Kendi portföyüm olur; sahibi bilgisi ilanSahibiTipi'nde kalır.
+    havuz: talep ? "KENDI_PORTFOY" : h.portal ? "DIS_ILAN" : kanal === "MANUEL" ? "KENDI_PORTFOY" : "PARTNER",
     portalUrl: h.portalUrl ?? undefined, portalIlanNo: h.ilanNo ?? undefined,
     hamMetin: metin, baslik: (ozet ? String(ozet) : ozetYaz(h, talep && rh.lokasyonlar.length ? [konumOzeti(lokasyonlar)] : r.lokasyonlar.map((l) => l.etiket), talep)).slice(0, 160),
     // v3.17 — jargon sözlüğünden çıkan kayıt alanları (krediye uygun, takasa açık) ve karşılığı olmayan jargon notları
@@ -503,7 +505,7 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
             {tek.veri && !tek.tekrar && (
               <button className="oz-eslesme" onClick={() => setAcik(acik === 0 ? null : 0)} disabled={!tek.eslesmeler.length}>
                 <b>{tek.eslesmeler.length}</b>
-                <span>{tek.eslesmeler.length ? `${tek.taslak.tip === "TALEP" ? "portföyle" : "taleple"} eşleşecek · en iyi %${tek.eslesmeler[0].s.skor}` : `Şu an eşleşen ${tek.taslak.tip === "TALEP" ? "portföy" : "talep"} yok`}</span>
+                <span>{tek.eslesmeler.length ? `${tek.taslak.tip === "TALEP" ? "portföyle" : "taleple"} eşleşecek · en iyi ${tek.eslesmeler[0].s.seviye}/5` : `Şu an eşleşen ${tek.taslak.tip === "TALEP" ? "portföy" : "talep"} yok`}</span>
                 {tek.eslesmeler.length > 0 && <i aria-hidden="true">{acik === 0 ? "▴" : "▾"}</i>}
               </button>
             )}
@@ -570,7 +572,7 @@ Yalnızca şu JSON'u döndür: {"hedef":"PORTFOY|TALEP","aileler":["DEPO|URETIM|
                   <span>{(s.veri?.lokasyonlar ?? []).map(lokEtiket).join(" · ") || (s.p.ilGeneli ? `${ilAdiOf(calismaIliOku())} geneli` : "Konum yok")}</span>
                   {s.veri && (v.fiyat ?? v.maxFiyat) != null && <b>{fiyatOf(s.veri)}</b>}
                   {s.veri && m2Of(s.veri) && <span>{m2Of(s.veri)}</span>}
-                  {s.eslesmeler.length > 0 && <span className="cs-es">{s.eslesmeler.length} eşleşme · %{s.eslesmeler[0].s.skor}</span>}
+                  {s.eslesmeler.length > 0 && <span className="cs-es">{s.eslesmeler.length} eşleşme · en iyi {s.eslesmeler[0].s.seviye}/5</span>}
                 </div>
                 {(s.p.uyarilar.length > 0 || s.kontrol.length > 0 || s.hatalar.length > 0) && !s.tekrar && <div className="cs-uyari">{[...s.p.uyarilar, ...s.kontrol, ...s.hatalar].join(" · ")}</div>}
                 {s.p.notlar.length > 0 && <div className="cs-not">{s.p.notlar.join(" · ")}</div>}

@@ -35,7 +35,7 @@ const PAKET = 10;
 import { ICE_AKTARMA_DEVIR } from "./devir";
 export { ICE_AKTARMA_DEVIR };
 import { GelenKutusu, useGelenRozet } from "./gelen-kutusu";
-import { KaynakSecici } from "./kaynak-secici";
+import { KaynakSecici, TopluKaynakSecici } from "./kaynak-secici";
 import { kaynakOf, kaynakUygula } from "../src/lib/domain/kaynak";
 const SON_GUN_SECENEK: [number | null, string][] = [[7, "Son 7 gün"], [30, "Son 30 gün"], [90, "Son 90 gün"], [null, "Tümü"]];
 
@@ -52,6 +52,8 @@ function taslakOlustur(k: any, m: WaMesaj | undefined, ingestionId: string) {
     // v3.16 — WhatsApp emlakçı grubundan gelen portföy: ilan sahibi "emlakçı", havuz "partner" (kendi portföyüm değil);
     // malik olduğu açıkça yazılıysa (ilanSahibiTipi: MALIK) dokunulmaz.
     ...(geri.tip === "PORTFOY" && (geri as any).ilanSahibiTipi !== "MALIK" ? { ilanSahibiTipi: (geri as any).ilanSahibiTipi && (geri as any).ilanSahibiTipi !== "BILINMIYOR" ? (geri as any).ilanSahibiTipi : "EMLAKCI", havuz: "PARTNER" } : {}),
+    // v3.36 — "sahibinden" yazsa da grupta paylaşılan ilan Kendi portföyüm değildir: havuz Partner, ilan sahibi bilgisi (MALIK) korunur
+    ...(geri.tip === "PORTFOY" && (geri as any).ilanSahibiTipi === "MALIK" && !(geri as any).portalUrl ? { havuz: "PARTNER" } : {}),
     baslik: ozet ? String(ozet).slice(0, 160) : undefined,
   };
   return { taslak, cozulemeyen: r.cozulemeyen, cozulen: r.lokasyonlar };
@@ -90,7 +92,9 @@ export function kuralAdaylari(mesajlar: WaMesaj[], d: DepoDurumu, ingestionId: s
       p.kisiAdi = p.kisiAdi ?? (adGibi ? m.gonderen : null);
       if (ben) p.notlar.push("Kendi mesajınız");
       const s = satirKur(p, { tipIpucu: y.tipIpucu } as any, "OTO", d, izler, kayitliMetinler, null, () => []);
-      const taslak: any = { ...s.taslak, kaynakDosya: m.dosya, ingestionId };
+      const taslak: any = { ...s.taslak, kaynakDosya: m.dosya, ingestionId, veriKanali: "WHATSAPP" };
+      // v3.36 — sohbet dosyasından gelen portföy meslektaş paylaşımıdır (Partner); yalnızca kendi mesajınız Kendi portföyüm
+      if (taslak.tip === "PORTFOY" && !taslak.portalUrl) taslak.havuz = ben ? "KENDI_PORTFOY" : "PARTNER";
       const nedenler = [...s.kontrol, ...p.uyarilar.filter((u) => !s.kontrol.includes(u))];
       if (s.durum === "TEKRAR") nedenler.unshift("Havuzda zaten var gibi görünüyor");
       cikti.push({
@@ -261,6 +265,7 @@ function Inceleme({ ia }: { ia: IceAktarma }) {
         {(sekme === "HAZIR" || sekme === "KONTROL" || sekme === "TUMU") && liste.length > 0 && <>
           <button className="btn" onClick={() => { const secilebilir = liste.filter((a) => a.durum === "HAZIR" || a.durum === "KONTROL"); setSecim(secim.size === secilebilir.length ? new Set() : new Set(secilebilir.map((a) => a.id))); }}>{secim.size && secim.size === liste.filter((a) => a.durum === "HAZIR" || a.durum === "KONTROL").length ? "Seçimi kaldır" : "Tümünü seç"}</button>
           <button className="btn" disabled={!secim.size} onClick={() => ekle([...secim])}>Seçilenleri ekle ({secim.size})</button>
+          <TopluKaynakSecici sayi={secim.size} uygula={(k) => { guncelle((dd) => dd.aktifIceAktarma ? { ...dd, aktifIceAktarma: { ...dd.aktifIceAktarma, adaylar: dd.aktifIceAktarma.adaylar.map((x) => (secim.has(x.id) ? { ...x, taslak: kaynakUygula(x.taslak as any, k) } : x)) } } : dd); bildir(`${secim.size} kaydın kaynağı değişti`); }} />
           <button className="btn" disabled={!secim.size} onClick={() => { guncelle((dd) => dd.aktifIceAktarma ? { ...dd, aktifIceAktarma: { ...dd.aktifIceAktarma, adaylar: dd.aktifIceAktarma.adaylar.map((a) => (secim.has(a.id) ? { ...a, durum: "ATLANDI" as const } : a)) } } : dd); setSecim(new Set()); }}>Seçilenleri atla</button>
         </>}
       </div>

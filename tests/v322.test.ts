@@ -16,7 +16,7 @@ import { INDEKS, BAGLAM, lokEtiket, konumOzeti } from "../demo/lokasyon";
 import { satirKur } from "../demo/ai-kutusu";
 import { haricDegistir } from "../demo/form";
 import { haricBirlestir } from "../src/lib/lokasyon/haric";
-import { eslesmeOnizle, FIYATSIZ_CARPAN } from "../src/lib/eslestirme/onizleme";
+import { eslesmeOnizle, FIYATSIZ_CARPAN, FIYATSIZ_SKOR_TAVANI } from "../src/lib/eslestirme/onizleme";
 import { KayitCreateSchema } from "../src/lib/validation/kayit";
 import { sahiplikKimligi, sahiplikOf, sahiplikNormalize, telAnahtar } from "../src/lib/domain/sahiplik";
 import { SahiplikAyarlari, SahiplikSecici } from "../demo/sahiplik";
@@ -83,26 +83,27 @@ test("form: bir konumu 'hariç tut' → ilçesi aranana eklenir; 'dahil et' geri
 });
 
 // ───── 2) Bütçesiz talep ─────
-test("bütçesiz talep: fiyat ölçülemediği için skor ×0,75 (≤ 69, Koşullu); aynı talep bütçeyle 100", () => {
+test("bütçesiz talep: fiyat ölçülemediği için −8 ve en fazla 79 (v3.36: 4/5 Koşullu; eskiden ×0,75); aynı talep bütçeyle 100", () => {
   const p = kayit("P14").veri as any;
   const tam = eslesmeOnizle({ ...(kayit("T15").veri as any), maxFiyat: 9_000_000 }, p, BAGLAM);
   const butcesiz = eslesmeOnizle(kayit("T15").veri as any, p, BAGLAM);
   assert.equal(tam.skor, 100);
-  assert.ok(butcesiz.skor <= 69 && butcesiz.skor >= 55, String(butcesiz.skor)); assert.equal(butcesiz.uygunluk, "KOSULLU");
+  assert.ok(butcesiz.skor <= FIYATSIZ_SKOR_TAVANI && butcesiz.skor >= 70, String(butcesiz.skor)); assert.equal(butcesiz.uygunluk, "KOSULLU"); assert.equal(butcesiz.seviye, 4);
+  assert.ok(butcesiz.gerekceler.some((g) => /bütçe/i.test(g)), butcesiz.gerekceler.join(" | "));
   assert.ok(butcesiz.veriEksikleri.includes("talepte bütçe yok"));
   // çarpan sırayı korur: m²'si de eksik talep daha aşağıda
   const m2siz = eslesmeOnizle({ ...(kayit("T15").veri as any), minM2: null }, p, BAGLAM);
   assert.ok(m2siz.skor < butcesiz.skor, `${m2siz.skor} < ${butcesiz.skor}`);
   // portföyde fiyat yoksa da aynı kural
-  assert.ok(eslesmeOnizle({ ...(kayit("T15").veri as any), maxFiyat: 9_000_000 }, { ...p, fiyat: null }, BAGLAM).skor <= 69);
-  assert.equal(FIYATSIZ_CARPAN, 0.75);
+  assert.ok(eslesmeOnizle({ ...(kayit("T15").veri as any), maxFiyat: 9_000_000 }, { ...p, fiyat: null }, BAGLAM).skor <= FIYATSIZ_SKOR_TAVANI);
+  assert.equal(FIYATSIZ_CARPAN, 0.75); assert.equal(FIYATSIZ_SKOR_TAVANI, 79);
 });
-test("örnek veride bütçesiz hiçbir eşleşme 70'e ulaşmaz", () => {
+test("örnek veride bütçesiz hiçbir eşleşme 80'e ulaşmaz (v3.36: en fazla 4/5; eskiden 70)", () => {
   const talepler = ornek.kayitlar.filter((k) => k.veri.tip === "TALEP" && k.veri.maxFiyat == null);
   assert.ok(talepler.length >= 1);
   for (const t of talepler) for (const p of ornek.kayitlar.filter((k) => k.veri.tip === "PORTFOY")) {
     const s = eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM);
-    assert.ok(s.skor < 70, `${t.id}~${p.id}: ${s.skor}`);
+    assert.ok(s.skor < 80 && s.seviye <= 4, `${t.id}~${p.id}: ${s.skor}`);
   }
 });
 

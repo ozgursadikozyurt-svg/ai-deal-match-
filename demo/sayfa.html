@@ -115,7 +115,7 @@ pre.ham{white-space:pre-wrap;background:var(--panel2);border:1px solid var(--lin
 .es-satir{font-size:.88rem;overflow-wrap:anywhere}.es-tip{display:inline-block;min-width:4.2rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
 .skor{width:62px;height:62px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border:3px solid currentColor;font-variant-numeric:tabular-nums}
 .skor b{font:600 1.25rem/1 var(--m)}.skor small{font-size:.6rem;opacity:.75}
-.s-iyi{color:var(--iyi);background:var(--iyi-bg)}.s-uyari{color:var(--uyari);background:var(--uyari-bg)}.s-kotu{color:var(--kotu);background:var(--kotu-bg)}
+.s-iyi{color:var(--iyi);background:var(--iyi-bg)}.s-orta{color:var(--mavi);background:var(--mavi-bg)}.s-uyari{color:var(--uyari);background:var(--uyari-bg)}.s-kotu{color:var(--kotu);background:var(--kotu-bg)}
 .es-bas{display:flex;gap:14px;align-items:center}
 .hata-satir{color:var(--kotu);font-size:.85rem;margin-top:4px}
 .uyari-satir{color:var(--uyari, #b26a00);font-size:.85rem;margin-top:4px}
@@ -645,7 +645,11 @@ main.sarici{padding-block:18px 32px}
 .es2-skor{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;width:52px;height:52px;border-radius:14px;background:var(--panel)}
 .es2-skor b{font:700 1.45rem/1 var(--d);font-variant-numeric:tabular-nums}
 .es2-skor small{font-size:.58rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.8;margin-top:2px}
-.es2-skor.s-iyi{background:var(--iyi-bg);color:var(--iyi)}.es2-skor.s-uyari{background:var(--uyari-bg);color:var(--uyari)}.es2-skor.s-kotu{background:var(--kotu-bg);color:var(--kotu)}
+.es2-skor.s-iyi{background:var(--iyi-bg);color:var(--iyi)}.es2-skor.s-orta{background:var(--mavi-bg);color:var(--mavi)}.es2-uygun.s-orta{color:var(--mavi)}
+/* v3.36 — uyum seviyesi gerekçeleri */
+.gerekce-kutu{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
+.gerekce-liste{margin:4px 0 6px;padding-left:1.1em;font-size:.86rem;line-height:1.45}.gerekce-liste li{margin:2px 0}.gerekce-liste .soluk{list-style:none;color:var(--mut)}
+.gerekce-yok{font-size:.86rem;color:var(--iyi);margin:4px 0}.es2-skor.s-uyari{background:var(--uyari-bg);color:var(--uyari)}.es2-skor.s-kotu{background:var(--kotu-bg);color:var(--kotu)}
 .es2.s-iyi,.es2.s-uyari,.es2.s-kotu{background:var(--panel);color:var(--fg)}
 .es2-durum{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding-right:36px}
 .es2-uygun{font:700 1rem/1.1 var(--d);letter-spacing:-.01em;background:none}

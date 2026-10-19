@@ -19,3 +19,17 @@ export function KaynakSecici({ deger, degis, kucuk = false, id }: { deger: Kayna
     {KAYNAK_SECIMLERI.map((k) => <button key={k} type="button" role="radio" aria-checked={deger === k} title={KAYNAK_SECIM_ACIKLAMA[k]} className={"cip secilir" + (deger === k ? " on" : "")} onClick={() => degis(k)}>{KAYNAK_SECIM_ETIKET[k]}</button>)}
   </div>;
 }
+
+/**
+ * v3.36 — toplu kaynak değişimi: seçili kayıtların kaynağını tek seferde değiştirir (WhatsApp içe aktarma, gelen kutusu, portföy listesi).
+ * Özgür (19 Eki 2026): "kendi portföyüm yazanları, yanlış olanları tek tek düzeltmek zorunda kalıyorum".
+ */
+export function TopluKaynakSecici({ sayi, uygula, etiket = "Seçilenlerin kaynağı" }: { sayi: number; uygula: (k: KaynakSecimi) => void; etiket?: string }) {
+  return <label className="kaynak-sec toplu-kaynak" onClick={(e) => e.stopPropagation()}>
+    <span>{etiket}{sayi ? ` (${sayi})` : ""}</span>
+    <select aria-label={etiket} value="" disabled={!sayi} onChange={(e) => { const k = e.target.value as KaynakSecimi; if (k) uygula(k); }}>
+      <option value="">Değiştir…</option>
+      {KAYNAK_SECIMLERI.map((k) => <option key={k} value={k} title={KAYNAK_SECIM_ACIKLAMA[k]}>{KAYNAK_SECIM_ETIKET[k]}</option>)}
+    </select>
+  </label>;
+}

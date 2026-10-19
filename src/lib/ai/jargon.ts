@@ -85,7 +85,8 @@ export function katOku(m: string): { bulunduguKat?: number; katSayisi?: number }
     const a = Number(g[1]), b = Number(g[2]);
     if (a <= 60 && b <= 60 && (a > 0 || b > 0)) return { bulunduguKat: Math.min(a, b), katSayisi: Math.max(a, b) };
   }
-  const tek = m.match(/(?<![\d])(\d{1,2})\s*\.?\s*kat(?!l[ıi])(?!\s*kar[şs][ıi]l)(?!\s*say)/u);
+  // v3.36 — "2+1 katta" oda sayısıdır, 1. kat değil (önünde + olan rakam alınmaz)
+  const tek = m.match(/(?<![\d+])(\d{1,2})\s*\.?\s*kat(?!l[ıi])(?!\s*kar[şs][ıi]l)(?!\s*say)/u);
   if (tek) return { bulunduguKat: Number(tek[1]) };
   const sayili = m.match(/(\d{1,2})\s*katl[ıi]/u);
   return sayili ? { katSayisi: Number(sayili[1]) } : {};
@@ -94,10 +95,14 @@ export function katOku(m: string): { bulunduguKat?: number; katSayisi?: number }
 /** "SIFIR" = 0 yaş · "15 yıllık" = 15 yaş */
 export function binaYasiOku(m: string): number | undefined {
   // v3.33 — aralık / üst sınır önce: "sıfırdan 7-8 yaşına kadar" → 8 (eskiden "sıfır" görülüp 0 okunuyordu), "en fazla 10 yaş", "10 yaş altı"
-  const ust = m.match(/(?:(\d{1,2})\s*[-–/]\s*)?(\d{1,2})\s*ya[şs][ıi]?(?:na|ndan)?\s*(?:kadar|alt[ıi]|ve\s*alt[ıi])/u)
-    ?? m.match(/(?:en\s*fazla|maks(?:imum)?|max)()\s*(\d{1,2})\s*ya[şs]/u);
+  // v3.36 — "5 yaşa kadar", "4 yaşa kadar" (eskiden yalnızca "yaşına kadar" okunuyordu); "yaşı en fazla 16-17" → 17
+  const ust = m.match(/(?:(\d{1,2})\s*[-–/]\s*)?(\d{1,2})\s*ya[şs](?:[ıi]na|[ıi]ndan|a|[ıi])?\s*(?:kadar|alt[ıi]|ve\s*alt[ıi])/u)
+    ?? m.match(/(?:en\s*fazla|maks(?:imum)?|max)()\s*(\d{1,2})\s*ya[şs]/u)
+    ?? m.match(/ya[şs][ıi]?\s*(?:en\s*fazla|maks(?:imum)?|max)\s*()(?:\d{1,2}\s*[-–]\s*)?(\d{1,2})/u);
   if (ust) return Number(ust[2]);
-  if (/\bs[ıi]f[ıi]r\b|\bs[ıi]f[ıi]r\s*bina|yeni\s*bina|yap[ıi]m[ıi]\s*yeni/u.test(m)) return 0;
+  if (/\bs[ıi]f[ıi]r\b|\bs[ıi]f[ıi]r\s*bina/u.test(m)) return 0;
+  // v3.36 — "yeni bina" sıfır demek değildir: en fazla 5 yaş (Hurma "yeni binada" talebi sıfır okunuyor, 3 yaşındaki daire tutmuyordu)
+  if (/yeni\s*bina|yap[ıi]m[ıi]\s*yeni/u.test(m)) return 5;
   const g = m.match(/(\d{1,3})\s*(?:y[ıi]ll[ıi]k|ya[şs][ıi]nda|ya[şs][ıi]\b)/u);
   return g ? Number(g[1]) : undefined;
 }
@@ -123,14 +128,19 @@ export function emsalOku(m: string): number | undefined {
  * Kat jargonundan istenen kat seçenekleri (talepte çoklu kat):
  * "arakat" / "katta" → ARA · "yüksek giriş" / "giriş" / "zemin" / "bahçe katı" → 0 · "son kat" / "çatı katı" → SON · "bodrum" → -1
  */
-export function katJargonu(m: string): string[] {
+export function katJargonu(m0: string): string[] {
+  // v3.36 — olumsuz cümledeki katlar istenmeyen kattır: "Giriş kat ve en üst kat kesinlikle düşünülmüyor" → giriş istenmiyor
+  // (eskiden ["ARA","0"] okunuyor, giriş kattaki daire 100 alıyordu)
+  const m = m0.split(/[.!;\n]+/u).filter((c) => !OLUMSUZ_KAT.test(c)).join(" . ");
   const k: string[] = [];
   if (/ara\s*kat|arakat|(?<![\p{L}])katta(?![\p{L}])/u.test(m)) k.push("ARA");
   if (/y[üu]ksek\s*giri[şs]|(?<![\p{L}])giri[şs]\s*kat|zemin\s*kat|bah[çc]e\s*kat/u.test(m)) k.push("0");
-  if (/son\s*kat|[çc]at[ıi]\s*kat/u.test(m)) k.push("SON");
+  if (/son\s*kat|en\s*[üu]st\s*kat|[çc]at[ıi]\s*kat/u.test(m)) k.push("SON");
   if (/bodrum\s*kat/u.test(m)) k.push("-1");
   return k;
 }
+/** v3.36 — kat geçen bir cümleyi "istenmiyor" yapan ifadeler */
+export const OLUMSUZ_KAT = /d[üu][şs][üu]n[üu]lm[üu]yor|olmas[ıi]n|olmamal[ıi]|olmayacak|istemiyor|istenmiyor|hari[çc]|de[ğg]il\b|tercih\s*edilmiyor|kabul\s*edilmiyor|bakm[ıi]yor|\bhay[ıi]r\b/u;
 
 /**
  * Fiyat jargonu düzeltmesi: metinde yazılan ham sayıyı bağlama göre düzeltir.

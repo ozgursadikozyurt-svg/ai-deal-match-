@@ -38,6 +38,8 @@ export function kaydediciKur(a: { api: Api; baslangic: DepoDurumu; durum: (s: Ka
   let calisiyor: Promise<void> | null = null;
   let hatalar: KaydetDurumu["hatalar"] = [];
   let deneme = 0;
+  /** v3.36 — yaşanan kaydetme hataları: bir sonraki başarılı istekle sunucuya gider (ayar "kayitGunlugu"), neden hata verdiği okunabilsin */
+  const gunluk: { zaman: string; mesaj: string; durum?: number; kayit?: number }[] = [];
   const reddedilen = new Map<string, string>(); // kimlik → reddedildiği andaki imza: içeriği değişmedikçe yeniden gönderilmez
   const bildir = (ad: KaydetAdi, mesaj?: string) => a.durum({ ad, hatalar, mesaj });
 
@@ -55,9 +57,18 @@ export function kaydediciKur(a: { api: Api; baslangic: DepoDurumu; durum: (s: Ka
       bildir("kaydediliyor");
       const yeniHatalar: KaydetDurumu["hatalar"] = [];
       for (const parca of p.parcalar) {
-        const r = await a.api("/api/durum", { method: "POST", json: parca });
+        const gonderilen = gunluk.splice(0, 30);
+        const kayitSay = Array.isArray((parca as any).kayitlar) ? (parca as any).kayitlar.length : 0;
+        let r: Response;
+        try { r = await a.api("/api/durum", { method: "POST", json: gonderilen.length ? { ...parca, kayitHatalari: gonderilen } : parca }); }
+        catch (e: any) { gunluk.unshift(...gonderilen); gunluk.push({ zaman: new Date(simdi()).toISOString(), mesaj: String(e?.message ?? e).slice(0, 300), kayit: kayitSay }); throw e; }
         const j: any = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(j?.mesaj ?? (j?.alanlar ? "Doğrulama hatası" : `Sunucu ${r.status}`));
+        if (!r.ok) {
+          gunluk.unshift(...gonderilen);
+          const mesaj = j?.mesaj ?? (j?.alanlar ? "Doğrulama hatası" : `Sunucu ${r.status}`);
+          if (gunluk.length < 60) gunluk.push({ zaman: new Date(simdi()).toISOString(), mesaj: String(mesaj).slice(0, 300), durum: r.status, kayit: kayitSay });
+          throw new Error(mesaj);
+        }
         for (const h of (j?.hatalar ?? []) as { id: string; mesaj: string }[]) yeniHatalar.push(h);
         for (const u of [...new Set(((j?.uyarilar ?? []) as { mesaj: string }[]).map((x) => x.mesaj))]) a.uyari?.(u);
       }
@@ -89,9 +100,16 @@ export function kaydediciKur(a: { api: Api; baslangic: DepoDurumu; durum: (s: Ka
       catch (e: any) {
         deneme++;
         // v3.28 — bağlantı kopması geçicidir: kullanıcıya anlaşılır yazılır ve hemen (3 sn) yeniden denenir
-        const gecici = /connection terminated|bağlantısı koptu|hyperdrive|econnreset|socket|network|failed to fetch|load failed|zaman aşımı|timeout/i.test(String(e?.message ?? e));
-        bildir("hata", gecici ? `Bağlantı koptu${deneme <= 4 ? " — yeniden deneniyor" : ""}` : `Kaydedilemedi: ${e?.message ?? e}${deneme <= 4 ? " — yeniden denenecek" : ""}`);
-        if (deneme <= 4) { zaman = setTimeout(() => { zaman = undefined; void calistir(); }, a.yenidenMs ?? (gecici ? 3000 : 8000)); (zaman as any)?.unref?.(); }
+        const metin = String(e?.message ?? e);
+        const gecici = /connection terminated|bağlantısı koptu|hyperdrive|econnreset|socket|network|failed to fetch|load failed|zaman aşımı|timeout/i.test(metin);
+        // v3.36 — 502/503/504 ve "Exceeded CPU" (Cloudflare ücretsiz plan, istek başına 10 ms) geçicidir: sunucu yoğun, iş kaybolmaz, yeniden denenir.
+        // Eskiden "Kaydedilemedi: Sunucu 503" yazıyordu ve kullanıcı kaydın gidip gitmediğini bilemiyordu.
+        const yogun = /sunucu 50[234]|exceeded|1102|resource limit|worker/i.test(metin);
+        const deneyecek = deneme <= (yogun || gecici ? 8 : 4);
+        bildir("hata", gecici ? `Bağlantı koptu${deneyecek ? " — yeniden deneniyor, değişiklikleriniz bekliyor" : ""}`
+          : yogun ? `Sunucu yoğun${deneyecek ? " — yeniden deneniyor, değişiklikleriniz bekliyor (kaybolmaz)" : " — birazdan yeniden deneyin; değişiklikleriniz bu cihazda bekliyor"}`
+          : `Kaydedilemedi: ${metin}${deneyecek ? " — yeniden denenecek" : ""}`);
+        if (deneyecek) { zaman = setTimeout(() => { zaman = undefined; void calistir(); }, a.yenidenMs ?? (gecici ? 3000 : yogun ? 2000 * Math.min(deneme, 5) : 8000)); (zaman as any)?.unref?.(); }
       } finally { calisiyor = null; }
     })();
     return calisiyor;

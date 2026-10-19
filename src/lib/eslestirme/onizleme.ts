@@ -1,5 +1,9 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.36 · 19 Ekim 2026 (v3.33'ten)
+ * v3.36 — UYUM SEVİYESİ 1–5 (ekranda yüzde yerine) + gerekçe listesi (neden bu seviye). Ölçüm: 19 Eki 2026 canlı veri, 16.095 çift;
+ *   "yanlış" işaretlenen 40 eşleşmenin 10'u 92–100 alıyordu. Düzeltmeler: döviz çevrimi, talepteki anlamsız değerler (0 kW, 5 kW,
+ *   çatı / duvar tipi) şart sayılmaz, "ara kat" isteyene giriş / son kat tutmaz, fazla oda ve üst üste ödün en fazla Koşullu,
+ *   bütçesi bilinmeyen ama başka her şeyi tutan eşleşme 63'te değil 79'da (4/5) kalır.
  * EŞLEŞTİRME MOTORU v3 (v3.11; v2 = v3.5) — veritabanı ve yapay zekâ gerektirmeyen saf fonksiyon.
  * Metin benzerliği değil, ticari gayrimenkulün katı kuralları (Killer Criteria):
  *  1. Talep DNA'sı (talep-dna.ts): öldürücü kriterler = talepte "şart" denenler + kullanım amacının doğası
@@ -44,7 +48,48 @@ export const BILINMEYEN_PUAN = 0.4;
  * Çarpan 0,75: en iyi bütçesiz eşleşme ~63–69'da kalır ("Skor ≥ 70" süzgecinin ve portföy edinme eşiği 80'in altı);
  * düz tavan yerine çarpan, bütçesizler arasındaki sırayı korur (m²'si de eksik olan daha aşağıda kalır).
  */
-export const FIYATSIZ_CARPAN = 0.75;
+export const FIYATSIZ_CARPAN = 0.75; // v3.36'dan beri kullanılmıyor (bkz. FIYATSIZ_CEZA)
+/**
+ * v3.36 — bütçe ya da fiyat bilinmiyorsa: çarpan yerine sabit ceza + tavan. Ölçüm (19 Eki 2026): "Döşemealtı–Serik 4.000 m² depo"
+ * talebine (bütçe yazılmamış, "kurumsal firma") 4.000 m² · 400 kW depo 63 alıyordu; çarpan iyi eşleşmeyi "zayıf" gösteriyordu.
+ * Şimdi en iyi bütçesiz eşleşme 79 (4/5 "Güçlü aday · bütçeyi sorun"): doğrulanmış (85+) olanların altında, ama 3/5'in üstünde.
+ */
+export const FIYATSIZ_CEZA = 8, FIYATSIZ_SKOR_TAVANI = 79;
+/** v3.36 — fazla oda en fazla Koşullu (≤ 84); iki ve üstü oda fazlaysa ≤ 74. Ölçüm: 2+1 talebine 3+1 kiralık üç eşleşme 92–98 "Sunulabilir" çıkıp "yanlış" işaretlendi. */
+export const FAZLA_ODA_IKI_SKOR_TAVANI = 74;
+/** v3.36 — üst üste ödün (fazla oda + bütçe üstü, m² sınır dışı + komşu mahalle…): ilkinden sonraki her ödün −6 ve en fazla 79 */
+export const ODUN_CEZASI = 6, ODUN_SKOR_TAVANI = 79;
+/**
+ * v3.36 — dövizli fiyatı TL'ye çevirmek için yaklaşık kur (14 Eki 2026 piyasa: USD 49,4 · EUR 55,4). Eşleştirme kaba karşılaştırma
+ * yapar (bütçe ±%10); kur birkaç puan oynasa da sonuç değişmez. Talep "3.000 USD" iken TL'lik kiralarla 3.000 TL gibi karşılaştırılıyordu.
+ */
+export const DOVIZ_TL: Record<string, number> = { TRY: 1, USD: 49.4, EUR: 55.4, GBP: 64 };
+/** v3.36 — talepte bu değerin altındaki elektrik isteği anlamsızdır (ev aboneliği; yapay zekâ "5 kW" yazıyordu) — şart sayılmaz */
+export const ELEKTRIK_ANLAMLI_EN_AZ = 10;
+/** v3.36 — talepte "tercih" sayılan tanım alanları: şart denmedikçe uymaması yalnızca −3 (tavan yok), bilinmemesi cezasız */
+export const TERCIH_ALANLARI: ReadonlySet<string> = new Set(["catiTipi", "duvarTipi", "cepheYonleri"]); // ısınma (doğalgaz) konutta gerçek istektir, tercih sayılmaz
+/** v3.36 — bina yaşı üst sınırında küçük aşım ödün sayılır (en az 2 yıl ya da %15): "yaşı en fazla 16-17" talebine 18 yaşındaki daire sunulmuştu */
+export const BINA_YASI_TOLERANS = (sinir: number) => Math.max(2, Math.round(sinir * 0.15));
+export const TERCIH_CEZASI = 3;
+/** v3.36 — uyum seviyesi (ekranda 1–5). Skor sıralama için içeride kalır. */
+export type Seviye = 1 | 2 | 3 | 4 | 5;
+export const SEVIYE_ETIKET: Record<Seviye, string> = { 5: "Sunulabilir", 4: "Güçlü aday", 3: "Sorulacak", 2: "Zayıf", 1: "Uymuyor" };
+export const SEVIYE_ACIKLAMA: Record<Seviye, string> = {
+  5: "Temel kriterlerin hepsi doğrulandı — sorulmadan sunulabilir",
+  4: "Tek bir soru ya da küçük ödün var (komşu mahalle, bütçe / bir özellik bilinmiyor, fazla oda)",
+  3: "Şart olan bir bilgi bilinmiyor ya da birkaç ödün var — sunmadan önce sorun",
+  2: "İstenen bir özellik yok, kat tutmuyor ya da konum uzak",
+  1: "Öldürücü kriter tutmuyor",
+};
+/** Skor eşikleri: 85+ → 5 (yalnızca Sunulabilir) · 70+ → 4 · 55+ → 3 · 41+ → 2 · altı 1 */
+export const SEVIYE_ESIK = { 5: 85, 4: 70, 3: 55, 2: 41 } as const;
+export function seviyeOf(skor: number, uygunluk: Uygunluk): Seviye {
+  if (uygunluk === "UYGUN_DEGIL") return 1;
+  if (uygunluk === "SUNULABILIR" && skor >= SEVIYE_ESIK[5]) return 5;
+  return skor >= SEVIYE_ESIK[4] ? 4 : skor >= SEVIYE_ESIK[3] ? 3 : 2;
+}
+/** Seviyenin alt skoru (süzgeç: "en az 4/5" → skor ≥ 70) */
+export const seviyeAltSkor = (n: number): number => (n >= 5 ? SEVIYE_ESIK[5] : n >= 4 ? SEVIYE_ESIK[4] : n >= 3 ? SEVIYE_ESIK[3] : n >= 2 ? SEVIYE_ESIK[2] : 0);
 /** v3.22.1 — talepte "istemiyor" denince portföyde var olması uyumsuzluk sayılan evet/hayır alanları */
 export const ISTENMEYEBILIR: ReadonlySet<string> = new Set(["siteIcinde", "havuz"]);
 /**
@@ -72,10 +117,10 @@ export const GUVEN_DUSUK_EN_COK = 3, GUVEN_YUKSEK_EN_AZ = 6;
  */
 export const BILINMEYEN_ISTEK_CEZASI = 4, BILINMEYEN_ISTEK_TAVAN = 12;
 /** v3.27 — istenen bir özellik bilinmiyorsa skor bunu geçemez: doğrulanmış eşleşme (ör. ofisi kesin olan depo) her zaman üstte kalır */
-export const BILINMEYEN_ISTEK_SKOR_TAVANI = 85;
+export const BILINMEYEN_ISTEK_SKOR_TAVANI = 84; // v3.36: 85 → 84 (bilinmeyen istek zaten Koşullu)
 /** v3.27 — istenen özellik portföyde açıkça YOK ise (ör. ofis yok): engel değilse bile bilinmeyenden daha aşağı sıralanır */
 export const KARSILANMAYAN_ISTEK_CEZASI = 8, KARSILANMAYAN_ISTEK_TAVAN = 16;
-export const KARSILANMAYAN_ISTEK_SKOR_TAVANI = 70; // v3.33: 80 → 70 (şartı bilinmeyenin, 74, altında)
+export const KARSILANMAYAN_ISTEK_SKOR_TAVANI = 64; // v3.36: 70 → 64 (3/5 "Sorulacak"ın altı); v3.33: 80 → 70
 /**
  * v3.33 — talepte ŞART olan bir kriter portföyde bilinmiyorsa (elektrik gücü yazılmamış depo, m²'si olmayan ilan) her biri için
  * düşülen puan ve skor tavanı. Ölçüm (19 Eki 2026, Özgür): "50 kW şart" talebine elektriği bilinmeyen depolar 83–84 alıyordu —
@@ -83,12 +128,12 @@ export const KARSILANMAYAN_ISTEK_SKOR_TAVANI = 70; // v3.33: 80 → 70 (şartı 
  * geçemiyordu. Elenmez (Koşullu, "Sorulacak"), ama doğrulanmış eşleşmelerin (85+) ve şartsız bilinmeyenlerin (≤ 84) altına iner.
  * Sıralama merdiveni: doğrulanmış 85–100 · şartsız bilinmeyen ≤ 84 · şartı bilinmeyen ≤ 74 · karşılanmayan istek ≤ 70 · kat uymuyor ≤ 60 · uygun değil ≤ 40.
  */
-export const SART_BILINMEYEN_CEZASI = 15, SART_BILINMEYEN_SKOR_TAVANI = 74;
+export const SART_BILINMEYEN_CEZASI = 15, SART_BILINMEYEN_SKOR_TAVANI = 69; // v3.36: 74 → 69 (3/5)
 /**
  * v3.33 — istenen kat tutmuyorsa (talep "katta" / ara kat, portföy giriş · zemin · son kat): elenmez ama listenin sonuna iner.
  * Özgür (19 Eki 2026): "katta" diyen müşteriye giriş, zemin, son kat sunulmaz; yine de tercih değişebileceği için düşük puanla görünsün.
  */
-export const KAT_UYMUYOR_SKOR_TAVANI = 60;
+export const KAT_UYMUYOR_SKOR_TAVANI = 54; // v3.36: 60 → 54 (2/5 "Zayıf")
 /** v3.33 — portföyde elektrik gücü alanı boşsa ilan metninden okunur ("40 kVA", "60 kw"); kW = kVA = kwa (eşit sayılır) */
 export function metindenGuc(k: Pick<OnizlemeKayit, "baslik" | "aciklama" | "hamMetin" | "ozet">): number | null {
   const m = [k.baslik, k.aciklama, k.hamMetin, k.ozet].filter(Boolean).join(" ").toLocaleLowerCase("tr").match(/(\d{1,5})\s*(?:k\.?v\.?a\b|kwa\b|kw\b|kilovat)/u);
@@ -156,7 +201,7 @@ export type LokasyonKademe = "AYNI_MAHALLE" | "ALT_BOLGE" | "AKS_MAHALLE" | "ILC
  * v3.28 — konum kademesine göre skor tavanı. Ağırlıklı ortalamada konum tek başına skoru yeterince düşürmüyordu: "yanlış" işaretlenen
  * yakın mahalle eşleşmeleri 86–88 alıyordu. Tavanla ekrandaki sayı "Koşullu" ile tutarlı olur: istenen yer 85–100, komşu ≤ 80, yakın ≤ 70.
  */
-export const KONUM_SKOR_TAVANI: Partial<Record<LokasyonKademe, number>> = { KOMSU_MAHALLE: 80, AKS_MAHALLE: 80, YAKIN: 70, ILCE_VERISIZ: 75, KOMSU_ILCE: 65, ORTA: 60, UZAK: 50, BILINMIYOR: 70, DISINDA: 45 }; // DISINDA: "bölge esnek" talepte 5 km ötesi uzaktan aşağıda
+export const KONUM_SKOR_TAVANI: Partial<Record<LokasyonKademe, number>> = { KOMSU_MAHALLE: 80, AKS_MAHALLE: 80, YAKIN: 69, ILCE_VERISIZ: 75, KOMSU_ILCE: 64, ORTA: 60, UZAK: 50, BILINMIYOR: 69, DISINDA: 45 }; // v3.36: yakın / bilinmiyor 70 → 69, komşu ilçe 65 → 64 (3/5) // DISINDA: "bölge esnek" talepte 5 km ötesi uzaktan aşağıda
 /** v3.28 — "Sunulabilir" yalnızca istenen yerin kendisinde: komşu / yakın mahalle en fazla "Koşullu" (müşteriye sorulur) */
 export const TAM_KONUM: ReadonlySet<LokasyonKademe> = new Set(["AYNI_MAHALLE", "ALT_BOLGE", "ILCE", "ILCE_GENEL", "IL_GENELI"]);
 
@@ -183,6 +228,8 @@ export interface OnizlemeKayit {
   minFiyat?: number | null;
   maxFiyat?: number | null;
   fiyatPeriyodu?: string;
+  /** v3.36 — TRY (varsayılan), USD, EUR, GBP: karşılaştırmadan önce TL'ye çevrilir (bkz. DOVIZ_TL) */
+  paraBirimi?: string | null;
   m2?: number | null;
   minM2?: number | null;
   maxM2?: number | null;
@@ -229,6 +276,8 @@ export interface KriterSatiri {
   puan?: number;
   /** v3.5 — matris bileşeni (ELEKTRIK, YAPI…) */
   bilesen?: string;
+  /** v3.36 — tercih (şart değil): uymaması yalnızca küçük eksi, "karşılanmayan istek" tavanı uygulanmaz */
+  tercih?: boolean;
 }
 
 export interface MatrisBileseni { kod: string; etiket: string; agirlik: number; puan: number | null }
@@ -261,6 +310,10 @@ export interface OnizlemeSonucu {
   /** v3.27 — kaç kriter gerçekten ölçülebildi */
   guven: Guven;
   dna: TalepDna;
+  /** v3.36 — uyum seviyesi 1–5 (ekranda yüzde yerine gösterilir) */
+  seviye: Seviye;
+  /** v3.36 — seviyeyi düşüren nedenler, etkisine göre sıralı ("Bütçe yazılmamış", "Elektrik şart ama portföyde yok"…) */
+  gerekceler: string[];
 }
 
 // ───────── Anahtar Uyum Matrisi ─────────
@@ -484,8 +537,24 @@ function karsilastir(alan: MulkOzellikAlani, tv: unknown, pv: unknown): KriterSo
   }
 }
 
-export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBaglami, ayar: ModelAyar = MODEL): OnizlemeSonucu {
+/** v3.36 — fiyatları TL'ye çevirir (iki taraf aynı para birimindeyse dokunmaz) */
+function dovizCevir(t: OnizlemeKayit, p: OnizlemeKayit): { t: OnizlemeKayit; p: OnizlemeKayit; not: string | null } {
+  const tp = t.paraBirimi || "TRY", pp = p.paraBirimi || "TRY";
+  if (tp === pp) return { t, p, not: null };
+  const kt = DOVIZ_TL[tp] ?? 1, kp = DOVIZ_TL[pp] ?? 1;
+  const c = (v: number | null | undefined, k: number) => (v == null ? v : Math.round(v * k));
+  const yaz = (x: string) => (x === "TRY" ? "TL" : x);
+  return {
+    t: { ...t, maxFiyat: c(t.maxFiyat, kt), minFiyat: c(t.minFiyat, kt), paraBirimi: "TRY" },
+    p: { ...p, fiyat: c(p.fiyat, kp), paraBirimi: "TRY" },
+    not: `Para birimi farklı (talep ${yaz(tp)}, portföy ${yaz(pp)}) — yaklaşık kurla TL'ye çevrilerek karşılaştırıldı`,
+  };
+}
+
+export function eslesmeOnizle(t0: OnizlemeKayit, p0: OnizlemeKayit, b: LokasyonBaglami, ayar: ModelAyar = MODEL): OnizlemeSonucu {
   const A = ayar;
+  const dv = dovizCevir(t0, p0);
+  const t = dv.t, p = dv.p;
   const dna = talepDnasi(t as any);
   const kritik = new Set(dna.kritik.map((k) => k.kriter));
   const esnek = new Set(t.ozellik?.esnekKriterler ?? []);
@@ -496,6 +565,7 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   const tipUyumu = { oran: tu.oran, aciklama: tu.aciklama, talepTipi: tu.tip };
   const tipIzinli = tipGecerli(tu);
   const uyarilar: string[] = [];
+  if (dv.not) uyarilar.push(dv.not);
   const supheliBirim = kiraPeriyotSuphesi(p);
   if (supheliBirim != null) uyarilar.push(`Portföy fiyatı yıllık girilmiş olabilir (aylık sayılırsa ${supheliBirim.toLocaleString("tr-TR")} TL/m²) — 12'ye bölünerek karşılaştırıldı`);
   const celiski = tipCeliskisi(t);
@@ -577,6 +647,16 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   // v3.29 — tek alanlı evet/hayır şartı (asansör, havuz) "şart" işaretlenmiş ama alanı boş bırakılmışsa "istiyor" sayılır
   const tOzellik: Record<string, unknown> = { ...(t.ozellik ?? {}) };
   for (const [kr, alan] of Object.entries(KRITIK_EVET_ALANI)) if (kritik.has(kr) && tOzellik[alan] == null) tOzellik[alan] = true;
+  // v3.36 — talepteki anlamsız sayısal istekler yok sayılır: "en az 0 kW", "en az 0 m² açık alan" (yapay zekâ boş yerine 0 yazıyordu)
+  // ve şart denmemiş ev düzeyi elektrik (< 10 kW: "otel mobilya deposu" talebine "5 kW" yazılmıştı; her depo bunu karşılar)
+  for (const [alan, v] of Object.entries(tOzellik)) {
+    const meta = MULK_OZELLIK_META[alan as MulkOzellikAlani];
+    if (meta?.karsilastirma === "min" && typeof v === "number" && v <= 0) delete tOzellik[alan];
+  }
+  for (const a of ["elektrikGucuKw", "elektrikGucuKva"]) {
+    const v = sayiMi(tOzellik[a]);
+    if (v != null && v < ELEKTRIK_ANLAMLI_EN_AZ && !kritik.has("ELEKTRIK")) delete tOzellik[a];
+  }
   // v3.33 — elektrik gücü: kW, kVA ("kwa") ve (trafo kelimesi geçmeden okunmuş) trafo kVA'sı aynı ölçü sayılır, tek satırda karşılaştırılır
   const pOzellik: Record<string, unknown> = { ...(p.ozellik ?? {}) };
   let gucMetinden = false;
@@ -609,11 +689,17 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
     const alanTuru = meta.karsilastirma === "min" && /AlanM2$/.test(alan);
     let sonuc = karsilastir(alan as MulkOzellikAlani, tv, pv), puan: number | undefined;
     if (alanTuru && pv != null && sonuc === "SAGLANMADI" && Number(pv) >= Number(tv) * (1 - dna.m2Tolerans / 100)) { sonuc = "SAGLANDI"; puan = 0.75; }
+    const yasAsimi = alan === "binaYasi" && !(kr && kritik.has(kr)) && sonuc === "SAGLANMADI" && pv != null && Number(pv) <= Number(tv) + BINA_YASI_TOLERANS(Number(tv));
+    if (yasAsimi) { sonuc = "SAGLANDI"; puan = 0.75; }
+    // v3.36 — tercih alanı (çatı, duvar, ısınma, cephe yönü) şart denmedikçe: bilinmemesi sayılmaz, uymaması küçük eksi (aşağıda)
+    const tercih = TERCIH_ALANLARI.has(alan) && !(kr && kritik.has(kr));
+    if (tercih && sonuc === "BILINMIYOR") continue;
+    if (tercih && sonuc === "SAGLANMADI") puan = 0.5;
     satirlar.push({
       anahtar: alan, etiket: meta.etiket + ("birim" in meta && meta.birim ? ` (${meta.birim})` : "") + (alanTuru ? ` (±%${dna.m2Tolerans})` : ""),
       talep: meta.karsilastirma === "min" ? `≥ ${fmt(tv)}` : meta.karsilastirma === "max" ? `≤ ${fmt(tv)}` : meta.karsilastirma === "sirali" ? `en az ${fmt(tv)}` : fmt(tv),
-      portfoy: fmt(pv) + (kapaliYedek ? " (ilan m²'si)" : alan === "elektrikGucuKw" && gucMetinden ? " (ilan metninden)" : ""), sonuc, ...(puan != null ? { puan } : {}),
-      kritik: !!kr && kritik.has(kr), bilesen: kr ? BILESEN[kr] ?? "DIGER" : "DIGER",
+      portfoy: fmt(pv) + (kapaliYedek ? " (ilan m²'si)" : alan === "elektrikGucuKw" && gucMetinden ? " (ilan metninden)" : yasAsimi ? ` (${Number(pv) - Number(tv)} yıl fazla)` : ""), sonuc, ...(puan != null ? { puan } : {}),
+      kritik: !!kr && kritik.has(kr), bilesen: kr ? BILESEN[kr] ?? "DIGER" : "DIGER", ...(tercih ? { tercih: true } : {}),
     });
   }
 
@@ -657,32 +743,51 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
   const fiyatKarsilastirilamadi = eksikCekirdek.some((x) => x.kod === "FIYAT");
   // v3.29 — fazla oda ancak fiyat bütçe içinde doğrulanmışsa sorulmadan sunulur; değilse Koşullu + not
   if (odaFazlasi > 0 && fiyatSatiri?.sonuc !== "SAGLANDI") uyarilar.push(`${odaFazlasi} oda fazla — bütçe içinde olduğu doğrulanamadı; sunmadan önce sorun`);
-  // v3.22 — bütçe / fiyat bilinmiyorsa skor tavanı (bkz. FIYATSIZ_CARPAN)
+  // v3.22 — bütçe / fiyat bilinmiyorsa (v3.36: sabit ceza + tavan, bkz. FIYATSIZ_CEZA)
   const fiyatBilinmiyor = fiyatKarsilastirilamadi || fiyatSatiri?.sonuc === "BILINMIYOR";
   // v3.22.1 — çekirdek bilgi (oda, m², fiyat) portföyde yoksa "Sunulabilir" denmez: sunmadan önce sorulur
   const cekirdekBilinmiyor = satirlar.some((x) => (x.anahtar === "odaSayisi" || x.anahtar === "m2" || x.anahtar === "fiyat") && x.sonuc === "BILINMIYOR");
   const cekirdekKosullu = fiyatKarsilastirilamadi || eksikCekirdek.length >= 2 || cekirdekBilinmiyor;
 
-  skor -= 5 * talepEksikleri.length; // talepte öldürücü bilgi eksikse skor "kesin" görünmesin
+  // v3.36 — gerekçeler: skoru / seviyeyi düşüren her kural buraya bir satır yazar (ekranda "Neden 3/5?")
+  const gerekceler: string[] = [];
+  const tavan = (n: number, neden: string) => { if (skor > n) skor = n; gerekceler.push(neden); };
+  const fiyatSatiriTalepBos = t.maxFiyat == null;
+  if (talepEksikleri.length) { skor -= 5 * talepEksikleri.length; gerekceler.push(`Talepte eksik bilgi: ${talepEksikleri.join(", ")}`); } // talepte öldürücü bilgi eksikse skor "kesin" görünmesin
   // v3.27 — istenen ama portföyde bilinmeyen özellik (çekirdek alan / fiyat / oda ve tip hariç; onların kendi kuralı var)
   // kullanım amacı müşterinin niyetidir, portföyde doğrulanacak bir özellik değil (portföylerde neredeyse hiç dolu değil)
   const ISTEK_DISI = ["odaSayisi", "m2", "fiyat", "mulkTipi", "kullanimAmaclari"];
-  // v3.33 — şart olanlar ayrı ve daha ağır sayılır (bkz. SART_BILINMEYEN_CEZASI); fiyatın kendi çarpanı var
+  // v3.33 — şart olanlar ayrı ve daha ağır sayılır (bkz. SART_BILINMEYEN_CEZASI); fiyatın kendi kuralı var
   const sartBilinmeyenler = satirlar.filter((x) => x.kritik && x.sonuc === "BILINMIYOR" && x.anahtar !== "fiyat" && x.anahtar !== "kullanimAmaclari" && x.anahtar !== "mulkTipi");
-  skor -= SART_BILINMEYEN_CEZASI * sartBilinmeyenler.length;
-  if (sartBilinmeyenler.length) skor = Math.min(skor, SART_BILINMEYEN_SKOR_TAVANI);
+  if (sartBilinmeyenler.length) { skor -= SART_BILINMEYEN_CEZASI * sartBilinmeyenler.length; tavan(SART_BILINMEYEN_SKOR_TAVANI, `Şart ama portföyde yazmıyor: ${sartBilinmeyenler.map((x) => x.etiket).join(", ")}`); }
   const bilinmeyenIstekler = satirlar.filter((x) => x.sonuc === "BILINMIYOR" && !x.kritik && !ISTEK_DISI.includes(x.anahtar)).map((x) => x.etiket);
-  skor -= Math.min(BILINMEYEN_ISTEK_TAVAN, BILINMEYEN_ISTEK_CEZASI * bilinmeyenIstekler.length);
-  if (bilinmeyenIstekler.length) skor = Math.min(skor, BILINMEYEN_ISTEK_SKOR_TAVANI);
-  const karsilanmayanIstekler = satirlar.filter((x) => x.sonuc === "SAGLANMADI" && !x.kritik && !ISTEK_DISI.includes(x.anahtar));
-  skor -= Math.min(KARSILANMAYAN_ISTEK_TAVAN, KARSILANMAYAN_ISTEK_CEZASI * karsilanmayanIstekler.length);
-  // v3.28 — istenen özelliğin OLMADIĞI biliniyorsa en fazla 80 (komşu mahalleyle aynı): "bilinmiyor" (≤ 84) her zaman önünde kalır
-  if (karsilanmayanIstekler.length) skor = Math.min(skor, KARSILANMAYAN_ISTEK_SKOR_TAVANI);
-  if (satirlar.some((x) => x.anahtar === "istenenKatlar" && x.sonuc === "SAGLANMADI")) skor = Math.min(skor, KAT_UYMUYOR_SKOR_TAVANI); // v3.33
-  if (fiyatBilinmiyor) skor = Math.round(skor * FIYATSIZ_CARPAN);
+  if (bilinmeyenIstekler.length) { skor -= Math.min(BILINMEYEN_ISTEK_TAVAN, BILINMEYEN_ISTEK_CEZASI * bilinmeyenIstekler.length); tavan(BILINMEYEN_ISTEK_SKOR_TAVANI, `Bilinmiyor (sorun): ${bilinmeyenIstekler.join(", ")}`); }
+  const karsilanmayanIstekler = satirlar.filter((x) => x.sonuc === "SAGLANMADI" && !x.kritik && !x.tercih && !ISTEK_DISI.includes(x.anahtar) && x.anahtar !== "istenenKatlar");
+  // v3.28 — istenen özelliğin OLMADIĞI biliniyorsa: "bilinmiyor" (≤ 84) her zaman önünde kalır
+  if (karsilanmayanIstekler.length) { skor -= Math.min(KARSILANMAYAN_ISTEK_TAVAN, KARSILANMAYAN_ISTEK_CEZASI * karsilanmayanIstekler.length); tavan(KARSILANMAYAN_ISTEK_SKOR_TAVANI, `İstenen yok: ${karsilanmayanIstekler.map((x) => `${x.etiket} (${x.portfoy})`).join(", ")}`); }
+  const tercihUymayan = satirlar.filter((x) => x.tercih && x.sonuc === "SAGLANMADI");
+  if (tercihUymayan.length) { skor -= TERCIH_CEZASI * tercihUymayan.length; gerekceler.push(`Tercih farklı: ${tercihUymayan.map((x) => `${x.etiket} ${x.portfoy}`).join(", ")}`); }
+  const katSatiri = satirlar.find((x) => x.anahtar === "istenenKatlar");
+  if (katSatiri?.sonuc === "SAGLANMADI") tavan(KAT_UYMUYOR_SKOR_TAVANI, `Kat uymuyor: istenen ${katSatiri.talep}, portföy ${katSatiri.portfoy}`); // v3.33
+  else if (katSatiri?.sonuc === "BILINMIYOR") gerekceler.push("Portföyün katı bilinmiyor");
+  if (fiyatBilinmiyor) { skor -= FIYATSIZ_CEZA; tavan(FIYATSIZ_SKOR_TAVANI, fiyatSatiriTalepBos ? "Talepte bütçe yazılmamış — bütçeyi sorun" : p.fiyat == null ? "Portföyde fiyat yok — fiyatı sorun" : "Fiyat karşılaştırılamadı (periyot / birim) — sorun"); }
+  // v3.36 — fazla oda en fazla Koşullu (aşağıda uygunluk); iki+ oda fazlaysa ayrıca tavan
+  if (odaFazlasi >= 2) tavan(FAZLA_ODA_IKI_SKOR_TAVANI, `${odaFazlasi} oda fazla`);
+  else if (odaFazlasi === 1) gerekceler.push("1 oda fazla — müşteriye sorun");
+  // v3.36 — üst üste ödün: her biri tek başına küçük, birlikte müşterinin istediğinden uzaklaşır
+  const odunler: string[] = [];
+  if (odaFazlasi > 0) odunler.push("fazla oda");
+  if (fiyatSatiri?.sonuc === "SAGLANDI" && fiyatSatiri.puan === 0.75) { odunler.push("bütçe üstü"); gerekceler.push("Fiyat bütçenin biraz üstünde (pazarlık payı içinde)"); }
+  const m2Satiri = satirlar.find((x) => x.anahtar === "m2");
+  if (m2Satiri?.sonuc === "SAGLANDI" && m2Satiri.puan === 0.75) { odunler.push("m² sınırda"); gerekceler.push("m² istenen aralığın biraz dışında (tolerans içinde)"); }
+  const yasSatiri = satirlar.find((x) => x.anahtar === "binaYasi");
+  if (yasSatiri?.sonuc === "SAGLANDI" && yasSatiri.puan === 0.75) { odunler.push("bina yaşı"); gerekceler.push(`Bina yaşı sınırın biraz üstünde: ${yasSatiri.portfoy}`); }
+  if (lok.kademe === "KOMSU_MAHALLE" || lok.kademe === "AKS_MAHALLE") odunler.push("komşu konum");
+  if (odunler.length >= 2) { skor -= ODUN_CEZASI * (odunler.length - 1); tavan(ODUN_SKOR_TAVANI, `Birden çok ödün: ${odunler.join(" + ")}`); }
   // v3.28 — konum tavanı (başka ilçedeki komşu mahalle komşudan 8 puan aşağıda)
   const konumTavani = KONUM_SKOR_TAVANI[lok.kademe];
-  if (konumTavani != null) skor = Math.min(skor, konumTavani - (lok.kademe === "KOMSU_MAHALLE" && lok.oran < A.lok.komsu ? 8 : 0));
+  if (konumTavani != null) tavan(konumTavani - (lok.kademe === "KOMSU_MAHALLE" && lok.oran < A.lok.komsu ? 8 : 0), lok.aciklama);
+  if (tipUyumu.oran < 0.9) gerekceler.push(`Benzer tip: ${tipUyumu.aciklama}`);
   skor = Math.max(0, Math.min(100, skor));
 
   // v3.27 — güven: talepte istenen kriterlerden kaçı portföyde gerçekten ölçülebildi (bölge ve tip dahil)
@@ -694,15 +799,22 @@ export function eslesmeOnizle(t: OnizlemeKayit, p: OnizlemeKayit, b: LokasyonBag
     : olculenKriter >= GUVEN_YUKSEK_EN_AZ && bilinmeyenSayi <= 1 ? "YUKSEK" : "ORTA";
   const guven: Guven = { seviye: guvenSeviye, olculen: olculenKriter, toplam: toplamKriter,
     aciklama: `${toplamKriter} kriterden ${olculenKriter}'i ölçüldü` + (celiski ? " · talep tipi şüpheli" : cekirdekKosullu ? " · m² / fiyat / oda eksik" : olculenKriter <= GUVEN_DUSUK_EN_COK ? " · talepte az kriter var" : "") };
+  if (guvenSeviye === "DUSUK" && !fiyatBilinmiyor) gerekceler.push(`Az bilgiyle ölçüldü (${guven.aciklama})`);
+  for (const u of uyarilar) if (u !== dv.not && !gerekceler.includes(u)) gerekceler.push(u);
+  const kosulluUyari = uyarilar.filter((u) => u !== dv.not); // döviz çevrimi tek başına "sorulacak" yapmaz
 
   const uygunluk: Uygunluk = kritikEngeller.length ? "UYGUN_DEGIL"
-    : guvenSeviye === "DUSUK" || uyarilar.length || bilinmeyenKritikler.length || bilinmeyenIstekler.length || talepEksikleri.length || cekirdekKosullu || tipUyumu.oran < 0.9 || satirlar.some((s) => s.sonuc === "SAGLANMADI")
+    : guvenSeviye === "DUSUK" || kosulluUyari.length || bilinmeyenKritikler.length || bilinmeyenIstekler.length || talepEksikleri.length || cekirdekKosullu || tipUyumu.oran < 0.9 || satirlar.some((s) => s.sonuc === "SAGLANMADI" && !s.tercih)
+      || odaFazlasi > 0 || odunler.length >= 2 // v3.36
       // v3.11 — zayıf bileşen: konum "biraz uzak / bilinmiyor" ya da bir satırın puanı eşiğin altında → sunmadan önce sor
       // v3.28 — komşu / yakın mahalle ve konumu bilinmeyen portföy en fazla Koşullu (TAM_KONUM)
-      || lok.belirsiz || !TAM_KONUM.has(lok.kademe) || satirlar.some((s) => s.sonuc === "SAGLANDI" && s.puan != null && s.puan < A.kosulluAlti) ? "KOSULLU" : "SUNULABILIR";
+      || lok.belirsiz || !TAM_KONUM.has(lok.kademe) || satirlar.some((s) => s.sonuc === "SAGLANDI" && !s.tercih && s.puan != null && s.puan < A.kosulluAlti) ? "KOSULLU" : "SUNULABILIR";
+  if (uygunluk === "UYGUN_DEGIL") gerekceler.unshift(...kritikEngeller.map((x) => `Uymuyor: ${x}`));
+  // v3.28 — "Koşullu" en fazla 84: ekranda 85 ve üstü yalnızca sorulmadan sunulabilecek eşleşmelerde görünür
+  const sonSkor = uygunluk === "UYGUN_DEGIL" ? Math.min(skor, 40) : uygunluk === "KOSULLU" ? Math.min(skor, KOSULLU_SKOR_TAVANI) : skor;
   return {
-    // v3.28 — "Koşullu" en fazla 84: ekranda 85 ve üstü yalnızca sorulmadan sunulabilecek eşleşmelerde görünür
-    uygunluk, tipUyumu, skor: uygunluk === "UYGUN_DEGIL" ? Math.min(skor, 40) : uygunluk === "KOSULLU" ? Math.min(skor, KOSULLU_SKOR_TAVANI) : skor, lokasyonPuani: lok.puan, lokasyonOrani: lok.oran, lokasyonKademe: lok.kademe, lokasyonMesafeM: lok.mesafeM, lokasyonAciklama: lok.aciklama,
+    uygunluk, tipUyumu, skor: sonSkor, lokasyonPuani: lok.puan, lokasyonOrani: lok.oran, lokasyonKademe: lok.kademe, lokasyonMesafeM: lok.mesafeM, lokasyonAciklama: lok.aciklama,
     kriterler: satirlar, kritikEngeller, bilinmeyenKritikler, matris: { ad: M.ad, bilesenler }, talepEksikleri, veriEksikleri, uyarilar, guven, dna,
+    seviye: seviyeOf(sonSkor, uygunluk), gerekceler: [...new Set(gerekceler)],
   };
 }

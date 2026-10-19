@@ -87,15 +87,15 @@ export function DosyaAktarma() {
   const [eklenen, setEklenen] = useKalici<Set<string>>("vg.dosya.eklenen", new Set());
   const [atlanan, setAtlanan] = useKalici<Set<string>>("vg.dosya.atlanan", new Set());          // v3.18 — "Atla" denen satırlar listeden düşer
   const [islemF, setIslemF] = useKalici<"HEPSI" | "SATILIK" | "KIRALIK" | "DEVREN">("vg.dosya.islemF", "HEPSI"); // v3.18
-  const [aiCalisiyor, setAiCalisiyor] = useState<string | null>(null);                           // v3.18 — satırı yapay zekâya yorumlatma
   const [aiSonuc, setAiSonuc] = useKalici<Record<string, Partial<Veri>>>("vg.dosya.aiSonuc", {});
+  const [denenen, setDenenen] = useKalici<Set<string>>("vg.dosya.denenen", new Set()); // v3.36 — yorumlanmış (ek bilgi çıkmasa da) satırlar tekrar sorulmaz
   const [goster, setGoster] = useKalici("vg.dosya.goster", 40);
   const [sr, setSr] = useKalici<Siralama>("vg.dosya.sr", { alan: "satir", yon: "artan" });
   const [rapor, setRapor] = useKalici<string | null>("vg.dosya.rapor", null);
   const girdi = useRef<HTMLInputElement>(null);
 
   const yukle = async (f: File) => {
-    setHata(null); setRapor(null); setEsOzel({}); setTur(null); setSecim(new Set()); setEklenen(new Set()); setAtlanan(new Set()); setAiSonuc({}); setAiOzet(null); setVcfRol({}); setVcf(null); setDosya(null); setKisiTablo(null); setKisiIlerleme(null);
+    setHata(null); setRapor(null); setEsOzel({}); setTur(null); setSecim(new Set()); setEklenen(new Set()); setAtlanan(new Set()); setAiSonuc({}); setDenenen(new Set()); setAiOzet(null); setVcfRol({}); setVcf(null); setDosya(null); setKisiTablo(null); setKisiIlerleme(null);
     try {
       const veri = new Uint8Array(await f.arrayBuffer());
       if (/\.vcf$/i.test(f.name)) { setVcf({ ad: f.name, kisiler: vcfOku(new TextDecoder().decode(veri)) }); return; }
@@ -161,40 +161,41 @@ export function DosyaAktarma() {
     return [sat.girdi?.hamMetin, ...hucre].filter(Boolean).join(" · ").slice(0, 4000);
   };
   /**
-   * Tek satırı yorumlar: önce bedava kurallar (jargon sözlüğü + hızlı ayrıştırıcı), yapay zekâ açıksa onun çıktısıyla zenginleştirir.
-   * Sonuç `aiSonuc`a yazılır ve satır listesine hemen yansır (yalnızca boş alanlar doldurulur, tablodaki değer korunur).
-   * Dönüş: "TAMAM" · "BOS" (satırda metin yok) · "HIC" (ek bilgi çıkmadı) · "HATA".
+   * v3.36 — satırları PAKET halinde yorumlar (eskiden satır başına bir yapay zekâ isteği: 40 satır = 40 istek, yavaş ve kotaya takılıyordu).
+   * Her satıra önce bedava kurallar (jargon + hızlı ayrıştırıcı) uygulanır; yapay zekâ açıksa paketteki satırlar tek istekte "### SATIR n"
+   * blokları olarak gönderilir, dönen kayıtlar satirNo ile satırlarına bağlanır. Sonuç `aiSonuc`a yazılır (yalnızca boş alanlar dolar).
+   * Satır durumu: "TAMAM" · "BOS" (satırda metin yok) · "HIC" (ek bilgi çıkmadı). Paket durumu: yapay zekâ yanıt vermediyse aiHata.
    */
-  const satiriYorumla = async (sat: { key: string; girdi: any; hucreler?: string[]; basliklar?: string[] }): Promise<"TAMAM" | "BOS" | "HIC" | "HATA" | "IZIN"> => {
-    const metin = satirMetni(sat);
-    if (!metin.trim()) return "BOS";
-    try {
-      const h = hizliAyristir(metin);
-      let kayit: any = null;
-      if (sample) {
-        const y = yorumla(metin, INDEKS);
-        const c = await aiJson(sample, aiYorumIstemi(metin, y, GEMINI_SISTEM_TALIMATI, GEMINI_RESPONSE_SCHEMA), { modelTier: "default" });
-        kayit = aiYanitiniDogrula(c).kayitlar[0] ?? null;
-      }
-      const { taslak } = taslakYap(metin, h, kayit ? { ...kayit, tip } : { tip });
+  const paketiYorumla = async (paket: { key: string; girdi: any; hucreler?: string[]; basliklar?: string[] }[]): Promise<{ satir: ("TAMAM" | "BOS" | "HIC")[]; aiHata: boolean; izin: boolean }> => {
+    const metinler = paket.map(satirMetni);
+    let aiKayit: (any | null)[] = paket.map(() => null), aiHata = false, izin = false;
+    const dolu = paket.map((_, i) => i).filter((i) => metinler[i].trim());
+    if (sample && dolu.length) {
+      const birlesik = dolu.map((i) => `### SATIR ${i + 1}\n${metinler[i]}`).join("\n\n");
+      try {
+        const y = yorumla(birlesik, INDEKS);
+        const istem = aiYorumIstemi(birlesik, y, GEMINI_SISTEM_TALIMATI, GEMINI_RESPONSE_SCHEMA)
+          + `\nÖNEMLİ: Metin "### SATIR n" başlıklı ${dolu.length} bloktan oluşur; her blok bir tablo satırıdır ve tek bir ${tip === "TALEP" ? "talebi" : "ilanı"} anlatır (tur = TOPLU_LISTE). Her bloktan TAM OLARAK bir kayıt çıkar, blok sırasıyla yaz ve her kayda "satirNo": <n> ekle.`;
+        const v = aiYanitiniDogrula(await aiJson(sample, istem, { modelTier: "default" }));
+        const noIle = v.kayitlar.filter((k) => Number.isInteger(k.satirNo));
+        if (noIle.length) for (const k of noIle) { const i = k.satirNo - 1; if (i >= 0 && i < paket.length) aiKayit[i] = k; }
+        else if (v.kayitlar.length === dolu.length) dolu.forEach((i, j) => { aiKayit[i] = v.kayitlar[j]; });
+      } catch (e: any) { if (e?.code === "not_granted") izin = true; else aiHata = true; }
+    }
+    const satir = paket.map((sat, i): "TAMAM" | "BOS" | "HIC" => {
+      const metin = metinler[i];
+      if (!metin.trim()) return "BOS";
+      const { taslak } = taslakYap(metin, hizliAyristir(metin), aiKayit[i] ? { ...aiKayit[i], tip } : { tip });
       const sonuc = temizle(taslak) as Partial<Veri>;
       const anlamli = ["fiyat", "maxFiyat", "m2", "minM2", "maxM2", "odaSayisi", "ozellik", "lokasyonHam", "mulkTipi", "operasyonNotu"].some((k) => (sonuc as any)[k] != null && (sonuc as any)[k] !== "" && !(typeof (sonuc as any)[k] === "object" && !Object.keys((sonuc as any)[k]).length));
       if (!anlamli) return "HIC";
       setAiSonuc((x) => ({ ...x, [sat.key]: sonuc }));
       return "TAMAM";
-    } catch (e: any) { return e?.code === "not_granted" ? "IZIN" : "HATA"; }
+    });
+    return { satir, aiHata, izin };
   };
   /** Yapay zekânın doldurduğu, tabloda boş olan alanlar (var olan değerin üzerine yazılmaz) */
   const temizle = (t: any) => Object.fromEntries(Object.entries(t).filter(([, v]) => v != null && v !== "" && !(Array.isArray(v) && !v.length)));
-
-  /** Satır düğmesi */
-  const aiYorumla = async (sat: (typeof satirlar)[number]) => {
-    if (!sample) bildir("Yapay zekâ kapalı — yalnızca kurallarla okunuyor (Ayarlar › Yapay zekâ)");
-    setAiCalisiyor(sat.key);
-    const r = await satiriYorumla(sat);
-    setAiCalisiyor(null);
-    bildir({ TAMAM: "Satır yorumlandı — eksik alanlar dolduruldu", BOS: "Bu satırda hiç dolu hücre yok (boş satır)", HIC: "Satırdan ek bilgi çıkarılamadı", HATA: "Yapay zekâ yanıt veremedi", IZIN: "Yapay zekâya izin verilmedi" }[r]);
-  };
 
   /**
    * v3.19 — EN ÜSTTEKİ düğme: yüklenen dosyayı türüne göre yorumlar.
@@ -202,27 +203,31 @@ export function DosyaAktarma() {
    *  • Kişi listesi / vCard → şirket, not ve etiketten rol önerilir (emlakçı, müteahhit, yatırımcı…).
    * Tek tıkta en çok AI_PAKET kayıt işlenir (kota); durdurulabilir.
    */
-  const AI_PAKET = 40;
+  const AI_PAKET = 80; // v3.36 — bir tıkta en çok 80 satır (8'erli paketler = 10 istek); kalanı için düğmeye yeniden basılır
+  const PAKET_SATIR = 8;
   const durdur = useRef(false);
   const [topluAi, setTopluAi] = useState<{ yapilan: number; toplam: number } | null>(null);
   const [aiOzet, setAiOzet] = useKalici<string | null>("vg.dosya.aiOzet", null);
   const [vcfRol, setVcfRol] = useKalici<Record<number, string[]>>("vg.dosya.vcfRol", {});
-  const eksikMi = (x: (typeof satirlar)[number]) => !x.aiYapti && (x.durumX === "KONTROL" || x.durumX === "HATALI" || (x.veri && (!x.veri.lokasyonlar.length || (tip === "TALEP" ? x.veri.maxFiyat == null : x.veri.fiyat == null) || !x.veri.mulkTipi)));
-  const aiAday = satirlar.filter((x) => !eklenen.has(x.key) && !atlanan.has(x.key) && x.durumX !== "TEKRAR" && eksikMi(x));
+  // v3.36 — TÜM satırlar yorumlanır (eskiden yalnızca "eksik" görünenler; satırlar tam görünüyorsa düğme pasif kalıyor, "çalışmıyor" sanılıyordu)
+  const aiAday = satirlar.filter((x) => !eklenen.has(x.key) && !atlanan.has(x.key) && x.durumX !== "TEKRAR" && !x.aiYapti && !denenen.has(x.key));
   const toplamAiIs = dosya ? aiAday.length : kisiTablo ? kisiTablo.satirlar.length : vcf ? vcf.kisiler.length : 0;
   const hepsiniYorumla = async () => {
     durdur.current = false; setAiOzet(null);
     if (!sample) bildir("Yapay zekâ kapalı — kurallarla okunacak (Ayarlar › Yapay zekâ)");
     if (dosya) {
-      const is = aiAday.slice(0, AI_PAKET); let ok = 0, hic = 0, bos = 0, hata = 0, izin = false;
+      const is = aiAday.slice(0, AI_PAKET); let ok = 0, hic = 0, bos = 0, hataPaket = 0, izin = false;
       setTopluAi({ yapilan: 0, toplam: is.length });
-      for (let i = 0; i < is.length && !durdur.current && !izin; i++) {
-        const r = await satiriYorumla(is[i]);
-        if (r === "TAMAM") ok++; else if (r === "HIC") hic++; else if (r === "BOS") bos++; else if (r === "IZIN") izin = true; else hata++;
-        setTopluAi({ yapilan: i + 1, toplam: is.length });
+      for (let i = 0; i < is.length && !durdur.current && !izin; i += PAKET_SATIR) {
+        const pk = is.slice(i, i + PAKET_SATIR);
+        const r = await paketiYorumla(pk);
+        if (!r.aiHata && !r.izin) setDenenen((x) => new Set([...x, ...pk.map((p) => p.key)]));
+        for (const x of r.satir) { if (x === "TAMAM") ok++; else if (x === "HIC") hic++; else bos++; }
+        if (r.aiHata) hataPaket++; if (r.izin) izin = true;
+        setTopluAi({ yapilan: Math.min(is.length, i + PAKET_SATIR), toplam: is.length });
       }
       setTopluAi(null);
-      setAiOzet(izin ? "Yapay zekâya izin verilmedi." : `${ok} satır tamamlandı${hic ? `, ${hic} satırdan ek bilgi çıkmadı` : ""}${bos ? `, ${bos} satır boş` : ""}${hata ? `, ${hata} satırda yapay zekâ yanıt vermedi` : ""}.${aiAday.length > AI_PAKET ? ` ${aiAday.length - AI_PAKET} satır daha var — düğmeye tekrar basın.` : ""}`);
+      setAiOzet(izin ? "Yapay zekâya izin verilmedi." : `${ok} satır yorumlandı${hic ? `, ${hic} satırdan ek bilgi çıkmadı` : ""}${bos ? `, ${bos} satır boş` : ""}${hataPaket ? ` · ${hataPaket} pakette yapay zekâ yanıt vermedi, o satırlar yalnızca kurallarla okundu` : ""}.${aiAday.length > AI_PAKET ? ` ${aiAday.length - AI_PAKET} satır daha var — düğmeye tekrar basın.` : ""}`);
       return;
     }
     // kişi listeleri: roller
@@ -315,7 +320,7 @@ export function DosyaAktarma() {
         <div className="satir sar">
           {!topluAi ? <button className="btn ai-btn" onClick={hepsiniYorumla} disabled={!toplamAiIs}>✦ Yapay zekâ ile yorumla{toplamAiIs ? ` (${Math.min(toplamAiIs, dosya ? AI_PAKET : AI_PAKET * 3)}${toplamAiIs > (dosya ? AI_PAKET : AI_PAKET * 3) ? " / " + toplamAiIs : ""})` : ""}</button>
             : <button className="btn" onClick={() => { durdur.current = true; }}>Durdur ({topluAi.yapilan} / {topluAi.toplam})</button>}
-          <span className="ipucu">{dosya ? (aiAday.length ? "Eksik ya da kontrol gerektiren satırları açıklama ve hücrelerinden tamamlar; sonra satır satır listeler." : "Tüm satırlar zaten tam görünüyor.") : "Şirket ve notlardan kişi rollerini önerir (emlakçı, müteahhit, yatırımcı…)."}{!sample ? " Yapay zekâ kapalı: yalnızca bedava kurallar çalışır." : ""}</span>
+          <span className="ipucu">{dosya ? (aiAday.length ? "Dosyadaki tüm satırları açıklama ve hücreleriyle birlikte okur, boş kalan alanları (konum, fiyat, m², oda, özellikler) tamamlar; tablodaki değerlere dokunmaz." : "Tüm satırlar yorumlandı.") : "Şirket ve notlardan kişi rollerini önerir (emlakçı, müteahhit, yatırımcı…)."}{!sample ? " Yapay zekâ kapalı: yalnızca bedava kurallar çalışır." : ""}</span>
         </div>
         {topluAi && <div className="ilerleme" role="progressbar" aria-valuemin={0} aria-valuemax={topluAi.toplam} aria-valuenow={topluAi.yapilan}><span style={{ width: `${Math.round((100 * topluAi.yapilan) / Math.max(1, topluAi.toplam))}%` }} /></div>}
         {aiOzet && !topluAi && <div className="basari-metin ipucu">{aiOzet}</div>}
@@ -397,14 +402,13 @@ export function DosyaAktarma() {
         <div className="kk-alt">{s.veri?.lokasyonlar.length ? s.veri.lokasyonlar.map((l) => lokEtiket(l as any)).join(" · ") : s.girdi.lokasyonHam ?? "Konum yok"} · {fiyatOf(s.girdi as any)}{m2Of(s.girdi as any) ? " · " + m2Of(s.girdi as any) : ""}{s.kisi ? ` · ${s.kisi.adSoyad}${s.kisi.sirket ? " (" + s.kisi.sirket + ")" : ""}` : ""}</div>
         {(s.kontrol.length > 0 || s.hatalar.length > 0) && <div className="ipucu uyari-metin">{[...s.kontrol, ...s.hatalar].join(" · ")}</div>}
         {s.durumX === "TEKRAR" && <div className="ipucu">{tip === "TALEP" ? "Bu talep zaten kayıtlı (aynı kişi, mülk, bütçe ve konum)" : "Bu ilan zaten kayıtlı (aynı ilan no / bağlantı ya da aynı sahip, fiyat ve konum)"} — eklenmez.</div>}
-        {/* v3.18 — satır işlemleri: Düzenle · Ekle · Atla · yapay zekâya yorumlat */}
+        {/* v3.18 — satır işlemleri: Düzenle · Ekle · Atla (v3.36: satır başına "yapay zekâya yorumlat" kalktı; üstteki düğme tüm dosyayı yorumlar) */}
         <div className="satir sar">
           {s.veri && eklenebilir(s) && <button className="btn kucuk birincil" onClick={() => ekle([s.key])}>Ekle</button>}
           <button className="btn kucuk" onClick={() => { git({ ad: "form", tip, taslak: { ...(aiSonuc[s.key] ?? {}), ...(s.veri ?? s.girdi), kisiler: s.veri?.kisiler } as any, geri: { ad: "veri", alt: "dosya" } }); }}>Düzenle</button>
           <button className="btn kucuk" onClick={() => { setAtlanan((x) => new Set([...x, s.key])); setSecim((x) => { const n = new Set(x); n.delete(s.key); return n; }); }}>Atla</button>
-          <button className="btn kucuk" disabled={aiCalisiyor === s.key} onClick={() => aiYorumla(s)}>{aiCalisiyor === s.key ? "Yorumlanıyor…" : "✦ Yapay zekâya yorumlat"}</button>
         </div>
-        {aiSonuc[s.key] && <div className="ipucu basari-metin">Yapay zekâ tamamladı: {Object.keys(aiSonuc[s.key]).filter((k) => k !== "hamMetin").slice(0, 8).join(", ")} — "Düzenle" ile forma taşıyın.</div>}
+        {aiSonuc[s.key] && <div className="ipucu basari-metin">Yorumlandı: {Object.keys(aiSonuc[s.key]).filter((k) => k !== "hamMetin").slice(0, 8).join(", ")} tamamlandı.</div>}
       </div>)}
       {gorunen.length > goster && <button className="btn" onClick={() => setGoster(goster + 60)}>Daha fazla göster ({gorunen.length - goster})</button>}
       {!gorunen.length && <p className="bos">Bu seçimde satır yok.</p>}

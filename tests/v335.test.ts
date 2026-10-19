@@ -82,7 +82,8 @@ test("arayüz: formda açılıp kapanan Yetki belgesi bölümü, detayda randevu
 });
 
 test("sürüm 3.35", () => {
-  assert.equal(SURUM, "3.35"); assert.equal(SURUM_GECMISI[0].surum, "3.35");
-  assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 3);
+  const i = SURUM_GECMISI.findIndex((k) => k.surum === "3.35"); // v3.36 öne eklendi
+  assert.ok(SURUM >= "3.35" && i >= 0); assert.equal(SURUM_GECMISI[i + 1].surum, "3.34");
+  assert.ok((SURUM_GECMISI[i].testEt ?? []).length >= 3);
   assert.ok(existsSync("docs/ANAHTAR_CRM_EK_v3.35_19Ekim2026.md"));
 });

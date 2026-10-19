@@ -5,6 +5,27 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.36 · 19 Ekim 2026 — Eşleştirme uyumu 1–5 seviye + gerekçe; yanlış okunan talepler düzeltildi; Geri tuşu; dosyanın tamamını yapay zekâyla yorumla; toplu kaynak değişimi
+
+- Eşleşme puanı yüzde yerine 1–5 uyum seviyesi: 5 Sunulabilir · 4 Güçlü aday · 3 Sorulacak · 2 Zayıf · 1 Uymuyor. Kartta "Neden 3/5?" satırı, eşleşme detayında gerekçe listesi. Süzgeç: "Uyum ≥ 4/5".
+- Neden: 19 Ekim canlı verisinde "yanlış" işaretlenen 40 eşleşmenin 10'u 92–100 alıyordu; %84, %74, %60 gibi sayılar aslında kademe tavanlarıydı ve yanıltıcıydı.
+- Talep okuma düzeltmeleri: "giriş ve en üst kat düşünülmüyor" artık giriş kat istemek sayılmıyor; "Güney cephe" Güney Mahallesi (Alanya) sanılmıyor; "Fabrikalar mah" mülk tipini Fabrika yapmıyor; "80 mt² ve üstü", "5 yaşa kadar", "yaşı en fazla 16-17", kiralıkta "boş daire" (eşyasız) okunuyor; "2+1 katta" 1. kat sanılmıyor; "yeni bina" sıfır değil ≤ 5 yaş.
+- Puanlama: dövizli bütçe / fiyat TL'ye çevrilerek karşılaştırılır (3.000 USD talep TL kiralarla 3.000 TL gibi karşılaştırılıyordu); talepte 0 kW / 5 kW gibi anlamsız elektrik isteği ve şart denmemiş çatı / duvar / ısınma / cephe tercihi eşleşmeyi düşürmez; "ara kat" isteyene son kat tutmaz; fazla oda ve üst üste ödün (fazla oda + bütçe üstü) en fazla 4/5; bütçesi yazılmamış ama her şeyi tutan eşleşme 63'te değil 79'da (4/5).
+- Canlı veri düzeltmesi (Kurulumu tamamla ile): 25 kayıtta (22 talep, 3 portföy) yanlış okunmuş 31 alan (kat, bina yaşı, eşya, m², Güney cephe konumu, Fabrika tipi) düzeltildi; her değişiklik kayıt geçmişine (audit) yazıldı.
+- Geri tuşu: telefonun / tarayıcının geri tuşu artık uygulama içinde bir önceki ekrana döner. Formdaki düğme "← Geri": kaydetmeden formun açıldığı ekrana döner; Kaydet sonrası Geri formu yeniden açmaz.
+- Dosya yükle (Excel): "✦ Yapay zekâ ile yorumla" dosyanın TÜM satırlarını 8'erli paketlerle yorumlar (eskiden yalnızca eksik görünenleri, satır başına bir istekle); satır altlarındaki "Yapay zekâya yorumlat" düğmeleri kaldırıldı.
+- Kaynak: WhatsApp sohbetinden / gelen kutusundan gelen portföy "sahibinden" yazsa da Partner (emlak grubu) olur — Kendi portföyüm yalnızca elle girişte ve kendi mesajınızda. WhatsApp içe aktarma, gelen kutusu ve Portföyler › "Toplu düzelt"te seçilenlerin kaynağı tek seferde değiştirilir.
+- Kaydetme: sunucu yoğunken (503 / Cloudflare işlemci sınırı) "Sunucu yoğun — yeniden deneniyor, değişiklikleriniz bekliyor" yazar ve sessizce yeniden dener; kayıtlar 4'erli gider; hatalar sunucuda "kayitGunlugu"na yazılır (neden hata verdiği sonradan okunabilsin).
+- Ana Sayfa: ★ Benim ve ofisim / Bugün bölümü Anahtar AI kutusunun altında.
+
+**Demo'da test edilecekler**
+
+- [ ] Eşleşmeler: kartlarda yüzde yerine 1–5 seviye ve "Neden 4/5?" satırı görünmeli; bir kartı açın, "Neden …/5?" kutusunda gerekçeler yazmalı.
+- [ ] Eşleşmeler › Uyum › 4/5: yalnızca 4 ve 5 seviyeli eşleşmeler kalmalı.
+- [ ] Bir portföyü Düzenle'ye girip telefonun geri tuşuna (ya da "← Geri"ye) basın: detaya dönmeli; oradan bir kez daha Geri listeye götürmeli.
+- [ ] Veri girişi › Dosya: bir Excel yükleyip "✦ Yapay zekâ ile yorumla"ya basın; tüm satırlar yorumlanmalı, satır altlarında ayrı düğme olmamalı.
+- [ ] Portföyler › Toplu düzelt: birkaç portföy seçip "Seçilenlerin kaynağı › Emlak grubu" deyin; kartlardaki kaynak değişmeli.
+
 ## v3.35 · 19 Ekim 2026 — Yetki belgesi (belge no, taşınmaz ID, bitiş), randevu kaydı ve İşlemler ekranı; Polaris işlemleri Anahtar'a taşındı
 
 - Portföy formu: açılıp kapanan "Yetki belgesi" bölümü — yetkili portföy, yetki belge no, taşınmaz ID, bitiş tarihi. Detayda Yetki satırında görünür.

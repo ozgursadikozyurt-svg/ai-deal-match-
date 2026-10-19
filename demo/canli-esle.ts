@@ -71,7 +71,7 @@ export interface Plan { parcalar: Record<string, unknown>[]; imza: Imza; bos: bo
  * v3.28 — parça boyları. Kayıt başına sunucuda ~8 sorgu (≈0,4 sn) gider; 100 kayıtlık parça 30–40 sn süren tek istek oluyordu ve
  * Cloudflare'de istek ortasında kesiliyordu ("Connection terminated unexpectedly", 14 Eki 2026). Kişiler de artık parça parça gider.
  */
-export const KAYIT_PARCA = 10, KISI_PARCA = 100;
+export const KAYIT_PARCA = 4, KISI_PARCA = 100; // v3.36: 10 → 4 — kayıt başına ~10 sorgu; büyük parça Cloudflare'in istek başına CPU sınırına (503) takılıyordu
 export function planla(onceki: Imza, d: DepoDurumu, parcaBoyu = KAYIT_PARCA): Plan {
   const yeni = imzaAl(d);
   const kisiler = d.kisiler.filter((k) => onceki.kisi.get(k.id) !== yeni.kisi.get(k.id)).map(kisiYuku);

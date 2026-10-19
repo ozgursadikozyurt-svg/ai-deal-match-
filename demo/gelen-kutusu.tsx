@@ -19,7 +19,7 @@ import { gelenDosyayiAc, type GelenParca } from "./gelen-oku";
 import { hamAdaylar, durumla, adaylariEkle, fiyatlariGuncelle, BEKLEYEN, GELEN_KAYNAK_ETIKET, GELEN_DURUM_ETIKET, ANA_TUR_ETIKET, type HamAday, type GelenAday, type GelenKaynak, type GelenDurum, type AnaTur, type GelenSayim } from "./gelen-aday";
 import { gmailKopruBetigi, GELEN_KANAL_ETIKET, type GelenDosyaKunye } from "../src/lib/ingest/gelen";
 import { kaynakOf, kaynakUygula, type KaynakSecimi } from "../src/lib/domain/kaynak";
-import { KaynakSecici } from "./kaynak-secici";
+import { KaynakSecici, TopluKaynakSecici } from "./kaynak-secici";
 import { ICE_AKTARMA_DEVIR } from "./devir";
 
 type Dosya = GelenDosyaKunye & { url?: string | null };
@@ -387,6 +387,7 @@ export function GelenKutusu({ gomulu = false }: { gomulu?: boolean } = {}) {
           {gorunen.some((a) => a.durum === "HAZIR" && a.veri) && <button className="btn kucuk birincil" onClick={() => ekle(gorunen.filter((a) => a.durum === "HAZIR"))}>Hazırların tümünü ekle ({gorunen.filter((a) => a.durum === "HAZIR" && a.veri).length})</button>}
           <button className="btn kucuk birincil" disabled={!secilenler.length} onClick={() => ekle(secilenler)}>Seçilenleri ekle ({secilenler.length})</button>
           <button className="btn kucuk" disabled={!secilenler.length} onClick={() => void atla(secilenler)}>Seçilenleri atla ({secilenler.length})</button>
+          <TopluKaynakSecici sayi={secilenler.length} uygula={(s) => { const m = new Map(KUTU.kaynak); for (const a of secilenler) m.set(a.key, s); yaz({ kaynak: m }); bildir(`${secilenler.length} kaydın kaynağı değişti`); }} />
           {gorunen.some((a) => a.durum === "DEGISTI") && <button className="btn kucuk" onClick={() => fiyat(gorunen)}>Fiyatları güncelle ({gorunen.filter((a) => a.durum === "DEGISTI").length})</button>}
         </div>}
       </>}

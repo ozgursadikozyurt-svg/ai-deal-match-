@@ -26,10 +26,11 @@ test("sürüm 3.29 kaydı", () => {
   assert.ok((k.testEt ?? []).length >= 4);
 });
 
-test("oda: 3+1 talebe bütçe içindeki 4+1 / 5+1 Sunulabilir ama tam 3+1'in altında; eksik oda elenir", () => {
+test("oda: 3+1 talebe bütçe içindeki 4+1 / 5+1 listede ama Koşullu (v3.36: 4/5), tam 3+1'in altında; eksik oda elenir", () => {
   const tam = s(talep({}), portfoy({})), bir = s(talep({}), portfoy({ odaSayisi: "4+1" })), iki = s(talep({}), portfoy({ odaSayisi: "5+1" }));
-  assert.deepEqual([tam.uygunluk, bir.uygunluk, iki.uygunluk], ["SUNULABILIR", "SUNULABILIR", "SUNULABILIR"]);
-  assert.ok(tam.skor > bir.skor && bir.skor > iki.skor && iki.skor >= 85, `${tam.skor} > ${bir.skor} > ${iki.skor}`);
+  assert.deepEqual([tam.uygunluk, bir.uygunluk, iki.uygunluk], ["SUNULABILIR", "KOSULLU", "KOSULLU"]);
+  assert.ok(tam.skor > bir.skor && bir.skor > iki.skor && iki.skor >= 70, `${tam.skor} > ${bir.skor} > ${iki.skor}`);
+  assert.deepEqual([tam.seviye, bir.seviye, iki.seviye], [5, 4, 4]);
   assert.equal(iki.kriterler.find((k) => k.anahtar === "odaSayisi")!.puan, MODEL.oda.fazla2);
   assert.match(iki.kriterler.find((k) => k.anahtar === "odaSayisi")!.portfoy, /2 oda fazla/);
   assert.equal(s(talep({}), portfoy({ odaSayisi: "2+1" })).uygunluk, "UYGUN_DEGIL");

@@ -10,6 +10,8 @@
  * v3.28 — etiketler Özgür'ün gerçek kararlarıyla güncellendi (14 Eki 2026: 34 "yanlış / fiyat", 11 "sunuldu"): sunulanların 10/11'i
  * aynı mahallede → komşu / yakın mahalle artık "K" (sorulur), başka ilçede komşu olmayan "U", konutta oda eksiği "U".
  * v3.29 — fazla oda bütçe içindeyse "S" (Özgür: "3+1 talebe 5+1 gösterebiliriz, aynı bütçedeyse fazla odanın zararı yok"); tam oda önde.
+ * v3.36 — fazla oda artık "K" (sorulur): 19 Eki 2026 canlı veride 2+1 talebine 3+1 kiralık üç eşleşme 92–98 "Sunulabilir" çıkıp üçü de
+ *   "yanlış" işaretlendi. Fazla oda listede kalır (4/5), tam oda önde.
  * Taban (V0) = v3.10 motorunun dondurulmuş kopyası (onizleme_v310.ts).
  */
 import { eslesmeOnizle, MODEL, type ModelAyar, type OnizlemeKayit } from "../../src/lib/eslestirme/onizleme";
@@ -34,8 +36,8 @@ const G: Grup[] = [
       c: [P("Muratpaşa / Güzeloluk", { odaSayisi: "2+1", fiyat: 8_500_000 }), "K", "Çağlayan'ın sınır komşusu (v3.28: sorulur)"],
       d: [P("Muratpaşa / Şirinyalı", { odaSayisi: "2+1", fiyat: 8_000_000 }), "K", "Fener'in sınır komşusu (v3.28: sorulur)"],
       e: [P("Muratpaşa / Doğuyaka", { odaSayisi: "3+1", fiyat: 5_650_000, m2: 115 }), "U", "3,9 km uzak + oda fazla + bütçenin %57'si (v3.10: 92 puan, Sunulabilir)"],
-      f: [P("Muratpaşa / Fener", { odaSayisi: "3+1", fiyat: 9_500_000 }), "S", "bir oda fazla, bütçe içinde (v3.29: sunulur, tam odanın altında)"],
-      g: [P("Muratpaşa / Fener", { odaSayisi: "4+1", fiyat: 9_800_000 }), "S", "iki oda fazla, bütçe içinde (v3.29)"],
+      f: [P("Muratpaşa / Fener", { odaSayisi: "3+1", fiyat: 9_500_000 }), "K", "bir oda fazla, bütçe içinde (v3.36: sorulur, 4/5; tam odanın altında)"],
+      g: [P("Muratpaşa / Fener", { odaSayisi: "4+1", fiyat: 9_800_000 }), "K", "iki oda fazla, bütçe içinde (v3.36: sorulur, bir oda fazladan aşağıda)"],
       o: [P("Muratpaşa / Fener", { odaSayisi: "4+1" }), "K", "iki oda fazla, fiyatı bilinmiyor — bütçe doğrulanmadan sunulmaz"],
       q: [P("Muratpaşa / Fener", { odaSayisi: "4+1", fiyat: 12_500_000 }), "U", "iki oda fazla ama bütçeyi %25 aşıyor"],
       h: [P("Muratpaşa / Meltem", { odaSayisi: "2+1", fiyat: 8_000_000 }), "U", "şehrin öbür ucu"],

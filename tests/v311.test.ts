@@ -109,11 +109,12 @@ test("sınır verisi olmayan il (İzmir): eski ilçe kuralı — aynı ilçe far
   assert.equal(s.uygunluk, "KOSULLU");
 });
 
-test("oda: istenen oda tam puan; fazla oda bütçe içindeyse sunulur ama altta; eksik oda uygun değil (v3.29)", () => {
+test("oda: istenen oda tam puan; fazla oda bütçe içindeyse listede ama Koşullu (v3.36); eksik oda uygun değil", () => {
   const t = T("Muratpaşa / Fener", { odaSayisi: "2+1", maxFiyat: 10_000_000 });
   const oda = (o: string) => { const s = es(t, P("Muratpaşa / Fener", { odaSayisi: o, fiyat: 9_000_000 })); return { u: s.uygunluk, skor: s.skor, puan: s.kriterler.find((k) => k.anahtar === "odaSayisi")!.puan }; };
   assert.deepEqual([oda("2+1").puan, oda("3+1").puan, oda("4+1").puan, oda("1+1").puan], [1, MODEL.oda.fazla1, MODEL.oda.fazla2, 0]);
-  assert.deepEqual([oda("2+1").u, oda("3+1").u, oda("4+1").u, oda("1+1").u], ["SUNULABILIR", "SUNULABILIR", "SUNULABILIR", "UYGUN_DEGIL"]);
+  // v3.36 — fazla oda sorulur (19 Eki: 2+1 talebine 3+1 kiralık üç eşleşme "yanlış" işaretlendi)
+  assert.deepEqual([oda("2+1").u, oda("3+1").u, oda("4+1").u, oda("1+1").u], ["SUNULABILIR", "KOSULLU", "KOSULLU", "UYGUN_DEGIL"]);
   assert.ok(oda("2+1").skor > oda("3+1").skor && oda("3+1").skor > oda("4+1").skor);
   // Müşteri oda sayısına "şart" dediyse eksik oda engeldir; fazla oda fiyatı bilinmeden sunulmaz
   const sart = { ...t, ozellik: { kritikKriterler: ["ODA_SAYISI"] } };
@@ -153,7 +154,8 @@ test("model deneyi: seçilen model (A) v3.10 tabanını ve diğer varyasyonları
   // v3.28 — konum tavanları komşu / yakın ağırlıklarının küçük farklarını önemsizleştirdi (B, C eşit olabilir);
   // eski davranışlar (ilçe sınırı yok, oda gevşek / yumuşak, konum sıkı / geniş, bütçe altı) A'dan kesin düşük kalmalı
   for (const s of DENEY_SONUCU) assert.ok(oran(s) <= oran(a), s.kod);
-  for (const k of ["C2", "D", "E", "F", "G", "H", "I", "J"]) assert.ok(oran(DENEY_SONUCU.find((s) => s.kod === k)!) < oran(a), k);
+  // v3.36 — fazla oda artık Koşullu olduğu için "oda sıkı" (G) sınıflandırmada A ile eşitlendi; diğerleri kesin düşük
+  for (const k of ["C2", "D", "E", "F", "H", "I", "J"]) assert.ok(oran(DENEY_SONUCU.find((s) => s.kod === k)!) < oran(a), k);
 });
 
 test("sürüm 3.11: günlükte ve test listesinde", () => {

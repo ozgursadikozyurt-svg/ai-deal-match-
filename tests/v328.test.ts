@@ -123,15 +123,15 @@ test("bütçe aralığının alt sınırı okunur ('6.500-7 milyon', '6 ila 7.50
   assert.equal(hizliAyristir("TALEP KUŞKAVAĞI ASANSÖR ŞART BÜTÇE 15 mil 3+1 satılık daire").maxFiyat, 15_000_000);
 });
 
-test("kaydetme: kayıtlar 10'arlı, kişiler 100'erli parçalarla gider (uzun istek Cloudflare'de kesiliyordu)", () => {
-  assert.equal(KAYIT_PARCA, 10); assert.equal(KISI_PARCA, 100);
+test("kaydetme: kayıtlar 4'erli (v3.36; eskiden 10), kişiler 100'erli parçalarla gider (uzun istek Cloudflare'de kesiliyordu)", () => {
+  assert.equal(KAYIT_PARCA, 4); assert.equal(KISI_PARCA, 100);
   const kayit = (i: number) => ({ id: "P" + i, olusturma: "2026-10-14T00:00:00Z", veri: { tip: "PORTFOY" } as any, notlar: [] });
   const kisi = (i: number) => ({ id: "K" + i, adSoyad: "Kişi " + i } as any);
   const bos: any = { kayitlar: [], kisiler: [], eslesmeNotlari: {}, ayarlar: { ttl: {} }, testler: {}, geriBildirim: "", ogrenilen: [], adaylar: [], iceAktarmaGecmisi: [], islenmisMesajlar: [], dosyaIzleri: {}, favoriler: [] };
   const once = imzaAl(bos);
   const p = planla(once, { ...bos, kayitlar: Array.from({ length: 25 }, (_, i) => kayit(i)), kisiler: Array.from({ length: 250 }, (_, i) => kisi(i)) });
   const kayitParca = p.parcalar.filter((x: any) => x.kayitlar), kisiParca = p.parcalar.filter((x: any) => x.kisiler);
-  assert.deepEqual(kayitParca.map((x: any) => x.kayitlar.length), [10, 10, 5]);
+  assert.deepEqual(kayitParca.map((x: any) => x.kayitlar.length), [4, 4, 4, 4, 4, 4, 1]);
   assert.deepEqual(kisiParca.map((x: any) => x.kisiler.length), [100, 100, 50]);
   assert.ok(p.parcalar.indexOf(kisiParca[2]) < p.parcalar.indexOf(kayitParca[0]), "kişiler kayıtlardan önce yazılır");
 });

@@ -200,7 +200,7 @@ const ODA_SECENEK = ["1+0", "1+1", "2+1", "3+1", "4+1", "5+1", "6+1"];
 const KAYIT_ROL_VARSAYILAN = (tip: string, sahip: string) => (sahip === "EMLAKCI" ? "EMLAKCI" : tip === "PORTFOY" ? "SAHIP" : "MUSTERI");
 
 export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "PORTFOY"; id?: string; taslak?: Partial<Veri>; adayId?: string; geri?: Ekran }) {
-  const { d, kayitKaydet, git, bildir, guncelle } = useDepo();
+  const { d, kayitKaydet, git, geri: geriDon, degistir, bildir, guncelle } = useDepo();
   const mevcut = id ? d.kayitlar.find((k) => k.id === id) : undefined;
   const talep = tip === "TALEP";
   const [f, setF] = useState<any>(() => {
@@ -257,16 +257,21 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
     kayitKaydet(kayit);
     if (adayId) {
       guncelle((dd) => (dd.aktifIceAktarma ? { ...dd, aktifIceAktarma: { ...dd.aktifIceAktarma, adaylar: dd.aktifIceAktarma.adaylar.map((a) => (a.id === adayId ? { ...a, durum: "EKLENDI" as const } : a)) } } : dd));
-      bildir("Havuza eklendi"); git({ ad: "veri", alt: "wa", donus: true }); return;
+      bildir("Havuza eklendi"); geriDon({ donus: true, yedek: { ad: "veri", alt: "wa" } }); return;
     }
-    bildir("Kaydedildi — doğrulamadan geçti"); git(geri ? { ...geri, donus: true } : { ad: "detay", id: kayit.id });
+    bildir("Kaydedildi — doğrulamadan geçti");
+    // v3.36 — form geçmişte kalmaz: düzenleme ve içe aktarmadan açılan form açıldığı ekrana döner; yeni kayıt detayına geçer ama
+    // oradan "Geri" formun açıldığı yere (Ana Sayfa, liste…) gider (eskiden Geri yeniden formu açıyordu)
+    if (mevcut || geri) geriDon({ donus: true, yedek: geri ?? { ad: "detay", id: kayit.id } });
+    else (degistir ?? git)({ ad: "detay", id: kayit.id });
   }
   // v3.15: form bir içe aktarma / veri girişi ekranından açıldıysa (geri) oraya, değilse eskisi gibi döner
-  const vazgec = () => (geri ? git({ ...geri, donus: true }) : adayId ? git({ ad: "veri", alt: "wa", donus: true }) : mevcut ? git({ ad: "detay", id: mevcut.id }) : git({ ad: "liste", tip }));
+  // v3.36 — Vazgeç = Geri: her zaman formun AÇILDIĞI ekrana döner (eskiden yeni ekran açıyor, Geri tekrar forma götürüyordu)
+  const vazgec = () => geriDon({ donus: true, yedek: geri ?? (adayId ? { ad: "veri", alt: "wa" } : mevcut ? { ad: "detay", id: mevcut.id } : { ad: "liste", tip }) });
 
   return <div className="yigin" ref={ust}>
-    {/* v3.24 — Vazgeç ve başlık tek satırda (genel "← Geri" bu ekranda gösterilmez: Vazgeç aynı işi yapar) */}
-    <div className="bas-satir"><button className="btn kucuk geri" onClick={vazgec}>← Vazgeç</button>
+    {/* v3.24 — Geri ve başlık tek satırda (v3.36: düğme "← Geri"; kaydetmeden formun açıldığı ekrana döner, telefonun geri tuşu da aynı) */}
+    <div className="bas-satir"><button className="btn kucuk geri" title="Kaydetmeden geri dön" onClick={vazgec}>← Geri</button>
       <h2>{mevcut ? "Kaydı düzenle" : taslak ? "Çıkarılan kaydı kontrol edin" : talep ? "Yeni talep" : "Yeni portföy"}</h2></div>
     {hatalar.length > 0 && <div className="hata-kutu" role="alert"><b>Kaydedilmedi — {hatalar.length} sorun var:</b><ul>{hatalar.map((h, i) => <li key={i}><b>{h.yer}:</b> {h.mesaj}</li>)}</ul></div>}
 

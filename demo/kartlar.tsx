@@ -6,7 +6,8 @@ import React, { useState } from "react";
 import { talepDnasi } from "../src/lib/eslestirme/talep-dna";
 import { kopmaEtiket } from "../src/lib/eslestirme/kopar";
 import { etiket } from "./etiketler";
-import { useDepo, Pill, IslemPill, UYGUNLUK, baslikOf, fiyatOf, m2Of, lokEtiket, eKey, type Eslesme } from "./ortak";
+import { useDepo, Pill, IslemPill, UYGUNLUK, SEVIYE_TON, seviyeBaslik, Gerekceler, baslikOf, fiyatOf, m2Of, lokEtiket, eKey, type Eslesme } from "./ortak";
+import { SEVIYE_ETIKET } from "../src/lib/eslestirme/onizleme";
 import { konumOzeti } from "./lokasyon";
 import { useSahiplik, SahiplikRozeti } from "./sahiplik";
 import { KapakKucuk } from "./fotograflar";
@@ -114,10 +115,10 @@ export function EslesmeKarti({ e, sec }: { e: Eslesme; sec?: { acik: boolean; de
     <div className={"es2 s-" + u.ton + (kopuk ? " soluk" : "") + (sec?.acik ? " secili" : "")} role="button" tabIndex={0} onClick={sec ? sec.degis : ac} onKeyDown={(ev: any) => { if (ev.key === "Enter") (sec ? sec.degis : ac)(); }}>
       <div className="es2-ust">
         {sec && <input type="checkbox" className="es2-sec" checked={sec.acik} aria-label="Eşleşmeyi seç" onClick={(ev) => ev.stopPropagation()} onChange={sec.degis} />}
-        <div className={"es2-skor s-" + u.ton}><b>{e.s.skor}</b><small>puan</small></div>
+        <div className={"es2-skor s-" + SEVIYE_TON[e.s.seviye]} title={seviyeBaslik(e.s.seviye)}><b>{e.s.seviye}</b><small>/5</small></div>
         <div className="es2-durum">
           <div className="es2-satir1">
-            <span className={"es2-uygun s-" + u.ton}>{u.e}</span>
+            <span className={"es2-uygun s-" + SEVIYE_TON[e.s.seviye]}>{SEVIYE_ETIKET[e.s.seviye]}</span>
             <FirsatRozeti f={e.f} komisyon />
           </div>
           <div className="pill-satir">
@@ -136,6 +137,8 @@ export function EslesmeKarti({ e, sec }: { e: Eslesme; sec?: { acik: boolean; de
       <Taraf k={e.p} ad="Portföy" />
       <div className="es2-neden">
         <span className="es2-n">{String(e.s.lokasyonAciklama).replace(/\s*\([+−-]?\d+\)/, "")}</span>
+        {/* v3.36 — seviyeyi en çok düşüren neden (konum zaten yukarıda yazıyor) */}
+        {!engel && e.s.seviye < 5 && (() => { const n = (e.s.gerekceler ?? []).find((x: string) => x !== e.s.lokasyonAciklama && !(e.s.uyarilar ?? []).includes(x)); return n ? <span className="es2-n">Neden {e.s.seviye}/5: {n}</span> : null; })()}
         {engel && <span className="es2-n kotu">Engel: {engel}</span>}
         {(e.s.uyarilar ?? []).map((x: string) => <span key={x} className="es2-n uyari">Kontrol: {x}</span>)}
         {!engel && <HizliCevaplar e={e} />}

@@ -243,6 +243,10 @@ export const katYaz = (a: readonly string[]): string => a.map((x) => KAT_SECENEK
 export function katUyumu(istenen: readonly string[], kat?: number | null, katSayisi?: number | null): "SAGLANDI" | "SAGLANMADI" | "BILINMIYOR" {
   if (!istenen.length) return "SAGLANDI";
   if (kat == null) return "BILINMIYOR";
+  // v3.36 — "ara kat" isteyene (SON da istenmedikçe) son kat tutmaz; yanına yazılmış kat numaraları bunu ezemez. Ölçüm (19 Eki 2026):
+  // "Arakat" talebi [1…6, ARA] okunup 5/5 son kat "tuttu" sayılıyordu. Açıkça seçilen giriş ("0") ara katla birlikte geçerli kalır
+  // (formda Giriş + Ara kat seçilebilir); olumsuz cümleden okunan giriş artık hiç yazılmaz (jargon.ts › katJargonu).
+  if (istenen.includes("ARA") && !istenen.includes("SON") && katSayisi != null && kat >= 1 && kat >= katSayisi) return "SAGLANMADI";
   if (istenen.some((x) => x !== "ARA" && x !== "SON" && Number(x) === kat)) return "SAGLANDI";
   const goreli = istenen.filter((x) => x === "ARA" || x === "SON");
   if (!goreli.length) return "SAGLANMADI";
