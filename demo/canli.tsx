@@ -41,10 +41,29 @@ type Faz = { ad: "aciliyor" } | { ad: "giris"; mesaj?: string } | { ad: "kayit";
 
 function Cerceve({ children }: { children: React.ReactNode }) {
   return <div className="sarici" style={{ maxWidth: 440, margin: "0 auto", padding: "10vh 16px 24px" }}>
-    <h1 style={{ margin: "0 0 4px" }}>{MARKA.ad}</h1>
-    <p className="ipucu" style={{ marginTop: 0 }}>v{SURUM} · {TARIH}</p>
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <img src="/favicon.svg" alt="Anahtar CRM logosu" width={48} height={48} style={{ borderRadius: 12 }} />
+      <h1 style={{ margin: 0 }}>{MARKA.ad}</h1>
+    </div>
+    <p className="ipucu" style={{ margin: "6px 0 0" }}>{MARKA.slogan} · v{SURUM} · {TARIH}</p>
     {children}
+    <Tanitim />
   </div>;
+}
+
+/** SEO — Giriş ekranındaki tanıtım: arama motorlarının (ve yeni ziyaretçinin) uygulamayı anlayacağı okunabilir metin */
+function Tanitim() {
+  return <section aria-labelledby="tanitim-baslik" style={{ marginTop: 28 }}>
+    <h2 id="tanitim-baslik" style={{ fontSize: "1.05rem", margin: "0 0 8px" }}>Anahtar CRM nedir?</h2>
+    <p>Emlak danışmanları ve ofisleri için yapay zekâ destekli talep ve portföy eşleştirme uygulaması. Müşteri taleplerinizi ve portföylerinizi tek yerde tutar, birbirine uyanları otomatik bulur.</p>
+    <ul style={{ paddingLeft: 18, margin: "8px 0" }}>
+      <li><b>Talep – portföy eşleştirme:</b> her eşleşme 1–5 uyum seviyesiyle ve gerekçesiyle gelir.</li>
+      <li><b>WhatsApp ve ilanlardan veri girişi:</b> emlak grubu mesajlarını ve ilan listelerini yapay zekâ okuyup kayda çevirir.</li>
+      <li><b>Müşteri takibi:</b> kişiler, notlar, randevular ve Google Kişiler ile eşitleme.</li>
+      <li><b>Ofis ve ekip:</b> danışmanlarınızı davet edin, yetkileri belirleyin; telefondan uygulama gibi kullanın.</li>
+    </ul>
+    <p className="ipucu">{DENEME_GUN_YAZI}, kart bilgisi istenmez. · <a href="/gizlilik.html">Gizlilik</a> · <a href="/kosullar.html">Koşullar</a></p>
+  </section>;
 }
 
 function Giris({ o, mesaj, bitti, acikKayit = false }: { o: OturumYoneticisi; mesaj?: string; bitti: () => void; acikKayit?: boolean }) {
