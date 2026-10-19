@@ -131,13 +131,13 @@ test("Ana menüde Konumlar / Bağlantılar / Yönetim yok; Ayarlar'ın içinde �
   for (const x of ["Ana Sayfa", "Talepler", "Portföyler", "Eşleşmeler", "İzleme", "Kişiler", "Veri Girişi", "Ayarlar"]) assert.ok(navEtiket.includes(x), `menüde ${x} olmalı`);
   await a.tikla(a.qa(".sol-menu .menu-oge").find((b) => (b.textContent ?? "").startsWith("Ayarlar")));
   const gecis = a.qa(".ayar-gecis-oge").map((b) => b.querySelector("b")!.textContent);
-  assert.deepEqual(gecis, ["Konumlar", "Bağlantılar", "Yönetim"]);
-  for (const [ad, aranan] of [["Konumlar", /Konum/], ["Bağlantılar", /Google/], ["Yönetim", /Kullanıcı|Ofis/]] as const) {
+  assert.deepEqual(gecis, ["Konumlar", "Bağlantılar", "İşlemler", "Yönetim"]); // v3.35 — İşlemler (yalnızca ofis yöneticisi)
+  for (const [ad, aranan] of [["Konumlar", /Konum/], ["Bağlantılar", /Google/], ["İşlemler", /bana kalan/i], ["Yönetim", /Kullanıcı|Ofis/]] as const) {
     await a.tikla(a.qa(".ayar-gecis-oge").find((b) => b.querySelector("b")!.textContent === ad));
     assert.match(a.q("main")!.textContent ?? "", aranan, ad + " ekranı açıldı");
     assert.equal(a.q(".sol-menu .menu-oge[aria-current=page]")?.textContent?.startsWith("Ayarlar"), true, ad + ": Ayarlar vurgulu");
     await a.tikla(a.dugme("← Geri"));
-    assert.equal(a.qa(".ayar-gecis-oge").length, 3, ad + ": Geri → Ayarlar");
+    assert.equal(a.qa(".ayar-gecis-oge").length, 4, ad + ": Geri → Ayarlar");
   }
   await a.kapat();
 });

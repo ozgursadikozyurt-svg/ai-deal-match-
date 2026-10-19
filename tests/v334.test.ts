@@ -56,7 +56,7 @@ test("arayüz: Yönetim'de kampanya bölümü yetkiye bağlı, formda kampanya l
 });
 
 test("sürüm 3.34: günlük kaydı, test adımları ve ek belge var", () => {
-  assert.equal(SURUM, "3.34"); assert.equal(SURUM_GECMISI[0].surum, "3.34");
-  assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 2);
+  assert.ok(SURUM >= "3.34"); const k = SURUM_GECMISI.find((x) => x.surum === "3.34")!;
+  assert.ok((k.testEt ?? []).length >= 2);
   assert.ok(existsSync("docs/ANAHTAR_CRM_EK_v3.34_19Ekim2026.md"));
 });

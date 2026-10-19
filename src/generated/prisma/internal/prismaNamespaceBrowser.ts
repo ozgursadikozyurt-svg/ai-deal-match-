@@ -58,6 +58,8 @@ export const ModelName = {
   Davet: 'Davet',
   Kampanya: 'Kampanya',
   KampanyaHarcama: 'KampanyaHarcama',
+  Randevu: 'Randevu',
+  Islem: 'Islem',
   Il: 'Il',
   Ilce: 'Ilce',
   Mahalle: 'Mahalle',
@@ -207,6 +209,51 @@ export const KampanyaHarcamaScalarFieldEnum = {
 } as const
 
 export type KampanyaHarcamaScalarFieldEnum = (typeof KampanyaHarcamaScalarFieldEnum)[keyof typeof KampanyaHarcamaScalarFieldEnum]
+
+
+export const RandevuScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  sahipKullaniciId: 'sahipKullaniciId',
+  tarih: 'tarih',
+  tur: 'tur',
+  sonuc: 'sonuc',
+  talepId: 'talepId',
+  portfoyId: 'portfoyId',
+  kisiId: 'kisiId',
+  not: 'not',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RandevuScalarFieldEnum = (typeof RandevuScalarFieldEnum)[keyof typeof RandevuScalarFieldEnum]
+
+
+export const IslemScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  sahipKullaniciId: 'sahipKullaniciId',
+  tarih: 'tarih',
+  tahsilatTarihi: 'tahsilatTarihi',
+  tur: 'tur',
+  baslik: 'baslik',
+  bedel: 'bedel',
+  paylasilan: 'paylasilan',
+  ofisPayi: 'ofisPayi',
+  banaKalan: 'banaKalan',
+  aciklama: 'aciklama',
+  reklam: 'reklam',
+  talepKaynagi: 'talepKaynagi',
+  talepId: 'talepId',
+  portfoyId: 'portfoyId',
+  kisiId: 'kisiId',
+  disKaynak: 'disKaynak',
+  disKimlik: 'disKimlik',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IslemScalarFieldEnum = (typeof IslemScalarFieldEnum)[keyof typeof IslemScalarFieldEnum]
 
 
 export const IlScalarFieldEnum = {
@@ -372,6 +419,8 @@ export const KayitScalarFieldEnum = {
   havuz: 'havuz',
   yetkili: 'yetkili',
   yetkiBitis: 'yetkiBitis',
+  yetkiBelgeNo: 'yetkiBelgeNo',
+  tasinmazNo: 'tasinmazNo',
   musteriKaynagi: 'musteriKaynagi',
   ilkKaynak: 'ilkKaynak',
   ilkKaynakDetay: 'ilkKaynakDetay',

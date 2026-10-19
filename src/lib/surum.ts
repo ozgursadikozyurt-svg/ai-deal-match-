@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.34 · 19 Ekim 2026
+ * Anahtar CRM v3.35 · 19 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.34";
+export const SURUM = "3.35";
 export const TARIH = "19 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.34_19Ekim2026";
+export const DOSYA_EKI = "v3.35_19Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,24 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.35",
+    tarih: "19 Ekim 2026",
+    baslik: "Yetki belgesi (belge no, taşınmaz ID, bitiş), randevu kaydı ve İşlemler ekranı; Polaris işlemleri Anahtar'a taşındı",
+    degisenler: [
+      "Portföy formu: açılıp kapanan \"Yetki belgesi\" bölümü — yetkili portföy, yetki belge no, taşınmaz ID, bitiş tarihi. Detayda Yetki satırında görünür.",
+      "Randevu ayrı kayıt: talep ya da portföy detayında \"Randevular\" kartı — tarih/saat, gösterim ya da görüşme, karşı taraf (eşleşmelerden), not. Sonuç sonradan girilir: Gerçekleşti / Gelmedi / İptal. Asistan da açabilir; kimin açtığı kayda geçer. Silme yok, yanlışsa İptal.",
+      "İşlemler ekranı (Ayarlar › İşlemler, yalnızca ofis yöneticisi): kapanan satış / kiralama, bedel, ofis payı, paylaşılan, bana kalan, açıklama, reklamdan mı, isteğe bağlı talep ve portföy bağı. \"Bana kalan\" tahsilat ayına yazılır; tahsil edilmeyen işlem \"bekleyen\"de durur. Yıl seçimi ve aylara göre bana kalan tablosu.",
+      "Polaris'teki işlemler (2024, 2025 arşivi ve 2026) Anahtar'a aktarıldı; geçmişte tahsilat tarihi = işlem tarihi alındı, böylece aylık toplamlar Polaris P&L ile birebir aynı. Polaris şimdilik değişmedi; bir sonraki adımda İşlemler ve P&L satır 3 Anahtar'dan okuyacak.",
+      "Yeni tablolar: randevu, islem; kayit'a yetkiBelgeNo ve tasinmazNo (yalnızca ekleme, RLS açık). Yayından sonra \"Kurulumu tamamla\" düğmesine basılmalı.",
+    ],
+    testEt: [
+      "Bir portföyü Düzenle › \"Yetki belgesi\" bölümünü açın: belge no, taşınmaz ID ve bitiş girin, kaydedin; detayda Yetki satırında görünmeli.",
+      "Bir talebin detayında \"Randevular\" › + Randevu: yarın 11:00 gösterim ekleyin, sonra \"Gerçekleşti\" deyin.",
+      "Ayarlar › İşlemler: 2026'yı seçin; aylara göre bana kalan Polaris P&L satır 3 ile aynı olmalı. + Yeni işlem ile \"tahsil edildi\" işaretini kaldırıp bir işlem ekleyin: \"Bekleyen\"de görünmeli.",
+      "Rol olarak görüntüle › Asistan: Ayarlar'da İşlemler görünmemeli; randevu ekleyebilmeli.",
+    ],
+  },
   {
     surum: "3.34",
     tarih: "19 Ekim 2026",

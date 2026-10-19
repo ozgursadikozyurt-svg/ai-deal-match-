@@ -249,6 +249,8 @@ export type OfisWhereInput = {
   kullanicilar?: Prisma.KullaniciListRelationFilter
   davetler?: Prisma.DavetListRelationFilter
   kampanyalar?: Prisma.KampanyaListRelationFilter
+  randevular?: Prisma.RandevuListRelationFilter
+  islemler?: Prisma.IslemListRelationFilter
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaListRelationFilter
   kayitlar?: Prisma.KayitListRelationFilter
   kisiler?: Prisma.KisiListRelationFilter
@@ -287,6 +289,8 @@ export type OfisOrderByWithRelationInput = {
   kullanicilar?: Prisma.KullaniciOrderByRelationAggregateInput
   davetler?: Prisma.DavetOrderByRelationAggregateInput
   kampanyalar?: Prisma.KampanyaOrderByRelationAggregateInput
+  randevular?: Prisma.RandevuOrderByRelationAggregateInput
+  islemler?: Prisma.IslemOrderByRelationAggregateInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaOrderByRelationAggregateInput
   kayitlar?: Prisma.KayitOrderByRelationAggregateInput
   kisiler?: Prisma.KisiOrderByRelationAggregateInput
@@ -328,6 +332,8 @@ export type OfisWhereUniqueInput = Prisma.AtLeast<{
   kullanicilar?: Prisma.KullaniciListRelationFilter
   davetler?: Prisma.DavetListRelationFilter
   kampanyalar?: Prisma.KampanyaListRelationFilter
+  randevular?: Prisma.RandevuListRelationFilter
+  islemler?: Prisma.IslemListRelationFilter
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaListRelationFilter
   kayitlar?: Prisma.KayitListRelationFilter
   kisiler?: Prisma.KisiListRelationFilter
@@ -404,6 +410,8 @@ export type OfisCreateInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -442,6 +450,8 @@ export type OfisUncheckedCreateInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -480,6 +490,8 @@ export type OfisUpdateInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -518,6 +530,8 @@ export type OfisUncheckedUpdateInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -750,6 +764,34 @@ export type OfisUpdateOneRequiredWithoutKampanyaHarcamalariNestedInput = {
   upsert?: Prisma.OfisUpsertWithoutKampanyaHarcamalariInput
   connect?: Prisma.OfisWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.OfisUpdateToOneWithWhereWithoutKampanyaHarcamalariInput, Prisma.OfisUpdateWithoutKampanyaHarcamalariInput>, Prisma.OfisUncheckedUpdateWithoutKampanyaHarcamalariInput>
+}
+
+export type OfisCreateNestedOneWithoutRandevularInput = {
+  create?: Prisma.XOR<Prisma.OfisCreateWithoutRandevularInput, Prisma.OfisUncheckedCreateWithoutRandevularInput>
+  connectOrCreate?: Prisma.OfisCreateOrConnectWithoutRandevularInput
+  connect?: Prisma.OfisWhereUniqueInput
+}
+
+export type OfisUpdateOneRequiredWithoutRandevularNestedInput = {
+  create?: Prisma.XOR<Prisma.OfisCreateWithoutRandevularInput, Prisma.OfisUncheckedCreateWithoutRandevularInput>
+  connectOrCreate?: Prisma.OfisCreateOrConnectWithoutRandevularInput
+  upsert?: Prisma.OfisUpsertWithoutRandevularInput
+  connect?: Prisma.OfisWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OfisUpdateToOneWithWhereWithoutRandevularInput, Prisma.OfisUpdateWithoutRandevularInput>, Prisma.OfisUncheckedUpdateWithoutRandevularInput>
+}
+
+export type OfisCreateNestedOneWithoutIslemlerInput = {
+  create?: Prisma.XOR<Prisma.OfisCreateWithoutIslemlerInput, Prisma.OfisUncheckedCreateWithoutIslemlerInput>
+  connectOrCreate?: Prisma.OfisCreateOrConnectWithoutIslemlerInput
+  connect?: Prisma.OfisWhereUniqueInput
+}
+
+export type OfisUpdateOneRequiredWithoutIslemlerNestedInput = {
+  create?: Prisma.XOR<Prisma.OfisCreateWithoutIslemlerInput, Prisma.OfisUncheckedCreateWithoutIslemlerInput>
+  connectOrCreate?: Prisma.OfisCreateOrConnectWithoutIslemlerInput
+  upsert?: Prisma.OfisUpsertWithoutIslemlerInput
+  connect?: Prisma.OfisWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OfisUpdateToOneWithWhereWithoutIslemlerInput, Prisma.OfisUpdateWithoutIslemlerInput>, Prisma.OfisUncheckedUpdateWithoutIslemlerInput>
 }
 
 export type OfisCreateNestedOneWithoutLokasyonAdaylariInput = {
@@ -993,6 +1035,8 @@ export type OfisCreateWithoutGelenDosyalariInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -1030,6 +1074,8 @@ export type OfisUncheckedCreateWithoutGelenDosyalariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -1083,6 +1129,8 @@ export type OfisUpdateWithoutGelenDosyalariInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -1120,6 +1168,8 @@ export type OfisUncheckedUpdateWithoutGelenDosyalariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -1157,6 +1207,8 @@ export type OfisCreateWithoutGelenAtlananlarInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -1194,6 +1246,8 @@ export type OfisUncheckedCreateWithoutGelenAtlananlarInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -1247,6 +1301,8 @@ export type OfisUpdateWithoutGelenAtlananlarInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -1284,6 +1340,8 @@ export type OfisUncheckedUpdateWithoutGelenAtlananlarInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -1320,6 +1378,8 @@ export type OfisCreateWithoutKullanicilarInput = {
   gelenKod?: string | null
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -1357,6 +1417,8 @@ export type OfisUncheckedCreateWithoutKullanicilarInput = {
   gelenKod?: string | null
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -1410,6 +1472,8 @@ export type OfisUpdateWithoutKullanicilarInput = {
   gelenKod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -1447,6 +1511,8 @@ export type OfisUncheckedUpdateWithoutKullanicilarInput = {
   gelenKod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -1484,6 +1550,8 @@ export type OfisCreateWithoutDavetlerInput = {
   gelenKod?: string | null
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -1521,6 +1589,8 @@ export type OfisUncheckedCreateWithoutDavetlerInput = {
   gelenKod?: string | null
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -1574,6 +1644,8 @@ export type OfisUpdateWithoutDavetlerInput = {
   gelenKod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -1611,6 +1683,8 @@ export type OfisUncheckedUpdateWithoutDavetlerInput = {
   gelenKod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -1648,6 +1722,8 @@ export type OfisCreateWithoutKampanyalarInput = {
   gelenKod?: string | null
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -1685,6 +1761,8 @@ export type OfisUncheckedCreateWithoutKampanyalarInput = {
   gelenKod?: string | null
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -1738,6 +1816,8 @@ export type OfisUpdateWithoutKampanyalarInput = {
   gelenKod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -1775,6 +1855,8 @@ export type OfisUncheckedUpdateWithoutKampanyalarInput = {
   gelenKod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -1813,6 +1895,8 @@ export type OfisCreateWithoutKampanyaHarcamalariInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
   matchler?: Prisma.MatchCreateNestedManyWithoutOfisInput
@@ -1850,6 +1934,8 @@ export type OfisUncheckedCreateWithoutKampanyaHarcamalariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
   matchler?: Prisma.MatchUncheckedCreateNestedManyWithoutOfisInput
@@ -1903,6 +1989,8 @@ export type OfisUpdateWithoutKampanyaHarcamalariInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
   matchler?: Prisma.MatchUpdateManyWithoutOfisNestedInput
@@ -1940,6 +2028,352 @@ export type OfisUncheckedUpdateWithoutKampanyaHarcamalariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
+  kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
+  kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
+  matchler?: Prisma.MatchUncheckedUpdateManyWithoutOfisNestedInput
+  ayarlar?: Prisma.AyarUncheckedUpdateManyWithoutOfisNestedInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayUncheckedUpdateManyWithoutOfisNestedInput
+  islenmisMesajlar?: Prisma.IslenmisMesajUncheckedUpdateManyWithoutOfisNestedInput
+  portalIlanlari?: Prisma.PortalIlanUncheckedUpdateManyWithoutOfisNestedInput
+  entegrasyonlar?: Prisma.EntegrasyonUncheckedUpdateManyWithoutOfisNestedInput
+  senkronCalismalari?: Prisma.SenkronCalismaUncheckedUpdateManyWithoutOfisNestedInput
+  senkronCakismalari?: Prisma.SenkronCakismaUncheckedUpdateManyWithoutOfisNestedInput
+  notionSyncLoglari?: Prisma.NotionSyncLogUncheckedUpdateManyWithoutOfisNestedInput
+  ingestionLoglari?: Prisma.IngestionLogUncheckedUpdateManyWithoutOfisNestedInput
+  auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
+  kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
+  kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
+  gelenDosyalari?: Prisma.GelenDosyaUncheckedUpdateManyWithoutOfisNestedInput
+  gelenAtlananlar?: Prisma.GelenAtlananUncheckedUpdateManyWithoutOfisNestedInput
+}
+
+export type OfisCreateWithoutRandevularInput = {
+  id?: string
+  ad: string
+  slug: string
+  durum?: $Enums.OfisDurumu
+  plan?: $Enums.Plan
+  sinirsiz?: boolean
+  denemeBitis?: Date | string | null
+  telefon?: string | null
+  sehir?: string | null
+  notlar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  gelenKod?: string | null
+  kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
+  davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
+  kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
+  kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
+  kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
+  kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
+  matchler?: Prisma.MatchCreateNestedManyWithoutOfisInput
+  ayarlar?: Prisma.AyarCreateNestedManyWithoutOfisInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayCreateNestedManyWithoutOfisInput
+  islenmisMesajlar?: Prisma.IslenmisMesajCreateNestedManyWithoutOfisInput
+  portalIlanlari?: Prisma.PortalIlanCreateNestedManyWithoutOfisInput
+  entegrasyonlar?: Prisma.EntegrasyonCreateNestedManyWithoutOfisInput
+  senkronCalismalari?: Prisma.SenkronCalismaCreateNestedManyWithoutOfisInput
+  senkronCakismalari?: Prisma.SenkronCakismaCreateNestedManyWithoutOfisInput
+  notionSyncLoglari?: Prisma.NotionSyncLogCreateNestedManyWithoutOfisInput
+  ingestionLoglari?: Prisma.IngestionLogCreateNestedManyWithoutOfisInput
+  auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
+  kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
+  kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
+  gelenDosyalari?: Prisma.GelenDosyaCreateNestedManyWithoutOfisInput
+  gelenAtlananlar?: Prisma.GelenAtlananCreateNestedManyWithoutOfisInput
+}
+
+export type OfisUncheckedCreateWithoutRandevularInput = {
+  id?: string
+  ad: string
+  slug: string
+  durum?: $Enums.OfisDurumu
+  plan?: $Enums.Plan
+  sinirsiz?: boolean
+  denemeBitis?: Date | string | null
+  telefon?: string | null
+  sehir?: string | null
+  notlar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  gelenKod?: string | null
+  kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
+  davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
+  kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
+  kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
+  kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
+  kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
+  matchler?: Prisma.MatchUncheckedCreateNestedManyWithoutOfisInput
+  ayarlar?: Prisma.AyarUncheckedCreateNestedManyWithoutOfisInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayUncheckedCreateNestedManyWithoutOfisInput
+  islenmisMesajlar?: Prisma.IslenmisMesajUncheckedCreateNestedManyWithoutOfisInput
+  portalIlanlari?: Prisma.PortalIlanUncheckedCreateNestedManyWithoutOfisInput
+  entegrasyonlar?: Prisma.EntegrasyonUncheckedCreateNestedManyWithoutOfisInput
+  senkronCalismalari?: Prisma.SenkronCalismaUncheckedCreateNestedManyWithoutOfisInput
+  senkronCakismalari?: Prisma.SenkronCakismaUncheckedCreateNestedManyWithoutOfisInput
+  notionSyncLoglari?: Prisma.NotionSyncLogUncheckedCreateNestedManyWithoutOfisInput
+  ingestionLoglari?: Prisma.IngestionLogUncheckedCreateNestedManyWithoutOfisInput
+  auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
+  kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
+  kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
+  gelenDosyalari?: Prisma.GelenDosyaUncheckedCreateNestedManyWithoutOfisInput
+  gelenAtlananlar?: Prisma.GelenAtlananUncheckedCreateNestedManyWithoutOfisInput
+}
+
+export type OfisCreateOrConnectWithoutRandevularInput = {
+  where: Prisma.OfisWhereUniqueInput
+  create: Prisma.XOR<Prisma.OfisCreateWithoutRandevularInput, Prisma.OfisUncheckedCreateWithoutRandevularInput>
+}
+
+export type OfisUpsertWithoutRandevularInput = {
+  update: Prisma.XOR<Prisma.OfisUpdateWithoutRandevularInput, Prisma.OfisUncheckedUpdateWithoutRandevularInput>
+  create: Prisma.XOR<Prisma.OfisCreateWithoutRandevularInput, Prisma.OfisUncheckedCreateWithoutRandevularInput>
+  where?: Prisma.OfisWhereInput
+}
+
+export type OfisUpdateToOneWithWhereWithoutRandevularInput = {
+  where?: Prisma.OfisWhereInput
+  data: Prisma.XOR<Prisma.OfisUpdateWithoutRandevularInput, Prisma.OfisUncheckedUpdateWithoutRandevularInput>
+}
+
+export type OfisUpdateWithoutRandevularInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  durum?: Prisma.EnumOfisDurumuFieldUpdateOperationsInput | $Enums.OfisDurumu
+  plan?: Prisma.EnumPlanFieldUpdateOperationsInput | $Enums.Plan
+  sinirsiz?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  denemeBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sehir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gelenKod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
+  davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
+  kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
+  kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
+  kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
+  kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
+  matchler?: Prisma.MatchUpdateManyWithoutOfisNestedInput
+  ayarlar?: Prisma.AyarUpdateManyWithoutOfisNestedInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayUpdateManyWithoutOfisNestedInput
+  islenmisMesajlar?: Prisma.IslenmisMesajUpdateManyWithoutOfisNestedInput
+  portalIlanlari?: Prisma.PortalIlanUpdateManyWithoutOfisNestedInput
+  entegrasyonlar?: Prisma.EntegrasyonUpdateManyWithoutOfisNestedInput
+  senkronCalismalari?: Prisma.SenkronCalismaUpdateManyWithoutOfisNestedInput
+  senkronCakismalari?: Prisma.SenkronCakismaUpdateManyWithoutOfisNestedInput
+  notionSyncLoglari?: Prisma.NotionSyncLogUpdateManyWithoutOfisNestedInput
+  ingestionLoglari?: Prisma.IngestionLogUpdateManyWithoutOfisNestedInput
+  auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
+  kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
+  kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
+  gelenDosyalari?: Prisma.GelenDosyaUpdateManyWithoutOfisNestedInput
+  gelenAtlananlar?: Prisma.GelenAtlananUpdateManyWithoutOfisNestedInput
+}
+
+export type OfisUncheckedUpdateWithoutRandevularInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  durum?: Prisma.EnumOfisDurumuFieldUpdateOperationsInput | $Enums.OfisDurumu
+  plan?: Prisma.EnumPlanFieldUpdateOperationsInput | $Enums.Plan
+  sinirsiz?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  denemeBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sehir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gelenKod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
+  davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
+  kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
+  kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
+  kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
+  kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
+  matchler?: Prisma.MatchUncheckedUpdateManyWithoutOfisNestedInput
+  ayarlar?: Prisma.AyarUncheckedUpdateManyWithoutOfisNestedInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayUncheckedUpdateManyWithoutOfisNestedInput
+  islenmisMesajlar?: Prisma.IslenmisMesajUncheckedUpdateManyWithoutOfisNestedInput
+  portalIlanlari?: Prisma.PortalIlanUncheckedUpdateManyWithoutOfisNestedInput
+  entegrasyonlar?: Prisma.EntegrasyonUncheckedUpdateManyWithoutOfisNestedInput
+  senkronCalismalari?: Prisma.SenkronCalismaUncheckedUpdateManyWithoutOfisNestedInput
+  senkronCakismalari?: Prisma.SenkronCakismaUncheckedUpdateManyWithoutOfisNestedInput
+  notionSyncLoglari?: Prisma.NotionSyncLogUncheckedUpdateManyWithoutOfisNestedInput
+  ingestionLoglari?: Prisma.IngestionLogUncheckedUpdateManyWithoutOfisNestedInput
+  auditLoglari?: Prisma.AuditLogUncheckedUpdateManyWithoutOfisNestedInput
+  kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutOfisNestedInput
+  kayitFotolari?: Prisma.KayitFotoUncheckedUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedUpdateManyWithoutOfisNestedInput
+  gelenDosyalari?: Prisma.GelenDosyaUncheckedUpdateManyWithoutOfisNestedInput
+  gelenAtlananlar?: Prisma.GelenAtlananUncheckedUpdateManyWithoutOfisNestedInput
+}
+
+export type OfisCreateWithoutIslemlerInput = {
+  id?: string
+  ad: string
+  slug: string
+  durum?: $Enums.OfisDurumu
+  plan?: $Enums.Plan
+  sinirsiz?: boolean
+  denemeBitis?: Date | string | null
+  telefon?: string | null
+  sehir?: string | null
+  notlar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  gelenKod?: string | null
+  kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
+  davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
+  kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
+  kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
+  kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
+  matchler?: Prisma.MatchCreateNestedManyWithoutOfisInput
+  ayarlar?: Prisma.AyarCreateNestedManyWithoutOfisInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayCreateNestedManyWithoutOfisInput
+  islenmisMesajlar?: Prisma.IslenmisMesajCreateNestedManyWithoutOfisInput
+  portalIlanlari?: Prisma.PortalIlanCreateNestedManyWithoutOfisInput
+  entegrasyonlar?: Prisma.EntegrasyonCreateNestedManyWithoutOfisInput
+  senkronCalismalari?: Prisma.SenkronCalismaCreateNestedManyWithoutOfisInput
+  senkronCakismalari?: Prisma.SenkronCakismaCreateNestedManyWithoutOfisInput
+  notionSyncLoglari?: Prisma.NotionSyncLogCreateNestedManyWithoutOfisInput
+  ingestionLoglari?: Prisma.IngestionLogCreateNestedManyWithoutOfisInput
+  auditLoglari?: Prisma.AuditLogCreateNestedManyWithoutOfisInput
+  kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutOfisInput
+  kayitFotolari?: Prisma.KayitFotoCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricCreateNestedManyWithoutOfisInput
+  gelenDosyalari?: Prisma.GelenDosyaCreateNestedManyWithoutOfisInput
+  gelenAtlananlar?: Prisma.GelenAtlananCreateNestedManyWithoutOfisInput
+}
+
+export type OfisUncheckedCreateWithoutIslemlerInput = {
+  id?: string
+  ad: string
+  slug: string
+  durum?: $Enums.OfisDurumu
+  plan?: $Enums.Plan
+  sinirsiz?: boolean
+  denemeBitis?: Date | string | null
+  telefon?: string | null
+  sehir?: string | null
+  notlar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  gelenKod?: string | null
+  kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
+  davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
+  kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
+  kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
+  kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
+  matchler?: Prisma.MatchUncheckedCreateNestedManyWithoutOfisInput
+  ayarlar?: Prisma.AyarUncheckedCreateNestedManyWithoutOfisInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayUncheckedCreateNestedManyWithoutOfisInput
+  islenmisMesajlar?: Prisma.IslenmisMesajUncheckedCreateNestedManyWithoutOfisInput
+  portalIlanlari?: Prisma.PortalIlanUncheckedCreateNestedManyWithoutOfisInput
+  entegrasyonlar?: Prisma.EntegrasyonUncheckedCreateNestedManyWithoutOfisInput
+  senkronCalismalari?: Prisma.SenkronCalismaUncheckedCreateNestedManyWithoutOfisInput
+  senkronCakismalari?: Prisma.SenkronCakismaUncheckedCreateNestedManyWithoutOfisInput
+  notionSyncLoglari?: Prisma.NotionSyncLogUncheckedCreateNestedManyWithoutOfisInput
+  ingestionLoglari?: Prisma.IngestionLogUncheckedCreateNestedManyWithoutOfisInput
+  auditLoglari?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOfisInput
+  kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutOfisInput
+  kayitFotolari?: Prisma.KayitFotoUncheckedCreateNestedManyWithoutOfisInput
+  senkronHaricleri?: Prisma.SenkronHaricUncheckedCreateNestedManyWithoutOfisInput
+  gelenDosyalari?: Prisma.GelenDosyaUncheckedCreateNestedManyWithoutOfisInput
+  gelenAtlananlar?: Prisma.GelenAtlananUncheckedCreateNestedManyWithoutOfisInput
+}
+
+export type OfisCreateOrConnectWithoutIslemlerInput = {
+  where: Prisma.OfisWhereUniqueInput
+  create: Prisma.XOR<Prisma.OfisCreateWithoutIslemlerInput, Prisma.OfisUncheckedCreateWithoutIslemlerInput>
+}
+
+export type OfisUpsertWithoutIslemlerInput = {
+  update: Prisma.XOR<Prisma.OfisUpdateWithoutIslemlerInput, Prisma.OfisUncheckedUpdateWithoutIslemlerInput>
+  create: Prisma.XOR<Prisma.OfisCreateWithoutIslemlerInput, Prisma.OfisUncheckedCreateWithoutIslemlerInput>
+  where?: Prisma.OfisWhereInput
+}
+
+export type OfisUpdateToOneWithWhereWithoutIslemlerInput = {
+  where?: Prisma.OfisWhereInput
+  data: Prisma.XOR<Prisma.OfisUpdateWithoutIslemlerInput, Prisma.OfisUncheckedUpdateWithoutIslemlerInput>
+}
+
+export type OfisUpdateWithoutIslemlerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  durum?: Prisma.EnumOfisDurumuFieldUpdateOperationsInput | $Enums.OfisDurumu
+  plan?: Prisma.EnumPlanFieldUpdateOperationsInput | $Enums.Plan
+  sinirsiz?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  denemeBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sehir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gelenKod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
+  davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
+  kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
+  kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
+  kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
+  matchler?: Prisma.MatchUpdateManyWithoutOfisNestedInput
+  ayarlar?: Prisma.AyarUpdateManyWithoutOfisNestedInput
+  lokasyonAdaylari?: Prisma.LokasyonAdayUpdateManyWithoutOfisNestedInput
+  islenmisMesajlar?: Prisma.IslenmisMesajUpdateManyWithoutOfisNestedInput
+  portalIlanlari?: Prisma.PortalIlanUpdateManyWithoutOfisNestedInput
+  entegrasyonlar?: Prisma.EntegrasyonUpdateManyWithoutOfisNestedInput
+  senkronCalismalari?: Prisma.SenkronCalismaUpdateManyWithoutOfisNestedInput
+  senkronCakismalari?: Prisma.SenkronCakismaUpdateManyWithoutOfisNestedInput
+  notionSyncLoglari?: Prisma.NotionSyncLogUpdateManyWithoutOfisNestedInput
+  ingestionLoglari?: Prisma.IngestionLogUpdateManyWithoutOfisNestedInput
+  auditLoglari?: Prisma.AuditLogUpdateManyWithoutOfisNestedInput
+  kayitNotlari?: Prisma.KayitNotUpdateManyWithoutOfisNestedInput
+  kayitFotolari?: Prisma.KayitFotoUpdateManyWithoutOfisNestedInput
+  senkronHaricleri?: Prisma.SenkronHaricUpdateManyWithoutOfisNestedInput
+  gelenDosyalari?: Prisma.GelenDosyaUpdateManyWithoutOfisNestedInput
+  gelenAtlananlar?: Prisma.GelenAtlananUpdateManyWithoutOfisNestedInput
+}
+
+export type OfisUncheckedUpdateWithoutIslemlerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  durum?: Prisma.EnumOfisDurumuFieldUpdateOperationsInput | $Enums.OfisDurumu
+  plan?: Prisma.EnumPlanFieldUpdateOperationsInput | $Enums.Plan
+  sinirsiz?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  denemeBitis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sehir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gelenKod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
+  davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
+  kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
   matchler?: Prisma.MatchUncheckedUpdateManyWithoutOfisNestedInput
@@ -1977,6 +2411,8 @@ export type OfisCreateWithoutLokasyonAdaylariInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -2014,6 +2450,8 @@ export type OfisUncheckedCreateWithoutLokasyonAdaylariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -2067,6 +2505,8 @@ export type OfisUpdateWithoutLokasyonAdaylariInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -2104,6 +2544,8 @@ export type OfisUncheckedUpdateWithoutLokasyonAdaylariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -2141,6 +2583,8 @@ export type OfisCreateWithoutAyarlarInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -2178,6 +2622,8 @@ export type OfisUncheckedCreateWithoutAyarlarInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -2231,6 +2677,8 @@ export type OfisUpdateWithoutAyarlarInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -2268,6 +2716,8 @@ export type OfisUncheckedUpdateWithoutAyarlarInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -2305,6 +2755,8 @@ export type OfisCreateWithoutKayitlarInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
   matchler?: Prisma.MatchCreateNestedManyWithoutOfisInput
@@ -2342,6 +2794,8 @@ export type OfisUncheckedCreateWithoutKayitlarInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
   matchler?: Prisma.MatchUncheckedCreateNestedManyWithoutOfisInput
@@ -2395,6 +2849,8 @@ export type OfisUpdateWithoutKayitlarInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
   matchler?: Prisma.MatchUpdateManyWithoutOfisNestedInput
@@ -2432,6 +2888,8 @@ export type OfisUncheckedUpdateWithoutKayitlarInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
   matchler?: Prisma.MatchUncheckedUpdateManyWithoutOfisNestedInput
@@ -2469,6 +2927,8 @@ export type OfisCreateWithoutKisilerInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   matchler?: Prisma.MatchCreateNestedManyWithoutOfisInput
@@ -2506,6 +2966,8 @@ export type OfisUncheckedCreateWithoutKisilerInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   matchler?: Prisma.MatchUncheckedCreateNestedManyWithoutOfisInput
@@ -2559,6 +3021,8 @@ export type OfisUpdateWithoutKisilerInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   matchler?: Prisma.MatchUpdateManyWithoutOfisNestedInput
@@ -2596,6 +3060,8 @@ export type OfisUncheckedUpdateWithoutKisilerInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   matchler?: Prisma.MatchUncheckedUpdateManyWithoutOfisNestedInput
@@ -2633,6 +3099,8 @@ export type OfisCreateWithoutIslenmisMesajlarInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -2670,6 +3138,8 @@ export type OfisUncheckedCreateWithoutIslenmisMesajlarInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -2723,6 +3193,8 @@ export type OfisUpdateWithoutIslenmisMesajlarInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -2760,6 +3232,8 @@ export type OfisUncheckedUpdateWithoutIslenmisMesajlarInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -2797,6 +3271,8 @@ export type OfisCreateWithoutMatchlerInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -2834,6 +3310,8 @@ export type OfisUncheckedCreateWithoutMatchlerInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -2887,6 +3365,8 @@ export type OfisUpdateWithoutMatchlerInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -2924,6 +3404,8 @@ export type OfisUncheckedUpdateWithoutMatchlerInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -2961,6 +3443,8 @@ export type OfisCreateWithoutPortalIlanlariInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -2998,6 +3482,8 @@ export type OfisUncheckedCreateWithoutPortalIlanlariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -3051,6 +3537,8 @@ export type OfisUpdateWithoutPortalIlanlariInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -3088,6 +3576,8 @@ export type OfisUncheckedUpdateWithoutPortalIlanlariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -3125,6 +3615,8 @@ export type OfisCreateWithoutAuditLoglariInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -3162,6 +3654,8 @@ export type OfisUncheckedCreateWithoutAuditLoglariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -3215,6 +3709,8 @@ export type OfisUpdateWithoutAuditLoglariInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -3252,6 +3748,8 @@ export type OfisUncheckedUpdateWithoutAuditLoglariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -3289,6 +3787,8 @@ export type OfisCreateWithoutIngestionLoglariInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -3326,6 +3826,8 @@ export type OfisUncheckedCreateWithoutIngestionLoglariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -3379,6 +3881,8 @@ export type OfisUpdateWithoutIngestionLoglariInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -3416,6 +3920,8 @@ export type OfisUncheckedUpdateWithoutIngestionLoglariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -3453,6 +3959,8 @@ export type OfisCreateWithoutEntegrasyonlarInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -3490,6 +3998,8 @@ export type OfisUncheckedCreateWithoutEntegrasyonlarInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -3543,6 +4053,8 @@ export type OfisUpdateWithoutEntegrasyonlarInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -3580,6 +4092,8 @@ export type OfisUncheckedUpdateWithoutEntegrasyonlarInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -3617,6 +4131,8 @@ export type OfisCreateWithoutSenkronHaricleriInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -3654,6 +4170,8 @@ export type OfisUncheckedCreateWithoutSenkronHaricleriInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -3707,6 +4225,8 @@ export type OfisUpdateWithoutSenkronHaricleriInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -3744,6 +4264,8 @@ export type OfisUncheckedUpdateWithoutSenkronHaricleriInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -3781,6 +4303,8 @@ export type OfisCreateWithoutSenkronCalismalariInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -3818,6 +4342,8 @@ export type OfisUncheckedCreateWithoutSenkronCalismalariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -3871,6 +4397,8 @@ export type OfisUpdateWithoutSenkronCalismalariInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -3908,6 +4436,8 @@ export type OfisUncheckedUpdateWithoutSenkronCalismalariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -3945,6 +4475,8 @@ export type OfisCreateWithoutSenkronCakismalariInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -3982,6 +4514,8 @@ export type OfisUncheckedCreateWithoutSenkronCakismalariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -4035,6 +4569,8 @@ export type OfisUpdateWithoutSenkronCakismalariInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -4072,6 +4608,8 @@ export type OfisUncheckedUpdateWithoutSenkronCakismalariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -4109,6 +4647,8 @@ export type OfisCreateWithoutNotionSyncLoglariInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -4146,6 +4686,8 @@ export type OfisUncheckedCreateWithoutNotionSyncLoglariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -4199,6 +4741,8 @@ export type OfisUpdateWithoutNotionSyncLoglariInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -4236,6 +4780,8 @@ export type OfisUncheckedUpdateWithoutNotionSyncLoglariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -4273,6 +4819,8 @@ export type OfisCreateWithoutKayitNotlariInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -4310,6 +4858,8 @@ export type OfisUncheckedCreateWithoutKayitNotlariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -4363,6 +4913,8 @@ export type OfisUpdateWithoutKayitNotlariInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -4400,6 +4952,8 @@ export type OfisUncheckedUpdateWithoutKayitNotlariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -4437,6 +4991,8 @@ export type OfisCreateWithoutKayitFotolariInput = {
   kullanicilar?: Prisma.KullaniciCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiCreateNestedManyWithoutOfisInput
@@ -4474,6 +5030,8 @@ export type OfisUncheckedCreateWithoutKayitFotolariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedCreateNestedManyWithoutOfisInput
   davetler?: Prisma.DavetUncheckedCreateNestedManyWithoutOfisInput
   kampanyalar?: Prisma.KampanyaUncheckedCreateNestedManyWithoutOfisInput
+  randevular?: Prisma.RandevuUncheckedCreateNestedManyWithoutOfisInput
+  islemler?: Prisma.IslemUncheckedCreateNestedManyWithoutOfisInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedCreateNestedManyWithoutOfisInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutOfisInput
   kisiler?: Prisma.KisiUncheckedCreateNestedManyWithoutOfisInput
@@ -4527,6 +5085,8 @@ export type OfisUpdateWithoutKayitFotolariInput = {
   kullanicilar?: Prisma.KullaniciUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUpdateManyWithoutOfisNestedInput
@@ -4564,6 +5124,8 @@ export type OfisUncheckedUpdateWithoutKayitFotolariInput = {
   kullanicilar?: Prisma.KullaniciUncheckedUpdateManyWithoutOfisNestedInput
   davetler?: Prisma.DavetUncheckedUpdateManyWithoutOfisNestedInput
   kampanyalar?: Prisma.KampanyaUncheckedUpdateManyWithoutOfisNestedInput
+  randevular?: Prisma.RandevuUncheckedUpdateManyWithoutOfisNestedInput
+  islemler?: Prisma.IslemUncheckedUpdateManyWithoutOfisNestedInput
   kampanyaHarcamalari?: Prisma.KampanyaHarcamaUncheckedUpdateManyWithoutOfisNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutOfisNestedInput
   kisiler?: Prisma.KisiUncheckedUpdateManyWithoutOfisNestedInput
@@ -4593,6 +5155,8 @@ export type OfisCountOutputType = {
   kullanicilar: number
   davetler: number
   kampanyalar: number
+  randevular: number
+  islemler: number
   kampanyaHarcamalari: number
   kayitlar: number
   kisiler: number
@@ -4618,6 +5182,8 @@ export type OfisCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   kullanicilar?: boolean | OfisCountOutputTypeCountKullanicilarArgs
   davetler?: boolean | OfisCountOutputTypeCountDavetlerArgs
   kampanyalar?: boolean | OfisCountOutputTypeCountKampanyalarArgs
+  randevular?: boolean | OfisCountOutputTypeCountRandevularArgs
+  islemler?: boolean | OfisCountOutputTypeCountIslemlerArgs
   kampanyaHarcamalari?: boolean | OfisCountOutputTypeCountKampanyaHarcamalariArgs
   kayitlar?: boolean | OfisCountOutputTypeCountKayitlarArgs
   kisiler?: boolean | OfisCountOutputTypeCountKisilerArgs
@@ -4668,6 +5234,20 @@ export type OfisCountOutputTypeCountDavetlerArgs<ExtArgs extends runtime.Types.E
  */
 export type OfisCountOutputTypeCountKampanyalarArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.KampanyaWhereInput
+}
+
+/**
+ * OfisCountOutputType without action
+ */
+export type OfisCountOutputTypeCountRandevularArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RandevuWhereInput
+}
+
+/**
+ * OfisCountOutputType without action
+ */
+export type OfisCountOutputTypeCountIslemlerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IslemWhereInput
 }
 
 /**
@@ -4821,6 +5401,8 @@ export type OfisSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   kullanicilar?: boolean | Prisma.Ofis$kullanicilarArgs<ExtArgs>
   davetler?: boolean | Prisma.Ofis$davetlerArgs<ExtArgs>
   kampanyalar?: boolean | Prisma.Ofis$kampanyalarArgs<ExtArgs>
+  randevular?: boolean | Prisma.Ofis$randevularArgs<ExtArgs>
+  islemler?: boolean | Prisma.Ofis$islemlerArgs<ExtArgs>
   kampanyaHarcamalari?: boolean | Prisma.Ofis$kampanyaHarcamalariArgs<ExtArgs>
   kayitlar?: boolean | Prisma.Ofis$kayitlarArgs<ExtArgs>
   kisiler?: boolean | Prisma.Ofis$kisilerArgs<ExtArgs>
@@ -4896,6 +5478,8 @@ export type OfisInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   kullanicilar?: boolean | Prisma.Ofis$kullanicilarArgs<ExtArgs>
   davetler?: boolean | Prisma.Ofis$davetlerArgs<ExtArgs>
   kampanyalar?: boolean | Prisma.Ofis$kampanyalarArgs<ExtArgs>
+  randevular?: boolean | Prisma.Ofis$randevularArgs<ExtArgs>
+  islemler?: boolean | Prisma.Ofis$islemlerArgs<ExtArgs>
   kampanyaHarcamalari?: boolean | Prisma.Ofis$kampanyaHarcamalariArgs<ExtArgs>
   kayitlar?: boolean | Prisma.Ofis$kayitlarArgs<ExtArgs>
   kisiler?: boolean | Prisma.Ofis$kisilerArgs<ExtArgs>
@@ -4926,6 +5510,8 @@ export type $OfisPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     kullanicilar: Prisma.$KullaniciPayload<ExtArgs>[]
     davetler: Prisma.$DavetPayload<ExtArgs>[]
     kampanyalar: Prisma.$KampanyaPayload<ExtArgs>[]
+    randevular: Prisma.$RandevuPayload<ExtArgs>[]
+    islemler: Prisma.$IslemPayload<ExtArgs>[]
     kampanyaHarcamalari: Prisma.$KampanyaHarcamaPayload<ExtArgs>[]
     kayitlar: Prisma.$KayitPayload<ExtArgs>[]
     kisiler: Prisma.$KisiPayload<ExtArgs>[]
@@ -5372,6 +5958,8 @@ export interface Prisma__OfisClient<T, Null = never, ExtArgs extends runtime.Typ
   kullanicilar<T extends Prisma.Ofis$kullanicilarArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$kullanicilarArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KullaniciPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   davetler<T extends Prisma.Ofis$davetlerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$davetlerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DavetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   kampanyalar<T extends Prisma.Ofis$kampanyalarArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$kampanyalarArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KampanyaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  randevular<T extends Prisma.Ofis$randevularArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$randevularArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RandevuPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  islemler<T extends Prisma.Ofis$islemlerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$islemlerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IslemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   kampanyaHarcamalari<T extends Prisma.Ofis$kampanyaHarcamalariArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$kampanyaHarcamalariArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KampanyaHarcamaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   kayitlar<T extends Prisma.Ofis$kayitlarArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$kayitlarArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KayitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   kisiler<T extends Prisma.Ofis$kisilerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Ofis$kisilerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KisiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5895,6 +6483,54 @@ export type Ofis$kampanyalarArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.KampanyaScalarFieldEnum | Prisma.KampanyaScalarFieldEnum[]
+}
+
+/**
+ * Ofis.randevular
+ */
+export type Ofis$randevularArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Randevu
+   */
+  select?: Prisma.RandevuSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Randevu
+   */
+  omit?: Prisma.RandevuOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RandevuInclude<ExtArgs> | null
+  where?: Prisma.RandevuWhereInput
+  orderBy?: Prisma.RandevuOrderByWithRelationInput | Prisma.RandevuOrderByWithRelationInput[]
+  cursor?: Prisma.RandevuWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RandevuScalarFieldEnum | Prisma.RandevuScalarFieldEnum[]
+}
+
+/**
+ * Ofis.islemler
+ */
+export type Ofis$islemlerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Islem
+   */
+  select?: Prisma.IslemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Islem
+   */
+  omit?: Prisma.IslemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslemInclude<ExtArgs> | null
+  where?: Prisma.IslemWhereInput
+  orderBy?: Prisma.IslemOrderByWithRelationInput | Prisma.IslemOrderByWithRelationInput[]
+  cursor?: Prisma.IslemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IslemScalarFieldEnum | Prisma.IslemScalarFieldEnum[]
 }
 
 /**

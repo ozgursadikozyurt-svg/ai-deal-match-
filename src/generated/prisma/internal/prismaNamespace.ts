@@ -404,6 +404,8 @@ export const ModelName = {
   Davet: 'Davet',
   Kampanya: 'Kampanya',
   KampanyaHarcama: 'KampanyaHarcama',
+  Randevu: 'Randevu',
+  Islem: 'Islem',
   Il: 'Il',
   Ilce: 'Ilce',
   Mahalle: 'Mahalle',
@@ -445,7 +447,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "ofis" | "gelenDosya" | "gelenAtlanan" | "kullanici" | "davet" | "kampanya" | "kampanyaHarcama" | "il" | "ilce" | "mahalle" | "altBolge" | "altBolgeMahalle" | "ilceKomsuluk" | "lokasyonAlias" | "lokasyonAday" | "ayar" | "kayitLokasyon" | "kayit" | "mulkOzellik" | "kisi" | "kayitKisi" | "islenmisMesaj" | "match" | "portalIlan" | "auditLog" | "ingestionLog" | "entegrasyon" | "senkronHaric" | "senkronCalisma" | "senkronCakisma" | "notionSyncLog" | "kayitNot" | "kayitFoto"
+    modelProps: "ofis" | "gelenDosya" | "gelenAtlanan" | "kullanici" | "davet" | "kampanya" | "kampanyaHarcama" | "randevu" | "islem" | "il" | "ilce" | "mahalle" | "altBolge" | "altBolgeMahalle" | "ilceKomsuluk" | "lokasyonAlias" | "lokasyonAday" | "ayar" | "kayitLokasyon" | "kayit" | "mulkOzellik" | "kisi" | "kayitKisi" | "islenmisMesaj" | "match" | "portalIlan" | "auditLog" | "ingestionLog" | "entegrasyon" | "senkronHaric" | "senkronCalisma" | "senkronCakisma" | "notionSyncLog" | "kayitNot" | "kayitFoto"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -964,6 +966,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.KampanyaHarcamaCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.KampanyaHarcamaCountAggregateOutputType> | number
+        }
+      }
+    }
+    Randevu: {
+      payload: Prisma.$RandevuPayload<ExtArgs>
+      fields: Prisma.RandevuFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RandevuFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RandevuPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RandevuFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RandevuPayload>
+        }
+        findFirst: {
+          args: Prisma.RandevuFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RandevuPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RandevuFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RandevuPayload>
+        }
+        findMany: {
+          args: Prisma.RandevuFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RandevuPayload>[]
+        }
+        create: {
+          args: Prisma.RandevuCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RandevuPayload>
+        }
+        createMany: {
+          args: Prisma.RandevuCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RandevuCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RandevuPayload>[]
+        }
+        delete: {
+          args: Prisma.RandevuDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RandevuPayload>
+        }
+        update: {
+          args: Prisma.RandevuUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RandevuPayload>
+        }
+        deleteMany: {
+          args: Prisma.RandevuDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RandevuUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RandevuUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RandevuPayload>[]
+        }
+        upsert: {
+          args: Prisma.RandevuUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RandevuPayload>
+        }
+        aggregate: {
+          args: Prisma.RandevuAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRandevu>
+        }
+        groupBy: {
+          args: Prisma.RandevuGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RandevuGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RandevuCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RandevuCountAggregateOutputType> | number
+        }
+      }
+    }
+    Islem: {
+      payload: Prisma.$IslemPayload<ExtArgs>
+      fields: Prisma.IslemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.IslemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.IslemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemPayload>
+        }
+        findFirst: {
+          args: Prisma.IslemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.IslemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemPayload>
+        }
+        findMany: {
+          args: Prisma.IslemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemPayload>[]
+        }
+        create: {
+          args: Prisma.IslemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemPayload>
+        }
+        createMany: {
+          args: Prisma.IslemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.IslemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemPayload>[]
+        }
+        delete: {
+          args: Prisma.IslemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemPayload>
+        }
+        update: {
+          args: Prisma.IslemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemPayload>
+        }
+        deleteMany: {
+          args: Prisma.IslemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.IslemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.IslemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemPayload>[]
+        }
+        upsert: {
+          args: Prisma.IslemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemPayload>
+        }
+        aggregate: {
+          args: Prisma.IslemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateIslem>
+        }
+        groupBy: {
+          args: Prisma.IslemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IslemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.IslemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IslemCountAggregateOutputType> | number
         }
       }
     }
@@ -3037,6 +3187,51 @@ export const KampanyaHarcamaScalarFieldEnum = {
 export type KampanyaHarcamaScalarFieldEnum = (typeof KampanyaHarcamaScalarFieldEnum)[keyof typeof KampanyaHarcamaScalarFieldEnum]
 
 
+export const RandevuScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  sahipKullaniciId: 'sahipKullaniciId',
+  tarih: 'tarih',
+  tur: 'tur',
+  sonuc: 'sonuc',
+  talepId: 'talepId',
+  portfoyId: 'portfoyId',
+  kisiId: 'kisiId',
+  not: 'not',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RandevuScalarFieldEnum = (typeof RandevuScalarFieldEnum)[keyof typeof RandevuScalarFieldEnum]
+
+
+export const IslemScalarFieldEnum = {
+  id: 'id',
+  ofisId: 'ofisId',
+  sahipKullaniciId: 'sahipKullaniciId',
+  tarih: 'tarih',
+  tahsilatTarihi: 'tahsilatTarihi',
+  tur: 'tur',
+  baslik: 'baslik',
+  bedel: 'bedel',
+  paylasilan: 'paylasilan',
+  ofisPayi: 'ofisPayi',
+  banaKalan: 'banaKalan',
+  aciklama: 'aciklama',
+  reklam: 'reklam',
+  talepKaynagi: 'talepKaynagi',
+  talepId: 'talepId',
+  portfoyId: 'portfoyId',
+  kisiId: 'kisiId',
+  disKaynak: 'disKaynak',
+  disKimlik: 'disKimlik',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IslemScalarFieldEnum = (typeof IslemScalarFieldEnum)[keyof typeof IslemScalarFieldEnum]
+
+
 export const IlScalarFieldEnum = {
   id: 'id',
   plaka: 'plaka',
@@ -3200,6 +3395,8 @@ export const KayitScalarFieldEnum = {
   havuz: 'havuz',
   yetkili: 'yetkili',
   yetkiBitis: 'yetkiBitis',
+  yetkiBelgeNo: 'yetkiBelgeNo',
+  tasinmazNo: 'tasinmazNo',
   musteriKaynagi: 'musteriKaynagi',
   ilkKaynak: 'ilkKaynak',
   ilkKaynakDetay: 'ilkKaynakDetay',
@@ -4648,6 +4845,8 @@ export type GlobalOmitConfig = {
   davet?: Prisma.DavetOmit
   kampanya?: Prisma.KampanyaOmit
   kampanyaHarcama?: Prisma.KampanyaHarcamaOmit
+  randevu?: Prisma.RandevuOmit
+  islem?: Prisma.IslemOmit
   il?: Prisma.IlOmit
   ilce?: Prisma.IlceOmit
   mahalle?: Prisma.MahalleOmit

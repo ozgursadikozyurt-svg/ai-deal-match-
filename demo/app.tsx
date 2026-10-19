@@ -6,6 +6,8 @@
  * Dosyalar: ortak.tsx (ortak parçalar) · form.tsx · ice-aktarma.tsx · konumlar.tsx · bu dosya (ekranlar + kabuk)
  */
 import { IlkKaynakSatirlari } from "./ilk-kaynak";
+import { RandevuKarti } from "./randevular";
+import { IslemlerEkrani } from "./islemler";
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Yonetim, yonetimGorunur, yetkiAktif, aktifRolEtiketi } from "./yonetim";
 import { createRoot } from "react-dom/client";
@@ -276,7 +278,7 @@ function Detay({ id }: { id: string }) {
         <div><span>Ana kategori</span><b>{etiket(v.anaKategori)}</b></div>
         <div><span>İlan sahibi</span><b>{(ILAN_SAHIBI_ETIKET as any)[v.ilanSahibiTipi]}</b></div>
         {!talep && <div><span>Havuz akışı</span><b><HavuzRozeti v={v} /></b></div>}
-        {!talep && v.yetkili && <div><span>Yetki</span><b>Yetki belgeli{v.yetkiBitis ? ` · ${tarihYaz(v.yetkiBitis)}'e kadar` : ""}</b></div>}
+        {!talep && (v.yetkili || v.yetkiBelgeNo || v.tasinmazNo) && <div><span>Yetki</span><b>{v.yetkili ? "Yetki belgeli" : "Belge bilgisi var"}{v.yetkiBitis ? ` · ${tarihYaz(v.yetkiBitis)}'e kadar` : ""}{v.yetkiBelgeNo ? ` · No ${v.yetkiBelgeNo}` : ""}{v.tasinmazNo ? ` · Taşınmaz ${v.tasinmazNo}` : ""}</b></div>}
         {v.alternatifMulkTipleri?.length ? <div><span>Alternatif tipler</span><b>{etiket(v.alternatifMulkTipleri)}</b></div> : null}
         {v.odaSayisi && <div><span>Oda</span><b>{v.odaSayisi}</b></div>}
         {v.netM2 != null && <div><span>Net alan</span><b>{v.netM2.toLocaleString("tr-TR")} m²</b></div>}
@@ -346,6 +348,9 @@ function Detay({ id }: { id: string }) {
       {v.hamMetin ? <><button className="btn kucuk" onClick={() => setHamAcik(!hamAcik)}>{hamAcik ? "Orijinal mesajı gizle" : "Orijinal mesajı göster"}</button>
         {hamAcik && <div className="wa-balon"><div className="wa-ust">{v.gondeAdi ?? telYaz(v.gondeTelefon) ?? "Gönderen"}{v.mesajTarihi ? ` · ${tarihYaz(v.mesajTarihi, true)}` : ""}{v.kayitGrubu ? ` · ${v.kayitGrubu}` : ""}</div><div className="wa-metin">{v.hamMetin}</div></div>}</> : <p className="ipucu">Orijinal mesaj yok (elle girildi).</p>}
     </section>
+
+    {/* v3.35 — randevular: gösterim / görüşme ve sonucu */}
+    <RandevuKarti kayitId={k.id} talep={talep} kisiId={(v.kisiler as any)?.[0]?.kisiId ?? null} karsilar={benim.filter((e) => e.s.uygunluk !== "UYGUN_DEGIL").map((e) => { const o2 = talep ? e.p : e.t; return { id: o2.id, baslik: baslikOf(o2.veri) }; })} />
 
     <section>
       <div className="bolum-bas"><h3>Eşleşmeler ({benim.filter((e) => e.s.uygunluk !== "UYGUN_DEGIL").length})</h3></div>
@@ -561,6 +566,7 @@ function Ayarlar() {
   const gecisler: { k: string; ad: string; ikon: string; acik: string; rozet?: number; git: () => void }[] = [
     { k: "konumlar", ad: "Konumlar", ikon: "konum", acik: "İlçe, mahalle ve bölge sözlüğü; öğrenilen konumlar", git: () => git({ ad: "konumlar" }) },
     ...(baglantilarGorunurMu(d) ? [{ k: "baglantilar", ad: "Bağlantılar", ikon: "baglanti", acik: cakisma ? `${cakisma} eşitleme çakışması seçiminizi bekliyor` : "Google Kişiler ile çift yönlü eşitleme", rozet: cakisma || undefined, git: () => git({ ad: "baglantilar" }) }] : []),
+    ...(yetkiAktif("islem.yonet") ? [{ k: "islemler", ad: "İşlemler", ikon: "anahtar", acik: "Kapanan satış ve kiralamalar, komisyon ve aylık bana kalan", git: () => git({ ad: "islemler" }) }] : []),
     ...(yonetimGorunur() ? [{ k: "yonetim", ad: "Yönetim", ikon: "kisi", acik: "Kullanıcılar, davet bağlantıları, ofisler ve planlar", git: () => git({ ad: "yonetim" }) }] : []),
   ];
   return <div className="yigin">
@@ -640,7 +646,7 @@ function sekmeOf(e: Ekran, d: DepoDurumu): string {
   if (e.ad === "eslesme") return "eslesmeler";
   if (e.ad === "kisi") return "kisiler";
   if (e.ad === "gelen") return "veri"; // v3.24
-  if (e.ad === "konumlar" || e.ad === "baglantilar" || e.ad === "yonetim") return "ayarlar"; // v3.21.2 — Ayarlar menüsünün altına alındı
+  if (e.ad === "konumlar" || e.ad === "baglantilar" || e.ad === "yonetim" || e.ad === "islemler") return "ayarlar"; // v3.21.2 — Ayarlar menüsünün altına alındı
   return e.ad;
 }
 
@@ -736,6 +742,7 @@ export function Uygulama() {
       {ekran.ad === "ayarlar" && <Ayarlar />}
       {ekran.ad === "baglantilar" && <Baglantilar />}
       {ekran.ad === "yonetim" && <Yonetim />}
+      {ekran.ad === "islemler" && <IslemlerEkrani />}
       {ekran.ad === "suresi" && <SuresiYaklasanlar />}
       {ekran.ad === "gorevler" && <GorevlerEkrani />}
     </main>

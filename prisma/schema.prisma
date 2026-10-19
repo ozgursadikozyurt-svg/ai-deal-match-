@@ -640,6 +640,8 @@ model Ofis {
   kullanicilar Kullanici[]
   davetler     Davet[]
   kampanyalar  Kampanya[]
+  randevular   Randevu[]
+  islemler     Islem[]
   kampanyaHarcamalari KampanyaHarcama[]
   kayitlar     Kayit[]
   kisiler      Kisi[]
@@ -786,6 +788,70 @@ model KampanyaHarcama {
   @@unique([kampanyaId, ay])
   @@index([ofisId, ay])
   @@map("kampanya_harcama")
+}
+
+/// v3.35 — Randevu (gösterim / görüşme). talepId, portfoyId, kisiId düz kimlik (yabancı anahtar yok): kayıt silinse de randevu geçmişi kalır.
+model Randevu {
+  id               String   @id @default(cuid())
+  ofisId           String   @default("")
+  ofis             Ofis     @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  /// randevuyu ayarlayan / yapan kullanıcı (asistan ya da danışman)
+  sahipKullaniciId String?
+  tarih            DateTime
+  /// GOSTERIM | GORUSME
+  tur              String   @default("GOSTERIM")
+  /// PLANLANDI | GERCEKLESTI | IPTAL | GELMEDI
+  sonuc            String   @default("PLANLANDI")
+  talepId          String?
+  portfoyId        String?
+  kisiId           String?
+  not              String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([ofisId, tarih])
+  @@index([ofisId, talepId])
+  @@index([ofisId, portfoyId])
+  @@map("randevu")
+}
+
+/// v3.35 — İşlem (kapanan satış / kiralama) ve komisyonu. P&L ayı = tahsilat tarihi; boşsa "bekleyen".
+/// Polaris'ten taşınanlarda disKaynak = "POLARIS", disKimlik = Polaris satır kimliği (tekrar aktarım aynı satırı günceller).
+model Islem {
+  id               String    @id @default(cuid())
+  ofisId           String    @default("")
+  ofis             Ofis      @relation(fields: [ofisId], references: [id], onDelete: Cascade)
+  sahipKullaniciId String?
+  /// işlem (kapanış) tarihi
+  tarih            DateTime
+  /// komisyonun tahsil edildiği gün; boş = tahsil edilmedi (bekleyen)
+  tahsilatTarihi   DateTime?
+  /// SATIS | KIRALAMA | DIGER
+  tur              String    @default("DIGER")
+  baslik           String
+  /// mülkün satış / kira bedeli
+  bedel            Decimal?  @db.Decimal(16, 2)
+  /// karşı tarafla (emlakçı, danışman) paylaşılan tutar
+  paylasilan       Decimal?  @db.Decimal(14, 2)
+  ofisPayi         Decimal?  @db.Decimal(14, 2)
+  /// net komisyon (bana kalan)
+  banaKalan        Decimal?  @db.Decimal(14, 2)
+  aciklama         String?
+  reklam           Boolean   @default(false)
+  /// talebin ilk kaynağı (ilk kaynak kodu), raporlar için
+  talepKaynagi     String?
+  talepId          String?
+  portfoyId        String?
+  kisiId           String?
+  disKaynak        String?
+  disKimlik        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([ofisId, disKaynak, disKimlik])
+  @@index([ofisId, tarih])
+  @@index([ofisId, tahsilatTarihi])
+  @@map("islem")
 }
 
 // ============================================================================
@@ -1049,6 +1115,9 @@ model Kayit {
   /// v3.5 — yetki belgeli portföy (havuz akışında 1. sıra: Yetkili → CRM → Partner → Web ilanı)
   yetkili         Boolean        @default(false)
   yetkiBitis      DateTime?
+  /// v3.35 — yetki belgesi numarası ve taşınmaz (TKGM) kimliği; portföy formunda gizlenebilir "Yetki belgesi" bölümü
+  yetkiBelgeNo    String?
+  tasinmazNo      String?
   musteriKaynagi  MusteriKaynagi?
   /// v3.32 — İLK KAYNAK (değiştirilemez): kaydın ilk geldiği kanal (src/lib/domain/ilk-kaynak.ts kodları), ayrıntısı ve zamanı.
   /// Kayıt oluşturulurken sunucu yazar; sonradan yalnızca "kaynak.duzelt" yetkisi değiştirebilir ve her değişiklik audit_log'a düşer.

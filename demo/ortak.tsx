@@ -18,7 +18,7 @@ export type Ekran = (
   | { ad: "ana" } | { ad: "liste"; tip: "TALEP" | "PORTFOY"; filtre?: any } | { ad: "detay"; id: string }
   | { ad: "form"; tip: "TALEP" | "PORTFOY"; id?: string; taslak?: Partial<Veri>; adayId?: string; geri?: Ekran }
   | { ad: "eslesmeler" } | { ad: "eslesme"; tid: string; pid: string } | { ad: "izleme" }
-  | { ad: "veri"; alt?: "metin" | "dosya" | "mesaj" | "wa" | "el" | "gelen"; metin?: string } | { ad: "konumlar" } | { ad: "kisiler" } | { ad: "kisi"; id: string } | { ad: "ayarlar" } | { ad: "baglantilar" } | { ad: "yonetim" }
+  | { ad: "veri"; alt?: "metin" | "dosya" | "mesaj" | "wa" | "el" | "gelen"; metin?: string } | { ad: "konumlar" } | { ad: "kisiler" } | { ad: "kisi"; id: string } | { ad: "ayarlar" } | { ad: "baglantilar" } | { ad: "yonetim" } | { ad: "islemler" }
   | { ad: "gelen" } // v3.23 — gelen kutusu (onay bekleyenler)
   | { ad: "suresi" } | { ad: "gorevler" } // v3.26 — süresi yaklaşanlar · tüm görevler
 ) & { donus?: boolean };

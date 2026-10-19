@@ -5,6 +5,21 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.35 · 19 Ekim 2026 — Yetki belgesi (belge no, taşınmaz ID, bitiş), randevu kaydı ve İşlemler ekranı; Polaris işlemleri Anahtar'a taşındı
+
+- Portföy formu: açılıp kapanan "Yetki belgesi" bölümü — yetkili portföy, yetki belge no, taşınmaz ID, bitiş tarihi. Detayda Yetki satırında görünür.
+- Randevu ayrı kayıt: talep ya da portföy detayında "Randevular" kartı — tarih/saat, gösterim ya da görüşme, karşı taraf (eşleşmelerden), not. Sonuç sonradan girilir: Gerçekleşti / Gelmedi / İptal. Asistan da açabilir; kimin açtığı kayda geçer. Silme yok, yanlışsa İptal.
+- İşlemler ekranı (Ayarlar › İşlemler, yalnızca ofis yöneticisi): kapanan satış / kiralama, bedel, ofis payı, paylaşılan, bana kalan, açıklama, reklamdan mı, isteğe bağlı talep ve portföy bağı. "Bana kalan" tahsilat ayına yazılır; tahsil edilmeyen işlem "bekleyen"de durur. Yıl seçimi ve aylara göre bana kalan tablosu.
+- Polaris'teki işlemler (2024, 2025 arşivi ve 2026) Anahtar'a aktarıldı; geçmişte tahsilat tarihi = işlem tarihi alındı, böylece aylık toplamlar Polaris P&L ile birebir aynı. Polaris şimdilik değişmedi; bir sonraki adımda İşlemler ve P&L satır 3 Anahtar'dan okuyacak.
+- Yeni tablolar: randevu, islem; kayit'a yetkiBelgeNo ve tasinmazNo (yalnızca ekleme, RLS açık). Yayından sonra "Kurulumu tamamla" düğmesine basılmalı.
+
+**Demo'da test edilecekler**
+
+- [ ] Bir portföyü Düzenle › "Yetki belgesi" bölümünü açın: belge no, taşınmaz ID ve bitiş girin, kaydedin; detayda Yetki satırında görünmeli.
+- [ ] Bir talebin detayında "Randevular" › + Randevu: yarın 11:00 gösterim ekleyin, sonra "Gerçekleşti" deyin.
+- [ ] Ayarlar › İşlemler: 2026'yı seçin; aylara göre bana kalan Polaris P&L satır 3 ile aynı olmalı. + Yeni işlem ile "tahsil edildi" işaretini kaldırıp bir işlem ekleyin: "Bekleyen"de görünmeli.
+- [ ] Rol olarak görüntüle › Asistan: Ayarlar'da İşlemler görünmemeli; randevu ekleyebilmeli.
+
 ## v3.34 · 19 Ekim 2026 — Reklam kampanyaları: kampanya listesi, elle aylık harcama, kayıt sayısı ve kayıt başına maliyet
 
 - Yönetim › Reklam kampanyaları (yalnızca ofis yöneticisi): Meta / Google / diğer kanal, kampanya adı ve isteğe bağlı bütçe ile kampanya açılır. Kampanya adı sonradan değişmez; bitince "Kapat" denir (geçmiş kayıt ve harcama kalır).

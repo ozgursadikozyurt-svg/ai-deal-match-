@@ -300,7 +300,18 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
         <IlkKaynakAlani f={f} set={set} kayitliDeger={mevcut?.veri as any} />
         <div className="alan"><label htmlFor="f-sahip">İlan sahibi</label><select id="f-sahip" value={f.ilanSahibiTipi} onChange={(e) => set("ilanSahibiTipi", e.target.value)}>{Object.entries(ILAN_SAHIBI_ETIKET).map(([k, e]) => <option key={k} value={k}>{e}</option>)}</select></div>
         {!talep && <div className="alan"><label htmlFor="f-havuz">Havuz</label><select id="f-havuz" value={f.havuz} onChange={(e) => set("havuz", e.target.value)}>{Object.entries(HAVUZ_ETIKET).map(([k, e]) => <option key={k} value={k}>{e}</option>)}</select></div>}
-        {!talep && f.havuz === "KENDI_PORTFOY" && <div className="alan"><label htmlFor="f-yetki">Yetki belgesi</label><div className="satir"><button type="button" id="f-yetki" className={cx("bool-cip", f.yetkili && "evet")} onClick={() => set("yetkili", !f.yetkili)}><span className="isaret">{f.yetkili ? "✓" : "+"}</span>Yetkili portföy</button>{f.yetkili && <input type="date" aria-label="Yetki bitiş" value={f.yetkiBitis ? new Date(f.yetkiBitis).toISOString().slice(0, 10) : ""} onChange={(e) => set("yetkiBitis", e.target.value ? new Date(e.target.value + "T12:00:00") : null)} />}</div></div>}
+        {/* v3.35 — Yetki belgesi: açılıp kapanan bölüm (yetkili, belge no, taşınmaz ID, bitiş) */}
+        {!talep && f.havuz === "KENDI_PORTFOY" && <details className="alan genis yetki-bolum" open={!!(f.yetkili || f.yetkiBelgeNo || f.tasinmazNo)}>
+          <summary><b>Yetki belgesi</b>{f.yetkili ? <span className="ipucu"> · yetkili{f.yetkiBitis ? ` · ${new Date(f.yetkiBitis).toLocaleDateString("tr-TR")}'e kadar` : ""}</span> : <span className="ipucu"> · yok</span>}</summary>
+          <div className="satir sar" style={{ marginTop: 8 }}>
+            <button type="button" id="f-yetki" className={cx("bool-cip", f.yetkili && "evet")} onClick={() => set("yetkili", !f.yetkili)}><span className="isaret">{f.yetkili ? "✓" : "+"}</span>Yetkili portföy</button>
+          </div>
+          <div className="satir sar" style={{ marginTop: 8 }}>
+            <label className="yigin" style={{ gap: 2 }}><small className="ipucu">Yetki belge no</small><input id="f-yetki-no" maxLength={60} value={f.yetkiBelgeNo ?? ""} onChange={(e) => set("yetkiBelgeNo", e.target.value || null)} placeholder="Ör. 2026/145" /></label>
+            <label className="yigin" style={{ gap: 2 }}><small className="ipucu">Taşınmaz ID</small><input id="f-tasinmaz" maxLength={60} value={f.tasinmazNo ?? ""} onChange={(e) => set("tasinmazNo", e.target.value || null)} placeholder="TKGM taşınmaz no" /></label>
+            <label className="yigin" style={{ gap: 2 }}><small className="ipucu">Bitiş tarihi</small><input type="date" aria-label="Yetki bitiş" value={f.yetkiBitis ? new Date(f.yetkiBitis).toISOString().slice(0, 10) : ""} onChange={(e) => set("yetkiBitis", e.target.value ? new Date(e.target.value + "T12:00:00") : null)} /></label>
+          </div>
+        </details>}
         <div className="alan genis"><label htmlFor="f-baslik">Başlık</label><input id="f-baslik" maxLength={160} value={f.baslik ?? ""} onChange={(e) => set("baslik", e.target.value)} placeholder="Kısa, tek satır" /></div>
         <div className="alan genis"><label htmlFor="f-aciklama">Açıklama <small className="ipucu">· kartta kısaca, detayda tamamı</small></label><textarea id="f-aciklama" rows={3} maxLength={2000} value={f.aciklama ?? ""} onChange={(e) => set("aciklama", e.target.value || null)} placeholder="Mülkün / talebin ayrıntısı: cephe, kullanım, sahibin beklentisi…" /></div>
       </div>

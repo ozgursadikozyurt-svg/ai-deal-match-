@@ -56,6 +56,17 @@ export type Kampanya = Prisma.KampanyaModel
  */
 export type KampanyaHarcama = Prisma.KampanyaHarcamaModel
 /**
+ * Model Randevu
+ * v3.35 — Randevu (gösterim / görüşme). talepId, portfoyId, kisiId düz kimlik (yabancı anahtar yok): kayıt silinse de randevu geçmişi kalır.
+ */
+export type Randevu = Prisma.RandevuModel
+/**
+ * Model Islem
+ * v3.35 — İşlem (kapanan satış / kiralama) ve komisyonu. P&L ayı = tahsilat tarihi; boşsa "bekleyen".
+ * Polaris'ten taşınanlarda disKaynak = "POLARIS", disKimlik = Polaris satır kimliği (tekrar aktarım aynı satırı günceller).
+ */
+export type Islem = Prisma.IslemModel
+/**
  * Model Il
  * 
  */

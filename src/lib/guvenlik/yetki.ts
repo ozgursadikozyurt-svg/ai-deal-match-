@@ -27,6 +27,7 @@ export type Yetki =
   | "ofis.entegrasyon" // Google / Notion bağlantısı
   | "ofis.disaAktar" // ofisin tüm verisini dışa aktar
   | "ofis.tumKayitlar" // ofisteki herkesin kaydını gör
+  | "islem.yonet" // v3.35 — işlem ve komisyon kayıtlarını gör / gir (asistan ve danışman göremez)
   | "kampanya.yonet" // v3.34 — kampanya ekle, bütçe ve aylık harcama gör / gir (asistan yalnızca kampanya adlarını görür)
   | "kaynak.duzelt" // v3.32 — kilitli ilk kaynağı değiştir (her değişiklik audit_log'a düşer)
   // --- günlük iş ---
@@ -50,6 +51,7 @@ const OFIS_YONETICISI: Yetki[] = [
   ...DANISMAN,
   "kaynak.duzelt",
   "kampanya.yonet",
+  "islem.yonet",
   "ofis.kullanicilar",
   "ofis.davet",
   "ofis.ayarlar",

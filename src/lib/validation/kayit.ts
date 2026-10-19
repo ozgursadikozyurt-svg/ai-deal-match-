@@ -168,6 +168,8 @@ export const KayitTemel = z.object({
   havuz: en(Havuz).default("KENDI_PORTFOY"),
   yetkili: z.boolean().default(false), // v3.5 — yetki belgeli portföy
   yetkiBitis: z.coerce.date().nullish(),
+  yetkiBelgeNo: kisaMetin(60), // v3.35
+  tasinmazNo: kisaMetin(60),
   musteriKaynagi: en(MusteriKaynagi).nullish(),
   // v3.32 — ilk kaynak (kilitli; kurallar src/lib/domain/ilk-kaynak.ts). Tarih ve ilk yanıtı sunucu yazar, istemcinin değeri yok sayılır.
   ilkKaynak: z.enum(ILK_KAYNAKLAR).nullish(),
