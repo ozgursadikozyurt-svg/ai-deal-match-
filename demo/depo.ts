@@ -125,7 +125,7 @@ export const bosBaglanti = (): DemoBaglanti => ({ durum: "BAGLI_DEGIL", hesap: n
 export const bosGoogleBaglanti = (): DemoBaglanti => { const b = bosBaglanti(); b.ayar.aralikDk = 5; b.ayar.googleYaz = true; return b; };
 
 /**
- * v3.14 — Canlı ortam: sayfa `<div id="kok" data-canli="1">` ile açılır (dist/canli/index.html). Canlıda durum sunucudan gelir,
+ * v3.14 — Canlı ortam: sayfa `<div id="kok" data-canli="1">` ile açılır (dist/canli/uygulama.html). Canlıda durum sunucudan gelir,
  * değişiklikler sunucuya yazılır (demo/canli*.ts); demoda localStorage kullanılır.
  */
 export const CANLI_ORTAM = typeof document !== "undefined" && !!document.getElementById("kok")?.dataset.canli;

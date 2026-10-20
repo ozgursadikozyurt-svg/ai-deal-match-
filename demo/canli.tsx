@@ -1,7 +1,7 @@
 /**
  * Anahtar CRM v3.33 · 19 Ekim 2026 (v3.14'ten)
  * v3.20: davet bağlantısıyla katılma (?davet=KOD), açılışta /api/oturum (rol, plan, yetkiler), hesabı olmayana anlaşılır mesaj.
- * Canlı giriş noktası (dist/canli/index.html): giriş → ilk kurulum denetimi → sunucudan durum → aynı demo ekranları, veri sunucuda.
+ * Canlı giriş noktası (dist/canli/uygulama.html): giriş → ilk kurulum denetimi → sunucudan durum → aynı demo ekranları, veri sunucuda.
  */
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -62,7 +62,7 @@ function Tanitim() {
       <li><b>Müşteri takibi:</b> kişiler, notlar, randevular ve Google Kişiler ile eşitleme.</li>
       <li><b>Ofis ve ekip:</b> danışmanlarınızı davet edin, yetkileri belirleyin; telefondan uygulama gibi kullanın.</li>
     </ul>
-    <p className="ipucu">{DENEME_GUN_YAZI}, kart bilgisi istenmez. · <a href="/emlak-crm">Ayrıntılı tanıtım</a> · <a href="/gizlilik.html">Gizlilik</a> · <a href="/kosullar.html">Koşullar</a></p>
+    <p className="ipucu">{DENEME_GUN_YAZI}, kart bilgisi istenmez. · <a href="/">Ayrıntılı tanıtım</a> · <a href="/gizlilik.html">Gizlilik</a> · <a href="/kosullar.html">Koşullar</a></p>
   </section>;
 }
 
@@ -80,7 +80,7 @@ function Giris({ o, mesaj, bitti, acikKayit = false }: { o: OturumYoneticisi; me
         {davet && <p>Bir ofise davet edildiniz. E-posta adresinizi yazın; gelen bağlantıya dokununca hesabınız açılır.</p>}
         <p className="ipucu">E-posta adresinize tek kullanımlık bir giriş bağlantısı göndereceğiz. Şifre gerekmez.</p>
         <div className="alan"><label htmlFor="gi-eposta">E-posta</label><input id="gi-eposta" type="email" autoComplete="email" inputMode="email" value={eposta} onChange={(e) => setEposta(e.target.value)} placeholder="ornek@eposta.com" /></div>
-        <button className="btn birincil" disabled={mesgul || !/.+@.+\..+/.test(eposta)} onClick={() => calis(async () => { await o.baglantiIste(eposta, location.origin + "/", davet || acikKayit); setAdim("gonderildi"); })}>{mesgul ? "Gönderiliyor…" : "Giriş bağlantısı gönder"}</button>
+        <button className="btn birincil" disabled={mesgul || !/.+@.+\..+/.test(eposta)} onClick={() => calis(async () => { await o.baglantiIste(eposta, location.origin + "/uygulama", davet || acikKayit); setAdim("gonderildi"); })}>{mesgul ? "Gönderiliyor…" : "Giriş bağlantısı gönder"}</button>
       </> : <>
         <p>Bağlantıyı <b>{eposta}</b> adresine gönderdik. E-postadaki bağlantıya bu cihazda dokunmanız yeterli.</p>
         <p className="ipucu">E-postanızda altı haneli bir kod da varsa buraya yazabilirsiniz:</p>

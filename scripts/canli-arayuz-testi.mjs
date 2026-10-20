@@ -4,7 +4,7 @@ import fs from "node:fs";
 import { SignJWT } from "jose";
 const SIR = new TextEncoder().encode("test-gizli-anahtar-en-az-32-karakter-olmali-123");
 const jwt = (e) => new SignJWT({ email: e }).setProtectedHeader({ alg: "HS256" }).setAudience("authenticated").setExpirationTime("1h").sign(SIR);
-const html = fs.readFileSync("dist/canli/index.html", "utf8");
+const html = fs.readFileSync("dist/canli/uygulama.html", "utf8");
 const bekle = async (kosul, ms = 8000) => { const t = Date.now(); while (Date.now() - t < ms) { try { if (await kosul()) return true; } catch {} await new Promise((r) => setTimeout(r, 100)); } return false; };
 let gecen = 0, kalan = 0; const tamam = (a, ok, d = "") => { ok ? gecen++ : kalan++; console.log(`${ok ? "✔" : "✘"} ${a}${d ? " — " + d : ""}`); };
 

@@ -1,6 +1,6 @@
 /**
  * Anahtar CRM v3.33 · 19 Ekim 2026
- * Canlı arayüzü derler → dist/canli/ (Cloudflare statik dosyaları): index.html (arayüz + stil + uygulama kodu), manifest, ikonlar.
+ * Canlı arayüzü derler → dist/canli/ (Cloudflare statik dosyaları): uygulama.html (arayüz + stil + uygulama kodu; / adresi public/index.html tanıtım sayfasıdır), manifest, ikonlar.
  * Demo ile aynı ekranlar; fark: demo/canli.tsx giriş noktası (giriş, sunucudan durum, kaydetme kuyruğu).
  * Çalıştır: npm run canli:arayuz   (npm run canli:build içinde otomatik)
  */
@@ -8,16 +8,6 @@ import { build } from "esbuild";
 import fs from "node:fs";
 import path from "node:path";
 import { SURUM, TARIH } from "../src/lib/surum";
-
-const JSON_LD = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
-    { "@type": "WebSite", "@id": "https://anahtarcrm.com/#site", url: "https://anahtarcrm.com/", name: "Anahtar CRM", alternateName: ["AnahtarCRM", "anahtarcrm.com"], inLanguage: "tr-TR", publisher: { "@id": "https://anahtarcrm.com/#org" } },
-    { "@type": "Organization", "@id": "https://anahtarcrm.com/#org", name: "Anahtar CRM", url: "https://anahtarcrm.com/", logo: { "@type": "ImageObject", url: "https://anahtarcrm.com/ikon-512.png", width: 512, height: 512 }, image: "https://anahtarcrm.com/og-gorsel.png", email: "ozgursadikozyurt@gmail.com", areaServed: { "@type": "Country", name: "Türkiye" } },
-    { "@type": "SoftwareApplication", "@id": "https://anahtarcrm.com/#uygulama", name: "Anahtar CRM", url: "https://anahtarcrm.com/", applicationCategory: "BusinessApplication", operatingSystem: "Web (tarayıcı), Android, iOS", inLanguage: "tr-TR", image: "https://anahtarcrm.com/og-gorsel.png",
-      description: "Emlak danışmanları ve ofisleri için yapay zekâ destekli talep / portföy eşleştirme, WhatsApp grup mesajlarından veri girişi ve müşteri takibi.", publisher: { "@id": "https://anahtarcrm.com/#org" } },
-  ],
-});
 
 async function main() {
   const kok = path.resolve(__dirname, "..");
@@ -50,11 +40,12 @@ async function main() {
     .replace('<div id="kok"></div>', '<div id="kok" data-canli="1"></div>')
     .replace("Bu demo için JavaScript gereklidir.", "Anahtar CRM için JavaScript gereklidir.");
   const icerik = sablon.replace("/*UYGULAMA*/", () => js);
-  const belge = `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Anahtar CRM — Emlak Danışmanları İçin Talep ve Portföy Eşleştirme</title><meta name="description" content="Anahtar CRM: emlak danışmanları ve ofisleri için yapay zekâ destekli talep / portföy eşleştirme, WhatsApp grup mesajlarından otomatik veri girişi ve müşteri takibi."><link rel="canonical" href="https://anahtarcrm.com/"><meta property="og:title" content="Anahtar CRM"><meta property="og:description" content="Emlak danışmanları için yapay zekâ destekli talep / portföy eşleştirme ve CRM."><meta property="og:url" content="https://anahtarcrm.com/"><meta property="og:type" content="website"><meta property="og:image" content="https://anahtarcrm.com/og-gorsel.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Anahtar CRM logosu — altın anahtar"><meta property="og:site_name" content="Anahtar CRM"><meta property="og:locale" content="tr_TR"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Anahtar CRM"><meta name="twitter:description" content="Emlak danışmanları için yapay zekâ destekli talep / portföy eşleştirme ve CRM."><meta name="twitter:image" content="https://anahtarcrm.com/og-gorsel.png"><meta name="robots" content="index,follow,max-image-preview:large"><meta name="application-name" content="Anahtar CRM"><meta name="theme-color" content="#14213D"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Anahtar CRM"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48"><link rel="apple-touch-icon" href="/ikon-180.png"><script type="application/ld+json">${JSON_LD}</script></head><body>${icerik}</body></html>`;
+  // Uygulama /uygulama adresinde; / adresindeki herkese açık tanıtım sayfası public/index.html'dir (arama motorları onu dizine alır, uygulamayı almaz).
+  const belge = `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Anahtar CRM</title><meta name="robots" content="noindex,follow"><meta name="theme-color" content="#14213D"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Anahtar CRM"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48"><link rel="apple-touch-icon" href="/ikon-180.png"></head><body>${icerik}</body></html>`;
   const cikti = path.join(kok, "dist/canli");
   fs.rmSync(cikti, { recursive: true, force: true }); fs.mkdirSync(cikti, { recursive: true });
-  fs.writeFileSync(path.join(cikti, "index.html"), belge);
+  fs.writeFileSync(path.join(cikti, "uygulama.html"), belge);
   for (const f of fs.readdirSync(path.join(kok, "public"))) fs.copyFileSync(path.join(kok, "public", f), path.join(cikti, f));
-  console.log(`✔ dist/canli/index.html (${(belge.length / 1024).toFixed(0)} KB) · v${SURUM} ${TARIH}`);
+  console.log(`✔ dist/canli/uygulama.html (${(belge.length / 1024).toFixed(0)} KB) · v${SURUM} ${TARIH}`);
 }
 main().catch((e) => { console.error(e); process.exit(1); });

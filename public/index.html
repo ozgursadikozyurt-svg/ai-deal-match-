@@ -3,17 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Emlak CRM — Talep ve Portföy Eşleştirme | Anahtar CRM</title>
+<script>
+/* Anahtar CRM — oturumu olan ya da giriş/davet/Google dönüşüyle gelen ziyaretçi tanıtımı görmeden uygulamaya geçer. Yeni ziyaretçi tanıtımı görür. ?tanitim=1 ile oturumluyken de tanıtım görülür. */
+try{var l=location,q="&"+l.search.slice(1)+"&"+l.hash.slice(1);if(!/&tanitim=/.test(q)&&(localStorage.getItem("anahtarcrm-oturum")||/&(davet|google|code|access_token|refresh_token|token_hash|error|error_code|error_description)=/.test(q))){l.replace("/uygulama"+l.search+l.hash)}}catch(e){}
+</script>
+<title>Anahtar CRM — Emlak CRM: Talep ve Portföy Eşleştirme</title>
 <meta name="description" content="Anahtar CRM, emlak danışmanları ve ofisleri için yapay zekâ destekli emlak CRM'i: müşteri taleplerini portföylerle otomatik eşleştirir, WhatsApp grup mesajlarını kayda çevirir, müşteri ve ekip takibini tek yerde toplar.">
-<link rel="canonical" href="https://anahtarcrm.com/emlak-crm">
+<link rel="canonical" href="https://anahtarcrm.com/">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta name="theme-color" content="#14213D">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Anahtar CRM">
 <meta property="og:locale" content="tr_TR">
-<meta property="og:title" content="Emlak CRM — Talep ve Portföy Eşleştirme | Anahtar CRM">
+<meta property="og:title" content="Anahtar CRM — Emlak CRM: Talep ve Portföy Eşleştirme">
 <meta property="og:description" content="Emlak danışmanları için yapay zekâ destekli talep / portföy eşleştirme, WhatsApp'tan veri girişi, müşteri ve ekip takibi.">
-<meta property="og:url" content="https://anahtarcrm.com/emlak-crm">
+<meta property="og:url" content="https://anahtarcrm.com/">
 <meta property="og:image" content="https://anahtarcrm.com/og-gorsel.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -32,10 +36,29 @@
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "WebSite",
+      "@id": "https://anahtarcrm.com/#site",
+      "url": "https://anahtarcrm.com/",
+      "name": "Anahtar CRM",
+      "alternateName": ["AnahtarCRM", "anahtarcrm.com"],
+      "inLanguage": "tr-TR",
+      "publisher": { "@id": "https://anahtarcrm.com/#org" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://anahtarcrm.com/#org",
+      "name": "Anahtar CRM",
+      "url": "https://anahtarcrm.com/",
+      "logo": { "@type": "ImageObject", "url": "https://anahtarcrm.com/ikon-512.png", "width": 512, "height": 512 },
+      "image": "https://anahtarcrm.com/og-gorsel.png",
+      "email": "ozgursadikozyurt@gmail.com",
+      "areaServed": { "@type": "Country", "name": "Türkiye" }
+    },
+    {
       "@type": "WebPage",
-      "@id": "https://anahtarcrm.com/emlak-crm#sayfa",
-      "url": "https://anahtarcrm.com/emlak-crm",
-      "name": "Emlak CRM — Talep ve Portföy Eşleştirme | Anahtar CRM",
+      "@id": "https://anahtarcrm.com/#sayfa",
+      "url": "https://anahtarcrm.com/",
+      "name": "Anahtar CRM — Emlak CRM: Talep ve Portföy Eşleştirme",
       "inLanguage": "tr-TR",
       "isPartOf": { "@id": "https://anahtarcrm.com/#site" },
       "about": { "@id": "https://anahtarcrm.com/#uygulama" },
@@ -43,8 +66,7 @@
       "breadcrumb": {
         "@type": "BreadcrumbList",
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Anahtar CRM", "item": "https://anahtarcrm.com/" },
-          { "@type": "ListItem", "position": 2, "name": "Emlak CRM", "item": "https://anahtarcrm.com/emlak-crm" }
+          { "@type": "ListItem", "position": 1, "name": "Anahtar CRM", "item": "https://anahtarcrm.com/" }
         ]
       }
     },
@@ -72,7 +94,7 @@
     },
     {
       "@type": "FAQPage",
-      "@id": "https://anahtarcrm.com/emlak-crm#sss",
+      "@id": "https://anahtarcrm.com/#sss",
       "mainEntity": [
         { "@type": "Question", "name": "Anahtar CRM nedir?", "acceptedAnswer": { "@type": "Answer", "text": "Anahtar CRM, emlak danışmanları ve emlak ofisleri için geliştirilmiş bir CRM uygulamasıdır. Müşteri taleplerini ve portföyleri tek yerde tutar, birbirine uyanları yapay zekâ destekli eşleştirme motoruyla bulur ve her eşleşmeyi 1–5 uyum seviyesi ile gerekçesiyle gösterir." } },
         { "@type": "Question", "name": "WhatsApp emlak gruplarındaki ilanları nasıl kayda çeviriyor?", "acceptedAnswer": { "@type": "Answer", "text": "WhatsApp sohbetini dışa aktarıp (.txt, .zip, .html veya .json) uygulamaya yüklersiniz ya da e-postayla gelen kutusuna gönderirsiniz. Uygulama mesajları okur; satılık, kiralık, talep, mülk tipi, konum, m², oda, kat ve fiyat gibi bilgileri ayırır. Kayıtlar onay bekleyenler havuzuna düşer, mükerrer olanlar işaretlenir, siz toplu olarak ekler ya da atlarsınız." } },
@@ -214,7 +236,7 @@ footer a{color:var(--mut)}
 <body>
 <header class="ust">
   <div class="ic">
-    <a class="marka" href="/emlak-crm" aria-label="Anahtar CRM ana sayfa">
+    <a class="marka" href="/" aria-label="Anahtar CRM ana sayfa">
       <img src="/favicon.svg" alt="" width="34" height="34" style="border-radius:9px">
       Anahtar CRM
     </a>
@@ -223,7 +245,7 @@ footer a{color:var(--mut)}
       <a href="#nasil">Nasıl çalışır</a>
       <a href="#kimler">Kimler için</a>
       <a href="#sss">SSS</a>
-      <a class="giris" href="/">Giriş</a>
+      <a class="giris" href="/uygulama">Giriş</a>
     </nav>
   </div>
 </header>
@@ -236,7 +258,7 @@ footer a{color:var(--mut)}
       <h1>Her talebe <em>doğru portföy</em>, WhatsApp'taki dağınıklık olmadan.</h1>
       <p class="alt">Anahtar CRM, müşteri taleplerinizi ve portföylerinizi tek yerde toplar, birbirine uyanları yapay zekâ ile eşleştirir ve emlak gruplarındaki mesajları sizin yerinize kayda çevirir.</p>
       <div class="cta">
-        <a class="btn btn-ana" href="/">Ücretsiz deneyin <span aria-hidden="true">→</span></a>
+        <a class="btn btn-ana" href="/uygulama">Ücretsiz deneyin <span aria-hidden="true">→</span></a>
         <a class="btn btn-ince" href="#nasil">Nasıl çalışır?</a>
       </div>
       <p class="not">Kurulum yok, kart bilgisi istenmez. Telefonda ve bilgisayarda çalışır.</p>
@@ -387,7 +409,7 @@ footer a{color:var(--mut)}
   <section class="son" aria-labelledby="son-baslik">
     <h2 id="son-baslik">Talepleriniz ve portföyleriniz birbirini bulsun</h2>
     <p>E-posta adresinizle bir dakikada başlayın. Kurulum yok, kart bilgisi istenmez.</p>
-    <div class="cta"><a class="btn btn-ana" href="/">Ücretsiz deneyin <span aria-hidden="true">→</span></a></div>
+    <div class="cta"><a class="btn btn-ana" href="/uygulama">Ücretsiz deneyin <span aria-hidden="true">→</span></a></div>
   </section>
 </div>
 </main>
@@ -396,7 +418,7 @@ footer a{color:var(--mut)}
   <div class="ic">
     <span>© 2026 Anahtar CRM · Özyurtlar Gayrimenkul, Antalya</span>
     <nav aria-label="Alt bağlantılar">
-      <a href="/">Giriş</a>
+      <a href="/uygulama">Giriş</a>
       <a href="/gizlilik.html">Gizlilik</a>
       <a href="/kosullar.html">Koşullar</a>
       <a href="mailto:ozgursadikozyurt@gmail.com">İletişim</a>
