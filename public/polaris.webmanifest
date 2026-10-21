@@ -1,0 +1,16 @@
+{
+  "name": "Polaris",
+  "short_name": "Polaris",
+  "description": "Ticari gayrimenkul çalışma rehberi",
+  "start_url": "/polaris",
+  "scope": "/polaris",
+  "display": "standalone",
+  "background_color": "#F3F5FA",
+  "theme_color": "#2B59F0",
+  "lang": "tr",
+  "icons": [
+    { "src": "/polaris-ikon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/polaris-ikon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/polaris-ikon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

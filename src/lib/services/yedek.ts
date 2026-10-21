@@ -11,7 +11,9 @@ export async function tamYedek(prisma: PrismaClient) {
     prisma.kayit.findMany({ include: { lokasyonlar: true, ozellik: true, kisiBaglari: true } }), prisma.kisi.findMany(),
     prisma.match.findMany(), prisma.kayitNot.findMany(), prisma.ayar.findMany(),
   ]);
-  return { surum: "4.0", tarih: new Date().toISOString(), kayitlar, kisiler, eslesmeler, notlar, ayarlar };
+  // Polaris v7 (21 Ekim 2026) — Polaris belgeleri de haftalık yedeğe girer (yalnızca bu platform yedeğinde; ofis dışa aktarımlarında yok)
+  const polaris = await prisma.$queryRawUnsafe<unknown[]>(`select kullanici_id, koleksiyon, belge_id, veri, guncellendi from polaris_belge`).catch(() => []);
+  return { surum: "4.0", tarih: new Date().toISOString(), kayitlar, kisiler, eslesmeler, notlar, ayarlar, polaris };
 }
 
 export async function yedegiDepola(icerik: string, env: { SUPABASE_URL?: string; SUPABASE_SERVICE_ROLE_KEY?: string }, f: typeof fetch = fetch, sakla = 12) {

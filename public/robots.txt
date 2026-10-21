@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /polaris
 
 Sitemap: https://anahtarcrm.com/sitemap.xml
