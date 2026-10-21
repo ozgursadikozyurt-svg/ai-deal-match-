@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.39 · 21 Ekim 2026
  * v3.21.2 — Eşleşmeler: tahmini komisyon toplamı kalktı · filtre/konum karta girip Geri dönünce korunur ·
  * kompakt süzgeçler + skor süzgeci · Konumlar, Bağlantılar, Yönetim Ayarlar içinde.
  * v3.22: yan çekmece yerine seçici satırında yatay açılan skor şeridi (testler ona göre güncellendi; ⋯ başlık satırında).
@@ -107,7 +107,7 @@ test("Uyum şeridi (v3.36: skor yerine 1–5): kapalıyken dar düğme; dokununc
   await a.tikla(dugme());
   assert.ok(a.q(".skor-serit"), "şerit açıldı"); assert.ok(a.q(".hs-satir .skor-serit"), "şerit seçici satırının içinde (listeyi örtmez)");
   assert.ok(a.q(".sirala-perde"), "dışına dokununca kapanır");
-  assert.ok(!a.q(".skor-aralik"), "v3.36: kaydırıcı yok, 4 seviye düğmesi");
+  assert.ok(a.q(".skor-aralik input[type=range]"), "v3.39: telefonda sürüklenen kaydırıcı"); // geniş ekranda düğmeler de durur
   assert.deepEqual([...a.qa(".skor-hazir button")].map((b) => b.textContent), ["2/5", "3/5", "4/5", "5/5"]);
   await a.tikla([...a.qa(".skor-hazir button")].find((b) => b.textContent === "4/5")); assert.equal(kaliciOku("eslesmeler.seviye"), 4);
   assert.match(dugme().textContent ?? "", /≥ 4\/5/); assert.ok(dugme().className.includes("on"));

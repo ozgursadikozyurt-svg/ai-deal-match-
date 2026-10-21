@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.39 · 21 Ekim 2026
  * Canlı arayüzü derler → dist/canli/ (Cloudflare statik dosyaları): uygulama.html (arayüz + stil + uygulama kodu; / adresi public/index.html tanıtım sayfasıdır), manifest, ikonlar.
  * Demo ile aynı ekranlar; fark: demo/canli.tsx giriş noktası (giriş, sunucudan durum, kaydetme kuyruğu).
  * Çalıştır: npm run canli:arayuz   (npm run canli:build içinde otomatik)
@@ -41,7 +41,7 @@ async function main() {
     .replace("Bu demo için JavaScript gereklidir.", "Anahtar CRM için JavaScript gereklidir.");
   const icerik = sablon.replace("/*UYGULAMA*/", () => js);
   // Uygulama /uygulama adresinde; / adresindeki herkese açık tanıtım sayfası public/index.html'dir (arama motorları onu dizine alır, uygulamayı almaz).
-  const belge = `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Anahtar CRM</title><meta name="robots" content="noindex,follow"><meta name="theme-color" content="#14213D"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Anahtar CRM"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48"><link rel="apple-touch-icon" href="/ikon-180.png"></head><body>${icerik}</body></html>`;
+  const belge = `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>Anahtar CRM</title><meta name="robots" content="noindex,follow"><meta name="theme-color" content="#14213D"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Anahtar CRM"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48"><link rel="apple-touch-icon" href="/ikon-180.png"></head><body>${icerik}</body></html>`;
   const cikti = path.join(kok, "dist/canli");
   fs.rmSync(cikti, { recursive: true, force: true }); fs.mkdirSync(cikti, { recursive: true });
   fs.writeFileSync(path.join(cikti, "uygulama.html"), belge);

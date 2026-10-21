@@ -5,6 +5,18 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.39 · 21 Ekim 2026 — Telefon: sabit ekran (yakınlaştırma ve yana kayma yok), alt menü sığar; uyum süzgeci sürüklenen çubuk
+
+- Alt menünün sığmaması: asıl neden Eşleşmeler başlık satırıydı — "437 eşleşme · +54 az verili · Talep başına en iyi 10 · ⋯" tek satıra sığmayıp sayfayı ekrandan genişletiyordu; telefon da sayfayı küçültüp yana kaydırıyordu, alt menü kenardan taşıyordu. Başlık artık alt satıra iniyor; ayrıca hiçbir ekran telefon genişliğini aşamıyor (360 px'te 9 ana ekran denendi).
+- Sabit ekran: telefonda iki parmakla / çift dokunarak yakınlaştırma ve sayfanın yana kayması kapalı; yalnızca yukarı-aşağı kaydırma (yatay çip satırları kendi içinde kaymaya devam eder). Yazı alanları 16 px olduğu için iPhone'da odaklanınca da büyümez.
+- Uyum süzgeci: telefonda seviye düğmeleri gizleniyordu (şerit yalnızca "Tümü · sayı · ✕" gösteriyordu). Artık sürüklenen çubuk: Tümü · 2 · 3 · 4 · 5; bırakınca liste süzülür. Geniş ekranda çubuğun yanında hazır düğmeler de durur.
+
+**Demo'da test edilecekler**
+
+- [ ] Telefonda Eşleşmeler'i açın, "Talep başına en iyi 10" çipini kaldırın: sayfa yana kaymamalı, alt menünün beş düğmesi de tam görünmeli.
+- [ ] İki parmakla yakınlaştırmayı deneyin: ekran büyümemeli; yatay çip satırları (Uygun / Sunulabilir…) yine parmakla kaymalı.
+- [ ] Eşleşmeler › Uyum: çubuğu sürükleyin; 4'e bırakınca "≥ 4/5" yazmalı ve liste azalmalı; en sola (Tümü) çekince süzgeç kalkmalı.
+
 ## v3.38 · 21 Ekim 2026 — Bütçesiz talep yalnızca Benim / işaretliyse muaf; Eşleşmeler uyuma göre, ≥ 3/5 ve talep başına en iyi 10; pasife alınma tarihi
 
 - Bütçesiz talep (v3.37 düzeltmesi): puan yalnızca ★ Benim talebinde ya da talep formunda "Bütçe m²'ye göre — puanı düşürme" işaretliyse düşmez. İçeri aktarılan (WhatsApp, Revy, dosya) bütçesiz talep en fazla 3/5 "Sorulacak" alır ve kartta yine "Eksik: talepte bütçe yok" yazar. Canlı ölçüm (21 Eki): 18 içeri aktarılmış bütçesiz talep 597 eşleşme üretiyordu, bir daire talebi tek başına 134.

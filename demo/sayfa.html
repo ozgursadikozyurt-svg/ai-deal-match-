@@ -21,6 +21,12 @@
   --iyi:#5fd19b;--iyi-bg:#123326;--uyari:#f0bf5e;--uyari-bg:#33270f;--kotu:#ff8a80;--kotu-bg:#3a1a18;--mavi:#8ab8f0;--mavi-bg:#15253b;--yesil:#7ed3a4;--yesil-bg:#14301f;color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--f);margin:0}
+/* v3.39 — telefonda sabit ekran: yakınlaştırma (çift dokunma / iki parmak) ve yana kayma yok. Sayfa hiçbir zaman ekran genişliğini aşmaz
+   (taşan bir satır tüm sayfayı genişletip alt menüyü ekrandan taşırıyordu). clip, sticky başlıkları bozmaz (hidden bozardı). */
+html,body{overflow-x:clip;max-width:100%;overscroll-behavior-x:none}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media (max-width:899px){html,body{touch-action:pan-x pan-y}}
+.icerik,.sarici,main{min-width:0;max-width:100%}
 h2{font-size:1.25rem;margin:0;text-wrap:balance;letter-spacing:-.01em}
 h3{font-size:1rem;margin:0 0 .6rem}
 button{font:inherit;color:inherit}
@@ -899,7 +905,13 @@ input[type=range]{padding:0;accent-color:var(--acc)}
 .skor-say{flex:none;font-size:.76rem;color:var(--mut);font-variant-numeric:tabular-nums;min-width:2.2em;text-align:right}
 .skor-kapat{flex:none;width:34px;height:34px;border:0;background:none;color:var(--mut);font-size:1rem;cursor:pointer;border-radius:8px}
 .skor-kapat:hover{background:var(--panel2)}
-@media (max-width:520px){.skor-hazir{display:none}.skor-serit{gap:8px}}
+/* v3.39 — uyum kaydırıcısı: telefonda sürüklenen çubuk (1 = Tümü … 5 = yalnızca 5/5); geniş ekranda yanında hazır düğmeler de durur */
+.skor-aralik{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.skor-aralik input[type=range]{width:100%;margin:0;padding:0;border:0;background:none;accent-color:var(--acc);height:28px;touch-action:pan-x;cursor:pointer}
+.skor-aralik-cizgi{display:flex;justify-content:space-between;font-size:.66rem;color:var(--mut);padding:0 2px;line-height:1}
+.skor-aralik-cizgi span.on{color:var(--acc);font-weight:700}
+@media (max-width:520px){.skor-hazir{display:none}.skor-serit{gap:8px;padding:0 4px 0 10px}}
+@media (min-width:521px){.skor-aralik{max-width:180px}}
 /* dar telefon: 4 seçici tek satıra sığsın — adet menüde görünür, düğmede gizlenir */
 @media (max-width:480px){.hs-satir .hs-btn b i{display:none}.hs-btn{padding:3px 18px 3px 8px}.hs-btn::after{right:6px}}
 .es-baslik .hs{flex:none}.es-baslik .hs-btn.ikon{min-height:36px;width:40px}
@@ -1002,7 +1014,8 @@ main.sarici>.genel-geri+*>h2:first-child{display:flex;align-items:center}
 .bas-satir{display:flex;align-items:center;gap:10px;min-height:var(--geri-y)}
 .bas-satir h2{flex:1 1 auto;min-width:0}
 .bas-satir .geri{flex:0 0 auto;align-self:center}
-.es-baslik{flex-wrap:nowrap}.es-baslik h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.es-baslik{flex-wrap:wrap;row-gap:6px}.es-baslik h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.es-baslik>.satir{flex-wrap:wrap;justify-content:flex-end;min-width:0;row-gap:6px}.es-baslik .btn.kucuk{white-space:nowrap}
 @media (max-width:480px){
   main.sarici>.genel-geri+* h2{font-size:1.08rem}
   .liste-yeni{padding-inline:.7rem}

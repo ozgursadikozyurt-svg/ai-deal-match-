@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.39 · 21 Ekim 2026
  * v3.38 — Özgür'ün 21 Ekim (2) istekleri:
  *   1) bütçesiz talep: yalnızca ★ Benim ya da "Bütçe m²'ye göre" işaretliyse puan düşmez; içeri aktarılmışsa en fazla 3/5
  *   2) pasife alınma tarihi (durumTarihi) ve "en uzun süredir pasif" sıralamaları
@@ -30,8 +30,9 @@ const T = (v: Partial<OnizlemeKayit> & Record<string, unknown> = {}): OnizlemeKa
 const P = (v: Partial<OnizlemeKayit> = {}): OnizlemeKayit => ({ tip: "PORTFOY", mulkTipi: "DAIRE", islemTipi: "KIRALIK", fiyatPeriyodu: "AYLIK", lokasyonlar: lok("Konyaaltı / Hurma", true), odaSayisi: "2+1", m2: 95, fiyat: 30_000, ...v } as OnizlemeKayit);
 
 test("sürüm 3.38 ve ek belge", () => {
-  assert.equal(SURUM, "3.38"); assert.equal(SURUM_GECMISI[0].surum, "3.38"); assert.equal(SURUM_GECMISI[1].surum, "3.37");
-  assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 4);
+  const i = SURUM_GECMISI.findIndex((x) => x.surum === "3.38"); // v3.39 öne eklendi
+  assert.ok(i >= 0 && SURUM_GECMISI[i + 1].surum === "3.37" && SURUM >= "3.38");
+  assert.ok((SURUM_GECMISI[i].testEt ?? []).length >= 4);
   assert.ok(fs.existsSync("docs/ANAHTAR_CRM_EK_v3.38_21Ekim2026.md"));
 });
 

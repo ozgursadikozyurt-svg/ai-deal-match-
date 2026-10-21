@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.39 · 21 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.38";
+export const SURUM = "3.39";
 export const TARIH = "21 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.38_21Ekim2026";
+export const DOSYA_EKI = "v3.39_21Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,21 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.39",
+    tarih: "21 Ekim 2026",
+    baslik: "Telefon: sabit ekran (yakınlaştırma ve yana kayma yok), alt menü sığar; uyum süzgeci sürüklenen çubuk",
+    degisenler: [
+      "Alt menünün sığmaması: asıl neden Eşleşmeler başlık satırıydı — \"437 eşleşme · +54 az verili · Talep başına en iyi 10 · ⋯\" tek satıra sığmayıp sayfayı ekrandan genişletiyordu; telefon da sayfayı küçültüp yana kaydırıyordu, alt menü kenardan taşıyordu. Başlık artık alt satıra iniyor; ayrıca hiçbir ekran telefon genişliğini aşamıyor (360 px'te 9 ana ekran denendi).",
+      "Sabit ekran: telefonda iki parmakla / çift dokunarak yakınlaştırma ve sayfanın yana kayması kapalı; yalnızca yukarı-aşağı kaydırma (yatay çip satırları kendi içinde kaymaya devam eder). Yazı alanları 16 px olduğu için iPhone'da odaklanınca da büyümez.",
+      "Uyum süzgeci: telefonda seviye düğmeleri gizleniyordu (şerit yalnızca \"Tümü · sayı · ✕\" gösteriyordu). Artık sürüklenen çubuk: Tümü · 2 · 3 · 4 · 5; bırakınca liste süzülür. Geniş ekranda çubuğun yanında hazır düğmeler de durur.",
+    ],
+    testEt: [
+      "Telefonda Eşleşmeler'i açın, \"Talep başına en iyi 10\" çipini kaldırın: sayfa yana kaymamalı, alt menünün beş düğmesi de tam görünmeli.",
+      "İki parmakla yakınlaştırmayı deneyin: ekran büyümemeli; yatay çip satırları (Uygun / Sunulabilir…) yine parmakla kaymalı.",
+      "Eşleşmeler › Uyum: çubuğu sürükleyin; 4'e bırakınca \"≥ 4/5\" yazmalı ve liste azalmalı; en sola (Tümü) çekince süzgeç kalkmalı.",
+    ],
+  },
   {
     surum: "3.38",
     tarih: "21 Ekim 2026",

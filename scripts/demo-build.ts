@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.39 · 21 Ekim 2026
  * Demo uygulamasını tek HTML dosyası olarak derler ve SURUMLER.md'yi üretir.
  * Çalıştır: npm run demo
  * Çıktılar:
@@ -46,7 +46,7 @@ const sablon = fs.readFileSync(path.join(kok, "demo/sayfa.html"), "utf8").replac
 const icerik = sablon.replace("/*UYGULAMA*/", () => js);
 fs.mkdirSync(path.join(kok, "dist"), { recursive: true });
 fs.writeFileSync(path.join(kok, "dist/artifact.html"), icerik);
-const tam = `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>${icerik}</body></html>`;
+const tam = `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"></head><body>${icerik}</body></html>`;
 const hedef = path.join(kok, `dist/anahtar-crm-demo_${DOSYA_EKI}.html`);
 fs.writeFileSync(hedef, tam);
 
