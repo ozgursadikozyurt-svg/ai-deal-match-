@@ -942,7 +942,7 @@ function tasimaEkrani(ilk){
   $k('#pkYukle').onclick=async()=>{if(!veri)return;$k('#pkYukle').disabled=true;const bar=$k('.pk-bar');bar.hidden=false;
     const is=[];for(const [kol,belgeler] of Object.entries(veri))for(const [id,doc] of Object.entries(belgeler))is.push([kol,id,doc]);
     let i=0,hata=0;
-    for(const [kol,id,doc] of is){let ok=false;for(let d=0;d<3&&!ok;d++){try{await apiJson(belgeYolu(kol+'/'+id),{method:'PUT',body:JSON.stringify(doc)});ok=true}catch{await bekle(800)}}
+    for(const [kol,id,doc] of is){let ok=false;for(let d=0;d<6&&!ok;d++){try{await apiJson(belgeYolu(kol+'/'+id),{method:'PUT',body:JSON.stringify(doc)});ok=true}catch{await bekle(700*(d+1))}}await bekle(60);
       if(!ok)hata++;i++;bar.firstChild.style.width=Math.round(i/is.length*100)+'%';$k('#pkTd').textContent=i+' / '+is.length+' belge yüklendi'+(hata?' · '+hata+' hata':'')}
     if(hata){$k('#pkTd').textContent=hata+' belge yüklenemedi. Dosyayı yeniden seçip tekrar yükle (yüklenenler yeniden yazılır, sorun olmaz).';$k('#pkYukle').disabled=false;return}
     await apiJson(belgeYolu('meta/goc'),{method:'PUT',body:JSON.stringify({tarih:new Date().toISOString(),belge:is.length})});
