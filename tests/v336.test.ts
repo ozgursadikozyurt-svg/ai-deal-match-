@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.36 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * v3.36 — eşleştirme uyum seviyesi (1–5) ve gerekçe; 19 Ekim canlı verisinde yanlış okunan talepler (parser); döviz; talepteki
  * anlamsız istekler; fazla oda / üst üste ödün; Geri tuşu (tarayıcı geçmişi); dosyanın tamamını yorumlama; WhatsApp portföyü Partner;
  * kaydetme günlüğü; veri düzeltmesi migration'ı.
@@ -30,8 +30,9 @@ const P = (ham: string, v: Partial<OnizlemeKayit>): OnizlemeKayit => ({ tip: "PO
 const es = (t: OnizlemeKayit, p: OnizlemeKayit) => eslesmeOnizle(t, p, BAGLAM);
 
 test("sürüm 3.36 ve ek belge", () => {
-  assert.equal(SURUM, "3.36"); assert.equal(SURUM_GECMISI[0].surum, "3.36"); assert.equal(SURUM_GECMISI[1].surum, "3.35");
-  assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 4);
+  const i = SURUM_GECMISI.findIndex((x) => x.surum === "3.36"); // v3.37: artık en üstte değil
+  assert.ok(i >= 0 && SURUM_GECMISI[i + 1].surum === "3.35" && SURUM >= "3.36");
+  assert.ok((SURUM_GECMISI[i].testEt ?? []).length >= 4);
   assert.ok(fs.existsSync("docs/ANAHTAR_CRM_EK_v3.36_19Ekim2026.md"));
 });
 
@@ -80,13 +81,16 @@ test("seviye: 85+ yalnızca Sunulabilir 5/5 · 70+ 4 · 55+ 3 · Koşullu en az 
   assert.equal(SEVIYE_ETIKET[4], "Güçlü aday");
 });
 
-test("tam eşleşme 5/5 ve gerekçesiz; bütçesiz ama her şeyi tutan 4/5 (79) ve gerekçesi 'bütçe'", () => {
+test("tam eşleşme 5/5 ve gerekçesiz; v3.37: bütçesiz ama her şeyi tutan da 5/5 (bütçe notu bilgi amaçlı)", () => {
   const t = T("Muratpaşa / Fener", { odaSayisi: "2+1", maxFiyat: 10_000_000 });
   const tam = es(t, P("Muratpaşa / Fener", { odaSayisi: "2+1", fiyat: 9_000_000, m2: 110 }));
   assert.equal(tam.seviye, 5); assert.deepEqual(tam.gerekceler, []);
   const butcesiz = es({ ...t, maxFiyat: null }, P("Muratpaşa / Fener", { odaSayisi: "2+1", fiyat: 9_000_000, m2: 110 }));
-  assert.equal(butcesiz.seviye, 4); assert.ok(butcesiz.skor <= FIYATSIZ_SKOR_TAVANI && butcesiz.skor >= 70, String(butcesiz.skor));
-  assert.match(butcesiz.gerekceler.join(" "), /bütçe/i);
+  assert.equal(butcesiz.seviye, 5, `${butcesiz.skor} ${butcesiz.gerekceler.join(" | ")}`); assert.ok(butcesiz.skor > FIYATSIZ_SKOR_TAVANI, String(butcesiz.skor));
+  assert.match(butcesiz.gerekceler.join(" "), /bütçe yok — puanı düşürmez/i);
+  // portföyde fiyat yoksa hâlâ en fazla 4/5
+  const fiyatsiz = es(t, P("Muratpaşa / Fener", { odaSayisi: "2+1", m2: 110 }));
+  assert.ok(fiyatsiz.seviye <= 4 && fiyatsiz.skor <= FIYATSIZ_SKOR_TAVANI, String(fiyatsiz.skor));
 });
 
 test("fazla oda + bütçe üstü (iki ödün) 4/5'in altına iner; tek fazla oda 4/5 ve 'sorun' gerekçesi", () => {

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * Demo örnek verisi — ticari kayıtlar Notion CRM'den, konut kayıtları WhatsApp grup örneklerinden türetildi (v3.3). Kişi adları ve telefonlar KURGUSALDIR.
  * Her kayıt yüklenirken gerçek doğrulamadan (KayitCreateSchema) ve gerçek konum çözücüden geçer;
  * geçemeyen kayıt ekranda "örnek veri hatası" olarak görünür (şema değişince erken uyarı).
@@ -8,12 +8,12 @@ import type { KayitCreateInput } from "../src/lib/validation/kayit";
 
 export type OrnekKayit = Omit<KayitCreateInput, "lokasyonlar"> & { oid: string; gunOnce: number; /** v3.22 — talepte hariç tutulan yerler */ haricHam?: string };
 
-export const ORNEK_VERI_SURUMU = "3.22-1";
+export const ORNEK_VERI_SURUMU = "3.37-1"; // v3.37: P1'e ilan no
 
 export const ORNEK_PORTFOYLER: OrnekKayit[] = [
   {
     oid: "P1", gunOnce: 20, tip: "PORTFOY", mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", fiyat: 300000, fiyatPeriyodu: "AYLIK", m2: 4000,
-    lokasyonHam: "Aksu / Hacıaliler", veriKanali: "NOTION", ilanSahibiTipi: "MALIK", portfoyAlinabilirlik: "COK_YUKSEK", yetkili: true,
+    lokasyonHam: "Aksu / Hacıaliler", veriKanali: "NOTION", ilanSahibiTipi: "MALIK", portfoyAlinabilirlik: "COK_YUKSEK", yetkili: true, portalIlanNo: "1346793126", // v3.37 — ilan no örneği
     gondeAdi: "Mehmet K. (örnek)", gondeTelefon: "+905550000101", baslik: "Hacıaliler 4000 m² depo 400 kW",
     hamMetin: "4000 m2 Kapalı 2000 m2 Açık alan\n400 kw elektirik gücü , yanlar panel ve\nÜzeri trapez saç\nKira Yıllık isteniyor",
     ozellik: { kapaliAlanM2: 4000, acikAlanM2: 2000, elektrikGucuKw: 400, elektrikGucuHam: "400 kw", duvarTipi: "SANDVIC_PANEL", catiTipi: "TRAPEZ_SAC", kiraOdemeSekli: "YILLIK_PESIN", kullanimAmaclari: ["DEPOLAMA", "URETIM"] },

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * v3.22 — "HARİÇ" bölge · bütçesiz talebin skoru · Benim / Ofisim işareti ve süzgeci · portföy kartında küçük fotoğraf ·
  * Eşleşmeler'de yatay skor şeridi.
  */
@@ -83,27 +83,33 @@ test("form: bir konumu 'hariç tut' → ilçesi aranana eklenir; 'dahil et' geri
 });
 
 // ───── 2) Bütçesiz talep ─────
-test("bütçesiz talep: fiyat ölçülemediği için −8 ve en fazla 79 (v3.36: 4/5 Koşullu; eskiden ×0,75); aynı talep bütçeyle 100", () => {
+test("v3.37 — bütçesiz talep: fiyat bileşeni nötr (ceza / tavan / 'Eksik' yok); portföyde fiyat yoksa −8 ve en fazla 79", () => {
   const p = kayit("P14").veri as any;
   const tam = eslesmeOnizle({ ...(kayit("T15").veri as any), maxFiyat: 9_000_000 }, p, BAGLAM);
   const butcesiz = eslesmeOnizle(kayit("T15").veri as any, p, BAGLAM);
   assert.equal(tam.skor, 100);
-  assert.ok(butcesiz.skor <= FIYATSIZ_SKOR_TAVANI && butcesiz.skor >= 70, String(butcesiz.skor)); assert.equal(butcesiz.uygunluk, "KOSULLU"); assert.equal(butcesiz.seviye, 4);
-  assert.ok(butcesiz.gerekceler.some((g) => /bütçe/i.test(g)), butcesiz.gerekceler.join(" | "));
-  assert.ok(butcesiz.veriEksikleri.includes("talepte bütçe yok"));
-  // çarpan sırayı korur: m²'si de eksik talep daha aşağıda
+  // Özgür (21 Eki 2026): "talepteki bütçe m²'ye göre değişebilir, skoru ekstra düşürme"
+  assert.ok(butcesiz.skor > FIYATSIZ_SKOR_TAVANI, String(butcesiz.skor));
+  assert.ok(!butcesiz.veriEksikleri.includes("talepte bütçe yok"));
+  assert.ok(butcesiz.gerekceler.some((g) => /bütçe yok — puanı düşürmez/.test(g)), butcesiz.gerekceler.join(" | "));
+  // m²'si de eksik talep önüne geçmez (konutta oda verilmişse ölçü odadır, eşit kalabilir)
   const m2siz = eslesmeOnizle({ ...(kayit("T15").veri as any), minM2: null }, p, BAGLAM);
-  assert.ok(m2siz.skor < butcesiz.skor, `${m2siz.skor} < ${butcesiz.skor}`);
-  // portföyde fiyat yoksa da aynı kural
+  assert.ok(m2siz.skor <= butcesiz.skor, `${m2siz.skor} <= ${butcesiz.skor}`);
+  // portföyde fiyat yoksa ceza kalır — bütçeli de bütçesiz de
   assert.ok(eslesmeOnizle({ ...(kayit("T15").veri as any), maxFiyat: 9_000_000 }, { ...p, fiyat: null }, BAGLAM).skor <= FIYATSIZ_SKOR_TAVANI);
+  const ikisiYok = eslesmeOnizle(kayit("T15").veri as any, { ...p, fiyat: null }, BAGLAM);
+  assert.ok(ikisiYok.skor <= FIYATSIZ_SKOR_TAVANI && ikisiYok.uygunluk === "KOSULLU", `${ikisiYok.skor} ${ikisiYok.uygunluk}`);
+  assert.ok(ikisiYok.gerekceler.some((g) => /Portföyde fiyat yok/.test(g)));
   assert.equal(FIYATSIZ_CARPAN, 0.75); assert.equal(FIYATSIZ_SKOR_TAVANI, 79);
 });
-test("örnek veride bütçesiz hiçbir eşleşme 80'e ulaşmaz (v3.36: en fazla 4/5; eskiden 70)", () => {
+
+test("v3.37 — örnek veride bütçesiz talepler fiyatsız portföyle en fazla 79; fiyatlı portföyle tavana takılmaz", () => {
   const talepler = ornek.kayitlar.filter((k) => k.veri.tip === "TALEP" && k.veri.maxFiyat == null);
   assert.ok(talepler.length >= 1);
   for (const t of talepler) for (const p of ornek.kayitlar.filter((k) => k.veri.tip === "PORTFOY")) {
     const s = eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM);
-    assert.ok(s.skor < 80 && s.seviye <= 4, `${t.id}~${p.id}: ${s.skor}`);
+    if ((p.veri as any).fiyat == null) assert.ok(s.skor < 80 && s.seviye <= 4, `${t.id}~${p.id}: ${s.skor}`);
+    assert.ok(!s.gerekceler.some((g) => /Talepte bütçe yazılmamış/.test(g)), `${t.id}~${p.id}`);
   }
 });
 

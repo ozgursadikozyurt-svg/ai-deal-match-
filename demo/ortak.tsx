@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * Demo — ekranların ortak parçaları: depo bağlamı, küçük bileşenler, eşleşme hesabı, konum öneri kutusu.
  */
 import React, { createContext, useContext, useMemo, useRef, useState } from "react";
@@ -7,6 +7,7 @@ import { eslesmeOnizle, temelUyum, seviyeOf, SEVIYE_ETIKET, SEVIYE_ACIKLAMA, typ
 import { mukerrerleriTopla } from "../src/lib/eslestirme/mukerrer";
 import { firsatDegerlendir, type FirsatSonuc } from "../src/lib/eslestirme/firsat";
 import { kimOf } from "../src/lib/domain/kim";
+import { ilanBaglantisi } from "../src/lib/domain/ilan-no";
 import { etiket, tl } from "./etiketler";
 import { BAGLAM, konumOner, lokEtiket, type KonumOnerisi } from "./lokasyon";
 import { kalanGun, type DepoDurumu, type Kayit, type Veri, type OrnekHata } from "./depo";
@@ -114,6 +115,18 @@ export function oneCikanlar(v: Partial<Veri>): string[] {
   return r.slice(0, 6);
 }
 export const enumYaz = (s: string) => s.replace(/\b[A-Z][A-Z_]{2,}\b/g, (x) => (x === "TIR" ? x : etiket(x)));
+/**
+ * v3.37 — ilan numarası çipi (portföy kartı, eşleşme kartı, detay): "İlan 1346793126". `baglanti` verilirse sahibinden'de açılır
+ * (kart düğmelerinin içinde bağlantı olmaz — iç içe tıklanabilir öğe olmasın diye yalnızca metin).
+ */
+export function IlanNoCip({ v, baglanti = false }: { v: { portalIlanNo?: string | null; portalUrl?: string | null; veriKanali?: string | null }; baglanti?: boolean }) {
+  const no = String(v.portalIlanNo ?? "").trim();
+  if (!no) return null;
+  const url = baglanti ? ilanBaglantisi(v) : null;
+  return url ? <a className="ilan-no" href={url} target="_blank" rel="noopener noreferrer" title="İlanı portalda aç" onClick={(e) => e.stopPropagation()}>İlan {no} ↗</a>
+    : <span className="ilan-no" title="İlan numarası">İlan {no}</span>;
+}
+
 export function Kopyala({ metin, etiketi = "Kopyala" }: { metin: string; etiketi?: string }) {
   const [ok, setOk] = useState(false);
   return <button className="btn kucuk" onClick={() => { navigator.clipboard?.writeText(metin).then(() => { setOk(true); setTimeout(() => setOk(false), 1500); }).catch(() => {}); }}>{ok ? "Kopyalandı" : etiketi}</button>;

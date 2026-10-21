@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * Demo — kayıt formu. Şemadan üretilir; mülk grubuna göre yalnızca anlamlı alanlar,
  * önce "önemli alanlar", gerisi "Tüm alanlar" altında. Bölümler varsayılan kapalı.
  */
@@ -28,6 +28,8 @@ import { useDepo, cx, Bolum, KonumSecici, tarihYaz, telYaz, type Ekran } from ".
 import { konumOgret } from "./konumlar";
 import { KisiSecici } from "./kisiler";
 import { ttlGun } from "../src/lib/domain/gecerlilik";
+import { useKaydedilmemis, useIlkHal } from "./kirli";
+import { ilanNoAyikla } from "../src/lib/domain/ilan-no";
 
 type Alan = MulkOzellikAlani;
 type Tur = { tur: "sayi" } | { tur: "bool" } | { tur: "metin" } | { tur: "tarih" } | { tur: "enum"; degerler: string[] } | { tur: "coklu"; degerler: string[] };
@@ -230,19 +232,26 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
   const doluSayisi = Object.entries(f.ozellik).filter(([k, v]) => !["kritikKriterler", "esnekKriterler", "eksikBilgiler"].includes(k) && v != null && !(Array.isArray(v) && !v.length)).length;
   const dnaOzet = [(f.ozellik.kritikKriterler ?? []).length && `${f.ozellik.kritikKriterler.length} şart`, (f.ozellik.esnekKriterler ?? []).length && `${f.ozellik.esnekKriterler.length} esnek`, (f.ozellik.eksikBilgiler ?? []).length && `${f.ozellik.eksikBilgiler.length} sorulacak`].filter(Boolean).join(" · ");
 
-  function kaydet() {
+  // v3.37 — kaydedilmemiş değişiklik: forma dokunulduktan sonra değişen form, başka ekrana geçerken "kaydedelim mi?" diye sorar
+  const ilkHal = useIlkHal(f);
+  const birak = useKaydedilmemis(ilkHal.degisti, mevcut ? "Kayıt düzenleme" : talep ? "Yeni talep" : "Yeni portföy", () => kaydet({ gitme: false }));
+  /** v3.37 — başarılıysa true; { gitme: false } ile çağrılınca (kaydetmeden çıkma sorusu) ekran değiştirmez */
+  function kaydet(secenek?: { gitme?: boolean }): boolean {
+    const gitme = secenek?.gitme !== false;
     const o: Record<string, any> = {};
     for (const [k, v] of Object.entries(f.ozellik ?? {})) if (v !== null && v !== undefined && v !== "" && k in SEKIL) o[k] = v;
     if (!talep) { delete o.kritikKriterler; delete o.esnekKriterler; delete o.eksikBilgiler; }
     // v3.10: eksik telefon kaydı kilitlemesin — kullanıcı Kişiler bölümündeki alandan düzeltir
     const telSorunu = telUyarisi(f.gondeTelefon);
-    if (telSorunu) { setHatalar([{ yer: "Telefon", mesaj: `${telSorunu}. Aşağıdaki “Kişiler” bölümünde düzeltin ya da alanı boşaltın.` }]); setKisiAcik(true); ust.current?.scrollIntoView({ behavior: "smooth" }); return; }
+    if (telSorunu) { setHatalar([{ yer: "Telefon", mesaj: `${telSorunu}. Aşağıdaki “Kişiler” bölümünde düzeltin ya da alanı boşaltın.` }]); setKisiAcik(true); ust.current?.scrollIntoView({ behavior: "smooth" }); return false; }
     const tel = telNormalize(f.gondeTelefon);
     const temiz: any = { ...f, gondeTelefon: tel && /^\+90\d{10}$/.test(tel) ? tel : null, ozellik: o, validUntil: vu };
     // Birincil kişi → eski alanlar (listelerde ve dışa aktarımda kullanılıyor)
     const bir = (f.kisiler ?? [])[0] && d.kisiler.find((k) => k.id === f.kisiler[0].kisiId);
     if (bir) { temiz.gondeAdi = bir.adSoyad; temiz.gondeTelefon = bir.telefon; temiz.gondeSirket = bir.sirket ?? temiz.gondeSirket; }
     for (const k of ["fiyat", "minFiyat", "maxFiyat", "m2", "netM2", "minM2", "maxM2"]) if (temiz[k] === "") temiz[k] = null;
+    // v3.37 — ilan no: yapıştırılan bağlantıdan numara (bağlantı da saklanır)
+    if (temiz.portalIlanNo != null) { const r = ilanNoAyikla(temiz.portalIlanNo); temiz.portalIlanNo = r.no; if (r.url && !temiz.portalUrl) temiz.portalUrl = r.url; }
     if (!ekstra.includes("krediyeUygun" as never)) delete temiz.krediyeUygun;
     temiz.alternatifMulkTipleri = (temiz.alternatifMulkTipleri ?? []).filter((t: string) => t !== temiz.mulkTipi).slice(0, 5);
     delete temiz.anaKategori; // her zaman mülk tipinden türetilir
@@ -252,24 +261,27 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
     Object.assign(temiz, ilk.yaz, { ilkYanit: (mevcut?.veri as any)?.ilkYanit ?? null });
     if (ilk.uyari) bildir(ilk.uyari);
     const p = KayitCreateSchema.safeParse(temiz);
-    if (!p.success) { setHatalar(p.error.issues.map((i) => ({ yer: hataEtiketi(i.path as any), mesaj: i.message }))); ust.current?.scrollIntoView({ behavior: "smooth" }); return; }
+    if (!p.success) { setHatalar(p.error.issues.map((i) => ({ yer: hataEtiketi(i.path as any), mesaj: i.message }))); ust.current?.scrollIntoView({ behavior: "smooth" }); return false; }
     const kayit: Kayit = { id: mevcut?.id ?? yeniId(tip), olusturma: mevcut?.olusturma ?? BUGUN.toISOString(), veri: p.data };
     kayitKaydet(kayit);
+    birak(); ilkHal.sifirla(); // kaydedildi: ayrılırken artık sorulmaz
     if (adayId) {
       guncelle((dd) => (dd.aktifIceAktarma ? { ...dd, aktifIceAktarma: { ...dd.aktifIceAktarma, adaylar: dd.aktifIceAktarma.adaylar.map((a) => (a.id === adayId ? { ...a, durum: "EKLENDI" as const } : a)) } } : dd));
-      bildir("Havuza eklendi"); geriDon({ donus: true, yedek: { ad: "veri", alt: "wa" } }); return;
+      bildir("Havuza eklendi"); if (gitme) geriDon({ donus: true, yedek: { ad: "veri", alt: "wa" } }); return true;
     }
     bildir("Kaydedildi — doğrulamadan geçti");
+    if (!gitme) return true;
     // v3.36 — form geçmişte kalmaz: düzenleme ve içe aktarmadan açılan form açıldığı ekrana döner; yeni kayıt detayına geçer ama
     // oradan "Geri" formun açıldığı yere (Ana Sayfa, liste…) gider (eskiden Geri yeniden formu açıyordu)
     if (mevcut || geri) geriDon({ donus: true, yedek: geri ?? { ad: "detay", id: kayit.id } });
     else (degistir ?? git)({ ad: "detay", id: kayit.id });
+    return true;
   }
   // v3.15: form bir içe aktarma / veri girişi ekranından açıldıysa (geri) oraya, değilse eskisi gibi döner
   // v3.36 — Vazgeç = Geri: her zaman formun AÇILDIĞI ekrana döner (eskiden yeni ekran açıyor, Geri tekrar forma götürüyordu)
   const vazgec = () => geriDon({ donus: true, yedek: geri ?? (adayId ? { ad: "veri", alt: "wa" } : mevcut ? { ad: "detay", id: mevcut.id } : { ad: "liste", tip }) });
 
-  return <div className="yigin" ref={ust}>
+  return <div className="yigin" ref={ust} onPointerDownCapture={ilkHal.dokun} onKeyDownCapture={ilkHal.dokun} onFocusCapture={ilkHal.dokun}>
     {/* v3.24 — Geri ve başlık tek satırda (v3.36: düğme "← Geri"; kaydetmeden formun açıldığı ekrana döner, telefonun geri tuşu da aynı) */}
     <div className="bas-satir"><button className="btn kucuk geri" title="Kaydetmeden geri dön" onClick={vazgec}>← Geri</button>
       <h2>{mevcut ? "Kaydı düzenle" : taslak ? "Çıkarılan kaydı kontrol edin" : talep ? "Yeni talep" : "Yeni portföy"}</h2></div>
@@ -297,6 +309,11 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
           <div className="alan"><label htmlFor="f-m2">{ekstra.includes("netM2") ? "Brüt alan (m²)" : "Alan (m²)"}</label><SayiGir binlik id="f-m2" deger={f.m2} onChange={(x) => set("m2", x)} /></div>
           {ekstra.includes("netM2") && <div className="alan"><label htmlFor="f-net">Net alan (m²)</label><SayiGir binlik id="f-net" deger={f.netM2} onChange={(x) => set("netM2", x)} /></div>}
         </>}
+        {/* v3.37 — ilan numarası (sahibinden vb.): numara ya da ilan bağlantısı yapıştırılır; detayda fiyatın yanında, kartlarda görünür */}
+        {(!talep || f.portalIlanNo) && <div className="alan"><label htmlFor="f-ilan-no">İlan no <small className="ipucu">· sahibinden vb.</small></label>
+          <input id="f-ilan-no" inputMode="numeric" maxLength={400} value={f.portalIlanNo ?? ""} placeholder="1346793126 ya da ilan bağlantısı"
+            onChange={(e) => set("portalIlanNo", e.target.value || null)}
+            onBlur={(e) => { const r = ilanNoAyikla(e.target.value); setF((x: any) => ({ ...x, portalIlanNo: r.no, ...(r.url ? { portalUrl: r.url } : {}) })); }} /></div>}
         <div className="alan"><label htmlFor="f-para">Para birimi</label><select id="f-para" value={f.paraBirimi} onChange={(e) => set("paraBirimi", e.target.value)}>{["TRY", "USD", "EUR", "GBP"].map((x) => <option key={x} value={x}>{etiket(x)}</option>)}</select></div>
         <div className="alan"><label htmlFor="f-per">Fiyat periyodu</label><select id="f-per" value={f.fiyatPeriyodu} onChange={(e) => set("fiyatPeriyodu", e.target.value)}>{["TOPLAM", "AYLIK", "YILLIK", "GUNLUK"].map((x) => <option key={x} value={x}>{etiket(x)}</option>)}</select></div>
         {/* v3.24 — tek bakışta kaynak: seçim aşağıdaki İlan sahibi / Havuz / Geldiği kanal alanlarını birlikte ayarlar */}
@@ -362,6 +379,6 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
       <textarea id="f-ham" rows={4} value={f.hamMetin ?? ""} onChange={(e) => set("hamMetin", e.target.value)} placeholder="WhatsApp mesajı veya ilan metni" />
     </Bolum>
 
-    <div className="satir yapiskan"><button className="btn birincil genis-btn" onClick={kaydet}>{adayId ? "Kaydet ve havuza ekle" : "Kaydet"}</button></div>
+    <div className="satir yapiskan"><button className="btn birincil genis-btn" onClick={() => kaydet()}>{adayId ? "Kaydet ve havuza ekle" : "Kaydet"}</button></div>
   </div>;
 }

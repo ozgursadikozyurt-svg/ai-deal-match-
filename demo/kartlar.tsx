@@ -1,12 +1,12 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * Demo — eşleşme kartı, eşleştirme tercihleri (eski "Talep DNA" kartı), kapatılabilir bilgi kutusu.
  */
 import React, { useState } from "react";
 import { talepDnasi } from "../src/lib/eslestirme/talep-dna";
 import { kopmaEtiket } from "../src/lib/eslestirme/kopar";
 import { etiket } from "./etiketler";
-import { useDepo, Pill, IslemPill, UYGUNLUK, SEVIYE_TON, seviyeBaslik, Gerekceler, baslikOf, fiyatOf, m2Of, lokEtiket, eKey, type Eslesme } from "./ortak";
+import { useDepo, Pill, IslemPill, UYGUNLUK, SEVIYE_TON, seviyeBaslik, Gerekceler, baslikOf, fiyatOf, m2Of, lokEtiket, eKey, IlanNoCip, type Eslesme } from "./ortak";
 import { SEVIYE_ETIKET } from "../src/lib/eslestirme/onizleme";
 import { konumOzeti } from "./lokasyon";
 import { useSahiplik, SahiplikRozeti } from "./sahiplik";
@@ -103,6 +103,7 @@ export function EslesmeKarti({ e, sec }: { e: Eslesme; sec?: { acik: boolean; de
       <div className="es2-alt">
         {konum(k.veri) && <span>{konum(k.veri)}</span>}
         {m2Of(k.veri) && <span>{m2Of(k.veri)}</span>}
+        <IlanNoCip v={k.veri} />
       </div>
     </div>
   );

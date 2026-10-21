@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * Demo — ortak filtre paneli (Talepler, Portföyler, Eşleşmeler, talep içi portföy çekmecesi).
  * Her alan çoklu seçim. Mülk türü seçilince o türe özel filtreler çıkar (ONEMLI_ALANLAR).
  * v3.5 — Kompakt: ekranda tek satır (arama · Acil · Filtrele rozeti) + tek satır kayan aktif çipler.
@@ -58,7 +58,7 @@ export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string
   if (f.ara) {
     const q = f.ara.toLocaleLowerCase("tr");
     const kisi = (v.kisiler ?? []).map((b) => kisiAd?.(b.kisiId) ?? "").join(" ");
-    if (!`${baslikOf(v)} ${etiket(v.mulkTipi)} ${v.lokasyonlar.map(lokEtiket).join(" ")} ${v.gondeAdi ?? ""} ${kisi} ${v.hamMetin ?? ""} ${v.kayitGrubu ?? ""}`.toLocaleLowerCase("tr").includes(q)) return false;
+    if (!`${baslikOf(v)} ${etiket(v.mulkTipi)} ${v.lokasyonlar.map(lokEtiket).join(" ")} ${v.gondeAdi ?? ""} ${kisi} ${v.hamMetin ?? ""} ${v.kayitGrubu ?? ""} ${v.portalIlanNo ?? ""}`.toLocaleLowerCase("tr").includes(q)) return false;
   }
   if (f.aileler.length) { const tipler = [v.mulkTipi, ...(v.alternatifMulkTipleri ?? [])]; if (!tipler.some((t) => f.aileler.includes(aileOf(t as any).kod))) return false; }
   if (f.islemler.length && ![v.islemTipi, ...(v.alternatifIslemTipleri ?? [])].some((i) => f.islemler.includes(i))) return false;

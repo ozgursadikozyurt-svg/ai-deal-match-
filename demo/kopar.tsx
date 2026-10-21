@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * Demo — eşleşmeyi kopar / geri al, ve kartlardaki "kim" etiketi (emlakçı mı, doğrudan müşteri mi, web ilanı mı).
  */
 import React, { useState } from "react";
@@ -37,7 +37,8 @@ export function KoparDugmesi({ tid, pid, kucuk = false, sonra }: { tid: string; 
         <h3>Eşleşmeyi kopar</h3>
         <p className="ipucu">Bu talep ile portföy bir daha ana ekranda, eşleşme listesinde ve çekmecede çıkmaz. Eşleşmeler → Koparılanlar'dan geri alabilirsiniz.</p>
         <div className="yigin kucuk-bosluk" role="radiogroup">{KOPMA_NEDENLERI.map(([k, l]) => <label key={k} className="onay-satir"><input type="radio" name="neden" checked={neden === k} onChange={() => setNeden(k)} /> {l}</label>)}</div>
-        <textarea rows={2} placeholder="Not (isteğe bağlı): ör. müşteri cepheyi beğenmedi" value={not} onChange={(e) => setNot(e.target.value)} />
+        <label className="alan-etiket" htmlFor={`kopar-aciklama-${anahtar}`}>Açıklama <small className="ipucu">· isteğe bağlı, eşleşme notuna eklenir</small></label>
+        <textarea id={`kopar-aciklama-${anahtar}`} rows={3} autoFocus placeholder="Ör. müşteri cepheyi beğenmedi; sahibi kiraya verdi" value={not} onChange={(e) => setNot(e.target.value)} />
         <div className="satir"><button type="button" className="btn birincil" onClick={() => { yaz({ durum: "REDDEDILDI", neden, tarih: new Date().toISOString(), ...(not.trim() ? { not: [n?.not, not.trim()].filter(Boolean).join("\n") } : {}) }); setAcik(false); bildir("Eşleşme koparıldı — artık gösterilmeyecek"); sonra?.(); }}>Kopar</button><button type="button" className="btn" onClick={() => setAcik(false)}>Vazgeç</button></div>
       </div>
     </div>}

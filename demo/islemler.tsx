@@ -1,10 +1,11 @@
 /**
- * Anahtar CRM v3.35 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * İŞLEMLER — kapanan satış / kiralama ve komisyon (yalnızca ofis yöneticisi: islem.yonet).
  * P&L kuralı: "bana kalan" tahsilat ayına yazılır; tahsilat tarihi boşsa "bekleyen" (src/lib/domain/islem.ts).
  * Canlıda /api/islemler; demoda örnek veri (kalıcı değil). Polaris'ten taşınan satırlarda "Polaris" etiketi görünür.
  */
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import { useKaydedilmemis, useIlkHal } from "./kirli";
 import { C, baslikOf } from "./ortak";
 import { CANLI } from "./depo";
 import { ISLEM_TURLERI, ISLEM_TURU_ETIKET, aylikBanaKalan, turTahmini, type IslemTuru } from "../src/lib/domain/islem";
@@ -61,8 +62,12 @@ export function IslemlerEkrani() {
     .filter((x) => !ara.trim() || `${x.baslik} ${x.aciklama ?? ""}`.toLocaleLowerCase("tr-TR").includes(ara.toLocaleLowerCase("tr-TR")))
     .sort((a, b) => (a.tarih < b.tarih ? 1 : -1));
 
-  const kaydet = async () => {
-    if (!duzen) return;
+  // v3.37 — açık formda değişiklik varken başka ekrana geçilirse "kaydedelim mi?"
+  const ilkHal = useIlkHal(duzen?.f ?? null);
+  const birak = useKaydedilmemis(!!duzen && ilkHal.degisti, "İşlem", () => kaydet());
+  const kapatForm = () => { birak(); ilkHal.sifirla(); setDuzen(null); };
+  const kaydet = async (): Promise<boolean> => {
+    if (!duzen) return true;
     setHata(undefined);
     try {
       const f = duzen.f;
@@ -76,24 +81,25 @@ export function IslemlerEkrani() {
       if (canli) { await api(duzen.id ? `/api/islemler?id=${duzen.id}` : "/api/islemler", { method: duzen.id ? "PATCH" : "POST", json: govde }); await yukle(); }
       else setListe((l) => duzen.id ? l.map((x) => (x.id === duzen.id ? { ...x, ...govde } as Islem : x)) : [{ id: "di" + Date.now(), ...govde } as Islem, ...l]);
       bildir(duzen.id ? "İşlem güncellendi" : "İşlem eklendi");
-      setDuzen(null);
-    } catch (e: any) { setHata(e?.message ?? "Kaydedilemedi"); }
+      kapatForm();
+      return true;
+    } catch (e: any) { setHata(e?.message ?? "Kaydedilemedi"); return false; }
   };
   const sil = async () => {
     if (!duzen?.id) return;
     try {
       if (canli) { await api(`/api/islemler?id=${duzen.id}`, { method: "DELETE" }); await yukle(); } else setListe((l) => l.filter((x) => x.id !== duzen.id));
-      bildir("İşlem silindi"); setDuzen(null); setSilOnay(false);
+      bildir("İşlem silindi"); kapatForm(); setSilOnay(false);
     } catch (e: any) { setHata(e.message); }
   };
   const setF = (k: keyof Form, v: any) => setDuzen((x) => x && { ...x, f: { ...x.f, [k]: v, ...(k === "baslik" && !x.f.turElle ? { tur: turTahmini(v) } : {}), ...(k === "tarih" && !x.id ? { tahsilatTarihi: v } : {}) } });
 
   return <div className="yigin">
-    <div className="satir-ara sar"><h2>İşlemler</h2><button className="btn birincil" onClick={() => { setDuzen({ f: bosForm() }); setSilOnay(false); }}>+ Yeni işlem</button></div>
+    <div className="satir-ara sar"><h2>İşlemler</h2><button className="btn birincil" onClick={() => { ilkHal.sifirla(); setDuzen({ f: bosForm() }); setSilOnay(false); }}>+ Yeni işlem</button></div>
     <p className="ipucu">Kapanan satış ve kiralamalar ile komisyonu. "Bana kalan" tahsilat ayına yazılır; tahsilatı girilmeyen işlem "bekleyen"de durur. Bu ekranı yalnızca ofis yöneticisi görür. Polaris'teki P&amp;L bu kayıtlardan okuyacak.</p>
     {hata && <p role="alert" className="hata">{hata}</p>}
 
-    {duzen && <section className="kart yigin" aria-label="İşlem formu">
+    {duzen && <section className="kart yigin" aria-label="İşlem formu" onPointerDownCapture={ilkHal.dokun} onKeyDownCapture={ilkHal.dokun} onFocusCapture={ilkHal.dokun}>
       <h3>{duzen.id ? "İşlemi düzenle" : "Yeni işlem"}</h3>
       <div className="alanlar">
         <div className="alan genis"><label htmlFor="i-baslik">Başlık</label><input id="i-baslik" maxLength={300} value={duzen.f.baslik} onChange={(e) => setF("baslik", e.target.value)} placeholder="Ör. Kepez 1.200 m² depo kiralama — Ahmet Bey" /></div>
@@ -113,8 +119,8 @@ export function IslemlerEkrani() {
         <div className="alan genis"><label htmlFor="i-acik">Açıklama</label><textarea id="i-acik" rows={2} maxLength={2000} value={duzen.f.aciklama} onChange={(e) => setF("aciklama", e.target.value)} placeholder="Ör. KDV'li fatura kesildi" /></div>
       </div>
       <div className="satir sar">
-        <button className="btn birincil" onClick={kaydet}>Kaydet</button>
-        <button className="btn" onClick={() => setDuzen(null)}>Vazgeç</button>
+        <button className="btn birincil" onClick={() => void kaydet()}>Kaydet</button>
+        <button className="btn" onClick={kapatForm}>Vazgeç</button>
         {duzen.id && (!silOnay ? <button className="btn" onClick={() => setSilOnay(true)}>Sil…</button> : <><span>Emin misiniz?</span><button className="btn tehlike" onClick={sil}>Evet, sil</button></>)}
       </div>
     </section>}
@@ -136,7 +142,7 @@ export function IslemlerEkrani() {
     <input type="search" aria-label="İşlem ara" value={ara} onChange={(e) => setAra(e.target.value)} placeholder="Başlık ya da açıklama ara" />
     {yukleniyor && <p className="ipucu">Yükleniyor…</p>}
     {!yukleniyor && gorunen.length === 0 && <p className="bos">{yil} için işlem yok.</p>}
-    {gorunen.map((x) => <button key={x.id} type="button" className="kart" style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: 2, width: "100%" }} onClick={() => { setDuzen({ id: x.id, f: formdan(x, ad) }); setSilOnay(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+    {gorunen.map((x) => <button key={x.id} type="button" className="kart" style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: 2, width: "100%" }} onClick={() => { ilkHal.sifirla(); setDuzen({ id: x.id, f: formdan(x, ad) }); setSilOnay(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
       <div className="satir-ara"><span className="ipucu">{new Date(x.tarih + "T12:00:00").toLocaleDateString("tr-TR")} · {ISLEM_TURU_ETIKET[x.tur]}{x.reklam ? " · Reklam" : ""}{x.disKaynak === "POLARIS" ? " · Polaris" : ""}{!x.tahsilatTarihi ? " · tahsilat bekliyor" : x.tahsilatTarihi !== x.tarih ? ` · tahsilat ${new Date(x.tahsilatTarihi + "T12:00:00").toLocaleDateString("tr-TR")}` : ""}</span><b>{TL(x.banaKalan)}</b></div>
       <b>{x.baslik}</b>
       {(x.bedel || x.ofisPayi || x.paylasilan || x.aciklama) && <span className="ipucu">{[x.bedel ? `Bedel ${TL(x.bedel)}` : "", x.ofisPayi ? `Ofis ${TL(x.ofisPayi)}` : "", x.paylasilan ? `Paylaşılan ${TL(x.paylasilan)}` : "", x.aciklama ?? ""].filter(Boolean).join(" · ")}</span>}

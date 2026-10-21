@@ -1,9 +1,10 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * Demo — Talep / portföy içinde görüşme ve not akışı. Tür (görüşme, arama, WhatsApp, gösterim, not), kim ile, ne konuşuldu.
  * Not eklenince bağlı kişinin "son iletişim" tarihi güncellenir. Sunucuda: KayitNot tablosu, /api/kayit/:id/notlar.
  */
 import React, { useState } from "react";
+import { useKaydedilmemis } from "./kirli";
 import { NOT_TURU, type Kayit, type KayitNotu, type NotTuru } from "./depo";
 import { useDepo, cx, tarihYaz } from "./ortak";
 import { TEMAS_NOT_TURLERI } from "../src/lib/domain/ilk-kaynak";
@@ -17,6 +18,8 @@ export function GorusmeNotlari({ k }: { k: Kayit }) {
   const bagli = (k.veri.kisiler ?? []).map((b) => d.kisiler.find((x) => x.id === b.kisiId)).filter(Boolean) as typeof d.kisiler;
   const [kisiId, setKisiId] = useState<string>(bagli[0]?.id ?? "");
   const notlar = (k.notlar ?? []).slice().sort((a, b) => b.tarih.localeCompare(a.tarih));
+  // v3.37 — yazılmış ama kaydedilmemiş not: başka ekrana geçerken "kaydedelim mi?"
+  const birak = useKaydedilmemis(metin.trim().length >= 2, "Görüşme notu", () => { ekle(); return true; });
   const ekle = () => {
     const n: KayitNotu = { id: yeniNotId(), tarih: new Date().toISOString(), tur, metin: metin.trim(), kisiId: kisiId || null };
     guncelle((x) => ({
@@ -25,7 +28,7 @@ export function GorusmeNotlari({ k }: { k: Kayit }) {
       kayitlar: x.kayitlar.map((y) => (y.id === k.id ? { ...y, notlar: [n, ...(y.notlar ?? [])], ...(!(y.veri as any).ilkYanit && (TEMAS_NOT_TURLERI as readonly string[]).includes(tur) ? { veri: { ...y.veri, ilkYanit: new Date(n.tarih) } as any } : {}) } : y)),
       kisiler: kisiId && tur !== "NOT" ? x.kisiler.map((y) => (y.id === kisiId ? { ...y, sonIletisim: n.tarih } : y)) : x.kisiler,
     }));
-    setMetin(""); bildir("Not eklendi");
+    birak(); setMetin(""); bildir("Not eklendi");
   };
   const sil = (id: string) => { guncelle((x) => ({ ...x, kayitlar: x.kayitlar.map((y) => (y.id === k.id ? { ...y, notlar: (y.notlar ?? []).filter((n) => n.id !== id) } : y)) })); bildir("Not silindi"); };
   return <section className="kart">

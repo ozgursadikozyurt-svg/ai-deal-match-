@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026 (v3.31: hoşgörülü arama — birkaç harf, sırasız kelimeler, Türkçe harf duyarsız, notlar ve telefon rakamları)
+ * Anahtar CRM v3.37 · 21 Ekim 2026 (v3.31: hoşgörülü arama — birkaç harf, sırasız kelimeler, Türkçe harf duyarsız, notlar ve telefon rakamları)
  * (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
  * v3.21 — çift yönlü Google: elle eklenen kişi ve bağlı kişideki düzeltme "Google'a gönderilecek" olur; silinen kişi Google'dan silinmez.
  * Demo — Kişiler: kişi seçici (yazdıkça arama, çoklu seçim, rol, + ile anında ekleme), kişi listesi ve kişi kartı.
@@ -11,7 +11,8 @@ import { telUyarisi } from "../src/lib/iletisim";
 import { GosterilenPortfoyler } from "./ilgilenenler";
 import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useKalici } from "./kalici";
-import { MULK_AILELERI } from "../src/lib/domain/kategori";
+import { MULK_AILELERI, aileOf } from "../src/lib/domain/kategori";
+import { sahipOzetleri, sahipSuzgeciUyar, sahipOzetMetni, SAHIP_KISI_ROLLERI, SAHIP_SUZGEC_ETIKET, type SahipSuzgeci } from "../src/lib/domain/sahipler";
 import { etiket } from "./etiketler";
 import { rolListesi, type RolTanim } from "../src/lib/domain/roller";
 import { yeniKisiId, BUGUN, NOT_TURU, CANLI, type Kisi, type Kayit, type DepoDurumu } from "./depo";
@@ -24,6 +25,7 @@ import { notionAcik } from "../src/lib/ozellikler";
 import { googleEsitle, ozetCumlesi } from "./google-baglanti";
 import { aramaIndeksi, aramaSorgusu, aramaEslesir, aramaNormalize, alintiBul, type AramaIndeksi, type AramaSorgusu } from "../src/lib/arama";
 import { SiralaDugmesi, kisiSiralama, siralaUygula, type Siralama } from "./filtre";
+import { useKaydedilmemis, farkliMi } from "./kirli";
 
 /** v3.7 — Ara + WhatsApp (WhatsApp Business kuruluysa onunla açılır) */
 export function IletisimDugmeleri({ tel, ad, mesaj, kucuk = false }: { tel?: string | null; ad?: string; mesaj?: string; kucuk?: boolean }) {
@@ -131,8 +133,21 @@ export function Kisiler() {
   const [kaynaklar, setKaynaklar] = useKalici<string[]>("kisiler.kaynaklar", []);
   const [bag, setBag] = useKalici<"" | "TALEP" | "PORTFOY" | "YOK">("kisiler.bag", "");   // v3.15: bağlı kayıt türü
   const [tel, setTel] = useKalici<"" | "VAR" | "YOK">("kisiler.tel", "");                  // v3.15: telefonu var / yok
+  // v3.37 — mülk sahipleri: sahip türü (aktif / pasif-arşiv portföyü olan…) ve mülk ailesi (Depo, Fabrika…)
+  const [sahip, setSahip] = useKalici<SahipSuzgeci>("kisiler.sahip", "");
+  const [sahipAile, setSahipAile] = useKalici<string[]>("kisiler.sahipAile", []);
   const [yeniAcik, setYeniAcik] = useState(false);
   const [yeni, setYeni] = useState({ adSoyad: "", telefon: "", rol: "" });
+  // v3.37 — yeni kişi formu yazılmışken başka ekrana geçilirse "kaydedelim mi?"
+  const yeniBirak = useKaydedilmemis(yeniAcik && !!(yeni.adSoyad.trim() || yeni.telefon.trim()), "Yeni kişi", () => yeniKaydet(false));
+  const yeniKaydet = (kartiAc: boolean): boolean => {
+    if (yeni.adSoyad.trim().length < 2) { bildir("Ad en az 2 karakter olmalı"); return false; }
+    const u = telUyarisi(yeni.telefon); if (u) { bildir(u); return false; }
+    const id = kisiEkle(guncelle, d, { elle: true, adSoyad: yeni.adSoyad, telefon: yeni.telefon, roller: yeni.rol ? [yeni.rol] : [] });
+    yeniBirak(); setYeni({ adSoyad: "", telefon: "", rol: "" }); setYeniAcik(false); bildir("Kişi eklendi");
+    if (kartiAc) git({ ad: "kisi", id });
+    return true;
+  };
   const [secili, setSecili] = useState<Set<string>>(new Set());            // v3.15: toplu işlem seçimi
   const [silOnay, setSilOnay] = useState(false);
   const [secimModu, setSecimModu] = useState(false);                         // v3.19: onay kutuları yalnızca "Seç" modunda görünür (kartlarda yer açar)
@@ -164,6 +179,7 @@ export function Kisiler() {
     }
     return m;
   }, [d.kayitlar]);
+  const sahipler = useMemo(() => sahipOzetleri(d.kayitlar as any, d.kisiler, (t) => aileOf(t as any)?.kod ?? "DIGER", d.eslesmeNotlari), [d.kayitlar, d.kisiler, d.eslesmeNotlari]);
   const kayitSay = (id: string, tip?: string) => { const x = sayilar.get(id); return !x ? 0 : tip === "TALEP" ? x.t : tip === "PORTFOY" ? x.p : tip ? 0 : x.n; };
   const kSay = (id: string) => kayitSay(id);
   const kaynakTutar = (k: Kisi, x: string) => (x === "GOOGLE" ? !!k.googleResourceName : x === "NOTION" ? !!k.notionId : kaynakOf(k) === x);
@@ -181,13 +197,14 @@ export function Kisiler() {
     if (kaynaklar.length && !kaynaklar.some((x) => kaynakTutar(k, x))) return false;
     if (bag === "YOK" ? kayitSay(k.id) > 0 : bag ? kayitSay(k.id, bag) === 0 : false) return false;
     if ((tel === "VAR" && !k.telefon) || (tel === "YOK" && k.telefon)) return false;
+    if (!sahipSuzgeciUyar(sahipler.get(k.id), sahip, sahipAile)) return false; // v3.37
     return true;
-  }), [d.kisiler, sorgu, gorusmeNorm, roller, kaynaklar, bag, tel, sayilar]); // eslint-disable-line react-hooks/exhaustive-deps
+  }), [d.kisiler, sorgu, gorusmeNorm, roller, kaynaklar, bag, tel, sayilar, sahipler, sahip, sahipAile]); // eslint-disable-line react-hooks/exhaustive-deps
   const siralamaSecenekleri = useMemo(() => kisiSiralama((id) => sayilar.get(id)?.n ?? 0), [sayilar]);
   const sirali = useMemo(() => siralaUygula(liste, sr, siralamaSecenekleri), [liste, sr, siralamaSecenekleri]);
   const gorunen = sirali.length > limit ? sirali.slice(0, limit) : sirali;
   // Süzgeç / arama / sıralama gerçekten değişince liste başa (ilk parçaya) döner; kişi kartından Geri dönüşte açık parça korunur
-  const suzImzasi = JSON.stringify([qGec, roller, kaynaklar, bag, tel, sr]);
+  const suzImzasi = JSON.stringify([qGec, roller, kaynaklar, bag, tel, sr, sahip, sahipAile]);
   const oncekiSuz = useRef(suzImzasi);
   useEffect(() => { if (oncekiSuz.current !== suzImzasi) { oncekiSuz.current = suzImzasi; setLimit(KISI_SAYFA); } }, [suzImzasi, setLimit]);
   const sonRef = useRef<HTMLDivElement>(null);
@@ -197,9 +214,11 @@ export function Kisiler() {
     o.observe(el); return () => o.disconnect();
   }, [gorunen.length, sirali.length, setLimit]);
   const gorunenSecili = sirali.filter((k) => secili.has(k.id)); // yalnızca ekranda görünen ve seçili olanlar işlenir (filtre değişince gizli seçimler silinmez)
-  const filtreSayisi = roller.length + kaynaklar.length + (bag ? 1 : 0) + (tel ? 1 : 0);
+  const filtreSayisi = roller.length + kaynaklar.length + (bag ? 1 : 0) + (tel ? 1 : 0) + (sahip ? 1 : 0) + sahipAile.length;
   const filtreVar = !!(q || filtreSayisi);
-  const temizle = () => { setQ(""); setRoller([]); setKaynaklar([]); setBag(""); setTel(""); };
+  const temizle = () => { setQ(""); setRoller([]); setKaynaklar([]); setBag(""); setTel(""); setSahip(""); setSahipAile([]); };
+  const aileAd = (kod: string) => MULK_AILELERI.find((a) => a.kod === kod)?.etiket ?? kod;
+  const sahipSay = (tur: SahipSuzgeci) => d.kisiler.filter((k) => sahipSuzgeciUyar(sahipler.get(k.id), tur, sahipAile)).length;
   // v3.21 — Google
   const gBagli = d.baglantilar?.google.durum === "BAGLI";
   const gGorunur = !CANLI.acik || !!d.googleCanli?.hazir;                       // canlıda Google bu kurulumda açılmadıysa düğme yok
@@ -231,7 +250,7 @@ export function Kisiler() {
       <div className="alan"><label htmlFor="nk-ad">Ad soyad / firma</label><input id="nk-ad" value={yeni.adSoyad} onChange={(e) => setYeni({ ...yeni, adSoyad: e.target.value })} /></div>
       <div className="alan"><label htmlFor="nk-tel">Telefon</label><TelGirdisi id="nk-tel" deger={yeni.telefon} onChange={(v) => setYeni({ ...yeni, telefon: v })} /></div>
       <div className="alan"><label htmlFor="nk-rol">Rol</label><select id="nk-rol" value={yeni.rol} onChange={(e) => setYeni({ ...yeni, rol: e.target.value })}><option value="">—</option>{KISI_ROLLERI.map(([r, l]) => <option key={r} value={r}>{l}</option>)}</select></div>
-    </div><div className="satir"><button className="btn birincil" disabled={yeni.adSoyad.trim().length < 2 || !!telUyarisi(yeni.telefon)} onClick={() => { const id = kisiEkle(guncelle, d, { elle: true, adSoyad: yeni.adSoyad, telefon: yeni.telefon, roller: yeni.rol ? [yeni.rol] : [] }); setYeni({ adSoyad: "", telefon: "", rol: "" }); setYeniAcik(false); git({ ad: "kisi", id }); }}>Ekle ve kartı aç</button></div></div>}
+    </div><div className="satir"><button className="btn birincil" disabled={yeni.adSoyad.trim().length < 2 || !!telUyarisi(yeni.telefon)} onClick={() => yeniKaydet(true)}>Ekle ve kartı aç</button></div></div>}
     <div className="fc"><div className="fc-ara"><span aria-hidden="true">⌕</span><input type="search" aria-label="Kişi ara" placeholder="Ara: birkaç harf yeter — ad, telefon, not, şirket…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       <button type="button" className={cx("fc-btn", filtreSayisi > 0 && "on")} onClick={() => setFiltreAcik(!filtreAcik)} aria-expanded={filtreAcik}>Filtrele{filtreSayisi > 0 && <b className="fc-rozet">{filtreSayisi}</b>}</button>
       <SiralaDugmesi secenekler={kisiSiralama(kSay)} s={sr} set={setSr} /></div>
@@ -241,9 +260,18 @@ export function Kisiler() {
       ...kaynaklar.map((x) => ({ e: KAYNAK_ETIKET[x], k: () => setKaynaklar(kaynaklar.filter((y) => y !== x)) })),
       ...(bag ? [{ e: bag === "YOK" ? "Kaydı olmayanlar" : bag === "TALEP" ? "Talebi olanlar" : "Portföyü olanlar", k: () => setBag("") }] : []),
       ...(tel ? [{ e: tel === "VAR" ? "Telefonu olanlar" : "Telefonu olmayanlar", k: () => setTel("") }] : []),
+      ...(sahip ? [{ e: SAHIP_SUZGEC_ETIKET[sahip], k: () => setSahip("") }] : []),
+      ...sahipAile.map((a) => ({ e: `Sahip: ${aileAd(a)}`, k: () => setSahipAile(sahipAile.filter((x) => x !== a)) })),
     ].map((c, i) => <button key={i} className="cip" onClick={c.k}>{c.e} <span aria-hidden="true">×</span></button>)}
       <button className="fc-temizle" onClick={temizle}>Temizle</button></div>}
     {filtreAcik && <div className="kart yigin kucuk-bosluk fp-kisi">
+      {/* v3.37 — Mülk sahipleri: kiracısı / alıcısı çıkmış olabilecek sahipleri geriye dönük aramak için */}
+      <details open className="fp-sahip"><summary>Mülk sahipleri <small className="ipucu">{sahip || sahipAile.length ? [sahip ? SAHIP_SUZGEC_ETIKET[sahip] : "", ...sahipAile.map(aileAd)].filter(Boolean).join(" · ") : "Tümü"}</small></summary>
+        <div className="cip-satir">{(Object.keys(SAHIP_SUZGEC_ETIKET) as Exclude<SahipSuzgeci, "">[]).map((t) => { const on = sahip === t; return <button key={t} type="button" className={cx("cip secilir", on && "on")} aria-pressed={on} onClick={() => setSahip(on ? "" : t)}>{SAHIP_SUZGEC_ETIKET[t]} <small>{sahipSay(t)}</small></button>; })}</div>
+        <div className="alan-etiket">Mülk tipi (sahip olduğu)</div>
+        <div className="cip-satir">{MULK_AILELERI.map((a) => { const n = [...sahipler.values()].filter((o) => o.aileler.includes(a.kod)).length; const on = sahipAile.includes(a.kod); if (!n && !on) return null; return <button key={a.kod} type="button" className={cx("cip secilir", on && "on")} aria-pressed={on} onClick={() => setSahipAile(on ? sahipAile.filter((x) => x !== a.kod) : [...sahipAile, a.kod])}>{a.etiket} <small>{n}</small></button>; })}</div>
+        <p className="ipucu">Sahip: portföye "Mülk sahibi" olarak bağlı ya da rolü Kiraya veren / Satıcı olan kişi. Mülk tipi bağlı portföylerden kendiliğinden gelir; portföyü kayıtlı olmayan tanıdık sahipler için kişi kartında rol + "Sahip olduğu mülk tipleri" seçin. En uzun süredir aranmayanlar için Sırala › Son iletişim (artan).</p>
+      </details>
       <details open><summary>Rol <small className="ipucu">{roller.length ? `${roller.length} seçili` : "Tümü"}</small></summary>
         <div className="cip-satir">{[...KISI_ROLLERI, [ROLSUZ, "Rolü yok"] as [string, string]].map(([r, l]) => { const n = r === ROLSUZ ? d.kisiler.filter((k) => !k.roller.length).length : d.kisiler.filter((k) => k.roller.includes(r)).length; const on = roller.includes(r); if (!n && !on && r === ROLSUZ) return null; return <button key={r} className={cx("cip secilir", on && "on")} style={!n && !on ? { opacity: 0.55 } : undefined} onClick={() => setRoller(on ? roller.filter((x) => x !== r) : [...roller, r])}>{l} <small>{n}</small></button>; })}</div>
       </details>
@@ -260,6 +288,8 @@ export function Kisiler() {
     {/* v3.19 — tek ince satır: sayı + "Seç". Onay kutuları ve toplu işlem düğmeleri yalnızca seçim modunda çıkar. */}
     <div className="kisi-arac">
       <span className="ipucu">{liste.length} kişi{gorunenSecili.length > 0 && ` · ${gorunenSecili.length} seçili`}</span>
+      {/* v3.37 — tek dokunuş: pasif / arşiv portföyü olan sahipler, en uzun süredir aranmayan önce */}
+      {!secimModu && sahip !== "KAPANMIS" && <button className="btn kucuk" id="sahip-tekrar-ara" onClick={() => { setSahip("KAPANMIS"); setSr({ alan: "iletisim", yon: "artan" }); }}>Tekrar aranacak sahipler</button>}
       {!secimModu ? <button className="btn kucuk" onClick={() => setSecimModu(true)} disabled={!sirali.length}>Seç</button> : <div className="kisi-arac-sec">
         <label className="kisi-hepsi"><input type="checkbox" aria-label="Listedeki tüm kişileri seç" checked={hepsiSecili} onChange={(e) => setSecili(e.target.checked ? new Set([...secili, ...sirali.map((k) => k.id)]) : new Set([...secili].filter((id) => !sirali.some((k) => k.id === id))))} /> {filtreVar ? "Süzülenlerin" : "Tümünün"} seçimi ({sirali.length})</label>
         {gorunenSecili.length > 0 && !silOnay && <><button className="btn kucuk" onClick={() => setSecili(new Set())}>Seçimi kaldır</button>{googleCiftYonlu(d) && gonderilebilir.length > 0 && <button className="btn kucuk" onClick={googleaGonder}>Google'a gönder ({gonderilebilir.length})</button>}{yetkiAktif("kayit.sil") && <button className="btn kucuk tehlike" onClick={() => setSilOnay(true)}>Toplu sil ({gorunenSecili.length})</button>}</>}
@@ -273,6 +303,7 @@ export function Kisiler() {
         {secimModu && <input type="checkbox" aria-label={`${k.adSoyad} seç`} checked={secili.has(k.id)} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} onChange={() => degisSec(k.id)} />}
         <div className="avatar">{k.adSoyad[0]?.toLocaleUpperCase("tr")}</div>
         <div className="kisi-bilgi"><b>{k.adSoyad}</b>{k.sirket && <div className="kk-alt">{k.sirket}</div>}<div className="kk-alt">{telYaz(k.telefon)}</div>
+          {sahipler.has(k.id) && <div className="kk-alt sahip-ozet">{sahipOzetMetni(sahipler.get(k.id)!, aileAd)}</div>}
           <NotAlintisi k={k} sorgu={sorgu} gorusme={gorusme.get(k.id)} />
           <div className="pill-satir"><KaynakRozeti k={k} />{k.roller.map((r) => <Pill key={r}>{rolAd(r)}</Pill>)}{!!sy?.t && <Pill ton="mavi">{sy.t} talep</Pill>}{!!sy?.p && <Pill ton="yesil">{sy.p} portföy</Pill>}</div></div>
         <button className="btn kucuk" aria-label={`${k.adSoyad} hızlı düzenle`} onKeyDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setDuzenId(duzenId === k.id ? null : k.id); }}><span aria-hidden="true">✎</span><span className="kisi-duzen-yazi"> Düzenle</span></button>
@@ -309,11 +340,13 @@ function NotAlintisi({ k, sorgu, gorusme }: { k: Kisi; sorgu: AramaSorgusu; goru
 function HizliDuzen({ k, kapat }: { k: Kisi; kapat: () => void }) {
   const { guncelle, bildir } = useDepo();
   const [f, setF] = useState<Kisi>(k);
-  const kaydet = () => {
-    if (f.adSoyad.trim().length < 2) return bildir("Ad en az 2 karakter olmalı");
-    const u = telUyarisi(f.telefon); if (u) return bildir(u);
+  // v3.37 — değişiklik varken başka ekrana geçilirse "kaydedelim mi?"
+  const birak = useKaydedilmemis(farkliMi(f, k), "Kişi düzenleme", () => kaydet(false));
+  const kaydet = (kapatsin = true): boolean => {
+    if (f.adSoyad.trim().length < 2) { bildir("Ad en az 2 karakter olmalı"); return false; }
+    const u = telUyarisi(f.telefon); if (u) { bildir(u); return false; }
     guncelle((x) => ({ ...x, kisiler: x.kisiler.map((y) => (y.id === k.id ? duzeltmeIsareti(x, y, { ...f, adSoyad: f.adSoyad.trim(), telefon: telNormalize(f.telefon) || null }) : y)) }));
-    bildir("Kişi güncellendi"); kapat();
+    birak(); bildir("Kişi güncellendi"); if (kapatsin) kapat(); return true;
   };
   return <section className="kart form" onClick={(e) => e.stopPropagation()}>
     <div className="alanlar">
@@ -326,7 +359,7 @@ function HizliDuzen({ k, kapat }: { k: Kisi; kapat: () => void }) {
     <div className="alan genis"><label htmlFor={`hd-not-${k.id}`}>Açıklama / notlar</label><textarea id={`hd-not-${k.id}`} rows={2} value={f.notlar ?? ""} onChange={(e) => setF({ ...f, notlar: e.target.value || null })} /></div>
     <div className="alan-etiket">Roller</div>
     <div className="cip-satir">{KISI_ROLLERI.map(([r, l]) => { const on = f.roller.includes(r); return <button key={r} type="button" className={cx("cip secilir", on && "on")} onClick={() => setF({ ...f, roller: on ? f.roller.filter((x) => x !== r) : [...f.roller, r] })}>{l}</button>; })}</div>
-    <div className="satir"><button className="btn birincil" onClick={kaydet}>Kaydet</button><button className="btn" onClick={kapat}>Vazgeç</button></div>
+    <div className="satir"><button className="btn birincil" onClick={() => kaydet()}>Kaydet</button><button className="btn" onClick={() => { birak(); kapat(); }}>Vazgeç</button></div>
   </section>;
 }
 
@@ -336,11 +369,15 @@ export function KisiKarti({ id }: { id: string }) {
   const es = useEslesmeler();
   const [duzen, setDuzen] = useState(false);
   const [f, setF] = useState<Kisi | null>(k ?? null);
+  // v3.37 — düzenleme açıkken değişiklik varsa ayrılmadan sorulur
+  const kaydetRef = useRef<() => boolean>(() => false);
+  const birak = useKaydedilmemis(duzen && !!k && !!f && farkliMi(f, k), "Kişi bilgileri", () => kaydetRef.current());
   if (!k || !f) return <div className="yigin"><p className="bos">Kişi bulunamadı.</p></div>;
   const ky = kisininKayitlari(d.kayitlar, id);
   const idler = new Set(ky.map((x) => x.id));
   const kisiEs = es.filter((e) => (idler.has(e.t.id) || idler.has(e.p.id)) && e.s.uygunluk !== "UYGUN_DEGIL");
-  const kaydet = () => { if (telUyarisi(f.telefon)) { bildir(telUyarisi(f.telefon)!); return; } guncelle((x) => ({ ...x, kisiler: x.kisiler.map((y) => (y.id === id ? duzeltmeIsareti(x, y, { ...f, telefon: telNormalize(f.telefon) || null }) : y)) })); setDuzen(false); bildir("Kişi güncellendi"); };
+  const kaydet = (): boolean => { if (telUyarisi(f.telefon)) { bildir(telUyarisi(f.telefon)!); return false; } guncelle((x) => ({ ...x, kisiler: x.kisiler.map((y) => (y.id === id ? duzeltmeIsareti(x, y, { ...f, telefon: telNormalize(f.telefon) || null }) : y)) })); birak(); setDuzen(false); bildir("Kişi güncellendi"); return true; };
+  kaydetRef.current = kaydet;
   const rolBagi = (kayit: Kayit) => (kayit.veri.kisiler ?? []).filter((b) => b.kisiId === id).map((b) => rolAd(b.rol, KAYIT_ROLLERI)).join(", ");
   return <div className="yigin">
     <section className="kart kisi-bas">
@@ -353,7 +390,7 @@ export function KisiKarti({ id }: { id: string }) {
         <div className="pill-satir"><KaynakRozeti k={k} />{k.roller.map((r) => <Pill key={r}>{rolAd(r)}</Pill>)}{k.uzmanlikAileleri.map((a) => <Pill key={a} ton="mavi">{MULK_AILELERI.find((x) => x.kod === a)?.etiket ?? a}</Pill>)}</div>
       </div>
       <div className="yigin kucuk-bosluk" style={{ alignItems: "flex-end" }}>
-        <button className="btn kucuk" onClick={() => { setF(k); setDuzen(!duzen); }}>{duzen ? "Vazgeç" : "Düzenle"}</button>
+        <button className="btn kucuk" onClick={() => { if (duzen) birak(); setF(k); setDuzen(!duzen); }}>{duzen ? "Vazgeç" : "Düzenle"}</button>
         {/* v3.21 — toplu içe aktarılmış / WhatsApp'tan gelmiş kişiyi tek tek Google rehberine gönder */}
         {googleCiftYonlu(d) && !k.googleResourceName && k.telefon && !k.kaynaktaSilindi && !googleBekliyorMu(k) && <button className="btn kucuk" onClick={() => { guncelle((x) => ({ ...x, kisiler: x.kisiler.map((y) => (y.id === id ? { ...y, googleaGonder: true } : y)) })); bildir("Bir sonraki eşitlemede Google rehberinize eklenecek"); }}>Google'a gönder</button>}
       </div>
@@ -367,10 +404,10 @@ export function KisiKarti({ id }: { id: string }) {
       </div>
       <div className="alan-etiket">Rolleri</div>
       <div className="cip-satir">{KISI_ROLLERI.map(([r, l]) => { const on = f.roller.includes(r); return <button key={r} type="button" className={cx("cip secilir", on && "on")} onClick={() => setF({ ...f, roller: on ? f.roller.filter((x) => x !== r) : [...f.roller, r] })}>{l}</button>; })}</div>
-      {f.roller.includes("EMLAKCI") && <><div className="alan-etiket">Uzmanlığı (emlakçı)</div><div className="cip-satir">{MULK_AILELERI.map((a) => { const on = f.uzmanlikAileleri.includes(a.kod); return <button key={a.kod} type="button" className={cx("cip secilir", on && "on")} onClick={() => setF({ ...f, uzmanlikAileleri: on ? f.uzmanlikAileleri.filter((x) => x !== a.kod) : [...f.uzmanlikAileleri, a.kod] })}>{a.etiket}</button>; })}</div></>}
+      {(f.roller.includes("EMLAKCI") || f.roller.some((r) => SAHIP_KISI_ROLLERI.has(r))) && <><div className="alan-etiket">{f.roller.includes("EMLAKCI") ? "Uzmanlığı (emlakçı)" : "Sahip olduğu mülk tipleri"} <small className="ipucu">{f.roller.includes("EMLAKCI") ? "" : "· portföyü kayıtlı olmasa da Kişiler › Mülk sahipleri süzgecinde çıkar"}</small></div><div className="cip-satir">{MULK_AILELERI.map((a) => { const on = f.uzmanlikAileleri.includes(a.kod); return <button key={a.kod} type="button" className={cx("cip secilir", on && "on")} onClick={() => setF({ ...f, uzmanlikAileleri: on ? f.uzmanlikAileleri.filter((x) => x !== a.kod) : [...f.uzmanlikAileleri, a.kod] })}>{a.etiket}</button>; })}</div></>}
       <label className="alan-etiket" htmlFor="kk-not">Açıklama / notlar</label>
       <textarea id="kk-not" rows={3} value={f.notlar ?? ""} onChange={(e) => setF({ ...f, notlar: e.target.value || null })} />
-      <div className="satir"><button className="btn birincil" onClick={kaydet}>Kaydet</button></div>
+      <div className="satir"><button className="btn birincil" onClick={() => kaydet()}>Kaydet</button></div>
     </section>}
     {!duzen && (k.notlar || k.referans || k.whatsappGruplari.length > 0) && <section className="kart">
       {k.notlar && <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{k.notlar}</p>}
@@ -389,7 +426,7 @@ export function KisiKarti({ id }: { id: string }) {
     <section>
       <div className="bolum-bas"><h3>Kayıtları</h3><div className="satir"><button className="btn kucuk" onClick={() => git({ ad: "form", tip: "TALEP", taslak: { kisiler: [{ kisiId: id, rol: k.roller.includes("EMLAKCI") ? "EMLAKCI" : "MUSTERI" }] } as any })}>+ Talep</button><button className="btn kucuk" onClick={() => git({ ad: "form", tip: "PORTFOY", taslak: { kisiler: [{ kisiId: id, rol: k.roller.includes("EMLAKCI") ? "EMLAKCI" : "SAHIP" }] } as any })}>+ Portföy</button></div></div>
       {ky.map((x) => <button key={x.id} className="kart kayit-kart" onClick={() => git({ ad: "detay", id: x.id })}>
-        <div className="pill-satir"><Pill ton={x.veri.tip === "TALEP" ? "mavi" : "yesil"}>{etiket(x.veri.tip)}</Pill><Pill>{etiket(x.veri.mulkTipi)}</Pill><IslemPill islem={x.veri.islemTipi} /><Pill>{rolBagi(x)}</Pill><TTL v={x.veri} /></div>
+        <div className="pill-satir"><Pill ton={x.veri.tip === "TALEP" ? "mavi" : "yesil"}>{etiket(x.veri.tip)}</Pill><Pill>{etiket(x.veri.mulkTipi)}</Pill><IslemPill islem={x.veri.islemTipi} /><Pill>{rolBagi(x)}</Pill>{x.veri.durum !== "ACTIVE" && <Pill>{etiket(x.veri.durum)}</Pill>}<TTL v={x.veri} /></div>
         <div className="kk-baslik">{baslikOf(x.veri)}</div><div className="kk-alt">{x.veri.lokasyonlar.map(lokEtiket).join(" · ")} · {fiyatOf(x.veri)}{m2Of(x.veri) ? " · " + m2Of(x.veri) : ""}</div>
       </button>)}
       {!ky.length && <p className="bos">Bu kişiye bağlı kayıt yok.</p>}

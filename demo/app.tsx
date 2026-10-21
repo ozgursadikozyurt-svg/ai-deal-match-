@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -20,7 +20,7 @@ import { ILCELER, INDEKS, ogrenilenleriYukle } from "./lokasyon";
 import { CANLI, depoYukle, depoKaydet, calismaIli, kalanGun, sureUzat, ornekVeriyiKur, type DepoDurumu, type Kayit, type Veri, type PipelineDurum } from "./depo";
 import { tipCeliskisi } from "../src/lib/domain/tip-celiskisi";
 import { kiraPeriyotSuphesi } from "../src/lib/eslestirme/onizleme";
-import { C, useDepo, tipYaz, cx, Pill, IslemPill, UYGUNLUK, Skor, Gerekceler, TTL, baslikOf, fiyatOf, m2Of, oneCikanlar, Kopyala, useEslesmeler, eKey, enumYaz, telYaz, tarihYaz, lokEtiket, type Ctx, type Ekran, type Eslesme } from "./ortak";
+import { C, useDepo, tipYaz, cx, Pill, IslemPill, UYGUNLUK, Skor, Gerekceler, TTL, baslikOf, fiyatOf, m2Of, oneCikanlar, Kopyala, IlanNoCip, useEslesmeler, eKey, enumYaz, telYaz, tarihYaz, lokEtiket, type Ctx, type Ekran, type Eslesme } from "./ortak";
 import { KayitFormu } from "./form";
 import { VeriGirisi } from "./ice-aktarma";
 import { Konumlar } from "./konumlar";
@@ -69,6 +69,7 @@ import { KapakKucuk } from "./fotograflar";
 import { GelenKutusuKarti, useGelenRozet, kutuOzetYukle } from "./gelen-kutusu";
 import { TopluKaynakSecici } from "./kaynak-secici";
 import { kaynakUygula } from "../src/lib/domain/kaynak";
+import { bekleyenVarMi, bekleyenler, hepsiniKaydet, hepsiniBirak, tarayiciUyarisiKur, useKaydedilmemis } from "./kirli";
 
 type Alan = keyof typeof MULK_OZELLIK_META;
 
@@ -161,7 +162,7 @@ export function KayitKart({ k, sec, uzat }: { k: Kayit; sec?: { on: boolean; deg
         {kisiAdlari.length > 0 && <div className="kk-alt">{kisiAdlari.join(", ")}</div>}
         {oneCikanlar(v).length > 0 && <div className="cip-satir">{oneCikanlar(v).map((c) => <span key={c} className="cip">{c}</span>)}</div>}
       </div>
-      <div className="kk-sag"><b>{fiyatOf(v)}</b><span>{m2Of(v)}</span></div>
+      <div className="kk-sag"><b>{fiyatOf(v)}</b><span>{m2Of(v)}</span><IlanNoCip v={v} /></div>
     </div>
   </button><div className="kart-anahtar"><AnahtarDugmesi anahtar={v.tip === "TALEP" ? favTalep(k.id) : favPortfoy(k.id)} /></div>
     {(v.aciklama || uzatGoster) && <div className="kart-ek">{v.aciklama ? <Aciklama metin={v.aciklama} /> : <span />}{uzatGoster && <UzatDugmesi k={k} />}</div>}
@@ -263,11 +264,14 @@ function Detay({ id }: { id: string }) {
   const yillikSuphe = !talep ? kiraPeriyotSuphesi(v as any) : null; // v3.27 — "aylık" kira birim olarak akla yatkın değil
   return <div className="yigin">
     {/* v3.13 — üst satır: solda geri, sağda Düzenle + (portföyde) Portföy paylaş. Önceden paylaş düğmesi başlığın altındaydı, üst sağ boştu. */}
+    {/* v3.37 — Pasife al / Arşivle / Tekrar aktifleştir üst satırda (eskiden sayfanın en altındaydı) */}
     <div className="detay-ust">
-      <div className="satir">
+      <div className="satir sar">
         <AnahtarDugmesi anahtar={talep ? favTalep(k.id) : favPortfoy(k.id)} kucuk={false} etiket />
         <button className="btn kucuk" onClick={() => git({ ad: "form", tip: v.tip, id: k.id })}>Düzenle</button>
         {!talep && <button className="btn kucuk birincil" id="portfoy-paylas" onClick={() => setPaylasAcik(true)}>Portföy paylaş</button>}
+        {v.durum === "ACTIVE" ? <><button className="btn kucuk" id="d-pasif" onClick={() => durumYap("PASSIVE")}>Pasife al</button><button className="btn kucuk" id="d-arsiv" onClick={() => durumYap("ARSIV")}>Arşivle</button></>
+          : <button className="btn kucuk" id="d-aktif" onClick={() => durumYap("ACTIVE")}>Tekrar aktifleştir</button>}
       </div>
     </div>
     {(celiski || yillikSuphe != null) && <section className="kart">
@@ -285,6 +289,8 @@ function Detay({ id }: { id: string }) {
       <SahiplikSecici k={k} />
       <div className="izgara">
         <div><span>{talep ? "Bütçe" : "Fiyat"}</span><b>{fiyatOf(v)}</b></div>
+        {/* v3.37 — ilan numarası fiyatın yanında; dokununca portalda açılır, numara kopyalanır */}
+        {v.portalIlanNo && <div className="d-ilan-no"><span>İlan no</span><b><IlanNoCip v={v} baglanti /><Kopyala metin={String(v.portalIlanNo)} /></b></div>}
         <div><span>Alan</span><b>{m2Of(v) || "—"}</b></div>
         <div><span>Ana kategori</span><b>{etiket(v.anaKategori)}</b></div>
         <div><span>İlan sahibi</span><b>{(ILAN_SAHIBI_ETIKET as any)[v.ilanSahibiTipi]}</b></div>
@@ -352,7 +358,7 @@ function Detay({ id }: { id: string }) {
         {v.mesajTarihi && <div><span>Mesaj tarihi</span><b>{tarihYaz(v.mesajTarihi, true)}</b></div>}
         {(v.gondeAdi || v.gondeTelefon) && <div><span>Gönderen</span><b>{[v.gondeAdi, telYaz(v.gondeTelefon)].filter(Boolean).join(" · ")}</b></div>}
         {v.kaynakDosya && <div><span>Dosya</span><b>{v.kaynakDosya}</b></div>}
-        {v.portalUrl && <div><span>İlan</span><b><a href={v.portalUrl} target="_blank" rel="noreferrer">{v.portalIlanNo ?? "Bağlantı"}</a></b></div>}
+        {v.portalUrl && !v.portalIlanNo && <div><span>İlan</span><b><a href={v.portalUrl} target="_blank" rel="noreferrer">Bağlantı</a></b></div>}
         <div><span>Sisteme giriş</span><b>{tarihYaz(k.olusturma)}</b></div>
         <IlkKaynakSatirlari v={v as any} />
       </div>
@@ -369,10 +375,6 @@ function Detay({ id }: { id: string }) {
       {!benim.some((e) => e.s.uygunluk !== "UYGUN_DEGIL") && <p className="bos">Uygun eşleşme yok{benim.length ? ` (${benim.length} aday elendi — Eşleşmeler ekranında "Uygun değil" filtresinde nedenleri görünür)` : ""}.</p>}
     </section>
 
-    <div className="satir sar">
-      <button className="btn" onClick={() => git({ ad: "form", tip: v.tip, id: k.id })}>Düzenle</button>
-      {v.durum === "ACTIVE" ? <><button className="btn" onClick={() => durumYap("PASSIVE")}>Pasife al</button><button className="btn" onClick={() => durumYap("ARSIV")}>Arşivle</button></> : <button className="btn" onClick={() => durumYap("ACTIVE")}>Tekrar aktifleştir</button>}
-    </div>
     {v.durum === "ACTIVE" && <EslesmeCekmecesi k={k} />}
   </div>;
 }
@@ -508,6 +510,7 @@ function Taraf({ k, rol, ham = false, karsi }: { k: Kayit; rol: string; ham?: bo
       <div className="ust-etiket">{rol}</div><div className="pill-satir"><SahiplikRozeti s={sahip} /><KimPill v={v} adli={false} /></div>
       <div className="taraf-bas"><KapakKucuk k={k} boyut={48} /><div className="kk-baslik">{baslikOf(v)}</div></div>
       <div className="kk-alt">{v.lokasyonlar.map(lokEtiket).join(" · ")} · {fiyatOf(v)} {m2Of(v) && "· " + m2Of(v)}</div>
+      <IlanNoCip v={v} />
     </button>
     {kisiler.length ? <div className="taraf-kisiler">{kisiler.map(({ b, ki }) => <div key={b.kisiId + b.rol} className="taraf-kisi">
       <button type="button" className="taraf-kisi-ad" onClick={() => git({ ad: "kisi", id: ki!.id })}><b>{ki!.adSoyad}</b> <small className="ipucu">{KAYIT_ROLLERI.find((r) => r[0] === b.rol)?.[1]}</small>{ki!.telefon ? <><br /><span className="tel">{telYaz(ki!.telefon)}</span></> : null}</button>
@@ -529,6 +532,9 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
   const anahtar = eKey(tid, pid);
   const n = d.eslesmeNotlari[anahtar] ?? { durum: "YENI" as PipelineDurum, not: "" };
   const [not, setNot] = useState(n.not);
+  // v3.37 — operasyon notu yazılıp kaydedilmeden çıkılırsa sorulur
+  const notBirak = useKaydedilmemis(not.trim() !== (n.not ?? "").trim(), "Eşleşme operasyon notu", () => { yazNot(); return true; });
+  const yazNot = () => { guncelle((dd) => ({ ...dd, eslesmeNotlari: { ...dd.eslesmeNotlari, [anahtar]: { ...(dd.eslesmeNotlari[anahtar] ?? n), not } } })); notBirak(); bildir("Not kaydedildi"); };
   if (!e) return <div className="yigin"><p className="bos">Bu eşleşme artık yok (kayıtlardan biri pasif ya da değişti).</p></div>;
   const [sor, setSor] = useState(false);
   const yaz = (x: Partial<typeof n>) => guncelle((dd) => ({ ...dd, eslesmeNotlari: { ...dd.eslesmeNotlari, [anahtar]: { ...n, ...x } } }));
@@ -536,14 +542,18 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
   const sorulacak = [...new Set([...e.s.kriterler.filter((k) => k.sonuc === "BILINMIYOR").map((k) => k.etiket + " (portföy sahibine)"), ...e.s.dna.eksik.map((x) => x.etiket + " (müşteriye)")])];
   const u = UYGUNLUK[e.s.uygunluk];
   return <div className="yigin">
-    <section className="kart es-bas"><Skor s={e.s.skor} u={e.s.uygunluk} /><div><Pill ton={u.ton}>{e.s.seviye}/5 · {SEVIYE_ETIKET[e.s.seviye]}</Pill> <FirsatRozeti f={e.f} komisyon /> <AnahtarDugmesi anahtar={favEslesme(tid, pid)} kucuk={false} etiket /><div className="ipucu">{e.s.lokasyonAciklama}</div>
+    {/* v3.37 — "Eşleşmeyi kopar" (açıklamalı) en üstte; koparılmışsa durumu ve "Geri al" aynı yerde */}
+    <div className={cx("detay-ust es-ust", n.durum === "REDDEDILDI" && "kopuk")}>
+      <div className="satir sar"><AnahtarDugmesi anahtar={favEslesme(tid, pid)} kucuk={false} etiket />{n.durum === "REDDEDILDI" && <b className="ipucu">Bu eşleşme koparıldı — listelerde gösterilmiyor</b>}</div>
+      <KoparDugmesi tid={tid} pid={pid} sonra={() => setSor(true)} />
+    </div>
+    <section className="kart es-bas"><Skor s={e.s.skor} u={e.s.uygunluk} /><div><Pill ton={u.ton}>{e.s.seviye}/5 · {SEVIYE_ETIKET[e.s.seviye]}</Pill> <FirsatRozeti f={e.f} komisyon /><div className="ipucu">{e.s.lokasyonAciklama}</div>
       {e.s.tipUyumu.oran < 1 && <div className="ipucu">Mülk tipi: {e.s.tipUyumu.aciklama}</div>}
       {e.s.guven && <div className="ipucu">Güven: {({ YUKSEK: "yüksek", ORTA: "orta", DUSUK: "düşük" } as const)[e.s.guven.seviye]} · {e.s.guven.aciklama}</div>}
       {(e.s.uyarilar ?? []).map((x) => <div key={x} className="uyari-satir">Kontrol: {x}</div>)}
       {e.s.kritikEngeller.length > 0 && <div className="hata-satir">Olmazsa olmaz karşılanmıyor: {e.s.kritikEngeller.join(", ")}</div>}
       {/* v3.36 — seviye gerekçesi */}
       <div className="gerekce-kutu"><div className="ust-etiket">Neden {e.s.seviye}/5?</div><Gerekceler s={e.s} /><div className="ipucu">{SEVIYE_ACIKLAMA[e.s.seviye]}</div></div></div></section>
-    <section className={cx("kart kopar-kart", n.durum === "REDDEDILDI" && "kopuk")}><div className="satir-ara"><div><b>{n.durum === "REDDEDILDI" ? "Bu eşleşme koparıldı" : "Uygun değil mi, sunuldu ve beğenilmedi mi?"}</b><div className="ipucu">{n.durum === "REDDEDILDI" ? "Ana ekranda ve listelerde gösterilmiyor." : "Koparırsanız bir daha önerilmez."}</div></div><KoparDugmesi tid={tid} pid={pid} sonra={() => setSor(true)} /></div></section>
     {sor && <SonrakiIletisimSorusu tid={tid} pid={pid} kapat={() => setSor(false)} />}
     <div className="iki-kolon"><Taraf k={e.t} rol="Talep" ham karsi={e.p} /><Taraf k={e.p} rol="Portföy" karsi={e.t} /></div>
     <section className="kart">
@@ -561,7 +571,7 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
       <EslesmeGorevleri tid={tid} pid={pid} />
       <label className="alan-etiket" htmlFor="es-not">Operasyon notu</label>
       <textarea id="es-not" rows={3} value={not} onChange={(ev) => setNot(ev.target.value)} placeholder="Görüşme sonrası notunuz…" />
-      <div className="satir"><button className="btn" onClick={() => { yaz({ not }); bildir("Not kaydedildi"); }}>Notu kaydet</button></div>
+      <div className="satir"><button className="btn" onClick={yazNot}>Notu kaydet</button></div>
     </section>
   </div>;
 }
@@ -698,22 +708,31 @@ export function Uygulama() {
   useEffect(() => { void kutuOzetYukle(); }, []); // v3.23 — gelen kutusu: açılışta yalnızca dosya listesi (tek küçük istek); dosyalar ekran açılınca okunur
   const gelenRozet = useGelenRozet(d);
   useEffect(() => googleOtomatik((f) => setD((x) => f(x))), []); // v3.22.2 canlı: açılışta yalnızca Google bağlantı DURUMU okunur; eşitleme günde bir sunucuda ya da elle (eskiden açılışta + 5 dk'da bir)
+  // v3.37 — kaydedilmemiş değişiklik koruması: formda değişiklik varken ekran değişecekse önce sorulur (kirli.ts)
+  const [kaydetSor, setKaydetSor] = useState<null | { eylem: () => void }>(null);
+  const korumali = (eylem: () => void) => { if (!bekleyenVarMi()) return eylem(); setKaydetSor({ eylem }); };
+  useEffect(() => tarayiciUyarisiKur(), []);
+  const gitYap = (e: Ekran) => {
+    const y = window.scrollY; // ayrılırken konum (kaydırmadan ÖNCE okunur)
+    if (e.ad === "liste" && e.filtre) kaliciSil(`liste.${e.tip}.`); // Ana Sayfa'dan hazır filtreyle gelince eski süzgeç karışmasın
+    const ayni = ekran.ad === e.ad && JSON.stringify(ekran) === JSON.stringify(e);
+    // v3.37 — form geçmişe girmez (kaydedildi ya da bilerek bırakıldı); Geri formdan önceki ekrana döner
+    setGecmis((g) => (ayni || ekran.ad === "form" ? g : [...g.slice(-40), { ekran, y }]));
+    if (!ayni) { try { history.pushState({ anahtarcrm: true }, ""); itilen.current++; } catch { /* önizleme çerçevesi */ } }
+    setEkran(e); window.scrollTo({ top: 0 });
+  };
+  // v3.21.2 — Geri: önceki ekran süzgeçleriyle (useKalici) ve ayrıldığın kaydırma konumunda açılır
+  const geriGit = (o?: { donus?: boolean; yedek?: Ekran }) => {
+    if (itilen.current > 0) { itilen.current--; yoksay.current++; try { history.back(); } catch { yoksay.current--; } } // tarayıcı geçmişi de bir adım geri
+    geriYapRef.current(o);
+  };
+  const gitRef = useRef(gitYap), geriRef = useRef(geriGit);
+  gitRef.current = gitYap; geriRef.current = geriGit;
   const ctx: Ctx = {
     d, guncelle: (f) => setD((x) => f(x)), bildir: setMesaj, ornekHatalari: yuk.hatalar, sample,
     kayitKaydet: (k) => setD((x) => { const eski = x.kayitlar.find((y) => y.id === k.id); const y = { ...x, kayitlar: eski ? x.kayitlar.map((z) => (z.id === k.id ? k : z)) : [k, ...x.kayitlar] }; return eski ? fiyatDususuIsle(y, eski, k) : y; }),
-    git: (e) => {
-      const y = window.scrollY; // ayrılırken konum (kaydırmadan ÖNCE okunur)
-      if (e.ad === "liste" && e.filtre) kaliciSil(`liste.${e.tip}.`); // Ana Sayfa'dan hazır filtreyle gelince eski süzgeç karışmasın
-      const ayni = ekran.ad === e.ad && JSON.stringify(ekran) === JSON.stringify(e);
-      setGecmis((g) => (ayni ? g : [...g.slice(-40), { ekran, y }]));
-      if (!ayni) { try { history.pushState({ anahtarcrm: true }, ""); itilen.current++; } catch { /* önizleme çerçevesi */ } }
-      setEkran(e); window.scrollTo({ top: 0 });
-    },
-    // v3.21.2 — Geri: önceki ekran süzgeçleriyle (useKalici) ve ayrıldığın kaydırma konumunda açılır
-    geri: (o) => {
-      if (itilen.current > 0) { itilen.current--; yoksay.current++; try { history.back(); } catch { yoksay.current--; } } // tarayıcı geçmişi de bir adım geri
-      geriYapRef.current(o);
-    },
+    git: (e) => korumali(() => gitRef.current(e)),
+    geri: (o) => korumali(() => geriRef.current(o)),
     degistir: (e) => { setEkran(e); window.scrollTo({ top: 0 }); },
     geriVar: gecmis.length > 0,
   };
@@ -730,6 +749,8 @@ export function Uygulama() {
       if (yoksay.current > 0) { yoksay.current--; return; } // uygulamadaki "← Geri"nin tetiklediği adım
       if (itilen.current > 0) itilen.current--;
       setMenuAcik(false);
+      // v3.37 — formda kaydedilmemiş değişiklik varsa telefonun geri tuşu da önce sorar (tarayıcı adımı geri konur)
+      if (bekleyenVarMi()) { try { history.pushState({ anahtarcrm: true }, ""); itilen.current++; } catch { /* önizleme */ } setKaydetSor({ eylem: () => geriRef.current({ donus: true }) }); return; }
       geriYapRef.current({ donus: true });
     };
     window.addEventListener("popstate", f);
@@ -794,7 +815,31 @@ export function Uygulama() {
     </div></div>}
     {mesaj && <div className="bildirim" role="status">{mesaj}</div>}
     {surumAcik && <SurumPaneli kapat={() => setSurumAcik(false)} />}
+    {kaydetSor && <KaydetSorusu eylem={kaydetSor.eylem} kapat={() => setKaydetSor(null)} bildir={setMesaj} />}
   </C.Provider>;
+}
+
+/** v3.37 — "Değişiklikler kaydedilmedi" penceresi: Kaydet ve devam et · Kaydetmeden çık · Vazgeç (ekranda kal) */
+export function KaydetSorusu({ eylem, kapat, bildir }: { eylem: () => void; kapat: () => void; bildir: (m: string) => void }) {
+  const [mesgul, setMesgul] = useState(false);
+  const adlar = [...new Set(bekleyenler().map((b) => b.ad))];
+  const kaydetVeGec = async () => {
+    setMesgul(true);
+    const ok = await hepsiniKaydet();
+    setMesgul(false); kapat();
+    if (ok) eylem(); else bildir("Kaydedilemedi — formdaki uyarıları düzeltin");
+  };
+  return <div className="perde" onClick={kapat}>
+    <div className="panel kaydet-sor" role="alertdialog" aria-modal="true" aria-labelledby="ks-baslik" onClick={(e) => e.stopPropagation()}>
+      <h3 id="ks-baslik">Değişiklikler kaydedilmedi</h3>
+      <p>{adlar.length ? <><b>{adlar.join(", ")}</b> ekranında yaptığınız değişiklikler kaydedilmedi.</> : "Bu ekranda kaydedilmemiş değişiklikler var."} Ayrılmadan kaydedelim mi?</p>
+      <div className="satir sar">
+        <button className="btn birincil" autoFocus disabled={mesgul} onClick={kaydetVeGec}>{mesgul ? "Kaydediliyor…" : "Kaydet ve devam et"}</button>
+        <button className="btn tehlike-cizgi" disabled={mesgul} onClick={() => { hepsiniBirak(); kapat(); eylem(); }}>Kaydetmeden çık</button>
+        <button className="btn" disabled={mesgul} onClick={kapat}>Vazgeç</button>
+      </div>
+    </div>
+  </div>;
 }
 
 /** v3.7 — sunucu tarafı çizim testleri (tests/v37-ui.test.ts) için dışa açık ekranlar */

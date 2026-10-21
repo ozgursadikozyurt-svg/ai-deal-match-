@@ -1,9 +1,10 @@
 /**
- * Anahtar CRM v3.35 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * RANDEVULAR — kayıt detayında gösterim / görüşme kartı: ekle, sonucunu gir (Gerçekleşti / Gelmedi / İptal).
  * Canlıda /api/randevular (src/lib/services/randevu.ts); demoda bu oturumluk örnek liste (kalıcı değil).
  */
 import React, { useContext, useEffect, useState } from "react";
+import { useKaydedilmemis } from "./kirli";
 import { C, Pill } from "./ortak";
 import { CANLI } from "./depo";
 import { RANDEVU_TURLERI, RANDEVU_TURU_ETIKET, RANDEVU_SONUCLARI, RANDEVU_SONUC_ETIKET } from "../src/lib/domain/islem";
@@ -36,12 +37,14 @@ export function RandevuKarti({ kayitId, talep, kisiId, karsilar }: { kayitId: st
   useEffect(() => { void yukle(); }, [kayitId]);
   const calis = async (is: () => Promise<void>, ok: string) => { setHata(undefined); try { await is(); bildir(ok); } catch (e: any) { setHata(e?.message ?? "Bir sorun oluştu"); } };
 
-  const ekle = () => calis(async () => {
+  // v3.37 — randevu formu doldurulmuşken başka ekrana geçilirse "kaydedelim mi?"
+  const birak = useKaydedilmemis(acik && !!(not.trim() || karsi), "Randevu", () => ekle());
+  const ekle = async (): Promise<boolean> => { let ok = false; await calis(async () => {
     const r = { tarih: new Date(tarih).toISOString(), tur, sonuc: "PLANLANDI" as Sonuc, talepId: talep ? kayitId : karsi || null, portfoyId: talep ? karsi || null : kayitId, kisiId: kisiId ?? null, not: not.trim() || null };
     if (canli) { await api("/api/randevular", { method: "POST", json: r }); await yukle(); }
     else { const y = { id: "r" + Date.now(), ...r }; DEMO.push(y); setListe((l) => [y, ...l]); }
-    setAcik(false); setNot(""); setKarsi("");
-  }, "Randevu eklendi");
+    birak(); setAcik(false); setNot(""); setKarsi(""); ok = true;
+  }, "Randevu eklendi"); return ok; };
   const sonucGir = (r: Randevu, sonuc: Sonuc) => calis(async () => {
     if (canli) { await api(`/api/randevular?id=${r.id}`, { method: "PATCH", json: { sonuc } }); await yukle(); }
     else { r.sonuc = sonuc; setListe((l) => l.map((x) => (x.id === r.id ? { ...x, sonuc } : x))); }
@@ -50,7 +53,7 @@ export function RandevuKarti({ kayitId, talep, kisiId, karsilar }: { kayitId: st
   const sirali = [...liste].sort((a, b) => (a.tarih < b.tarih ? 1 : -1));
   const ad = (id?: string | null) => karsilar.find((k) => k.id === id)?.baslik;
   return <section className="kart yigin" id="randevular">
-    <div className="satir-ara"><h3>Randevular ({liste.length})</h3><button className="btn kucuk" onClick={() => setAcik(!acik)}>{acik ? "Vazgeç" : "+ Randevu"}</button></div>
+    <div className="satir-ara"><h3>Randevular ({liste.length})</h3><button className="btn kucuk" onClick={() => { if (acik) birak(); setAcik(!acik); }}>{acik ? "Vazgeç" : "+ Randevu"}</button></div>
     {hata && <p role="alert" className="hata">{hata}</p>}
     {acik && <div className="yigin" style={{ gap: 8 }}>
       <div className="satir sar">
@@ -62,7 +65,7 @@ export function RandevuKarti({ kayitId, talep, kisiId, karsilar }: { kayitId: st
         {karsilar.slice(0, 40).map((k) => <option key={k.id} value={k.id}>{k.baslik}</option>)}
       </select>}
       <input aria-label="Randevu notu" maxLength={1000} value={not} onChange={(e) => setNot(e.target.value)} placeholder="Not (isteğe bağlı)" />
-      <div><button className="btn birincil" onClick={ekle}>Randevuyu kaydet</button></div>
+      <div><button className="btn birincil" onClick={() => void ekle()}>Randevuyu kaydet</button></div>
     </div>}
     {sirali.length === 0 && !acik && <p className="ipucu">Henüz randevu yok. Gösterim ya da görüşme ayarlayınca buraya ekleyin; sonucu sonradan girilir.</p>}
     {sirali.map((r) => <div key={r.id} className="satir-ara sar" style={{ borderTop: "1px solid var(--cizgi, #e5e5e5)", paddingTop: 6 }}>

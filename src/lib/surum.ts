@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.36 · 19 Ekim 2026
+ * Anahtar CRM v3.37 · 21 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.36";
-export const TARIH = "19 Ekim 2026";
+export const SURUM = "3.37";
+export const TARIH = "21 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.36_19Ekim2026";
+export const DOSYA_EKI = "v3.37_21Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,27 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.37",
+    tarih: "21 Ekim 2026",
+    baslik: "Bütçesiz talep puanı düşürmez; kaydedilmemiş değişiklik uyarısı; Mülk sahipleri süzgeci; Pasife al / Arşivle / Kopar üstte; ilan no her yerde",
+    degisenler: [
+      "Eşleştirme: talepte bütçe yazılmamışsa fiyat bileşeni nötr — ceza, 79 tavanı ve kartta \"Eksik: talepte bütçe yok\" yok (bütçe çoğu zaman seçilen m²'ye göre konuşulur). Gerekçede bilgi notu: \"Talepte bütçe yok — puanı düşürmez\". Portföyde fiyat yoksa eski kural aynen: −8 ve en fazla 79 (4/5), \"Portföyde fiyat yok — fiyatı sorun\". Örnek: \"Kepez 2.000–4.000 m² depo\" (bütçesiz) talebine 3.000 m² / 250 bin TL depo artık 5/5.",
+      "Kaydedilmemiş değişiklik: talep / portföy formu, kişi düzenleme ve yeni kişi, İşlemler formu, randevu, görüşme notu ve eşleşme operasyon notu yazılmışken başka menüye, \"← Geri\"ye ya da telefonun geri tuşuna basılırsa \"Değişiklikler kaydedilmedi\" penceresi: Kaydet ve devam et · Kaydetmeden çık · Vazgeç (ekranda kal). Sekme kapanırken tarayıcı da uyarır. Değişiklik yoksa sorulmaz.",
+      "Kişiler › Filtrele › Mülk sahipleri: Tüm sahipler · Aktif portföyü olanlar · Pasif / arşiv portföyü olanlar (tekrar ara) · Portföyü kayıtlı olmayan sahipler; ayrıca sahip olduğu mülk tipi (Depo, Fabrika…). Kişi kartında tek satır özet: \"Depo / Lojistik · 2 portföy (1 pasif/arşiv) · 3 sunum\". Tek dokunuş: \"Tekrar aranacak sahipler\" (en uzun süredir aranmayan önce).",
+      "Sahip kim sayılır: portföye \"Mülk sahibi\" olarak bağlı kişi ya da rolü Kiraya veren / Satıcı olan kişi. Mülk tipi bağlı portföylerden kendiliğinden gelir; portföyü kayıtlı olmayan tanıdık sahip için kişi kartında rol + \"Sahip olduğu mülk tipleri\" seçilir. Ayrı bir grup / etiket tutmak gerekmez.",
+      "Kayıt detayı: Pasife al / Arşivle (ya da Tekrar aktifleştir) üst satırda, Düzenle'nin yanında (alttaki tekrar kaldırıldı). Eşleşme detayı: \"Eşleşmeyi kopar\" en üstte; pencerede ayrı \"Açıklama\" alanı (eşleşme notuna eklenir).",
+      "İlan no (sahibinden vb.): portföy formunda alan — numara ya da ilan bağlantısı yapıştırılır, numara kendiliğinden ayrılır. Detayda fiyatın hemen yanında, dokununca ilan açılır (sahibinden.com/<no>), numara kopyalanır. Portföy listesi kartında, eşleşme kartlarında ve eşleşme detayında \"İlan 1346793126\" çipi. Talep / portföy aramasında ilan numarası da aranır.",
+      "Veritabanı değişikliği yok (ilan no alanı v3.7'den beri vardı); yayından sonra \"Kurulumu tamamla\" gerekmez.",
+    ],
+    testEt: [
+      "Bir depo talebinin bütçesini silip kaydedin: eşleşmelerinde \"Eksik: talepte bütçe yok\" yazmamalı; fiyatı olan uygun depolar 4/5'e düşmemeli.",
+      "Bir portföyü Düzenle'ye girin, başlığı değiştirin ve soldaki menüden Kişiler'e basın: \"Değişiklikler kaydedilmedi\" penceresi çıkmalı. Vazgeç → formda kalmalı; Kaydet ve devam et → kaydedip Kişiler'e geçmeli.",
+      "Kişiler › \"Tekrar aranacak sahipler\": pasif / arşiv portföyü olan sahipler gelmeli; kartta \"… portföy (1 pasif/arşiv)\" satırı. Filtrele › Mülk sahipleri › Depo / Lojistik ile yalnızca depo sahipleri kalmalı.",
+      "P1 (Hacıaliler 4000 m² depo): kartta \"İlan 1346793126\", detayda Fiyat'ın yanında İlan no; dokununca sahibinden açılmalı. Düzenle'de İlan no alanına bir sahibinden bağlantısı yapıştırın: yalnızca numara kalmalı.",
+      "Bir kaydın detayında Pasife al / Arşivle üstte olmalı; bir eşleşmeyi açın: \"Eşleşmeyi kopar\" en üstte, pencerede Açıklama alanı.",
+    ],
+  },
   {
     surum: "3.36",
     tarih: "19 Ekim 2026",
