@@ -1,13 +1,14 @@
 /**
- * Anahtar CRM v3.37 · 21 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * Demo — ekranların ortak parçaları: depo bağlamı, küçük bileşenler, eşleşme hesabı, konum öneri kutusu.
  */
 import React, { createContext, useContext, useMemo, useRef, useState } from "react";
-import { eslesmeOnizle, temelUyum, seviyeOf, SEVIYE_ETIKET, SEVIYE_ACIKLAMA, type OnizlemeSonucu, type Uygunluk, type Seviye } from "../src/lib/eslestirme/onizleme";
+import { eslesmeOnizle, temelUyum, butceSerbestle, seviyeOf, SEVIYE_ETIKET, SEVIYE_ACIKLAMA, type OnizlemeSonucu, type Uygunluk, type Seviye } from "../src/lib/eslestirme/onizleme";
 import { mukerrerleriTopla } from "../src/lib/eslestirme/mukerrer";
 import { firsatDegerlendir, type FirsatSonuc } from "../src/lib/eslestirme/firsat";
 import { kimOf } from "../src/lib/domain/kim";
 import { ilanBaglantisi } from "../src/lib/domain/ilan-no";
+import { sureYaz } from "../src/lib/domain/sahipler";
 import { etiket, tl } from "./etiketler";
 import { BAGLAM, konumOner, lokEtiket, type KonumOnerisi } from "./lokasyon";
 import { kalanGun, type DepoDurumu, type Kayit, type Veri, type OrnekHata } from "./depo";
@@ -94,7 +95,7 @@ export const tipYaz = (v: Partial<Veri>) => `${etiket(v.mulkTipi)}${(v.alternati
 export const baslikOf = (v: Partial<Veri>) => v.baslik || `${etiket(v.mulkTipi)}${v.odaSayisi ? " " + v.odaSayisi : ""} · ${etiket(v.islemTipi)}`;
 const para = (n: number, pb?: string, per?: string) => (pb && pb !== "TRY" ? n.toLocaleString("tr-TR") + " " + etiket(pb) + (per === "AYLIK" ? " / ay" : "") : tl(n, per));
 export const fiyatOf = (v: Partial<Veri>) => v.tip === "TALEP"
-  ? (v.maxFiyat != null ? "≤ " + para(v.maxFiyat, v.paraBirimi, v.fiyatPeriyodu) : "Bütçe yok")
+  ? (v.maxFiyat != null ? "≤ " + para(v.maxFiyat, v.paraBirimi, v.fiyatPeriyodu) : (v as any).butceSerbest ? "Bütçe m²'ye göre" : "Bütçe yok")
   : (v.fiyat != null ? para(v.fiyat, v.paraBirimi, v.fiyatPeriyodu) : "Fiyat yok");
 export const m2Of = (v: Partial<Veri>) => v.tip === "TALEP" ? (v.minM2 || v.maxM2 ? `${v.minM2?.toLocaleString("tr-TR") ?? "…"}–${v.maxM2?.toLocaleString("tr-TR") ?? "…"} m²` : "") : v.m2 ? v.m2.toLocaleString("tr-TR") + " m²" : "";
 export function oneCikanlar(v: Partial<Veri>): string[] {
@@ -127,6 +128,13 @@ export function IlanNoCip({ v, baglanti = false }: { v: { portalIlanNo?: string 
     : <span className="ilan-no" title="İlan numarası">İlan {no}</span>;
 }
 
+/** v3.38 — durum çipi: "Pasif · 3 aydır" (durum tarihi biliniyorsa) */
+export function DurumPill({ v }: { v: { durum: string; durumTarihi?: unknown } }) {
+  if (v.durum === "ACTIVE") return null;
+  const t = v.durumTarihi ? new Date(v.durumTarihi as any).getTime() : NaN;
+  return <Pill>{etiket(v.durum)}{Number.isFinite(t) ? ` · ${sureYaz(t)}` : ""}</Pill>;
+}
+
 export function Kopyala({ metin, etiketi = "Kopyala" }: { metin: string; etiketi?: string }) {
   const [ok, setOk] = useState(false);
   return <button className="btn kucuk" onClick={() => { navigator.clipboard?.writeText(metin).then(() => { setOk(true); setTimeout(() => setOk(false), 1500); }).catch(() => {}); }}>{ok ? "Kopyalandı" : etiketi}</button>;
@@ -153,12 +161,12 @@ export function useEslesmeler(koparilanDahil = false): Eslesme[] {
     const sahip = (k: Kayit) => { if (!sahipler.has(k.id)) sahipler.set(k.id, sc(k.veri).tur); return sahipler.get(k.id)!; };
     for (const t of T) for (const p of P) if (temelUyum(t.veri as any, p.veri as any)) {
       const f = firsatDegerlendir(kim(t).tur, kim(p).tur, { islemTipi: String(p.veri.islemTipi), fiyat: p.veri.fiyat ?? null, butce: t.veri.maxFiyat ?? null, talepSahip: sahip(t), portfoySahip: sahip(p) });
-      r.push({ t, p, s: eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM), f });
+      r.push({ t, p, s: eslesmeOnizle(butceSerbestle(t.veri as any, sahip(t) === "BENIM"), p.veri as any, BAGLAM), f }); // v3.38
     }
     const sira: Record<Uygunluk, number> = { SUNULABILIR: 0, KOSULLU: 1, UYGUN_DEGIL: 2 };
-    // v3.19 — önce uygunluk, sonra fırsat kademesi (sahibinden ↔ müşteri önde), sonra skor
-    // v3.27 — aynı talebe düşen mükerrer portföyler tek satır ("+N aynı ilan")
-    return mukerrerleriTopla(r.sort((a, b) => sira[a.s.uygunluk] - sira[b.s.uygunluk] || b.s.seviye - a.s.seviye /* v3.36 */ || b.f.sira - a.f.sira || b.s.skor - a.s.skor));
+    // v3.38 — önce uygunluk, sonra uyum (seviye → skor): kriterleri dolu ve iyi tutan eşleşmeler en üstte; fırsat kademesi yalnızca eşitlikte
+    // (Özgür, 21 Eki 2026: "iyi değerleri oluşanları puanları önce yukarıdan sıralamalısın"). v3.27 — mükerrer portföyler tek satır.
+    return mukerrerleriTopla(r.sort((a, b) => sira[a.s.uygunluk] - sira[b.s.uygunluk] || b.s.seviye - a.s.seviye || b.s.skor - a.s.skor || b.f.sira - a.f.sira));
   }, [d.kayitlar, d.kisiler, d.ogrenilen, d.ayarlar.sahiplik, d.ayarlar.paylasim]);
   return useMemo(() => (koparilanDahil ? tum : tum.filter((e) => d.eslesmeNotlari[`${e.t.id}~${e.p.id}`]?.durum !== "REDDEDILDI")), [tum, d.eslesmeNotlari, koparilanDahil]);
 }

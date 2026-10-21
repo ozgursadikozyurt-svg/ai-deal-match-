@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * v3.21.2 — Eşleşmeler: tahmini komisyon toplamı kalktı · filtre/konum karta girip Geri dönünce korunur ·
  * kompakt süzgeçler + skor süzgeci · Konumlar, Bağlantılar, Yönetim Ayarlar içinde.
  * v3.22: yan çekmece yerine seçici satırında yatay açılan skor şeridi (testler ona göre güncellendi; ⋯ başlık satırında).
@@ -44,19 +44,19 @@ test("Eşleşmeler: 'tahmini komisyon ≈ …' toplam satırı ve eski Fırsat �
 test("Eşleşmeler: karta girip Geri dönünce uygunluk, fırsat, skor süzgeçleri ve çipleri korunur; Temizle hepsini sıfırlar", async () => {
   let a = await ac(React.createElement(Eslesmeler), ctx());
   await a.tikla(a.dugme(/^Sunulabilir \(/));
-  await skorYaz(a, 3);                                                                  // uyum ≥ 3/5
+  await skorYaz(a, 4);                                                                  // uyum ≥ 4/5 (v3.38: varsayılan ≥ 3/5)
   await a.tikla(a.q(".skor-kapat"));
   await a.tikla(a.qa(".hs-satir .hs-btn")[1]);                                          // Fırsat seçicisi
   await a.tikla(a.qa(".hs-menu .hs-oge").find((x) => /^Öncelikli/.test(x.textContent ?? "")));
-  assert.deepEqual([kaliciOku("eslesmeler.u"), kaliciOku("eslesmeler.seviye"), kaliciOku("eslesmeler.fk")], ["SUNULABILIR", 3, "ONCELIKLI"]);
+  assert.deepEqual([kaliciOku("eslesmeler.u"), kaliciOku("eslesmeler.seviye"), kaliciOku("eslesmeler.fk")], ["SUNULABILIR", 4, "ONCELIKLI"]);
   await a.kapat();                                                                      // ekran sökülür (karta girildi)
 
   a = await ac(React.createElement(Eslesmeler), ctx());                                  // Geri: ekran yeniden çizilir
   assert.ok(a.dugme(/^Sunulabilir \(/)!.className.includes("on"), "Sunulabilir seçili kaldı");
-  assert.match(a.q(".skor-hs .hs-btn")!.textContent ?? "", /Uyum≥ 3\/5/);
+  assert.match(a.q(".skor-hs .hs-btn")!.textContent ?? "", /Uyum≥ 4\/5/);
   assert.ok(a.q(".skor-hs .hs-btn")!.className.includes("on"));
   const cipler = a.qa(".aktif-filtreler .cip").map((x) => x.textContent ?? "");
-  assert.ok(cipler.some((x) => x.includes("Uyum ≥ 3/5")) && cipler.some((x) => x.includes("Fırsat: Öncelikli")), cipler.join("|"));
+  assert.ok(cipler.some((x) => x.includes("Uyum ≥ 4/5")) && cipler.some((x) => x.includes("Fırsat: Öncelikli")), cipler.join("|"));
   await a.tikla(a.q(".fc-temizle"));
   assert.equal(kaliciOku("eslesmeler.seviye"), 0); assert.equal(kaliciOku("eslesmeler.fk"), "");
   assert.equal(a.qa(".aktif-filtreler .cip").length, 0, "Temizle: çipler gitti");
@@ -103,7 +103,7 @@ test("Uyum şeridi (v3.36: skor yerine 1–5): kapalıyken dar düğme; dokununc
   const a = await ac(React.createElement(Eslesmeler), ctx());
   const dugme = () => a.q(".skor-hs .hs-btn")!;
   assert.equal(dugme().getAttribute("aria-expanded"), "false"); assert.ok(!a.q(".skor-serit"));
-  assert.match(dugme().textContent ?? "", /UyumTümü/);
+  assert.match(dugme().textContent ?? "", /Uyum≥ 3\/5/); // v3.38 — varsayılan ≥ 3/5
   await a.tikla(dugme());
   assert.ok(a.q(".skor-serit"), "şerit açıldı"); assert.ok(a.q(".hs-satir .skor-serit"), "şerit seçici satırının içinde (listeyi örtmez)");
   assert.ok(a.q(".sirala-perde"), "dışına dokununca kapanır");
@@ -112,7 +112,7 @@ test("Uyum şeridi (v3.36: skor yerine 1–5): kapalıyken dar düğme; dokununc
   await a.tikla([...a.qa(".skor-hazir button")].find((b) => b.textContent === "4/5")); assert.equal(kaliciOku("eslesmeler.seviye"), 4);
   assert.match(dugme().textContent ?? "", /≥ 4\/5/); assert.ok(dugme().className.includes("on"));
   assert.match(a.q(".skor-say")!.textContent ?? "", /^\d+$/);
-  await a.tikla([...a.qa(".skor-hazir button")].find((b) => b.textContent === "4/5")); assert.equal(kaliciOku("eslesmeler.seviye"), 0, "aynı seviyeye yeniden dokununca sıfırlanır");
+  await a.tikla([...a.qa(".skor-hazir button")].find((b) => b.textContent === "4/5")); assert.equal(kaliciOku("eslesmeler.seviye"), 0, "aynı seviyeye yeniden dokununca sıfırlanır (Tümü)");
   await a.tikla(a.q(".skor-kapat")); assert.ok(!a.q(".skor-serit"));
   await a.kapat();
 });

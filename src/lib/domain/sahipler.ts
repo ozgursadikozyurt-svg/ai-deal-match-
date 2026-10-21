@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.37 · 21 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * Mülk sahipleri: Kişiler ekranındaki "Mülk sahipleri" süzgecinin ve kişi kartlarındaki sahip özetinin hesabı.
  *
  * Özgür (21 Eki 2026): "Geçmişe dönük bazen mülk sahiplerini tekrar arıyorum — bir talebe istinaden depo sahibinin kiracısı çıkmış
@@ -24,7 +24,7 @@ export const KAPANMIS_DURUMLAR: ReadonlySet<string> = new Set(["PASSIVE", "ARSIV
 /** Sunulmuş sayılan eşleşme aşamaları (müşteriye iletildi ve sonrası) */
 export const SUNULMUS_ASAMALAR: ReadonlySet<string> = new Set(["BILDIRILDI", "GORUSULDU", "GOSTERIM", "PAZARLIK", "KAPANDI"]);
 
-export interface SahipPortfoyu { id: string; baslik?: string; aile: string; durum: string }
+export interface SahipPortfoyu { id: string; baslik?: string; aile: string; durum: string; /** v3.38 — durumun değiştiği an (ms) */ durumTarihi?: number | null }
 export interface SahipOzeti {
   /** sahibi olduğu portföyler (tümü) */
   portfoyler: SahipPortfoyu[];
@@ -35,9 +35,11 @@ export interface SahipOzeti {
   aileler: string[];
   /** portföylerinin müşteriye sunulmuş (iletildi, görüşüldü, gösterildi, pazarlık, kapandı) eşleşme sayısı */
   sunulan: number;
+  /** v3.38 — pasif / arşiv / süresi dolmuş portföylerinden en eskisinin durum tarihi (ms); bilinmiyorsa null */
+  enEskiKapanma: number | null;
 }
 
-interface KayitGirdisi { id: string; veri: { tip: string; mulkTipi: string; durum: string; baslik?: string | null; kisiler?: { kisiId: string; rol: string }[] | null } }
+interface KayitGirdisi { id: string; veri: { tip: string; mulkTipi: string; durum: string; baslik?: string | null; durumTarihi?: unknown; kisiler?: { kisiId: string; rol: string }[] | null } }
 interface KisiGirdisi { id: string; roller: string[]; uzmanlikAileleri?: string[] | null }
 
 /**
@@ -59,7 +61,7 @@ export function sahipOzetleri(
     if (pid) sunulanPortfoy.set(pid, (sunulanPortfoy.get(pid) ?? 0) + 1);
   }
   const m = new Map<string, SahipOzeti>();
-  const al = (id: string) => { let x = m.get(id); if (!x) { x = { portfoyler: [], aktif: 0, kapanmis: 0, aileler: [], sunulan: 0 }; m.set(id, x); } return x; };
+  const al = (id: string) => { let x = m.get(id); if (!x) { x = { portfoyler: [], aktif: 0, kapanmis: 0, aileler: [], sunulan: 0, enEskiKapanma: null }; m.set(id, x); } return x; };
   for (const k of kayitlar) {
     if (k.veri.tip !== "PORTFOY") continue;
     const gorulen = new Set<string>();
@@ -71,8 +73,10 @@ export function sahipOzetleri(
       gorulen.add(b.kisiId);
       const x = al(b.kisiId);
       const aile = aileOf(k.veri.mulkTipi);
-      x.portfoyler.push({ id: k.id, baslik: k.veri.baslik ?? undefined, aile, durum: k.veri.durum });
-      if (KAPANMIS_DURUMLAR.has(k.veri.durum)) x.kapanmis++; else if (k.veri.durum === "ACTIVE") x.aktif++;
+      const dt = k.veri.durumTarihi ? new Date(k.veri.durumTarihi as any).getTime() || null : null;
+      x.portfoyler.push({ id: k.id, baslik: k.veri.baslik ?? undefined, aile, durum: k.veri.durum, durumTarihi: dt });
+      if (KAPANMIS_DURUMLAR.has(k.veri.durum)) { x.kapanmis++; if (dt != null && (x.enEskiKapanma == null || dt < x.enEskiKapanma)) x.enEskiKapanma = dt; }
+      else if (k.veri.durum === "ACTIVE") x.aktif++;
       if (!x.aileler.includes(aile)) x.aileler.push(aile);
       x.sunulan += sunulanPortfoy.get(k.id) ?? 0;
     }
@@ -106,9 +110,14 @@ export function sahipSuzgeciUyar(o: SahipOzeti | undefined, tur: SahipSuzgeci, a
 }
 
 /** Kartta tek satırlık özet: "Depo / Lojistik · 2 portföy (1 pasif) · 3 sunum" */
-export function sahipOzetMetni(o: SahipOzeti, aileEtiket: (kod: string) => string): string {
+/** v3.38 — "3 aydır", "12 gündür", "bugün" */
+export function sureYaz(ms: number, simdi = Date.now()): string {
+  const gun = Math.max(0, Math.floor((simdi - ms) / 86_400_000));
+  return gun === 0 ? "bugünden beri" : gun < 31 ? `${gun} gündür` : gun < 365 ? `${Math.floor(gun / 30)} aydır` : `${Math.floor(gun / 365)} yıldır`;
+}
+export function sahipOzetMetni(o: SahipOzeti, aileEtiket: (kod: string) => string, simdi = Date.now()): string {
   const parca = [o.aileler.map(aileEtiket).join(", ") || "Mülk sahibi"];
-  if (o.portfoyler.length) parca.push(`${o.portfoyler.length} portföy${o.kapanmis ? ` (${o.kapanmis} pasif/arşiv)` : ""}`);
+  if (o.portfoyler.length) parca.push(`${o.portfoyler.length} portföy${o.kapanmis ? ` (${o.kapanmis} pasif/arşiv${o.enEskiKapanma != null ? `, ${sureYaz(o.enEskiKapanma, simdi)}` : ""})` : ""}`);
   else parca.push("kayıtlı portföy yok");
   if (o.sunulan) parca.push(`${o.sunulan} sunum`);
   return parca.join(" · ");

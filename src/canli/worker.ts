@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026 (v3.20'den)
+ * Anahtar CRM v3.38 · 21 Ekim 2026 (v3.20'den)
  * AŞAMA 7 — Cloudflare Worker girişi. Tek proje: arayüz (statik dosyalar, ASSETS) + /api (sunucu kodu) + zamanlanmış işler.
  *  - /api/yapilandirma, /api/saglik → açık (giriş ekranının ihtiyacı / sağlık kontrolü)
  *  - /api/davet/kabul → giriş şart, ofis şart değil (kişi henüz bir ofiste değil)
@@ -141,7 +141,7 @@ export default {
         // Supabase Free 7 gün işlem görmeyen projeyi durdurur → günlük küçük sorgu + REST isteği
         await prisma.$queryRawUnsafe("SELECT 1");
         await fetch(`${env.SUPABASE_URL.replace(/\/$/, "")}/rest/v1/`, { headers: { apikey: env.SUPABASE_ANON_KEY } }).catch(() => {});
-        await prisma.kayit.updateMany({ where: { durum: "ACTIVE", validUntil: { lt: new Date() } }, data: { durum: "EXPIRED" } });
+        await prisma.kayit.updateMany({ where: { durum: "ACTIVE", validUntil: { lt: new Date() } }, data: { durum: "EXPIRED", durumTarihi: new Date() } }); // v3.38
         // v3.23 — gelen kutusu: 45 günden eski ham dosyalar ve 1 yıldan eski "atlandı" anahtarları
         await gelenTemizlik(prisma).catch((e) => console.error("Gelen kutusu temizliği:", e));
       } else if (ev.cron.startsWith("0 4")) {

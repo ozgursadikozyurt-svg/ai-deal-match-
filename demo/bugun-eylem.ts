@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * "Bugün" panosu — durum üzerindeki işlemler (React yok; testlenebilir). Ekranlar bunları `guncelle((d) => …)` içinde çağırır.
  * Kurallar src/lib/domain/gorev.ts'de; burada yalnızca DepoDurumu ile birleştirme var.
  */
@@ -85,7 +85,7 @@ export function gorevGorusuldu(d: DepoDurumu, g: Gorev, o: GorusulduSecenegi = {
 export function gorevIlgilenmiyor(d: DepoDurumu, g: Gorev, neden: string, nedenYazisi: string, simdi: Date = simdiOf()): DepoDurumu {
   let x: DepoDurumu = { ...d, gorevler: gorevKapat(d.gorevler ?? [], g, "KAPALI", nedenYazisi, simdi) };
   if (g.eslesme) { const [tid, pid] = g.eslesme.split("~"); x = eslesmeDurumunuUygula(x, tid, pid, "REDDEDILDI", { neden, tarih: simdi.toISOString() }, simdi); }
-  else if (g.kural === "TALEP_SURE" && g.kayitId) x = { ...x, kayitlar: x.kayitlar.map((k) => (k.id === g.kayitId ? { ...k, veri: { ...k.veri, durum: "PASSIVE" } as Veri } : k)) };
+  else if (g.kural === "TALEP_SURE" && g.kayitId) x = { ...x, kayitlar: x.kayitlar.map((k) => (k.id === g.kayitId ? { ...k, veri: { ...k.veri, durum: "PASSIVE", durumTarihi: new Date() } as Veri } : k)) };
   return x;
 }
 

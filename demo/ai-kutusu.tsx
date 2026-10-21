@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * Demo — Akıllı giriş kutusu ("Anahtar AI"). Ana sayfanın en üstünde ve Veri girişi › Yapıştır'da aynı bileşen.
  *   1) Metin önce yorumlanır (src/lib/ai/yorumlayici.ts): portal ilan sayfası, WhatsApp sohbet dökümü, toplu liste,
  *      tek talep / ilan, yalnızca bağlantı, kişi / telefon ya da soru.
@@ -18,7 +18,8 @@ import { yorumla, konumBul, aiYorumIstemi, YORUM_ETIKETI, type Yorum, type Yorum
 import { aiYanitiniDogrula } from "../src/lib/ai/yorum-dogrula";
 import { tekrarAnahtarlari } from "../src/lib/ingest/tekrar";
 import { hizliAyristir, metinTuru, soruFiltresi, metindenKonumlar, type HizliSonuc, type SoruFiltresi } from "../src/lib/ai/hizli-ayristirici";
-import { eslesmeOnizle, temelUyum, type OnizlemeSonucu } from "../src/lib/eslestirme/onizleme";
+import { eslesmeOnizle, temelUyum, butceSerbestle, type OnizlemeSonucu } from "../src/lib/eslestirme/onizleme";
+import { useSahiplik } from "./sahiplik";
 import { havuzKatmani, portfoyEdinmeFirsati } from "../src/lib/eslestirme/havuz";
 import { metinParmakIzi } from "../src/lib/ingest/whatsapp";
 import { etiket, VERI_KANALI_ETIKET } from "./etiketler";
@@ -170,6 +171,7 @@ const ORNEKLER = (toplantiNotu: string): [string, string][] => [
 
 export function AkilliKutu({ gomulu = false, baslangic = "", donus }: { gomulu?: boolean; baslangic?: string; donus?: boolean }) {
   const { d, sample, git, kayitKaydet, guncelle, bildir } = useDepo();
+  const sc = useSahiplik(); // v3.38
   const HK = gomulu ? "vg.ak." : "ana.ak."; // v3.15: forma gidip "Vazgeç" ile dönülünce yorumlanan metin ve sonuçlar yerinde kalır
   hafizaBaslat(HK, donus);
   const GERI: Ekran = gomulu ? { ad: "veri", alt: "metin" } : { ad: "ana" };
@@ -204,7 +206,7 @@ export function AkilliKutu({ gomulu = false, baslangic = "", donus }: { gomulu?:
   const eslesmeBul = (v: any): { k: any; s: any }[] =>
     aktif.filter((k: any) => k.veri.tip !== v.tip).map((k: any) => {
       const t = v.tip === "TALEP" ? v : k.veri, p = v.tip === "TALEP" ? k.veri : v;
-      return temelUyum(t, p) ? { k, s: eslesmeOnizle(t, p, BAGLAM) } : null;
+      return temelUyum(t, p) ? { k, s: eslesmeOnizle(butceSerbestle(t, sc(t).tur === "BENIM"), p, BAGLAM) } : null;
     }).filter((x: any): x is { k: any; s: any } => !!x && x.s.uygunluk !== "UYGUN_DEGIL").sort((a: any, b: any) => b.s.skor - a.s.skor);
 
   const kaynakla = (s: Satir, i: number): Satir => { const k = kaynakS[i] ?? (kaynakTum || null); return k ? { ...s, taslak: kaynakUygula(s.taslak, k), veri: s.veri ? kaynakUygula(s.veri, k) : null } : s; };

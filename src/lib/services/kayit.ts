@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * Kayıt servis katmanı — API route'ları, WhatsApp ingest ve Notion import aynı fonksiyonları kullanır.
  */
 import { createHash } from "node:crypto";
@@ -23,7 +23,7 @@ export async function ttlAyarlari(prisma: PrismaClient): Promise<TA> {
 export async function sureUzat(prisma: PrismaClient, id: string, gun: number) {
   const k = await prisma.kayit.findUniqueOrThrow({ where: { id } });
   const taban = Math.max(Date.now(), k.validUntil.getTime());
-  return prisma.kayit.update({ where: { id }, data: { validUntil: new Date(taban + gun * 86_400_000), ttlUyariGonderildi: false, ...(k.durum === "EXPIRED" ? { durum: "ACTIVE" } : {}) } });
+  return prisma.kayit.update({ where: { id }, data: { validUntil: new Date(taban + gun * 86_400_000), ttlUyariGonderildi: false, ...(k.durum === "EXPIRED" ? { durum: "ACTIVE", durumTarihi: new Date() } : {}) } });
 }
 
 /** Duplicate önleme: ham metin varsa ona, yoksa yapısal alanlara göre */

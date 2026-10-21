@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.37 · 21 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * Demo — kayıt formu. Şemadan üretilir; mülk grubuna göre yalnızca anlamlı alanlar,
  * önce "önemli alanlar", gerisi "Tüm alanlar" altında. Bölümler varsayılan kapalı.
  */
@@ -301,7 +301,9 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
           return <div className="alan genis"><label>Oda sayısı{talep ? " · birden çok seçebilirsiniz" : ""}</label><div className="cip-satir">{ODA_SECENEK.map((o) => <button type="button" key={o} aria-pressed={secili.includes(o)} className={cx("cip secilir", secili.includes(o) && "on")} onClick={() => tikla(o)}>{o}</button>)}<input id="f-oda" aria-label="Diğer oda sayısı" className="kisa-girdi" placeholder="diğer: 2+2, 7+1…" key={digerler.join()} defaultValue={digerler.join(", ")} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); (e.target as HTMLInputElement).blur(); } }} onBlur={(e) => { const dig = odaListesi(e.target.value).map((x) => x.etiket); yaz(talep ? [...secili.filter((x) => ODA_SECENEK.includes(x)), ...dig] : dig.slice(0, 1)); }} /></div></div>;
         })()}
         {talep ? <>
-          <div className="alan"><label htmlFor="f-maxf">Bütçe (en fazla)</label><SayiGir binlik id="f-maxf" deger={f.maxFiyat} onChange={(x) => set("maxFiyat", x)} /></div>
+          <div className="alan"><label htmlFor="f-maxf">Bütçe (en fazla)</label><SayiGir binlik id="f-maxf" deger={f.maxFiyat} onChange={(x) => set("maxFiyat", x)} />
+            {/* v3.38 — bütçe yazılmadıysa eşleşme puanı düşmesin (★ Benim talepleri zaten muaf) */}
+            {f.maxFiyat == null && <button type="button" id="f-butce-serbest" className={cx("bool-cip kucuk-cip", f.butceSerbest && "evet")} aria-pressed={!!f.butceSerbest} title="İçeri aktarılan bütçesiz talepler en fazla 3/5 alır; bunu işaretlerseniz puan düşmez" onClick={() => set("butceSerbest", f.butceSerbest ? null : true)}><span className="isaret">{f.butceSerbest ? "✓" : "+"}</span>Bütçe m²'ye göre — puanı düşürme</button>}</div>
           <div className="alan"><label htmlFor="f-minm2">En az alan (m²)</label><SayiGir binlik id="f-minm2" deger={f.minM2} onChange={(x) => set("minM2", x)} /></div>
           <div className="alan"><label htmlFor="f-maxm2">En fazla alan (m²)</label><SayiGir binlik id="f-maxm2" deger={f.maxM2} onChange={(x) => set("maxM2", x)} /></div>
         </> : <>

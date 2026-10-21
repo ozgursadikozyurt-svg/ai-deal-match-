@@ -1,11 +1,12 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * Demo — kayıt detayının altındaki açılır çekmece: talebin içinden çıkmadan uygun portföyleri
  * (portföyün içindeyken uygun talepleri) filtreleyip incelemek ve eşleşmeye almak için.
  */
 import { eslesmeDurumunuUygula } from "./bugun-eylem";
 import React, { useMemo, useState } from "react";
-import { eslesmeOnizle, temelUyum } from "../src/lib/eslestirme/onizleme";
+import { eslesmeOnizle, temelUyum, butceSerbestle } from "../src/lib/eslestirme/onizleme";
+import { useSahiplik } from "./sahiplik";
 import { aileOf, benzerAileler } from "../src/lib/domain/kategori";
 import { etiket } from "./etiketler";
 import { BAGLAM, INDEKS } from "./lokasyon";
@@ -34,6 +35,7 @@ function talepMesaji(k: Kayit): string {
 }
 export function EslesmeCekmecesi({ k }: { k: Kayit }) {
   const { d, guncelle, git, bildir } = useDepo();
+  const sc = useSahiplik(); // v3.38 — ★ Benim talebi bütçesizse puan düşmez
   const talep = k.veri.tip === "TALEP";
   const [acik, setAcik] = useState(false);
   const [f, setF] = useState<Filtre>(() => baslangicFiltresi(k));
@@ -46,13 +48,13 @@ export function EslesmeCekmecesi({ k }: { k: Kayit }) {
   const satirlar0 = useMemo(() => karsi.filter((x) => filtreUygula(x.veri, f, kisiAd)).map((x) => {
     const t = talep ? k : x, p = talep ? x : k;
     const uyum = temelUyum(t.veri as any, p.veri as any);
-    return { x, t, p, uyum, s: eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM) };
+    return { x, t, p, uyum, s: eslesmeOnizle(butceSerbestle(t.veri as any, sc(t.veri).tur === "BENIM"), p.veri as any, BAGLAM) };
   }).filter((r) => !sadeceUygun || (r.uyum && r.s.uygunluk !== "UYGUN_DEGIL")).sort((a, b) => Number(b.uyum) - Number(a.uyum) || b.s.skor - a.s.skor), [karsi, f, sadeceUygun, k]);
   const [kopukGoster, setKopukGoster] = useState(false);
   const kopuk = (r: { t: Kayit; p: Kayit }) => d.eslesmeNotlari[eKey(r.t.id, r.p.id)]?.durum === "REDDEDILDI";
   const kopukSayi = satirlar0.filter(kopuk).length;
   const satirlar = siralaUygula(satirlar0.filter((r) => kopukGoster || !kopuk(r)), sr, secenek);
-  const uygunSayi = karsi.filter((x) => x.veri.durum === "ACTIVE").filter((x) => { const t = talep ? k : x, p = talep ? x : k; return temelUyum(t.veri as any, p.veri as any) && eslesmeOnizle(t.veri as any, p.veri as any, BAGLAM).uygunluk !== "UYGUN_DEGIL"; }).length;
+  const uygunSayi = karsi.filter((x) => x.veri.durum === "ACTIVE").filter((x) => { const t = talep ? k : x, p = talep ? x : k; return temelUyum(t.veri as any, p.veri as any) && eslesmeOnizle(butceSerbestle(t.veri as any, sc(t.veri).tur === "BENIM"), p.veri as any, BAGLAM).uygunluk !== "UYGUN_DEGIL"; }).length;
   const takipte = (tid: string, pid: string) => { const n = d.eslesmeNotlari[eKey(tid, pid)]; return !!n && n.durum !== "YENI" && n.durum !== "REDDEDILDI"; };
   const takipDegis = (tid: string, pid: string, v: boolean) => {
     guncelle((dd) => eslesmeDurumunuUygula(dd, tid, pid, v ? "BILDIRILDI" : "YENI"));

@@ -1,9 +1,9 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * Kayıt başına eşleşme özeti (en iyi skor, uygun eşleşme sayısı, en iyi karşı kayıt).
  * Notion'a geri yazımda ve senkron raporunda ("bu içe aktarma N yeni eşleşme getirdi") kullanılır.
  */
-import { eslesmeOnizle, temelUyum, type LokasyonBaglami, type Uygunluk } from "./onizleme";
+import { eslesmeOnizle, temelUyum, butceSerbestle, type LokasyonBaglami, type Uygunluk } from "./onizleme";
 
 export interface OzetKayit { id: string; veri: Record<string, any> }
 export interface EslesmeOzeti { sayi: number; sunulabilir: number; enIyiSkor: number | null; enIyiId: string | null; enIyiBaslik: string | null; enIyiUygunluk: Uygunluk | null }
@@ -27,7 +27,7 @@ export function eslesmeOzetleri(kayitlar: OzetKayit[], b: LokasyonBaglami): Map<
   };
   for (const t of T) for (const p of P) {
     if (!temelUyum(t.veri as any, p.veri as any)) continue;
-    const s = eslesmeOnizle(t.veri as any, p.veri as any, b);
+    const s = eslesmeOnizle(butceSerbestle(t.veri as any), p.veri as any, b); // v3.38
     yaz(t.id, p, s.skor, s.uygunluk); yaz(p.id, t, s.skor, s.uygunluk);
   }
   for (const k of aktif) if (!m.has(k.id)) m.set(k.id, bos());

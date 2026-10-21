@@ -1073,6 +1073,10 @@ model Kayit {
   isaret        String?
   tip           KayitTipi
   durum         Durum        @default(ACTIVE)
+  /// v3.38 — durumun son değiştiği an (pasife alındı, arşivlendi, süresi doldu, yeniden aktif). "En uzun süredir pasif" sıralaması.
+  durumTarihi   DateTime?
+  /// v3.38 — talepte bütçe yazılmamışsa eşleşme puanı düşürülmesin ("Bütçe m²'ye göre"). ★ Benim talepleri zaten muaf.
+  butceSerbest  Boolean?
   aciliyet      Aciliyet     @default(NORMAL)
 
   // ---- Kategori & işlem (Madde 1) ----
@@ -1199,6 +1203,7 @@ model Kayit {
   @@index([gondeTelefon])
   @@index([kisiId])
   @@index([ofisId, ilkKaynak]) // v3.32 — kaynak raporları
+  @@index([durum, durumTarihi]) // v3.38 — en uzun süredir pasif
   @@map("kayit")
   @@index([portalIlanNo]) // v3.7 — toplu içe aktarmada aynı ilanı tanımak için
 }

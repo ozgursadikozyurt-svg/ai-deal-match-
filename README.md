@@ -1,4 +1,4 @@
-# Anahtar CRM (anahtarcrm) — v3.37 · 21 Ekim 2026
+# Anahtar CRM (anahtarcrm) — v3.38 · 21 Ekim 2026
 
 > Önceki adlar: Anakey, Anahtar.ai. Canlı proje/Worker/depo adı **anahtarcrm** (v3.14). (Bu dosya v3.5'ten beri güncellenmemişti; v3.9'da güncellendi.)
 
@@ -22,6 +22,7 @@ npm run canli:test && npm run canli:test:depo && npm run canli:test:giris && npm
 
 ## Google ile bağlan — çift yönlü Google Kişiler (v3.21)
 - Kullanıcı için tek adım: Bağlantılar › **Google ile bağlan** → Google'da "İzin ver". Kurallar ve platform kurulumu (bir kez): **`docs/GOOGLE_BAGLANTI_KURULUMU_v3.21_8Ekim2026.md`**; mimari: **`docs/ANAHTAR_CRM_EK_v3.21_8Ekim2026.md`**.
+- **Bütçesiz talep yalnızca Benim / işaretliyse muaf, Eşleşmeler ≥ 3/5 ve talep başına en iyi 10, pasife alınma tarihi (v3.38):** içeri aktarılmış bütçesiz talep en fazla 3/5; liste uyuma göre sıralı; `kayit.durumTarihi`, `kayit.butceSerbest` (yayından sonra "Kurulumu tamamla"). Ayrıntı: **`docs/ANAHTAR_CRM_EK_v3.38_21Ekim2026.md`**.
 - **Bütçesiz talep, kaydedilmemiş değişiklik, mülk sahipleri, ilan no (v3.37):** talepte bütçe yoksa eşleşme puanı ekstra düşmez (portföyde fiyat yoksa ceza kalır); formdan kaydetmeden başka ekrana geçerken "Kaydet / Kaydetmeden çık / Vazgeç" sorulur; Kişiler › Mülk sahipleri süzgeci ve "Tekrar aranacak sahipler"; Pasife al / Arşivle / Eşleşmeyi kopar üstte; ilan no formda, detayda fiyatın yanında ve kartlarda. Ayrıntı: **`docs/ANAHTAR_CRM_EK_v3.37_21Ekim2026.md`**.
 - **Yetki belgesi, randevu ve işlemler (v3.35):** portföyde açılıp kapanan "Yetki belgesi" (belge no, taşınmaz ID, bitiş); talep / portföy detayında Randevular (sonuç: gerçekleşti / gelmedi / iptal); Ayarlar › İşlemler (yalnızca ofis yöneticisi; bana kalan tahsilat ayına). Polaris işlemleri taşındı. Ayrıntı: **`docs/ANAHTAR_CRM_EK_v3.35_19Ekim2026.md`**.
 - **Reklam kampanyaları (v3.34):** Yönetim › Reklam kampanyaları — kampanya (Meta / Google / diğer), elle aylık harcama, kayıt sayısı ve kayıt başına maliyet. Kayıt, ilk kaynak detayındaki kampanya adıyla bağlanır; asistan yalnızca adları görür. Ayrıntı: **`docs/ANAHTAR_CRM_EK_v3.34_19Ekim2026.md`**; uygulama sırası: **`docs/ANAHTAR_POLARIS_KARAR_v1.2_19Ekim2026.md`**.

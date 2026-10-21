@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * v3.7 — demo ekranlarının sunucu tarafında hatasız çizildiğini doğrular (tarayıcısız duman testi):
  * listeler + sıralama düğmesi, kayıt detayı + görüşme notları + ara/WhatsApp, kişiler, bağlantılar, toplu veri girişi.
  */
@@ -28,7 +28,7 @@ const ciz = (el: React.ReactElement) => renderToStaticMarkup(React.createElement
 
 test("listeler: sıralama düğmesi var", () => {
   for (const tip of ["TALEP", "PORTFOY"] as const) assert.match(ciz(React.createElement(Liste, { tip })), /sirala-btn/);
-  assert.match(ciz(React.createElement(Eslesmeler)), /Fırsat önceliği/); // v3.19: varsayılan sıralama
+  assert.match(ciz(React.createElement(Eslesmeler)), /Uyum \(en iyi önce\)/); // v3.38: varsayılan sıralama uyum (eskiden fırsat önceliği)
 });
 test("detay: görüşme notları ve not akışı", () => {
   const h = ciz(React.createElement(Detay, { id: kayitlar[0].id }));

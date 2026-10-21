@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.38 · 21 Ekim 2026 (v3.14'ten)
  * AŞAMA 7 — Canlı sürümün veri köprüsü. Arayüz (demo ile aynı ekranlar) tüm durumu tek seferde okur
  * (`durumGetir`), değişiklikleri parça parça yazar (`degisiklikUygula`). Veritabanı ilişkisel kalır:
  * Notion/Google senkronu, toplu giriş, dışa aktarma ve eşleştirme servisleri aynı tablolarla çalışmaya devam eder.
@@ -167,10 +167,12 @@ export async function degisiklikUygula(prisma: PrismaClient, g: Degisiklik) {
     let kUyari: string | undefined;
     try {
       await geciciyseTekrarla(() => prisma.$transaction(async (tx) => {
-        const var_ = await tx.kayit.findUnique({ where: { id: k.id }, select: { id: true, ilkKaynak: true, ilkKaynakDetay: true, ilkKaynakTarihi: true, ilkYanit: true } });
+        const var_ = await tx.kayit.findUnique({ where: { id: k.id }, select: { id: true, ilkKaynak: true, ilkKaynakDetay: true, ilkKaynakTarihi: true, ilkYanit: true, durum: true, durumTarihi: true } });
         const karar = ilkKaynakKarari(var_ ?? null, { ...p.data, ilkKaynak: gelenVeri.ilkKaynak as string | null | undefined, ilkKaynakDetay: gelenVeri.ilkKaynakDetay as string | null | undefined }, yetkiVar(rol, "kaynak.duzelt"), simdi, k.olusturma ? new Date(k.olusturma) : null);
         const yanit = k.notlar ? ilkYanitKarari(var_?.ilkYanit, k.notlar.map((n) => n.tur), simdi) : var_?.ilkYanit ?? null;
-        const tamVeri = { ...veri, ...karar.yaz, ilkYanit: yanit };
+        // v3.38 — durum tarihi sunucuda yazılır: durum değiştiyse şimdi; değişmediyse eskisi; yeni kayıtta (aktif değilse) istemcinin değeri ya da şimdi
+        const durumTarihi = var_ ? (var_.durum !== p.data.durum ? simdi : var_.durumTarihi ?? null) : p.data.durum !== "ACTIVE" ? p.data.durumTarihi ?? simdi : null;
+        const tamVeri = { ...veri, ...karar.yaz, ilkYanit: yanit, durumTarihi };
         if (var_) {
           await tx.kayitLokasyon.deleteMany({ where: { kayitId: k.id } });
           await tx.kayitKisi.deleteMany({ where: { kayitId: k.id } });

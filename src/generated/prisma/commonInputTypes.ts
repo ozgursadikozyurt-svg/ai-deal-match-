@@ -508,6 +508,11 @@ export type EnumDurumFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumDurumFilter<$PrismaModel> | $Enums.Durum
 }
 
+export type BoolNullableFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedBoolNullableFilter<$PrismaModel> | boolean | null
+}
+
 export type EnumAciliyetFilter<$PrismaModel = never> = {
   equals?: $Enums.Aciliyet | Prisma.EnumAciliyetFieldRefInput<$PrismaModel>
   in?: $Enums.Aciliyet[] | Prisma.ListEnumAciliyetFieldRefInput<$PrismaModel>
@@ -548,11 +553,6 @@ export type EnumFiyatPeriyoduFilter<$PrismaModel = never> = {
   in?: $Enums.FiyatPeriyodu[] | Prisma.ListEnumFiyatPeriyoduFieldRefInput<$PrismaModel>
   notIn?: $Enums.FiyatPeriyodu[] | Prisma.ListEnumFiyatPeriyoduFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumFiyatPeriyoduFilter<$PrismaModel> | $Enums.FiyatPeriyodu
-}
-
-export type BoolNullableFilter<$PrismaModel = never> = {
-  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedBoolNullableFilter<$PrismaModel> | boolean | null
 }
 
 export type EnumVeriKanaliFilter<$PrismaModel = never> = {
@@ -644,6 +644,14 @@ export type EnumDurumWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumDurumFilter<$PrismaModel>
 }
 
+export type BoolNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedBoolNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedBoolNullableFilter<$PrismaModel>
+}
+
 export type EnumAciliyetWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.Aciliyet | Prisma.EnumAciliyetFieldRefInput<$PrismaModel>
   in?: $Enums.Aciliyet[] | Prisma.ListEnumAciliyetFieldRefInput<$PrismaModel>
@@ -702,14 +710,6 @@ export type EnumFiyatPeriyoduWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumFiyatPeriyoduFilter<$PrismaModel>
   _max?: Prisma.NestedEnumFiyatPeriyoduFilter<$PrismaModel>
-}
-
-export type BoolNullableWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
-  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
-  _min?: Prisma.NestedBoolNullableFilter<$PrismaModel>
-  _max?: Prisma.NestedBoolNullableFilter<$PrismaModel>
 }
 
 export type EnumVeriKanaliWithAggregatesFilter<$PrismaModel = never> = {
@@ -1744,6 +1744,11 @@ export type NestedEnumDurumFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumDurumFilter<$PrismaModel> | $Enums.Durum
 }
 
+export type NestedBoolNullableFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedBoolNullableFilter<$PrismaModel> | boolean | null
+}
+
 export type NestedEnumAciliyetFilter<$PrismaModel = never> = {
   equals?: $Enums.Aciliyet | Prisma.EnumAciliyetFieldRefInput<$PrismaModel>
   in?: $Enums.Aciliyet[] | Prisma.ListEnumAciliyetFieldRefInput<$PrismaModel>
@@ -1784,11 +1789,6 @@ export type NestedEnumFiyatPeriyoduFilter<$PrismaModel = never> = {
   in?: $Enums.FiyatPeriyodu[] | Prisma.ListEnumFiyatPeriyoduFieldRefInput<$PrismaModel>
   notIn?: $Enums.FiyatPeriyodu[] | Prisma.ListEnumFiyatPeriyoduFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumFiyatPeriyoduFilter<$PrismaModel> | $Enums.FiyatPeriyodu
-}
-
-export type NestedBoolNullableFilter<$PrismaModel = never> = {
-  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedBoolNullableFilter<$PrismaModel> | boolean | null
 }
 
 export type NestedEnumVeriKanaliFilter<$PrismaModel = never> = {
@@ -1856,6 +1856,14 @@ export type NestedEnumDurumWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumDurumFilter<$PrismaModel>
 }
 
+export type NestedBoolNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedBoolNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedBoolNullableFilter<$PrismaModel>
+}
+
 export type NestedEnumAciliyetWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.Aciliyet | Prisma.EnumAciliyetFieldRefInput<$PrismaModel>
   in?: $Enums.Aciliyet[] | Prisma.ListEnumAciliyetFieldRefInput<$PrismaModel>
@@ -1914,14 +1922,6 @@ export type NestedEnumFiyatPeriyoduWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumFiyatPeriyoduFilter<$PrismaModel>
   _max?: Prisma.NestedEnumFiyatPeriyoduFilter<$PrismaModel>
-}
-
-export type NestedBoolNullableWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
-  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
-  _min?: Prisma.NestedBoolNullableFilter<$PrismaModel>
-  _max?: Prisma.NestedBoolNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumVeriKanaliWithAggregatesFilter<$PrismaModel = never> = {

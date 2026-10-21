@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.37 · 21 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * v3.37 — Özgür'ün 21 Ekim istekleri:
  *   1) talepte bütçe yoksa eşleşme puanı ekstra düşmez (portföyde fiyat yoksa ceza kalır)
  *   2) kaydedilmemiş değişiklik varken başka ekrana geçerken "kaydedelim mi?"
@@ -30,14 +30,15 @@ const T = (v: Partial<OnizlemeKayit> = {}): OnizlemeKayit => ({ tip: "TALEP", mu
 const P = (v: Partial<OnizlemeKayit> = {}): OnizlemeKayit => ({ tip: "PORTFOY", mulkTipi: "DEPO_ANTREPO", islemTipi: "KIRALIK", fiyatPeriyodu: "AYLIK", lokasyonlar: lok("Kepez", true), m2: 3000, fiyat: 250_000, ...v } as OnizlemeKayit);
 
 test("sürüm 3.37 ve ek belge", () => {
-  assert.equal(SURUM, "3.37"); assert.equal(SURUM_GECMISI[0].surum, "3.37"); assert.equal(SURUM_GECMISI[1].surum, "3.36");
-  assert.ok((SURUM_GECMISI[0].testEt ?? []).length >= 4);
+  const i = SURUM_GECMISI.findIndex((x) => x.surum === "3.37"); // v3.38 öne eklendi
+  assert.ok(i >= 0 && SURUM_GECMISI[i + 1].surum === "3.36" && SURUM >= "3.37");
+  assert.ok((SURUM_GECMISI[i].testEt ?? []).length >= 4);
   assert.ok(fs.existsSync("docs/ANAHTAR_CRM_EK_v3.37_21Ekim2026.md"));
 });
 
 // ───── 1) Bütçesiz talep ─────
-test("depo talebi '2.000–4.000 m², bütçe yok': fiyatlı uygun depo 5/5 alır; 'Eksik: talepte bütçe yok' yazmaz", () => {
-  const s = eslesmeOnizle(T(), P(), BAGLAM);
+test("depo talebi '2.000–4.000 m², bütçe yok' (v3.38: Benim / Bütçe m²'ye göre): fiyatlı uygun depo 5/5 alır; 'Eksik: talepte bütçe yok' yazmaz", () => {
+  const s = eslesmeOnizle(T({ butceSerbest: true }), P(), BAGLAM);
   const butceli = eslesmeOnizle(T({ maxFiyat: 300_000 }), P(), BAGLAM);
   assert.ok(s.skor >= 85 && s.seviye === 5, `${s.skor} ${s.seviye} ${s.gerekceler.join(" | ")}`);
   assert.ok(Math.abs(s.skor - butceli.skor) <= 3, `bütçesiz ${s.skor} ~ bütçeli ${butceli.skor}`);
@@ -45,7 +46,7 @@ test("depo talebi '2.000–4.000 m², bütçe yok': fiyatlı uygun depo 5/5 alı
   assert.ok(s.gerekceler.some((g) => /bütçe yok — puanı düşürmez/.test(g)));
 });
 test("portföyde fiyat yoksa ceza aynen: bütçesiz talepte de en fazla 79 ve 'Portföyde fiyat yok'", () => {
-  const s = eslesmeOnizle(T(), P({ fiyat: null }), BAGLAM);
+  const s = eslesmeOnizle(T({ butceSerbest: true }), P({ fiyat: null }), BAGLAM);
   assert.ok(s.skor <= FIYATSIZ_SKOR_TAVANI && s.seviye <= 4, String(s.skor));
   assert.ok(s.gerekceler.some((g) => /Portföyde fiyat yok/.test(g)));
   assert.ok(s.veriEksikleri.includes("portföyde fiyat yok"));

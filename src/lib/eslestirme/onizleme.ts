@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.37 · 21 Ekim 2026 (v3.33'ten)
+ * Anahtar CRM v3.38 · 21 Ekim 2026 (v3.33'ten)
  * v3.36 — UYUM SEVİYESİ 1–5 (ekranda yüzde yerine) + gerekçe listesi (neden bu seviye). Ölçüm: 19 Eki 2026 canlı veri, 16.095 çift;
  *   "yanlış" işaretlenen 40 eşleşmenin 10'u 92–100 alıyordu. Düzeltmeler: döviz çevrimi, talepteki anlamsız değerler (0 kW, 5 kW,
  *   çatı / duvar tipi) şart sayılmaz, "ara kat" isteyene giriş / son kat tutmaz, fazla oda ve üst üste ödün en fazla Koşullu,
@@ -61,6 +61,18 @@ export const FIYATSIZ_CEZA = 8, FIYATSIZ_SKOR_TAVANI = 79;
  * "2.000–4.000 m²" der, bütçe seçilen m²'ye göre konuşulur. Portföyde FİYAT yoksa ceza (FIYATSIZ_CEZA + tavan 79) aynen kalır.
  */
 export const butcesizTalep = (t: { maxFiyat?: number | null; minFiyat?: number | null }) => t.maxFiyat == null && t.minFiyat == null;
+/**
+ * v3.38 — v3.37'nin "bütçesiz talep nötr" kuralı YALNIZCA güvenilir talepte geçerli: ★ Benim talebi ya da talepte "Bütçe m²'ye göre"
+ * işaretli (`butceSerbest`). Özgür (21 Eki 2026, canlı deneme): "içeri aktarılan tüm ilanlarda bütçe olmayanlar 5/5 oldu; bütçe
+ * olmadığı için dairelerde çok fazla eşleşmeye giriyor, eşleşme ekranını dolduruyor." Ölçüm (21 Eki, 109 talep × 589 portföy):
+ * bütçesiz 18 içeri aktarılmış talep 597 eşleşme üretiyordu (tek bir daire talebi 134).
+ * İçeri aktarılmış bütçesiz talep: fiyat ölçülemez (0,4) + −8 ve en fazla 64 → 3/5 "Sorulacak" (eşleşme listesinde varsayılan
+ * süzgeç ≥ 3/5; listenin üstünü bütçesi bilinen eşleşmelere bırakır).
+ */
+export const BUTCESIZ_ICERI_SKOR_TAVANI = 64;
+/** v3.38 — motor girdisi: ★ Benim talebi (elle işaret ya da Ayarlar'daki ad / telefon) bütçesizse "Bütçe m²'ye göre" sayılır */
+export const butceSerbestle = <V extends { tip?: string; butceSerbest?: boolean | null; isaret?: string | null }>(v: V, benim = false): V =>
+  v.tip === "TALEP" && !v.butceSerbest && (benim || v.isaret === "BENIM") ? { ...v, butceSerbest: true } : v;
 /** v3.36 — fazla oda en fazla Koşullu (≤ 84); iki ve üstü oda fazlaysa ≤ 74. Ölçüm: 2+1 talebine 3+1 kiralık üç eşleşme 92–98 "Sunulabilir" çıkıp "yanlış" işaretlendi. */
 export const FAZLA_ODA_IKI_SKOR_TAVANI = 74;
 /** v3.36 — üst üste ödün (fazla oda + bütçe üstü, m² sınır dışı + komşu mahalle…): ilkinden sonraki her ödün −6 ve en fazla 79 */
@@ -157,7 +169,8 @@ export function eksikVeriUyarilari(t: OnizlemeKayit, p: OnizlemeKayit): string[]
   if (talepAlan || portfoyAlan) u.push(`m² bilgisi yok (${talepAlan && portfoyAlan ? "talep ve portföy" : talepAlan ? "talep" : "portföy"})`);
   // oda yalnızca konut grubunda aranır (depo, arsa, dükkan için anlamsız uyarı verilmez)
   if (matrisOf(t.mulkTipi) === "KONUT" && !t.odaSayisi && !p.odaSayisi) u.push("oda sayısı yok");
-  // v3.37 — talepte bütçe yokluğu "eksik" sayılmaz (bütçe m²'ye göre konuşulur); yalnızca portföyde fiyat yoksa uyarı
+  // v3.37 — Benim / "Bütçe m²'ye göre" talepte bütçe yokluğu "eksik" sayılmaz; v3.38: içeri aktarılmış talepte yine uyarı
+  if (t.maxFiyat == null && t.minFiyat == null && !t.butceSerbest) u.push("talepte bütçe yok");
   if (p.fiyat == null) u.push("portföyde fiyat yok");
   const mahalle = (x: OnizlemeKayit) => arananLok(x.lokasyonlar).some((l) => l.mahalleId != null || l.altBolgeId != null);
   if (!mahalle(t) && !mahalle(p)) u.push("konum yalnızca ilçe düzeyinde");
@@ -234,6 +247,8 @@ export interface OnizlemeKayit {
   minFiyat?: number | null;
   maxFiyat?: number | null;
   fiyatPeriyodu?: string;
+  /** v3.38 — talepte bütçe yoksa puan düşürülmez (★ Benim talebi ya da "Bütçe m²'ye göre" işaretli). Yalnızca talepte anlamlı. */
+  butceSerbest?: boolean | null;
   /** v3.36 — TRY (varsayılan), USD, EUR, GBP: karşılaştırmadan önce TL'ye çevrilir (bkz. DOVIZ_TL) */
   paraBirimi?: string | null;
   m2?: number | null;
@@ -736,7 +751,9 @@ export function eslesmeOnizle(t0: OnizlemeKayit, p0: OnizlemeKayit, b: LokasyonB
   const konutOdaliAlansiz = mAdi === "KONUT" && t.minM2 == null && t.maxM2 == null && odaListesi(t.odaSayisi).length > 0;
   // v3.37 — talepte bütçe yoksa (fiyat satırı da yok) Fiyat bileşeni ölçülmez sayılır: ağırlığı dağıtılır, 0,4 cezası uygulanmaz
   const butcesiz = t.maxFiyat == null; // yalnızca alt sınır yazılmışsa da karşılaştırılacak üst bütçe yoktur
-  const eksikCekirdek = bilesenler.filter((x) => x.puan == null && CEKIRDEK.has(x.kod) && !(x.kod === "ALAN" && konutOdaliAlansiz) && !(x.kod === "FIYAT" && butcesiz));
+  // v3.38 — nötr yalnızca Benim talebi ya da "Bütçe m²'ye göre" işaretli talepte (butceSerbest; çağıran belirler)
+  const butceMuaf = butcesiz && !!t.butceSerbest;
+  const eksikCekirdek = bilesenler.filter((x) => x.puan == null && CEKIRDEK.has(x.kod) && !(x.kod === "ALAN" && konutOdaliAlansiz) && !(x.kod === "FIYAT" && butceMuaf));
   for (const x of eksikCekirdek) (x as { puan: number | null }).puan = BILINMEYEN_PUAN;
   const sayilan = bilesenler.filter((x) => x.puan != null);
   const toplamW = sayilan.reduce((a, x) => a + x.agirlik, 0);
@@ -753,10 +770,10 @@ export function eslesmeOnizle(t0: OnizlemeKayit, p0: OnizlemeKayit, b: LokasyonB
   if (odaFazlasi > 0 && fiyatSatiri?.sonuc !== "SAGLANDI") uyarilar.push(`${odaFazlasi} oda fazla — bütçe içinde olduğu doğrulanamadı; sunmadan önce sorun`);
   // v3.22 — bütçe / fiyat bilinmiyorsa (v3.36: sabit ceza + tavan, bkz. FIYATSIZ_CEZA)
   // v3.37 — bütçesiz talepte yalnızca portföyün fiyatı da yoksa "fiyat bilinmiyor" (portföyde fiyat olmaması gerçek eksik)
-  const fiyatBilinmiyor = fiyatKarsilastirilamadi || fiyatSatiri?.sonuc === "BILINMIYOR" || (butcesiz && p.fiyat == null);
+  const fiyatBilinmiyor = fiyatKarsilastirilamadi || fiyatSatiri?.sonuc === "BILINMIYOR" || (butceMuaf && p.fiyat == null);
   // v3.22.1 — çekirdek bilgi (oda, m², fiyat) portföyde yoksa "Sunulabilir" denmez: sunmadan önce sorulur
   const cekirdekBilinmiyor = satirlar.some((x) => (x.anahtar === "odaSayisi" || x.anahtar === "m2" || x.anahtar === "fiyat") && x.sonuc === "BILINMIYOR");
-  const cekirdekKosullu = fiyatKarsilastirilamadi || eksikCekirdek.length >= 2 || cekirdekBilinmiyor || (butcesiz && p.fiyat == null); // v3.37
+  const cekirdekKosullu = fiyatKarsilastirilamadi || eksikCekirdek.length >= 2 || cekirdekBilinmiyor || (butceMuaf && p.fiyat == null); // v3.37
 
   // v3.36 — gerekçeler: skoru / seviyeyi düşüren her kural buraya bir satır yazar (ekranda "Neden 3/5?")
   const gerekceler: string[] = [];
@@ -780,7 +797,8 @@ export function eslesmeOnizle(t0: OnizlemeKayit, p0: OnizlemeKayit, b: LokasyonB
   if (katSatiri?.sonuc === "SAGLANMADI") tavan(KAT_UYMUYOR_SKOR_TAVANI, `Kat uymuyor: istenen ${katSatiri.talep}, portföy ${katSatiri.portfoy}`); // v3.33
   else if (katSatiri?.sonuc === "BILINMIYOR") gerekceler.push("Portföyün katı bilinmiyor");
   if (fiyatBilinmiyor) { skor -= FIYATSIZ_CEZA; tavan(FIYATSIZ_SKOR_TAVANI, p.fiyat == null ? "Portföyde fiyat yok — fiyatı sorun" : fiyatSatiriTalepBos ? "Talepte bütçe yazılmamış — bütçeyi sorun" : "Fiyat karşılaştırılamadı (periyot / birim) — sorun"); }
-  else if (butcesiz) gerekceler.push("Talepte bütçe yok — puanı düşürmez; fiyatı müşteriyle m²'ye göre konuşun");
+  if (butcesiz && !butceMuaf) tavan(BUTCESIZ_ICERI_SKOR_TAVANI, "Bütçesiz talep (içeri aktarılmış) — en fazla 3/5; kendi talebinizse \"Bütçe m²'ye göre\" işaretleyin"); // v3.38
+  else if (butceMuaf && !fiyatBilinmiyor) gerekceler.push("Talepte bütçe yok — puanı düşürmez; fiyatı müşteriyle m²'ye göre konuşun");
   // v3.36 — fazla oda en fazla Koşullu (aşağıda uygunluk); iki+ oda fazlaysa ayrıca tavan
   if (odaFazlasi >= 2) tavan(FAZLA_ODA_IKI_SKOR_TAVANI, `${odaFazlasi} oda fazla`);
   else if (odaFazlasi === 1) gerekceler.push("1 oda fazla — müşteriye sorun");
@@ -804,7 +822,7 @@ export function eslesmeOnizle(t0: OnizlemeKayit, p0: OnizlemeKayit, b: LokasyonB
   const lokOlculdu = lok.kademe !== "BILINMIYOR" && lok.kademe !== "IL_GENELI";
   // v3.37 — bütçesiz talep "az kriterli" sayılmasın: portföyün fiyatı varsa bütçe m²'ye göre konuşulacak bir kriter gibi sayılır
   // (yoksa "Kepez 2.000 m² depo" gibi tipik bir talep yalnızca bütçe yazılmadığı için güven DÜŞÜK → Koşullu oluyordu)
-  const butceNotr = butcesiz && p.fiyat != null ? 1 : 0;
+  const butceNotr = butceMuaf && p.fiyat != null ? 1 : 0;
   const olculenKriter = (lokOlculdu ? 1 : 0) + 1 + satirlar.filter((s) => s.sonuc !== "BILINMIYOR").length + butceNotr;
   const toplamKriter = 2 + satirlar.length + butceNotr;
   const bilinmeyenSayi = toplamKriter - olculenKriter;

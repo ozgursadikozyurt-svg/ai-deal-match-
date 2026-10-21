@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.37 · 21 Ekim 2026 (v3.31: hoşgörülü arama — birkaç harf, sırasız kelimeler, Türkçe harf duyarsız, notlar ve telefon rakamları)
+ * Anahtar CRM v3.38 · 21 Ekim 2026 (v3.31: hoşgörülü arama — birkaç harf, sırasız kelimeler, Türkçe harf duyarsız, notlar ve telefon rakamları)
  * (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
  * v3.21 — çift yönlü Google: elle eklenen kişi ve bağlı kişideki düzeltme "Google'a gönderilecek" olur; silinen kişi Google'dan silinmez.
  * Demo — Kişiler: kişi seçici (yazdıkça arama, çoklu seçim, rol, + ile anında ekleme), kişi listesi ve kişi kartı.
@@ -16,7 +16,7 @@ import { sahipOzetleri, sahipSuzgeciUyar, sahipOzetMetni, SAHIP_KISI_ROLLERI, SA
 import { etiket } from "./etiketler";
 import { rolListesi, type RolTanim } from "../src/lib/domain/roller";
 import { yeniKisiId, BUGUN, NOT_TURU, CANLI, type Kisi, type Kayit, type DepoDurumu } from "./depo";
-import { useDepo, cx, Pill, IslemPill, TTL, baslikOf, fiyatOf, m2Of, lokEtiket, telYaz, tarihYaz, Kopyala, useEslesmeler, eKey, Skor, type Ctx } from "./ortak";
+import { DurumPill, useDepo, cx, Pill, IslemPill, TTL, baslikOf, fiyatOf, m2Of, lokEtiket, telYaz, tarihYaz, Kopyala, useEslesmeler, eKey, Skor, type Ctx } from "./ortak";
 import { telNormalize } from "./form";
 import { aramaLinki, whatsappLinki, selamMetni } from "../src/lib/iletisim";
 import { demoGoogleSenkron, demoGoogleSilinenler } from "./senkron-demo";
@@ -200,7 +200,7 @@ export function Kisiler() {
     if (!sahipSuzgeciUyar(sahipler.get(k.id), sahip, sahipAile)) return false; // v3.37
     return true;
   }), [d.kisiler, sorgu, gorusmeNorm, roller, kaynaklar, bag, tel, sayilar, sahipler, sahip, sahipAile]); // eslint-disable-line react-hooks/exhaustive-deps
-  const siralamaSecenekleri = useMemo(() => kisiSiralama((id) => sayilar.get(id)?.n ?? 0), [sayilar]);
+  const siralamaSecenekleri = useMemo(() => kisiSiralama((id) => sayilar.get(id)?.n ?? 0, (id) => sahipler.get(id)?.enEskiKapanma ?? null), [sayilar, sahipler]);
   const sirali = useMemo(() => siralaUygula(liste, sr, siralamaSecenekleri), [liste, sr, siralamaSecenekleri]);
   const gorunen = sirali.length > limit ? sirali.slice(0, limit) : sirali;
   // Süzgeç / arama / sıralama gerçekten değişince liste başa (ilk parçaya) döner; kişi kartından Geri dönüşte açık parça korunur
@@ -253,7 +253,7 @@ export function Kisiler() {
     </div><div className="satir"><button className="btn birincil" disabled={yeni.adSoyad.trim().length < 2 || !!telUyarisi(yeni.telefon)} onClick={() => yeniKaydet(true)}>Ekle ve kartı aç</button></div></div>}
     <div className="fc"><div className="fc-ara"><span aria-hidden="true">⌕</span><input type="search" aria-label="Kişi ara" placeholder="Ara: birkaç harf yeter — ad, telefon, not, şirket…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       <button type="button" className={cx("fc-btn", filtreSayisi > 0 && "on")} onClick={() => setFiltreAcik(!filtreAcik)} aria-expanded={filtreAcik}>Filtrele{filtreSayisi > 0 && <b className="fc-rozet">{filtreSayisi}</b>}</button>
-      <SiralaDugmesi secenekler={kisiSiralama(kSay)} s={sr} set={setSr} /></div>
+      <SiralaDugmesi secenekler={siralamaSecenekleri} s={sr} set={setSr} /></div>
     {/* v3.16 — dağınık çip satırları tek "Filtrele" menüsünde toplandı (rol · kaynak · kayıt · telefon) */}
     {filtreSayisi > 0 && <div className="aktif-filtreler">{[
       ...roller.map((r) => ({ e: r === ROLSUZ ? "Rolü yok" : rolAd(r), k: () => setRoller(roller.filter((x) => x !== r)) })),
@@ -289,7 +289,7 @@ export function Kisiler() {
     <div className="kisi-arac">
       <span className="ipucu">{liste.length} kişi{gorunenSecili.length > 0 && ` · ${gorunenSecili.length} seçili`}</span>
       {/* v3.37 — tek dokunuş: pasif / arşiv portföyü olan sahipler, en uzun süredir aranmayan önce */}
-      {!secimModu && sahip !== "KAPANMIS" && <button className="btn kucuk" id="sahip-tekrar-ara" onClick={() => { setSahip("KAPANMIS"); setSr({ alan: "iletisim", yon: "artan" }); }}>Tekrar aranacak sahipler</button>}
+      {!secimModu && sahip !== "KAPANMIS" && <button className="btn kucuk" id="sahip-tekrar-ara" onClick={() => { setSahip("KAPANMIS"); setSr({ alan: "pasif", yon: "artan" }); }}>Tekrar aranacak sahipler</button>}
       {!secimModu ? <button className="btn kucuk" onClick={() => setSecimModu(true)} disabled={!sirali.length}>Seç</button> : <div className="kisi-arac-sec">
         <label className="kisi-hepsi"><input type="checkbox" aria-label="Listedeki tüm kişileri seç" checked={hepsiSecili} onChange={(e) => setSecili(e.target.checked ? new Set([...secili, ...sirali.map((k) => k.id)]) : new Set([...secili].filter((id) => !sirali.some((k) => k.id === id))))} /> {filtreVar ? "Süzülenlerin" : "Tümünün"} seçimi ({sirali.length})</label>
         {gorunenSecili.length > 0 && !silOnay && <><button className="btn kucuk" onClick={() => setSecili(new Set())}>Seçimi kaldır</button>{googleCiftYonlu(d) && gonderilebilir.length > 0 && <button className="btn kucuk" onClick={googleaGonder}>Google'a gönder ({gonderilebilir.length})</button>}{yetkiAktif("kayit.sil") && <button className="btn kucuk tehlike" onClick={() => setSilOnay(true)}>Toplu sil ({gorunenSecili.length})</button>}</>}
@@ -426,7 +426,7 @@ export function KisiKarti({ id }: { id: string }) {
     <section>
       <div className="bolum-bas"><h3>Kayıtları</h3><div className="satir"><button className="btn kucuk" onClick={() => git({ ad: "form", tip: "TALEP", taslak: { kisiler: [{ kisiId: id, rol: k.roller.includes("EMLAKCI") ? "EMLAKCI" : "MUSTERI" }] } as any })}>+ Talep</button><button className="btn kucuk" onClick={() => git({ ad: "form", tip: "PORTFOY", taslak: { kisiler: [{ kisiId: id, rol: k.roller.includes("EMLAKCI") ? "EMLAKCI" : "SAHIP" }] } as any })}>+ Portföy</button></div></div>
       {ky.map((x) => <button key={x.id} className="kart kayit-kart" onClick={() => git({ ad: "detay", id: x.id })}>
-        <div className="pill-satir"><Pill ton={x.veri.tip === "TALEP" ? "mavi" : "yesil"}>{etiket(x.veri.tip)}</Pill><Pill>{etiket(x.veri.mulkTipi)}</Pill><IslemPill islem={x.veri.islemTipi} /><Pill>{rolBagi(x)}</Pill>{x.veri.durum !== "ACTIVE" && <Pill>{etiket(x.veri.durum)}</Pill>}<TTL v={x.veri} /></div>
+        <div className="pill-satir"><Pill ton={x.veri.tip === "TALEP" ? "mavi" : "yesil"}>{etiket(x.veri.tip)}</Pill><Pill>{etiket(x.veri.mulkTipi)}</Pill><IslemPill islem={x.veri.islemTipi} /><Pill>{rolBagi(x)}</Pill><DurumPill v={x.veri as any} /><TTL v={x.veri} /></div>
         <div className="kk-baslik">{baslikOf(x.veri)}</div><div className="kk-alt">{x.veri.lokasyonlar.map(lokEtiket).join(" · ")} · {fiyatOf(x.veri)}{m2Of(x.veri) ? " · " + m2Of(x.veri) : ""}</div>
       </button>)}
       {!ky.length && <p className="bos">Bu kişiye bağlı kayıt yok.</p>}

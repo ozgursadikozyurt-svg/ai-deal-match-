@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.37 · 21 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * Demo — ortak filtre paneli (Talepler, Portföyler, Eşleşmeler, talep içi portföy çekmecesi).
  * Her alan çoklu seçim. Mülk türü seçilince o türe özel filtreler çıkar (ONEMLI_ALANLAR).
  * v3.5 — Kompakt: ekranda tek satır (arama · Acil · Filtrele rozeti) + tek satır kayan aktif çipler.
@@ -250,13 +250,17 @@ export function kayitSiralama(tip?: "TALEP" | "PORTFOY"): SiralamaSecenegi<Kayit
     { alan: "m2", etiket: "m²", deger: (k) => k.veri.m2 ?? k.veri.maxM2 ?? k.veri.minM2 ?? null, varsayilanYon: "azalan" },
     { alan: "sure", etiket: "Kalan süre", deger: (k) => tarihNo(k.veri.validUntil), varsayilanYon: "artan" },
     { alan: "tarih", etiket: "İlan / mesaj tarihi", deger: (k) => tarihNo(k.veri.mesajTarihi), varsayilanYon: "azalan" },
+    // v3.38 — en uzun süredir pasif / arşiv / süresi dolmuş olan önce (aktif kayıtlar sona)
+    { alan: "durumTarihi", etiket: "Pasife alınma (en eski önce)", deger: (k) => (k.veri.durum !== "ACTIVE" ? tarihNo((k.veri as any).durumTarihi) ?? 0 : null), varsayilanYon: "artan" },
   ];
   if (tip !== "PORTFOY") l.push({ alan: "aciliyet", etiket: "Aciliyet", deger: (k) => (k.veri.tip === "TALEP" ? ACIL_SIRA[k.veri.aciliyet ?? "NORMAL"] : null), varsayilanYon: "azalan" });
   l.push({ alan: "baslik", etiket: "Başlık", deger: (k) => k.veri.baslik ?? null, varsayilanYon: "artan" });
   return l;
 }
-export function kisiSiralama(kayitSayisi: (id: string) => number): SiralamaSecenegi<Kisi>[] {
+export function kisiSiralama(kayitSayisi: (id: string) => number, kapanma?: (id: string) => number | null): SiralamaSecenegi<Kisi>[] {
   return [
+    // v3.38 — mülk sahipleri: portföyü en uzun süredir pasif / arşiv olan önce (kiracısı çıkmış olabilecek ilk sahip en üstte)
+    ...(kapanma ? [{ alan: "pasif", etiket: "Portföyü en uzun süredir pasif", deger: (k: Kisi) => kapanma(k.id), varsayilanYon: "artan" as const }] : []),
     { alan: "ad", etiket: "Ad", deger: (k) => k.adSoyad, varsayilanYon: "artan" },
     { alan: "giris", etiket: "Eklenme", deger: (k) => tarihNo(k.olusturma), varsayilanYon: "azalan" },
     { alan: "kayit", etiket: "Kayıt sayısı", deger: (k) => kayitSayisi(k.id), varsayilanYon: "azalan" },

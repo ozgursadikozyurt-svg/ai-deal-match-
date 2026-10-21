@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.38 · 21 Ekim 2026 (v3.13'ten)
  * Ekosistem senkron işi — Google Kişiler (v3.21: çift yönlü, çok ofisli) ve Notion (v3.21: gizli, kod yerinde). Planlama saf modüllerde (google/kisiler.ts, notion/plan.ts),
  * bu dosya planı veritabanına uygular, çalışma geçmişini ve çakışmaları yazar.
  *
@@ -22,7 +22,7 @@ import { kisiTaslagi, portfoyTaslagi, talepTaslagi, kisidenTalep, kayitHazirla, 
 import { kisiPlani, kayitPlani, kaybolanlar, type MevcutNotionKayit, type MevcutNotionKisi, type HazirKayit } from "../notion/plan";
 import { geriYazimDegerleri, geriYazimOzellikleri, geriYazimGerekli, eksikGeriYazimAlanlari } from "../notion/geri-yazim";
 import { eslesmeOzetleri } from "../eslestirme/ozet";
-import { eslesmeOnizle, aksIfadesi, type LokasyonBaglami } from "../eslestirme/onizleme";
+import { eslesmeOnizle, butceSerbestle, aksIfadesi, type LokasyonBaglami } from "../eslestirme/onizleme";
 import { komsulukKur } from "../lokasyon/komsuluk";
 import { lokasyonIndeksiYukle } from "../lokasyon/cozumle";
 import { kayitOlustur, ttlAyarlari } from "./kayit";
@@ -417,7 +417,7 @@ export async function notionSenkronCalistir(prisma: PrismaClient, o: SenkronSece
         await cakismalariYaz(prisma, "NOTION", "KAYIT", x.id, x.cakismalar);
       }
       for (const x of [...p.arsivle, ...(tam && tumGorulen[t] ? kaybolanlar(mevcut, t, tumGorulen[t]) : [])])
-        await prisma.kayit.update({ where: { id: x.id }, data: { durum: "ARSIV", arsivNotu: "Notion'da silindi / çöpe atıldı" } });
+        await prisma.kayit.update({ where: { id: x.id }, data: { durum: "ARSIV", durumTarihi: new Date(), arsivNotu: "Notion'da silindi / çöpe atıldı" } });
       notionEslesmeleri.push(...p.notionEslesmeleri);
       ozet.guncellenen += p.ozet.guncellenen; ozet.baglanan += p.ozet.baglanan; ozet.degismeyen += p.ozet.degismeyen; ozet.cakisma += p.ozet.cakisma; ozet.hatali += p.ozet.hatali; ozet.arsivlenen += p.ozet.arsivlenen;
       hataListesi.push(...p.hatali);
@@ -429,7 +429,7 @@ export async function notionSenkronCalistir(prisma: PrismaClient, o: SenkronSece
       for (const [tn, pn] of notionEslesmeleri) {
         const [tk, pk] = await Promise.all([prisma.kayit.findFirst({ where: { notionId: tn }, include: { lokasyonlar: true, ozellik: true } }), prisma.kayit.findFirst({ where: { notionId: pn }, include: { lokasyonlar: true, ozellik: true } })]);
         if (!tk || !pk) continue;
-        const s = eslesmeOnizle(kayitVeri(tk) as any, kayitVeri(pk) as any, b);
+        const s = eslesmeOnizle(butceSerbestle(kayitVeri(tk) as any), kayitVeri(pk) as any, b); // v3.38
         await prisma.match.upsert({ where: { talepId_portfoyId: { talepId: tk.id, portfoyId: pk.id } }, update: {}, create: { talepId: tk.id, portfoyId: pk.id, matematikSkor: s.skor, finalSkor: s.skor, uygunluk: s.uygunluk, durum: "BILDIRILDI", operasyonNotu: "Notion'da ilişkilendirilmişti" } });
         ozet.notionEslesmesi++;
       }

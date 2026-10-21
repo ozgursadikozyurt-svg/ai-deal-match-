@@ -3367,6 +3367,8 @@ export const KayitScalarFieldEnum = {
   isaret: 'isaret',
   tip: 'tip',
   durum: 'durum',
+  durumTarihi: 'durumTarihi',
+  butceSerbest: 'butceSerbest',
   aciliyet: 'aciliyet',
   anaKategori: 'anaKategori',
   mulkTipi: 'mulkTipi',

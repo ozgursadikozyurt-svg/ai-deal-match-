@@ -60,6 +60,8 @@ export type KayitMinAggregateOutputType = {
   isaret: string | null
   tip: $Enums.KayitTipi | null
   durum: $Enums.Durum | null
+  durumTarihi: Date | null
+  butceSerbest: boolean | null
   aciliyet: $Enums.Aciliyet | null
   anaKategori: $Enums.AnaKategori | null
   mulkTipi: $Enums.MulkTipi | null
@@ -129,6 +131,8 @@ export type KayitMaxAggregateOutputType = {
   isaret: string | null
   tip: $Enums.KayitTipi | null
   durum: $Enums.Durum | null
+  durumTarihi: Date | null
+  butceSerbest: boolean | null
   aciliyet: $Enums.Aciliyet | null
   anaKategori: $Enums.AnaKategori | null
   mulkTipi: $Enums.MulkTipi | null
@@ -198,6 +202,8 @@ export type KayitCountAggregateOutputType = {
   isaret: number
   tip: number
   durum: number
+  durumTarihi: number
+  butceSerbest: number
   aciliyet: number
   anaKategori: number
   mulkTipi: number
@@ -301,6 +307,8 @@ export type KayitMinAggregateInputType = {
   isaret?: true
   tip?: true
   durum?: true
+  durumTarihi?: true
+  butceSerbest?: true
   aciliyet?: true
   anaKategori?: true
   mulkTipi?: true
@@ -370,6 +378,8 @@ export type KayitMaxAggregateInputType = {
   isaret?: true
   tip?: true
   durum?: true
+  durumTarihi?: true
+  butceSerbest?: true
   aciliyet?: true
   anaKategori?: true
   mulkTipi?: true
@@ -439,6 +449,8 @@ export type KayitCountAggregateInputType = {
   isaret?: true
   tip?: true
   durum?: true
+  durumTarihi?: true
+  butceSerbest?: true
   aciliyet?: true
   anaKategori?: true
   mulkTipi?: true
@@ -601,6 +613,8 @@ export type KayitGroupByOutputType = {
   isaret: string | null
   tip: $Enums.KayitTipi
   durum: $Enums.Durum
+  durumTarihi: Date | null
+  butceSerbest: boolean | null
   aciliyet: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -699,6 +713,8 @@ export type KayitWhereInput = {
   isaret?: Prisma.StringNullableFilter<"Kayit"> | string | null
   tip?: Prisma.EnumKayitTipiFilter<"Kayit"> | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFilter<"Kayit"> | $Enums.Durum
+  durumTarihi?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
+  butceSerbest?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
   aciliyet?: Prisma.EnumAciliyetFilter<"Kayit"> | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFilter<"Kayit"> | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFilter<"Kayit"> | $Enums.MulkTipi
@@ -786,6 +802,8 @@ export type KayitOrderByWithRelationInput = {
   isaret?: Prisma.SortOrderInput | Prisma.SortOrder
   tip?: Prisma.SortOrder
   durum?: Prisma.SortOrder
+  durumTarihi?: Prisma.SortOrderInput | Prisma.SortOrder
+  butceSerbest?: Prisma.SortOrderInput | Prisma.SortOrder
   aciliyet?: Prisma.SortOrder
   anaKategori?: Prisma.SortOrder
   mulkTipi?: Prisma.SortOrder
@@ -878,6 +896,8 @@ export type KayitWhereUniqueInput = Prisma.AtLeast<{
   isaret?: Prisma.StringNullableFilter<"Kayit"> | string | null
   tip?: Prisma.EnumKayitTipiFilter<"Kayit"> | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFilter<"Kayit"> | $Enums.Durum
+  durumTarihi?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
+  butceSerbest?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
   aciliyet?: Prisma.EnumAciliyetFilter<"Kayit"> | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFilter<"Kayit"> | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFilter<"Kayit"> | $Enums.MulkTipi
@@ -965,6 +985,8 @@ export type KayitOrderByWithAggregationInput = {
   isaret?: Prisma.SortOrderInput | Prisma.SortOrder
   tip?: Prisma.SortOrder
   durum?: Prisma.SortOrder
+  durumTarihi?: Prisma.SortOrderInput | Prisma.SortOrder
+  butceSerbest?: Prisma.SortOrderInput | Prisma.SortOrder
   aciliyet?: Prisma.SortOrder
   anaKategori?: Prisma.SortOrder
   mulkTipi?: Prisma.SortOrder
@@ -1048,6 +1070,8 @@ export type KayitScalarWhereWithAggregatesInput = {
   isaret?: Prisma.StringNullableWithAggregatesFilter<"Kayit"> | string | null
   tip?: Prisma.EnumKayitTipiWithAggregatesFilter<"Kayit"> | $Enums.KayitTipi
   durum?: Prisma.EnumDurumWithAggregatesFilter<"Kayit"> | $Enums.Durum
+  durumTarihi?: Prisma.DateTimeNullableWithAggregatesFilter<"Kayit"> | Date | string | null
+  butceSerbest?: Prisma.BoolNullableWithAggregatesFilter<"Kayit"> | boolean | null
   aciliyet?: Prisma.EnumAciliyetWithAggregatesFilter<"Kayit"> | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriWithAggregatesFilter<"Kayit"> | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiWithAggregatesFilter<"Kayit"> | $Enums.MulkTipi
@@ -1121,6 +1145,8 @@ export type KayitCreateInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -1207,6 +1233,8 @@ export type KayitUncheckedCreateInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -1289,6 +1317,8 @@ export type KayitUpdateInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -1375,6 +1405,8 @@ export type KayitUncheckedUpdateInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -1459,6 +1491,8 @@ export type KayitCreateManyInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -1532,6 +1566,8 @@ export type KayitUpdateManyMutationInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -1606,6 +1642,8 @@ export type KayitUncheckedUpdateManyInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -1730,6 +1768,8 @@ export type KayitCountOrderByAggregateInput = {
   isaret?: Prisma.SortOrder
   tip?: Prisma.SortOrder
   durum?: Prisma.SortOrder
+  durumTarihi?: Prisma.SortOrder
+  butceSerbest?: Prisma.SortOrder
   aciliyet?: Prisma.SortOrder
   anaKategori?: Prisma.SortOrder
   mulkTipi?: Prisma.SortOrder
@@ -1818,6 +1858,8 @@ export type KayitMaxOrderByAggregateInput = {
   isaret?: Prisma.SortOrder
   tip?: Prisma.SortOrder
   durum?: Prisma.SortOrder
+  durumTarihi?: Prisma.SortOrder
+  butceSerbest?: Prisma.SortOrder
   aciliyet?: Prisma.SortOrder
   anaKategori?: Prisma.SortOrder
   mulkTipi?: Prisma.SortOrder
@@ -1887,6 +1929,8 @@ export type KayitMinOrderByAggregateInput = {
   isaret?: Prisma.SortOrder
   tip?: Prisma.SortOrder
   durum?: Prisma.SortOrder
+  durumTarihi?: Prisma.SortOrder
+  butceSerbest?: Prisma.SortOrder
   aciliyet?: Prisma.SortOrder
   anaKategori?: Prisma.SortOrder
   mulkTipi?: Prisma.SortOrder
@@ -2088,6 +2132,10 @@ export type EnumDurumFieldUpdateOperationsInput = {
   set?: $Enums.Durum
 }
 
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
+}
+
 export type EnumAciliyetFieldUpdateOperationsInput = {
   set?: $Enums.Aciliyet
 }
@@ -2120,10 +2168,6 @@ export type EnumParaBirimiFieldUpdateOperationsInput = {
 
 export type EnumFiyatPeriyoduFieldUpdateOperationsInput = {
   set?: $Enums.FiyatPeriyodu
-}
-
-export type NullableBoolFieldUpdateOperationsInput = {
-  set?: boolean | null
 }
 
 export type EnumVeriKanaliFieldUpdateOperationsInput = {
@@ -2317,6 +2361,8 @@ export type KayitCreateWithoutOfisInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -2401,6 +2447,8 @@ export type KayitUncheckedCreateWithoutOfisInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -2514,6 +2562,8 @@ export type KayitScalarWhereInput = {
   isaret?: Prisma.StringNullableFilter<"Kayit"> | string | null
   tip?: Prisma.EnumKayitTipiFilter<"Kayit"> | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFilter<"Kayit"> | $Enums.Durum
+  durumTarihi?: Prisma.DateTimeNullableFilter<"Kayit"> | Date | string | null
+  butceSerbest?: Prisma.BoolNullableFilter<"Kayit"> | boolean | null
   aciliyet?: Prisma.EnumAciliyetFilter<"Kayit"> | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFilter<"Kayit"> | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFilter<"Kayit"> | $Enums.MulkTipi
@@ -2587,6 +2637,8 @@ export type KayitCreateWithoutSahipKullaniciInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -2671,6 +2723,8 @@ export type KayitUncheckedCreateWithoutSahipKullaniciInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -2779,6 +2833,8 @@ export type KayitCreateWithoutLokasyonlarInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -2864,6 +2920,8 @@ export type KayitUncheckedCreateWithoutLokasyonlarInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -2961,6 +3019,8 @@ export type KayitUpdateWithoutLokasyonlarInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -3046,6 +3106,8 @@ export type KayitUncheckedUpdateWithoutLokasyonlarInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -3127,6 +3189,8 @@ export type KayitCreateWithoutOzellikInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -3212,6 +3276,8 @@ export type KayitUncheckedCreateWithoutOzellikInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -3309,6 +3375,8 @@ export type KayitUpdateWithoutOzellikInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -3394,6 +3462,8 @@ export type KayitUncheckedUpdateWithoutOzellikInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -3475,6 +3545,8 @@ export type KayitCreateWithoutKisiInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -3560,6 +3632,8 @@ export type KayitUncheckedCreateWithoutKisiInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -3667,6 +3741,8 @@ export type KayitCreateWithoutKisiBaglariInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -3752,6 +3828,8 @@ export type KayitUncheckedCreateWithoutKisiBaglariInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -3849,6 +3927,8 @@ export type KayitUpdateWithoutKisiBaglariInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -3934,6 +4014,8 @@ export type KayitUncheckedUpdateWithoutKisiBaglariInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -4015,6 +4097,8 @@ export type KayitCreateWithoutTalepMatchleriInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -4100,6 +4184,8 @@ export type KayitUncheckedCreateWithoutTalepMatchleriInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -4186,6 +4272,8 @@ export type KayitCreateWithoutPortfoyMatchleriInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -4271,6 +4359,8 @@ export type KayitUncheckedCreateWithoutPortfoyMatchleriInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -4368,6 +4458,8 @@ export type KayitUpdateWithoutTalepMatchleriInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -4453,6 +4545,8 @@ export type KayitUncheckedUpdateWithoutTalepMatchleriInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -4545,6 +4639,8 @@ export type KayitUpdateWithoutPortfoyMatchleriInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -4630,6 +4726,8 @@ export type KayitUncheckedUpdateWithoutPortfoyMatchleriInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -4711,6 +4809,8 @@ export type KayitCreateWithoutPortalKaynagiInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -4796,6 +4896,8 @@ export type KayitUncheckedCreateWithoutPortalKaynagiInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -4893,6 +4995,8 @@ export type KayitUpdateWithoutPortalKaynagiInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -4978,6 +5082,8 @@ export type KayitUncheckedUpdateWithoutPortalKaynagiInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -5059,6 +5165,8 @@ export type KayitCreateWithoutAuditLoglariInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -5144,6 +5252,8 @@ export type KayitUncheckedCreateWithoutAuditLoglariInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -5241,6 +5351,8 @@ export type KayitUpdateWithoutAuditLoglariInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -5326,6 +5438,8 @@ export type KayitUncheckedUpdateWithoutAuditLoglariInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -5407,6 +5521,8 @@ export type KayitCreateWithoutGorusmeNotlariInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -5492,6 +5608,8 @@ export type KayitUncheckedCreateWithoutGorusmeNotlariInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -5589,6 +5707,8 @@ export type KayitUpdateWithoutGorusmeNotlariInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -5674,6 +5794,8 @@ export type KayitUncheckedUpdateWithoutGorusmeNotlariInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -5755,6 +5877,8 @@ export type KayitCreateWithoutFotolarInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -5840,6 +5964,8 @@ export type KayitUncheckedCreateWithoutFotolarInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -5937,6 +6063,8 @@ export type KayitUpdateWithoutFotolarInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -6022,6 +6150,8 @@ export type KayitUncheckedUpdateWithoutFotolarInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -6104,6 +6234,8 @@ export type KayitCreateManyOfisInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -6177,6 +6309,8 @@ export type KayitUpdateWithoutOfisInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -6261,6 +6395,8 @@ export type KayitUncheckedUpdateWithoutOfisInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -6344,6 +6480,8 @@ export type KayitUncheckedUpdateManyWithoutOfisInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -6418,6 +6556,8 @@ export type KayitCreateManySahipKullaniciInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -6491,6 +6631,8 @@ export type KayitUpdateWithoutSahipKullaniciInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -6575,6 +6717,8 @@ export type KayitUncheckedUpdateWithoutSahipKullaniciInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -6658,6 +6802,8 @@ export type KayitUncheckedUpdateManyWithoutSahipKullaniciInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -6733,6 +6879,8 @@ export type KayitCreateManyKisiInput = {
   isaret?: string | null
   tip: $Enums.KayitTipi
   durum?: $Enums.Durum
+  durumTarihi?: Date | string | null
+  butceSerbest?: boolean | null
   aciliyet?: $Enums.Aciliyet
   anaKategori: $Enums.AnaKategori
   mulkTipi: $Enums.MulkTipi
@@ -6805,6 +6953,8 @@ export type KayitUpdateWithoutKisiInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -6890,6 +7040,8 @@ export type KayitUncheckedUpdateWithoutKisiInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -6973,6 +7125,8 @@ export type KayitUncheckedUpdateManyWithoutKisiInput = {
   isaret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tip?: Prisma.EnumKayitTipiFieldUpdateOperationsInput | $Enums.KayitTipi
   durum?: Prisma.EnumDurumFieldUpdateOperationsInput | $Enums.Durum
+  durumTarihi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  butceSerbest?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   aciliyet?: Prisma.EnumAciliyetFieldUpdateOperationsInput | $Enums.Aciliyet
   anaKategori?: Prisma.EnumAnaKategoriFieldUpdateOperationsInput | $Enums.AnaKategori
   mulkTipi?: Prisma.EnumMulkTipiFieldUpdateOperationsInput | $Enums.MulkTipi
@@ -7132,6 +7286,8 @@ export type KayitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   isaret?: boolean
   tip?: boolean
   durum?: boolean
+  durumTarihi?: boolean
+  butceSerbest?: boolean
   aciliyet?: boolean
   anaKategori?: boolean
   mulkTipi?: boolean
@@ -7220,6 +7376,8 @@ export type KayitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isaret?: boolean
   tip?: boolean
   durum?: boolean
+  durumTarihi?: boolean
+  butceSerbest?: boolean
   aciliyet?: boolean
   anaKategori?: boolean
   mulkTipi?: boolean
@@ -7298,6 +7456,8 @@ export type KayitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isaret?: boolean
   tip?: boolean
   durum?: boolean
+  durumTarihi?: boolean
+  butceSerbest?: boolean
   aciliyet?: boolean
   anaKategori?: boolean
   mulkTipi?: boolean
@@ -7376,6 +7536,8 @@ export type KayitSelectScalar = {
   isaret?: boolean
   tip?: boolean
   durum?: boolean
+  durumTarihi?: boolean
+  butceSerbest?: boolean
   aciliyet?: boolean
   anaKategori?: boolean
   mulkTipi?: boolean
@@ -7443,7 +7605,7 @@ export type KayitSelectScalar = {
   updatedAt?: boolean
 }
 
-export type KayitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "sahipKullaniciId" | "gorunurluk" | "isaret" | "tip" | "durum" | "aciliyet" | "anaKategori" | "mulkTipi" | "alternatifMulkTipleri" | "islemTipi" | "alternatifIslemTipleri" | "fiyat" | "minFiyat" | "maxFiyat" | "paraBirimi" | "fiyatPeriyodu" | "krediyeUygun" | "takasaAcik" | "m2" | "netM2" | "minM2" | "maxM2" | "m2ToleransYuzde" | "odaSayisi" | "lokasyonHam" | "adres" | "enlem" | "boylam" | "veriKanali" | "ilanSahibiTipi" | "havuz" | "yetkili" | "yetkiBitis" | "yetkiBelgeNo" | "tasinmazNo" | "musteriKaynagi" | "ilkKaynak" | "ilkKaynakDetay" | "ilkKaynakTarihi" | "ilkYanit" | "portfoyAlinabilirlik" | "kisiId" | "gondeAdi" | "gondeTelefon" | "gondeSirket" | "kayitGrubu" | "mesajTarihi" | "kaynakDosya" | "ingestionId" | "portalUrl" | "portalIlanNo" | "portalIlanSahibi" | "baslik" | "ozet" | "aciklama" | "hamMetin" | "operasyonNotu" | "arsivNotu" | "ozelSartlar" | "validUntil" | "ttlUyariGonderildi" | "fingerprint" | "notionId" | "notionSonSync" | "notionSnapshot" | "notionGeriYazim" | "alanGuvenleri" | "aiModelVersiyon" | "createdAt" | "updatedAt", ExtArgs["result"]["kayit"]>
+export type KayitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ofisId" | "sahipKullaniciId" | "gorunurluk" | "isaret" | "tip" | "durum" | "durumTarihi" | "butceSerbest" | "aciliyet" | "anaKategori" | "mulkTipi" | "alternatifMulkTipleri" | "islemTipi" | "alternatifIslemTipleri" | "fiyat" | "minFiyat" | "maxFiyat" | "paraBirimi" | "fiyatPeriyodu" | "krediyeUygun" | "takasaAcik" | "m2" | "netM2" | "minM2" | "maxM2" | "m2ToleransYuzde" | "odaSayisi" | "lokasyonHam" | "adres" | "enlem" | "boylam" | "veriKanali" | "ilanSahibiTipi" | "havuz" | "yetkili" | "yetkiBitis" | "yetkiBelgeNo" | "tasinmazNo" | "musteriKaynagi" | "ilkKaynak" | "ilkKaynakDetay" | "ilkKaynakTarihi" | "ilkYanit" | "portfoyAlinabilirlik" | "kisiId" | "gondeAdi" | "gondeTelefon" | "gondeSirket" | "kayitGrubu" | "mesajTarihi" | "kaynakDosya" | "ingestionId" | "portalUrl" | "portalIlanNo" | "portalIlanSahibi" | "baslik" | "ozet" | "aciklama" | "hamMetin" | "operasyonNotu" | "arsivNotu" | "ozelSartlar" | "validUntil" | "ttlUyariGonderildi" | "fingerprint" | "notionId" | "notionSonSync" | "notionSnapshot" | "notionGeriYazim" | "alanGuvenleri" | "aiModelVersiyon" | "createdAt" | "updatedAt", ExtArgs["result"]["kayit"]>
 export type KayitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ofis?: boolean | Prisma.OfisDefaultArgs<ExtArgs>
   sahipKullanici?: boolean | Prisma.Kayit$sahipKullaniciArgs<ExtArgs>
@@ -7512,6 +7674,14 @@ export type $KayitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     isaret: string | null
     tip: $Enums.KayitTipi
     durum: $Enums.Durum
+    /**
+     * v3.38 — durumun son değiştiği an (pasife alındı, arşivlendi, süresi doldu, yeniden aktif). "En uzun süredir pasif" sıralaması.
+     */
+    durumTarihi: Date | null
+    /**
+     * v3.38 — talepte bütçe yazılmamışsa eşleşme puanı düşürülmesin ("Bütçe m²'ye göre"). ★ Benim talepleri zaten muaf.
+     */
+    butceSerbest: boolean | null
     aciliyet: $Enums.Aciliyet
     anaKategori: $Enums.AnaKategori
     mulkTipi: $Enums.MulkTipi
@@ -8053,6 +8223,8 @@ export interface KayitFieldRefs {
   readonly isaret: Prisma.FieldRef<"Kayit", 'String'>
   readonly tip: Prisma.FieldRef<"Kayit", 'KayitTipi'>
   readonly durum: Prisma.FieldRef<"Kayit", 'Durum'>
+  readonly durumTarihi: Prisma.FieldRef<"Kayit", 'DateTime'>
+  readonly butceSerbest: Prisma.FieldRef<"Kayit", 'Boolean'>
   readonly aciliyet: Prisma.FieldRef<"Kayit", 'Aciliyet'>
   readonly anaKategori: Prisma.FieldRef<"Kayit", 'AnaKategori'>
   readonly mulkTipi: Prisma.FieldRef<"Kayit", 'MulkTipi'>

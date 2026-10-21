@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.37 · 21 Ekim 2026
+ * Anahtar CRM v3.38 · 21 Ekim 2026
  * v3.36 — eşleştirme uyum seviyesi (1–5) ve gerekçe; 19 Ekim canlı verisinde yanlış okunan talepler (parser); döviz; talepteki
  * anlamsız istekler; fazla oda / üst üste ödün; Geri tuşu (tarayıcı geçmişi); dosyanın tamamını yorumlama; WhatsApp portföyü Partner;
  * kaydetme günlüğü; veri düzeltmesi migration'ı.
@@ -81,11 +81,11 @@ test("seviye: 85+ yalnızca Sunulabilir 5/5 · 70+ 4 · 55+ 3 · Koşullu en az 
   assert.equal(SEVIYE_ETIKET[4], "Güçlü aday");
 });
 
-test("tam eşleşme 5/5 ve gerekçesiz; v3.37: bütçesiz ama her şeyi tutan da 5/5 (bütçe notu bilgi amaçlı)", () => {
+test("tam eşleşme 5/5 ve gerekçesiz; v3.38: 'Bütçe m²'ye göre' işaretli bütçesiz talep de 5/5 (bütçe notu bilgi amaçlı)", () => {
   const t = T("Muratpaşa / Fener", { odaSayisi: "2+1", maxFiyat: 10_000_000 });
   const tam = es(t, P("Muratpaşa / Fener", { odaSayisi: "2+1", fiyat: 9_000_000, m2: 110 }));
   assert.equal(tam.seviye, 5); assert.deepEqual(tam.gerekceler, []);
-  const butcesiz = es({ ...t, maxFiyat: null }, P("Muratpaşa / Fener", { odaSayisi: "2+1", fiyat: 9_000_000, m2: 110 }));
+  const butcesiz = es({ ...t, maxFiyat: null, butceSerbest: true }, P("Muratpaşa / Fener", { odaSayisi: "2+1", fiyat: 9_000_000, m2: 110 }));
   assert.equal(butcesiz.seviye, 5, `${butcesiz.skor} ${butcesiz.gerekceler.join(" | ")}`); assert.ok(butcesiz.skor > FIYATSIZ_SKOR_TAVANI, String(butcesiz.skor));
   assert.match(butcesiz.gerekceler.join(" "), /bütçe yok — puanı düşürmez/i);
   // portföyde fiyat yoksa hâlâ en fazla 4/5

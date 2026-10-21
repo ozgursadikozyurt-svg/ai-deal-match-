@@ -5,6 +5,23 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.38 · 21 Ekim 2026 — Bütçesiz talep yalnızca Benim / işaretliyse muaf; Eşleşmeler uyuma göre, ≥ 3/5 ve talep başına en iyi 10; pasife alınma tarihi
+
+- Bütçesiz talep (v3.37 düzeltmesi): puan yalnızca ★ Benim talebinde ya da talep formunda "Bütçe m²'ye göre — puanı düşürme" işaretliyse düşmez. İçeri aktarılan (WhatsApp, Revy, dosya) bütçesiz talep en fazla 3/5 "Sorulacak" alır ve kartta yine "Eksik: talepte bütçe yok" yazar. Canlı ölçüm (21 Eki): 18 içeri aktarılmış bütçesiz talep 597 eşleşme üretiyordu, bir daire talebi tek başına 134.
+- Eşleşmeler sırası: önce uygunluk, sonra uyum (seviye → puan); fırsat kademesi yalnızca eşitlikte. Varsayılan sıralama "Uyum (en iyi önce)" — "Fırsat önceliği" sıralama menüsünde duruyor.
+- Eşleşmeler varsayılan süzgeçleri: "Uyum ≥ 3/5" (2/5 Zayıf gizli) ve "Talep başına en iyi 10" (bir talebe düşen eşleşmelerin en iyi 10'u listede, gerisi talebin detayında). İkisi de çip olarak görünür, × ile kalkar; başlıktaki "+N" düğmesi tümünü açar. Canlı veride liste 2.481'den ~700'e iner.
+- Pasife alınma tarihi: kayıt pasife alınınca, arşivlenince, süresi dolunca ya da yeniden aktif olunca tarih yazılır (sunucu yazar). Detayda ve kişi kartında "Pasif · 3 aydır". Talepler / Portföyler › Sırala › "Pasife alınma (en eski önce)". Kişiler › "Tekrar aranacak sahipler" artık portföyü en uzun süredir pasif olan sahibi en üstte getirir; kartta "(1 pasif/arşiv, 4 aydır)".
+- Mevcut pasif / arşiv kayıtlarda tarih tutulmuyordu: kurulumda son güncelleme zamanı (süresi dolmuşta geçerlilik bitişi) yaklaşık tarih olarak yazılır.
+- Veritabanı: kayit.durumTarihi, kayit.butceSerbest (yalnızca ekleme). Yayından sonra "Kurulumu tamamla" düğmesine basılmalı.
+
+**Demo'da test edilecekler**
+
+- [ ] Eşleşmeler'i açın: üstte "Uyum ≥ 3/5" ve "Talep başına en iyi 10" çipleri; liste en yüksek seviyeden aşağı sıralı olmalı. Başlıktaki "+N" ile tümü açılmalı.
+- [ ] WhatsApp'tan gelmiş bütçesiz bir daire talebinin eşleşmeleri en fazla 3/5 olmalı. Aynı talebi açıp Düzenle › Bütçe altında "Bütçe m²'ye göre — puanı düşürme"yi işaretleyip kaydedin: uygun olanlar 4/5 – 5/5'e çıkmalı.
+- [ ] ★ Benim işaretli bütçesiz bir depo talebinin eşleşmeleri düşmemeli.
+- [ ] Bir portföyü Pasife alın: detayda "Pasif · bugünden beri" yazmalı. Portföyler › Filtrele › Durum: Pasif, Sırala › "Pasife alınma (en eski önce)".
+- [ ] Kişiler › "Tekrar aranacak sahipler": kartta "(… pasif/arşiv, N aydır)"; en eski pasif en üstte.
+
 ## v3.37 · 21 Ekim 2026 — Bütçesiz talep puanı düşürmez; kaydedilmemiş değişiklik uyarısı; Mülk sahipleri süzgeci; Pasife al / Arşivle / Kopar üstte; ilan no her yerde
 
 - Eşleştirme: talepte bütçe yazılmamışsa fiyat bileşeni nötr — ceza, 79 tavanı ve kartta "Eksik: talepte bütçe yok" yok (bütçe çoğu zaman seçilen m²'ye göre konuşulur). Gerekçede bilgi notu: "Talepte bütçe yok — puanı düşürmez". Portföyde fiyat yoksa eski kural aynen: −8 ve en fazla 79 (4/5), "Portföyde fiyat yok — fiyatı sorun". Örnek: "Kepez 2.000–4.000 m² depo" (bütçesiz) talebine 3.000 m² / 250 bin TL depo artık 5/5.
