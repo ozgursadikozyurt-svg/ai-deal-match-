@@ -1,4 +1,4 @@
-// Anahtar CRM v3.40 · 23 Ekim 2026
+// Anahtar CRM v3.41 · 23 Ekim 2026
 // GET  /api/kisiler?q=meh   → yazdıkça arama (ad, şirket, telefonun son hanesi)
 // POST /api/kisiler { adSoyad, telefon?, roller? … } → aynı telefon varsa mevcut kişi döner
 import { prisma } from "@/lib/db";

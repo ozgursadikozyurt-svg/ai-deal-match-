@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * Görevler ekranı — SADE (v3.40). Yalnızca sizin eklediğiniz hatırlatıcılar ve "Bunu göreve alalım mı?" ile onayladığınız takipler.
  * Sistem kendiliğinden görev üretmez. Geciken · Bugün · Sonra, altta Tamamlananlar (kapalı). Satırlar Bugün panosundakiyle aynı.
  */

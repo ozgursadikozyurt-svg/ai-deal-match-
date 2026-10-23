@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * Demo — Eşleşmeler ekranının kompakt hızlı süzgeçleri.
  *
  * Eskiden İşlem (Tümü/Satılık/Kiralık/Devren), Uygunluk ve "Fırsat önceliği" kartı üç ayrı satır + büyük bir kart

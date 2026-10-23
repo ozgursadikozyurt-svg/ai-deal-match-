@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * v3.7 — demo ekranlarının sunucu tarafında hatasız çizildiğini doğrular (tarayıcısız duman testi):
  * listeler + sıralama düğmesi, kayıt detayı + görüşme notları + ara/WhatsApp, kişiler, bağlantılar, toplu veri girişi.
  */

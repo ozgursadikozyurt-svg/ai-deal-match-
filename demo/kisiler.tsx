@@ -1,10 +1,11 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026 (v3.31: hoşgörülü arama — birkaç harf, sırasız kelimeler, Türkçe harf duyarsız, notlar ve telefon rakamları)
+ * Anahtar CRM v3.41 · 23 Ekim 2026 (v3.31: hoşgörülü arama — birkaç harf, sırasız kelimeler, Türkçe harf duyarsız, notlar ve telefon rakamları)
  * (v3.13'ten; v3.7: ara / WhatsApp düğmeleri, sıralama, görüşme notları)
  * v3.21 — çift yönlü Google: elle eklenen kişi ve bağlı kişideki düzeltme "Google'a gönderilecek" olur; silinen kişi Google'dan silinmez.
  * Demo — Kişiler: kişi seçici (yazdıkça arama, çoklu seçim, rol, + ile anında ekleme), kişi listesi ve kişi kartı.
  * Alanlar Notion "Müşteri-Yatırımcılar-Kişiler" tablosuna göre (ROL, Phone, Açıklama, Referans, ilişkili talep/portföy).
  */
+import { useRehber, rehberiYukle } from "./kisi-parca";
 import { yetkiAktif } from "./yonetim";
 import { TelGirdisi } from "./girdi";
 import { telUyarisi } from "../src/lib/iletisim";
@@ -127,8 +128,11 @@ export const kisininKayitlari = (kayitlar: Kayit[], kisiId: string) => kayitlar.
 
 export function Kisiler() {
   const { d, git, guncelle, bildir } = useDepo();
+  const rehber = useRehber();
   // v3.21.2 — arama, süzgeçler ve sıralama kişi kartından Geri dönünce korunur (useKalici)
   const [q, setQ] = useKalici("kisiler.q", "");
+  // arama yazılınca rehberin kalanı da gelir: yoksa yüklenmemiş kişi "yok" sanılırdı
+  useEffect(() => { if (q.trim() && rehber.sonraki != null && !rehber.yukluyor && !rehber.hata) void rehberiYukle(guncelle, { hepsi: true }); }, [q]); // eslint-disable-line react-hooks/exhaustive-deps
   const [roller, setRoller] = useKalici<string[]>("kisiler.roller", []);
   const [kaynaklar, setKaynaklar] = useKalici<string[]>("kisiler.kaynaklar", []);
   const [bag, setBag] = useKalici<"" | "TALEP" | "PORTFOY" | "YOK">("kisiler.bag", "");   // v3.15: bağlı kayıt türü
@@ -311,6 +315,10 @@ export function Kisiler() {
       </div>
       {duzenId === k.id && <HizliDuzen k={k} kapat={() => setDuzenId(null)} />}
     </React.Fragment>; })}
+    {rehber.sonraki != null && <div className="kart satir" style={{ justifyContent: "center", gap: 12, padding: "12px 0", flexWrap: "wrap" }} data-testid="rehber-devam">
+      <span className="ipucu">Rehberde {d.kisiler.length.toLocaleString("tr-TR")}{rehber.toplam ? ` / ${rehber.toplam.toLocaleString("tr-TR")}` : ""} kişi yüklü{rehber.hata ? ` · ${rehber.hata}` : ""}</span>
+      <button className="btn" disabled={!!rehber.yukluyor} onClick={() => void rehberiYukle(guncelle, { sayfa: 4 })}>{rehber.yukluyor ? "Yükleniyor…" : rehber.hata ? "Yeniden dene" : "Devam et"}</button>
+      <button className="btn kucuk" disabled={!!rehber.yukluyor} onClick={() => void rehberiYukle(guncelle, { hepsi: true })}>Hepsini yükle</button></div>}
     {sirali.length > gorunen.length && <div ref={sonRef} className="satir" style={{ justifyContent: "center", padding: "12px 0" }}>
       <button className="btn" onClick={() => setLimit((l) => l + KISI_SAYFA)}>Daha fazla göster ({sirali.length - gorunen.length} kişi daha)</button></div>}
     {!liste.length && <p className="bos">Eşleşen kişi yok.</p>}

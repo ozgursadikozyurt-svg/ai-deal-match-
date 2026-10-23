@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * GELEN KUTUSU — "onay bekleyenler". E-postayla ya da yüklemeyle gelen dosyalardaki (Revy Excel dökümü, WhatsApp sohbet .zip / .txt)
  * her ilan / talep burada tek havuzda bekler; kullanıcı ekler ya da atlar. Hiçbir kayıt onaysız havuza girmez.
  *
@@ -9,6 +9,7 @@
  *    v3.24: tarih gruplaması kaldırıldı (çok satır oluşturuyordu) — tek düz liste, HAZIR olanlar en üstte; ilan tarihi kartta yazar.
  *  - Dosyalar tarayıcıda açılır (demo/gelen-oku.ts); canlıda ham dosya sunucudan indirilir, demoda örnek dosyalar bu tarayıcıdadır.
  */
+import { useRehberTamamla } from "./kisi-parca";
 import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useDepo, cx, Pill, IslemPill, Kopyala, baslikOf, fiyatOf, m2Of, lokEtiket, tarihYaz } from "./ortak";
 import { useKalici, kaliciSil } from "./kalici";
@@ -203,6 +204,7 @@ const SAYFA = 60;
 
 export function GelenKutusu({ gomulu = false }: { gomulu?: boolean } = {}) {
   const { d, guncelle, bildir, git } = useDepo();
+  useRehberTamamla(); // v3.41 — kişi eşleştirmesi için rehberin kalanı arka planda gelir
   const k = useKutu();
   const [f, setF] = useKalici<Suzgec>("gelen.suzgec", BOS_SUZGEC);
   const [secim, setSecim] = useKalici<Set<string>>("gelen.secim", new Set());

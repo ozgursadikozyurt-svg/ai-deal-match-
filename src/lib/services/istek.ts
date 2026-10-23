@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * İsteği yapanın rolü ve yeni kayıtların sahibi. Platform bağlamı (zamanlayıcı, testler) tam yetkilidir, sahip yazmaz.
  * Asistanın açtığı kayıt ve kişi yardım ettiği danışmana aittir (asistan değişse de veri danışmanda kalır).
  */

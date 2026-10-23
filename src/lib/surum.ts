@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.40";
+export const SURUM = "3.41";
 export const TARIH = "23 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.40_23Ekim2026";
+export const DOSYA_EKI = "v3.41_23Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,23 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.41",
+    tarih: "23 Ekim 2026",
+    baslik: "Rehber parça parça: açılışta yalnızca talep / portföye bağlı kişiler, kalanı \"Devam et\" ile (503 / CPU sınırına karşı)",
+    degisenler: [
+      "Uygulama açılışında artık ~7.800 kişinin hepsi indirilmez: yalnızca bir talebe / portföye bağlı kişiler gelir (ilgili=1). Kayıtlar (talep + portföy) eskisi gibi tam yüklenir; eşleşme hesabı etkilenmez.",
+      "Rehber ekranında \"Rehberde N / TOPLAM kişi yüklü\" çubuğu: \"Devam et\" 250'lik 4 parça (1.000 kişi) çeker, \"Hepsini yükle\" kalanı bitirir. Hata olursa \"Yeniden dene\".",
+      "Rehberde arama yazınca kalan kişiler kendiliğinden yüklenir; Gelen kutusu, Toplu içe aktarma ve talep / portföy formu da açılınca rehberin kalanını arka planda tamamlar (var olan kişi yeni kişi sanılıp tekrar eklenmesin).",
+      "Sunucu: GET /api/durum?parca=kisi&ilgili=1 ve parca=diger yanıtında kisiToplam. Kişi sayfası 250 satır (istek başına işlemci süresi düşük).",
+    ],
+    testEt: [
+      "Sayfayı yenileyin: önceye göre belirgin hızlı açılmalı, 503 gelmemeli.",
+      "Rehber: üstte/altta \"Rehberde … / … kişi yüklü\" ve \"Devam et\" görünmeli; Devam et sayıyı artırmalı; \"Hepsini yükle\" 7.985'e tamamlamalı.",
+      "Rehberde bilmediğiniz bir kişinin adını aratın: bulunmalı (arama kalanı kendiliğinden yükler).",
+      "Bir talebin / portföyün kişi adları (mülk sahibi vb.) eskisi gibi görünmeli.",
+    ],
+  },
   {
     surum: "3.40",
     tarih: "23 Ekim 2026",

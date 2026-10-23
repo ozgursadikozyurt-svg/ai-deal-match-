@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * RANDEVU — gösterim / görüşme. Asistan dahil kayıt yazabilen herkes açar ve sonucunu girer; yapan kullanıcı sunucuda yazılır.
  * Silme yok: yanlış randevu "İptal" yapılır (asistan performansı ve Polaris sayıları bu kayıtlardan okunur).
  */

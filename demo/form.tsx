@@ -1,8 +1,9 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * Demo — kayıt formu. Şemadan üretilir; mülk grubuna göre yalnızca anlamlı alanlar,
  * önce "önemli alanlar", gerisi "Tüm alanlar" altında. Bölümler varsayılan kapalı.
  */
+import { useRehberTamamla } from "./kisi-parca";
 import { SayiGir, SayiAdim, TelGirdisi, sayiYap } from "./girdi";
 import { telStandart, telBicimle, telUyarisi } from "../src/lib/iletisim";
 import { talepDnasi } from "../src/lib/eslestirme/talep-dna";
@@ -203,6 +204,7 @@ const KAYIT_ROL_VARSAYILAN = (tip: string, sahip: string) => (sahip === "EMLAKCI
 
 export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "PORTFOY"; id?: string; taslak?: Partial<Veri>; adayId?: string; geri?: Ekran }) {
   const { d, kayitKaydet, git, geri: geriDon, degistir, bildir, guncelle } = useDepo();
+  useRehberTamamla(); // v3.41 — kişi seçici / aynı telefon uyarısı için
   const mevcut = id ? d.kayitlar.find((k) => k.id === id) : undefined;
   const talep = tip === "TALEP";
   const [f, setF] = useState<any>(() => {

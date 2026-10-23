@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.41 · 23 Ekim 2026 (v3.14'ten)
  * AŞAMA 7 — Canlı sürümün veri köprüsü. Arayüz (demo ile aynı ekranlar) tüm durumu tek seferde okur
  * (`durumGetir`), değişiklikleri parça parça yazar (`degisiklikUygula`). Veritabanı ilişkisel kalır:
  * Notion/Google senkronu, toplu giriş, dışa aktarma ve eşleştirme servisleri aynı tablolarla çalışmaya devam eder.
@@ -90,16 +90,25 @@ export async function durumGetir(prisma: PrismaClient) {
  * Yanıttaki `sonraki` bir sonraki sayfanın `atla` değeridir (null = bitti). Parametresiz GET eskisi gibi her şeyi tek seferde verir.
  */
 export const DURUM_KAYIT_PARCA = 60, DURUM_KISI_PARCA = 1000;
-export async function durumParcasiGetir(prisma: PrismaClient, parca: "kayit" | "kisi" | "diger", atla = 0, al?: number) {
+export async function durumParcasiGetir(prisma: PrismaClient, parca: "kayit" | "kisi" | "diger", atla = 0, al?: number, ilgili = false) {
   const skip = Math.max(0, Math.floor(atla) || 0);
   if (parca === "diger") {
     const zaman = new Date().toISOString();
-    const [eslesmeler, ayarlar] = await Promise.all(DIGER_SORGULARI(prisma));
-    return { kisiZamani: zaman, ...digerCikti(eslesmeler, ayarlar) };
+    const [eslesmeler, ayarlar, kisiToplam] = await Promise.all([...DIGER_SORGULARI(prisma), prisma.kisi.count()]);
+    return { kisiZamani: zaman, kisiToplam, ...digerCikti(eslesmeler, ayarlar) };
   }
   if (parca === "kisi") {
     const take = Math.min(Math.max(1, Math.floor(al ?? DURUM_KISI_PARCA) || DURUM_KISI_PARCA), 2000);
-    const satirlar = await prisma.kisi.findMany({ select: KISI_SEC, orderBy: [{ adSoyad: "asc" }, { id: "asc" }], skip, take });
+    // v3.41 — ilgili=1: yalnızca bir talebe / portföye bağlı kişiler (açılışta bunlar yüklenir; rehberin geri kalanı "Devam et" ile gelir)
+    let where: { id: { in: string[] } } | undefined;
+    if (ilgili) {
+      // ofis süzgeci yalnızca Kayit'ta uygulanır (ebeveyn üzerinden): bağ tablosu doğrudan sorgulanmaz
+      const kayitlar = await prisma.kayit.findMany({ select: { kisiId: true, kisiBaglari: { select: { kisiId: true } } } });
+      const ids = new Set<string>();
+      for (const k of kayitlar as any[]) { if (k.kisiId) ids.add(k.kisiId); for (const b of k.kisiBaglari) ids.add(b.kisiId); }
+      where = { id: { in: [...ids] } };
+    }
+    const satirlar = await prisma.kisi.findMany({ where, select: KISI_SEC, orderBy: [{ adSoyad: "asc" }, { id: "asc" }], skip, take });
     return { kisiler: satirlar.map(kisiSatiri), sonraki: satirlar.length === take ? skip + take : null };
   }
   const take = Math.min(Math.max(1, Math.floor(al ?? DURUM_KAYIT_PARCA) || DURUM_KAYIT_PARCA), 200);

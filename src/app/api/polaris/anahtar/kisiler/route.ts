@@ -1,4 +1,4 @@
-// Anahtar CRM v3.40 · 23 Ekim 2026
+// Anahtar CRM v3.41 · 23 Ekim 2026
 // Polaris v7 · 21 Ekim 2026
 // GET /api/polaris/anahtar/kisiler?son=<kisi id> → en çok 1000 kişi (id sırasıyla, son'dan sonrası)
 // Polaris'in "Anahtar CRM ile eşitle" düğmesi bunu sayfa sayfa okur. Salt okunur; ofis süzgeci kiracılık katmanından gelir.

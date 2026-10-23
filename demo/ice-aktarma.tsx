@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * Demo — Veri Girişi: WhatsApp sohbet dosyalarını toplu içe aktarma + güvene göre ayırma + toplu onay.
  *
  * Akış (uzun sohbetlerde kullanıcının her mesajı tek tek onaylamaması için):
@@ -11,6 +11,7 @@
  *       HATALI  → şemaya uymadı (yapay zekâ uydurma alan/değer üretti) → eklenmez
  *  4. Tanınmayan konumlar Konum öğrenme listesine düşer.
  */
+import { useRehberTamamla } from "./kisi-parca";
 import React, { useEffect, useRef, useState } from "react";
 import { unzipSync, strFromU8 } from "fflate";
 import { DosyaAktarma } from "./toplu-giris";
@@ -282,6 +283,7 @@ function Inceleme({ ia }: { ia: IceAktarma }) {
 
 export function TopluIceAktarma() {
   const { d, guncelle, bildir, sample } = useDepo();
+  useRehberTamamla(); // v3.41
   const [sonGun, setSonGun] = useState<number | null>(null);
   const dosyaGirdi = useRef<HTMLInputElement>(null);
   const [surukle, setSurukle] = useState(false);

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.40 · 23 Ekim 2026
+// Anahtar CRM v3.41 · 23 Ekim 2026
 // GET   /api/kampanyalar              → yönetici: bütçe, harcama, kayıt sayısı ve maliyetle · diğer roller: yalnızca açık kampanya adları
 // POST  /api/kampanyalar              → { kanal, ad, butce?, baslangic?, bitis?, aciklama? } (ofis yöneticisi)
 // PATCH /api/kampanyalar?id=…         → { kanal?, butce?, baslangic?, bitis?, aktif?, aciklama? } (ad değişmez)

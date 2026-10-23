@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.41 · 23 Ekim 2026 (v3.14'ten)
  * v3.20: davet bağlantısıyla katılma (?davet=KOD), açılışta /api/oturum (rol, plan, yetkiler), hesabı olmayana anlaşılır mesaj.
  * Canlı giriş noktası (dist/canli/uygulama.html): giriş → ilk kurulum denetimi → sunucudan durum → aynı demo ekranları, veri sunucuda.
  */
@@ -15,6 +15,7 @@ import { kayitlariOnar } from "./onarim";
 import { KaydetGostergesi } from "./canli-gosterge";
 import { MARKA } from "../src/lib/marka";
 import { SURUM, TARIH } from "../src/lib/surum";
+import { REHBER, KISI_PARCA_ADEDI } from "./kisi-parca";
 
 // v3.20 — davet kodu adresten alınır ve giriş bağlantısı dönene kadar bu tarayıcıda saklanır
 const DAVET_ANAHTAR = "anahtarcrm-davet";
@@ -153,13 +154,13 @@ function Canli({ cfg }: { cfg: Yapilandirma }) {
       }
       if (!r.ok) { const j: any = await r.json().catch(() => ({})); throw new Error(j?.mesaj ?? `Sunucu ${r.status}`); }
       const diger = await r.json();
-      const sayfalar = async (parca: "kayit" | "kisi", anahtar: "kayitlar" | "kisiler"): Promise<any[]> => {
+      const sayfalar = async (parca: "kayit" | "kisi", anahtar: "kayitlar" | "kisiler", ek = ""): Promise<any[]> => {
         const hepsi: any[] = [];
         for (let atla: number | null = 0; atla != null;) {
           let j: any = null, son = "";
           for (let deneme = 0; deneme < 3 && !j; deneme++) {
             if (deneme) await new Promise((x) => setTimeout(x, 400 * deneme));
-            const rr = await api(`/api/durum?parca=${parca}&atla=${atla}`);
+            const rr = await api(`/api/durum?parca=${parca}&atla=${atla}${ek}`);
             if (rr.ok) j = await rr.json(); else son = (await rr.json().catch(() => ({})))?.mesaj ?? `Sunucu ${rr.status}`;
           }
           if (!j) throw new Error(son || "Veriler alınamadı");
@@ -168,7 +169,12 @@ function Canli({ cfg }: { cfg: Yapilandirma }) {
         return hepsi;
       };
       // eski sunucu (parçasız) her şeyi tek seferde döndürür: o zaman ek istek atılmaz
-      const sunucu = Array.isArray(diger.kayitlar) && Array.isArray(diger.kisiler) ? diger : { ...diger, ...Object.fromEntries(await Promise.all([sayfalar("kayit", "kayitlar").then((x) => ["kayitlar", x]), sayfalar("kisi", "kisiler").then((x) => ["kisiler", x])])) };
+      // v3.41 — kişilerin yalnızca talep / portföye bağlı olanları açılışta gelir (ilgili=1); rehberin geri kalanı "Devam et" ile (demo/kisi-parca.ts)
+      const tamSunucu = Array.isArray(diger.kayitlar) && Array.isArray(diger.kisiler);
+      const sunucu = tamSunucu ? diger : { ...diger, ...Object.fromEntries(await Promise.all([sayfalar("kayit", "kayitlar").then((x) => ["kayitlar", x]), sayfalar("kisi", "kisiler", `&ilgili=1&al=${KISI_PARCA_ADEDI}`).then((x) => ["kisiler", x])])) };
+      REHBER.toplam = tamSunucu ? null : (typeof diger.kisiToplam === "number" ? diger.kisiToplam : null);
+      REHBER.sonraki = tamSunucu || (REHBER.toplam != null && (sunucu as any).kisiler.length >= REHBER.toplam) ? null : 0;
+      REHBER.yukluyor = null; REHBER.hata = null;
       const durum = sunucudanDurum(sunucu);
       fotoEsle(durum.kayitlar as any);
       const k = kaydediciKur({ api, baslangic: durum, durum: setKaydet, yedekAnahtari: `anahtar.canli.bekleyen.${o.eposta ?? "?"}`, uyari: (m) => CANLI.bildir?.(m) });

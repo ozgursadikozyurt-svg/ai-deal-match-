@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * (1) Mülk grubuna göre kritik bilgi: kiralık dairede depo soruları çıkmaz; depoda çıkmaya devam eder.
  * (2) Otomatik görevler: eski sistem görevleri açılışta temizlenir, yinelenenler tekleşir; elle / "göreve alalım" görevleri kalır.
  */
@@ -58,6 +58,6 @@ test("aşama tablosu boş: durum değişince görev kendiliğinden doğmaz", () 
 });
 
 test("sürüm 3.40 ve ek belge", () => {
-  assert.equal(SURUM, "3.40"); assert.equal(SURUM_GECMISI[0].surum, "3.40"); assert.equal(SURUM_GECMISI[1].surum, "3.39");
+  assert.ok(SURUM_GECMISI.some((x) => x.surum === "3.40")); assert.equal(SURUM_GECMISI[SURUM_GECMISI.findIndex((x) => x.surum === "3.40") + 1].surum, "3.39");
   assert.ok(fs.existsSync("docs/ANAHTAR_CRM_EK_v3.40_23Ekim2026.md"));
 });

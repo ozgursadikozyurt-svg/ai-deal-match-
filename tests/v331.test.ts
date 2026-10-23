@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * v3.31 — WhatsApp sohbeti .html ve .json dışa aktarımlarından içe alma; Kişiler'de hoşgörülü arama
  *   (birkaç harf, sırasız kelimeler, Türkçe harf duyarsız, notlar / görüşme notları, telefon rakamları).
  */

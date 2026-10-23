@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * RANDEVULAR — kayıt detayında gösterim / görüşme kartı: ekle, sonucunu gir (Gerçekleşti / Gelmedi / İptal).
  * Canlıda /api/randevular (src/lib/services/randevu.ts); demoda bu oturumluk örnek liste (kalıcı değil).
  */

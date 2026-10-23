@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * TİP ÇELİŞKİSİ — kaydın metni (başlık / açıklama / ham mesaj) başka bir mülk ailesini söylüyor ama kendi ailesinin
  * hiçbir anahtar kelimesini içermiyorsa uyarır. Ölçüm (13 Eki 2026, canlı veri): "—SATILIK ARSA— Altıntaş 30–35 milyon"
  * talebi Büro/Ofis olarak kaydedilmişti ve 157 daireyle eşleşiyordu; asıl uygun aday (Aksu D400, 18.401 m² arsa) hiç çıkmıyordu.

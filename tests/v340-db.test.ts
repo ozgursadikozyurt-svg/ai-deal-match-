@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.40 · 23 Ekim 2026
+ * Anahtar CRM v3.41 · 23 Ekim 2026
  * v3.40 — veritabanlı: parçalı açılış (durumParcasiGetir) tek seferlik durumGetir ile aynı veriyi sayfa sayfa verir.
  */
 import { test } from "node:test";
@@ -34,4 +34,18 @@ test("parçalı açılış: kayıt ve kişi sayfaları birleşince tek seferlik 
   const diger: any = await durumParcasiGetir(prisma, "diger");
   assert.ok(diger.ayarlar && diger.eslesmeNotlari && typeof diger.kisiZamani === "string");
   assert.equal(diger.kayitlar, undefined, "diğer parçada kayıt yok");
+});
+
+test("v3.41 ilgili=1: yalnızca talebe / portföye bağlı kişiler; diger yanıtında kisiToplam", async () => {
+  await degisiklikUygula(prisma, DegisiklikSchema.parse({
+    kisiler: [{ id: "IL1", adSoyad: "Bağlı Kişi", telefon: "05329990001" }, { id: "IL2", adSoyad: "Bağsız Kişi", telefon: "05329990002" }],
+    kayitlar: [{ id: "ILK1", veri: { ...P, baslik: "Bağlı", kisiler: [{ kisiId: "IL1", rol: "SAHIP" }] } }],
+  }));
+  const j: any = await durumParcasiGetir(prisma, "kisi", 0, 1000, true);
+  const idler = j.kisiler.map((k: any) => k.id);
+  assert.ok(idler.includes("IL1")); assert.ok(!idler.includes("IL2"));
+  const tum: any = await durumParcasiGetir(prisma, "kisi", 0, 1000, false);
+  assert.ok(tum.kisiler.map((k: any) => k.id).includes("IL2"));
+  const diger: any = await durumParcasiGetir(prisma, "diger");
+  assert.ok(diger.kisiToplam >= 2);
 });

@@ -5,6 +5,20 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.41 · 23 Ekim 2026 — Rehber parça parça: açılışta yalnızca talep / portföye bağlı kişiler, kalanı "Devam et" ile (503 / CPU sınırına karşı)
+
+- Uygulama açılışında artık ~7.800 kişinin hepsi indirilmez: yalnızca bir talebe / portföye bağlı kişiler gelir (ilgili=1). Kayıtlar (talep + portföy) eskisi gibi tam yüklenir; eşleşme hesabı etkilenmez.
+- Rehber ekranında "Rehberde N / TOPLAM kişi yüklü" çubuğu: "Devam et" 250'lik 4 parça (1.000 kişi) çeker, "Hepsini yükle" kalanı bitirir. Hata olursa "Yeniden dene".
+- Rehberde arama yazınca kalan kişiler kendiliğinden yüklenir; Gelen kutusu, Toplu içe aktarma ve talep / portföy formu da açılınca rehberin kalanını arka planda tamamlar (var olan kişi yeni kişi sanılıp tekrar eklenmesin).
+- Sunucu: GET /api/durum?parca=kisi&ilgili=1 ve parca=diger yanıtında kisiToplam. Kişi sayfası 250 satır (istek başına işlemci süresi düşük).
+
+**Demo'da test edilecekler**
+
+- [ ] Sayfayı yenileyin: önceye göre belirgin hızlı açılmalı, 503 gelmemeli.
+- [ ] Rehber: üstte/altta "Rehberde … / … kişi yüklü" ve "Devam et" görünmeli; Devam et sayıyı artırmalı; "Hepsini yükle" 7.985'e tamamlamalı.
+- [ ] Rehberde bilmediğiniz bir kişinin adını aratın: bulunmalı (arama kalanı kendiliğinden yükler).
+- [ ] Bir talebin / portföyün kişi adları (mülk sahibi vb.) eskisi gibi görünmeli.
+
 ## v3.40 · 23 Ekim 2026 — Sade Görevler (kendiliğinden görev yok, sorulur); az verili eşleşme yok; mülk tipine göre kritik bilgi; hızlı sayfa geçişi; Cloudflare CPU aşımına karşı parçalı açılış
 
 - Görevler / Bugün: sistem artık kendiliğinden görev ÜRETMEZ. Kalkan kurallar: %90+ "sıcak eşleşme — sunumu gönder", 30 gündür temas, talep süresi doluyor, yetki belgesi bitiyor ve takip durumu (Bildirildi / Gösterim / Pazarlık…) değişince her gün yeniden doğan "izlenimi sor / geri dönüş al" görevleri (tekrarlayan görevlerin nedeni buydu). Eski otomatik görevler açılışta temizlenir, yinelenenler tekleşir.
