@@ -34,7 +34,17 @@ jobs:
         with:
           version: latest
       - name: Supabase'e yükle
-        run: supabase functions deploy api --project-ref "$SUPABASE_PROJE" --no-verify-jwt --use-api
+        run: |
+          set +e
+          supabase functions deploy api --project-ref "$SUPABASE_PROJE" --no-verify-jwt --use-api > /tmp/yukle.log 2>&1
+          kod=$?
+          cat /tmp/yukle.log
+          if [ $kod -ne 0 ]; then
+            # hata özetini uyarı olarak da yaz (kayıtlara erişilemeyen yerlerden okunabilsin)
+            ozet=$(tail -25 /tmp/yukle.log | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Supabase yükleme hatası::$ozet"
+            exit $kod
+          fi
       - name: Ayakta mı?
         run: |
           sleep 5
