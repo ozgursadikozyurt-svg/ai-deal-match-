@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.39 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.39";
-export const TARIH = "21 Ekim 2026";
+export const SURUM = "3.40";
+export const TARIH = "23 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.39_21Ekim2026";
+export const DOSYA_EKI = "v3.40_23Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,31 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.40",
+    tarih: "23 Ekim 2026",
+    baslik: "Sade Görevler (kendiliğinden görev yok, sorulur); az verili eşleşme yok; mülk tipine göre kritik bilgi; hızlı sayfa geçişi; Cloudflare CPU aşımına karşı parçalı açılış",
+    degisenler: [
+      "Görevler / Bugün: sistem artık kendiliğinden görev ÜRETMEZ. Kalkan kurallar: %90+ \"sıcak eşleşme — sunumu gönder\", 30 gündür temas, talep süresi doluyor, yetki belgesi bitiyor ve takip durumu (Bildirildi / Gösterim / Pazarlık…) değişince her gün yeniden doğan \"izlenimi sor / geri dönüş al\" görevleri (tekrarlayan görevlerin nedeni buydu). Eski otomatik görevler açılışta temizlenir, yinelenenler tekleşir.",
+      "Görev yalnızca iki yoldan doğar: (1) siz \"+ Görev\" ile eklersiniz, (2) eşleşme takip durumunu değiştirince (Bildirildi · Görüşüldü · Gösterim · Pazarlık · Koparıldı) ya da eşleşmeye not yazınca \"Bunu göreve alalım mı?\" diye sorulur: not görev metni olarak gelir, tarihi seçersiniz ya da \"Gerek yok\" dersiniz. Fiyat düşünce önceden ilgilenenleri aramak (FIYAT) kalır.",
+      "Görevler ekranı sadeleşti: tür süzgeci, açıklama metni ve \"Bu hafta\" ayrımı kalktı; Geciken · Bugün · Sonra ve kapalı Tamamlananlar.",
+      "Eşleşmeler: \"+N az verili\" düğmesi ve az verili eşleşmeler kalktı — talepte ya da portföyde ölçülebilen bilgi çok azsa (güven düşük) eşleşme hiç oluşturulmaz.",
+      "Talep detayı: \"Eşleşmeler (N)\" listesi önce uygunluk, sonra uyum (seviye → skor) sırasıyla; havuz katmanı yalnızca eşitlikte.",
+      "Kritik bilgi mülk tipine göre: kiralık dairede artık depo soruları (yükseklik, TIR / kamyon, elektrik, m²) çıkmaz — neden: forma önceden girilmiş ya da yapay zekânın eklediği depo \"kullanım amacı\" konut talebine de uygulanıyordu. Konut: bölge, bütçe, oda, kat, eşya (kiralıkta), asansör, bina yaşı, site / güvenlik, otopark, ısınma, balkon / bahçe, krediye uygunluk (satılıkta). Ofis, dükkan, hizmet, arsa ve bina için de kendi listeleri var; depo / üretim aynen kalır. Müşterinin açıkça \"şart\" dediği kriter her zaman korunur.",
+      "\"Neden 4/5\" ve \"Eksik\" satırları düz Türkçe: \"Bilinmiyor (sorun): Bina yaşı\" → \"Müşterinin istediği ama portföyde yazılı olmayan: Bina yaşı\"; \"m² bilgisi yok (talep)\" → \"Talepte m² yazılı değil\"; \"Eksik:\" → \"Eksik bilgi:\".",
+      "Yeni talep formunda \"İlan sahibi\" alanı kalktı (talepte anlamsızdı; kaynak seçimi zaten ayarlıyor). Ayarlar'dan \"Yapay zekâ\" bölümü kaldırıldı (anahtar sunucuda; varsayılan sağlayıcı değişmedi).",
+      "HIZ: Talepler / Portföyler / Eşleşmeler / Ana Sayfa her açılışta tüm talep × portföy eşleşmesini baştan hesaplıyordu, bir not kaydetmek de hepsini yeniden hesaplatıyordu. Artık sonuç ekranlar arasında ortak önbellekte; bir kayıt değişince yalnızca o kaydın çiftleri yeniden hesaplanır.",
+      "Cloudflare \"CPU süresi sınırı\" (günde 100+): açılışta tüm kayıt + ~7.800 kişi + eşleşme tek istekte çekiliyordu (ücretsiz planda istek başına 10 ms). Açılış artık küçük parçalarla: GET /api/durum?parca=diger | kayit&atla= | kisi&atla= (60 kayıt / 1.000 kişi sayfaları, geçici hatada 3 deneme). Parametresiz GET eskisi gibi çalışır. Görev listesi küçüldüğü için her görev değişiminde yazılan ayar da küçüldü.",
+    ],
+    testEt: [
+      "Ana Sayfa › Bugün: eskiden tekrar eden görevler gitmiş olmalı; yalnızca elle eklediğiniz ve onayladığınız görevler kalmalı.",
+      "Bir eşleşmeyi açın, takip durumunu \"Gösterim\" yapın: \"Bunu göreve alalım mı?\" sorulmalı; 3 gün seçince Görevler'e düşmeli, \"Gerek yok\" deyince hiçbir şey eklenmemeli.",
+      "Yeni talep › Kiralık Daire: \"Olmazsa olmazlar\" altında TIR / yükseklik / elektrik sorusu çıkmamalı; oda, kat, eşya gibi konut soruları çıkmalı. Depo talebinde eskisi gibi kalmalı.",
+      "Yeni talep ekranında \"İlan sahibi\" alanı olmamalı; Ayarlar'da \"Yapay zekâ\" bölümü olmamalı.",
+      "Eşleşmeler: \"+N az verili\" düğmesi olmamalı. Bir talebin detayında \"Eşleşmeler (N)\" en yüksek uyumdan aşağı sıralı olmalı.",
+      "Talepler → Eşleşmeler → Portföyler arasında geçin: ilk açılıştan sonraki geçişler belirgin hızlı olmalı; bir kayda not ekleyince gecikme olmamalı.",
+    ],
+  },
   {
     surum: "3.39",
     tarih: "21 Ekim 2026",

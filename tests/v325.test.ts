@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026 — Bugün panosu, İlgilenenler, kompakt form
+ * Anahtar CRM v3.40 · 23 Ekim 2026 — Bugün panosu, İlgilenenler, kompakt form
  */
 import { test as nodeTest } from "node:test";
 import assert from "node:assert/strict";
@@ -29,17 +29,13 @@ const talep = () => ornek.kayitlar.find((k) => k.veri.tip === "TALEP")!;
 const portfoy = () => ornek.kayitlar.find((k) => k.veri.tip === "PORTFOY")!;
 
 
-test("takip: Gösterim → 'Geri dönüş al' 2 gün sonra; aynı durum tekrar basılınca görev çoğalmaz; Koparıldı görevleri kapatır", () => {
+test("takip (v3.40): Gösterim / Koparıldı kendiliğinden görev AÇMAZ; durum kaydedilir", () => {
   let d = durum();
   d = eslesmeDurumunuUygula(d, talep().id, portfoy().id, "GOSTERIM", {}, BUGUN);
-  const acik = (d.gorevler ?? []).filter((g) => g.durum === "ACIK");
-  assert.ok(acik.some((g) => g.vade === gunEkle(bugun, 2) && /Geri dönüş/.test(g.baslik)), JSON.stringify(acik));
-  assert.ok(acik.some((g) => g.vade === gunEkle(bugun, 1) && /izlenim/i.test(g.baslik)));
-  const n = (d.gorevler ?? []).length;
-  d = eslesmeDurumunuUygula(d, talep().id, portfoy().id, "GOSTERIM", {}, BUGUN);
-  assert.equal((d.gorevler ?? []).length, n);
+  assert.equal(d.eslesmeNotlari[`${talep().id}~${portfoy().id}`].durum, "GOSTERIM");
+  assert.equal((d.gorevler ?? []).filter((g) => g.durum === "ACIK").length, 0, "görev yalnızca sorulup onaylanınca açılır");
   d = eslesmeDurumunuUygula(d, talep().id, portfoy().id, "REDDEDILDI", { neden: "YANLIS" }, BUGUN);
-  assert.equal((d.gorevler ?? []).filter((g) => g.durum === "ACIK" && g.eslesme).length, 0, "koparınca açık görev kalmaz");
+  assert.equal((d.gorevler ?? []).filter((g) => g.durum === "ACIK" && g.eslesme).length, 0);
 });
 
 test("üç düğme: Ulaşılamadı → yarın; Görüşüldü → not + yeni vade; İlgilenmiyor → kapanır", () => {
@@ -61,7 +57,7 @@ test("ilgilenenler: kaydet/güncelle/sil; durum değişince görev; normalize bo
   const kisi = ornek.kisiler[0].id, k = portfoy().id;
   d = ilgilenenKaydet(d, { kayitId: k, kisiId: kisi, durum: "GOSTERILDI" }, BUGUN);
   assert.equal(d.ilgilenenler!.length, 1);
-  assert.ok(d.gorevler!.some((g) => g.durum === "ACIK" && g.vade === gunEkle(bugun, 2)));
+  assert.equal(d.gorevler!.filter((g) => g.durum === "ACIK").length, 0, "v3.40 — ilgilenen durumu görev üretmez");
   d = ilgilenenKaydet(d, { kayitId: k, kisiId: kisi, durum: "TEKLIF" }, BUGUN);
   assert.equal(d.ilgilenenler!.length, 1);
   d = ilgilenenSil(d, d.ilgilenenler![0].id, BUGUN);
@@ -102,11 +98,12 @@ test("pano: görev satırında üç düğme; Ulaşılamadı yarına atar", async
   await e.kapat();
 });
 
-test("eşleşme detayı: Görüşüldü'ye basınca 'Bir sonraki iletişim ne zaman?' sorulur ve seçim görev olur", async () => {
+test("eşleşme detayı: Görüşüldü'ye basınca 'Bunu göreve alalım mı?' sorulur ve seçim görev olur", async () => {
   const c = ctx(durum({ gorevler: [], ilgilenenler: [] }));
   const e = await ac(React.createElement(EslesmeDetay, { tid: talep().id, pid: portfoy().id } as any), c);
   await e.tikla(e.dugme("Görüşüldü"));
-  assert.match(e.metin(), /Bir sonraki iletişim ne zaman\?/);
+  assert.match(e.metin(), /Bunu göreve alalım mı\?/);
+  assert.equal(c.d.gorevler!.length, 0, "onaylanmadan görev açılmaz");
   await e.tikla(e.dugme("3 gün"));
   assert.ok(c.d.gorevler!.some((g) => g.durum === "ACIK" && g.vade === gunEkle(bugun, 3) && g.kural === "SONRAKI"));
   await e.kapat();

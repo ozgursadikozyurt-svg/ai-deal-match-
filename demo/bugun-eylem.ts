@@ -1,12 +1,12 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * "Bugün" panosu — durum üzerindeki işlemler (React yok; testlenebilir). Ekranlar bunları `guncelle((d) => …)` içinde çağırır.
  * Kurallar src/lib/domain/gorev.ts'de; burada yalnızca DepoDurumu ile birleştirme var.
  */
 import { simdi as simdiOf, type DepoDurumu, type EslesmeNotu, type Kayit, type KayitNotu, type PipelineDurum, type Veri } from "./depo";
 import {
-  eslesmeDurumuDegisti, fiyatDustu, gorevEkle, gorevErtele, gorevKapat, gunEkle, gunYaz, ilgilenenUygula, asamaDegisti, sanalGorevler, gorevleriBirlestir,
-  type Gorev, type GorevGirdisi, type Ilgilenen, type IlgiDurumu, type SanalEslesme, type SanalKayit,
+  eslesmeDurumuDegisti, fiyatDustu, gorevEkle, gorevErtele, gorevKapat, gunEkle, gunYaz, ilgilenenUygula, asamaDegisti,
+  type Gorev, type GorevGirdisi, type Ilgilenen, type IlgiDurumu,
 } from "../src/lib/domain/gorev";
 import { sureUzat } from "./depo";
 import type { Eslesme } from "./ortak";
@@ -112,19 +112,14 @@ export function fiyatDususuIsle(d: DepoDurumu, eski: Kayit | undefined, yeni: Ka
   return gorevler === d.gorevler ? d : { ...d, gorevler };
 }
 
-/** Ekrana giren birleşik liste: saklı görevler + o an hesaplanan sanal görevler. `benimOfis`: kayıt kimliği → benim / ofisim mi (yalnızca bunlar için sanal görev üretilir) */
-export function bugunGorevleri(d: DepoDurumu, es: Eslesme[], benimOfis: (k: Kayit) => boolean, simdi: Date = simdiOf()): Gorev[] {
-  const kayitlar = new Map(d.kayitlar.map((k) => [k.id, k]));
+/**
+ * Ekrana giren liste: yalnızca saklı görevler (v3.40). Eskiden her açılışta hesaplanan "sanal" görevler de karışırdı
+ * (%90+ eşleşme, 30 gün temas, talep süresi, yetki belgesi); Bugün artık yalnızca hatırlatıcılarınızı ve onayladığınız takipleri gösterir.
+ * (es · benimOfis parametreleri eski çağrılarla uyum için duruyor.)
+ */
+export function bugunGorevleri(d: DepoDurumu, _es?: Eslesme[], _benimOfis?: (k: Kayit) => boolean, _simdi: Date = simdiOf()): Gorev[] {
+  const kayitlar = new Set(d.kayitlar.map((k) => k.id));
   // sahibi silinmiş / bulunamayan kayıtlara bağlı görevler gizlenir
-  const saklanan = (d.gorevler ?? []).filter((g) => !g.kayitId || kayitlar.has(g.kayitId));
-  const kisiler: SanalKayit[] = d.kayitlar.filter((k) => k.veri.durum === "ACTIVE" && benimOfis(k)).map((k) => ({
-    id: k.id, tip: k.veri.tip, olusturma: k.olusturma, baslik: k.veri.baslik ?? "", validUntil: k.veri.validUntil ? new Date(k.veri.validUntil).toISOString() : null,
-    yetkili: !!k.veri.yetkili, yetkiBitis: k.veri.yetkiBitis ? new Date(k.veri.yetkiBitis as any).toISOString() : null,
-    sonNot: (k.notlar ?? []).map((n) => n.tarih).sort().at(-1) ?? null, kisiId: kayitKisisi(k),
-  }));
-  const sicak: SanalEslesme[] = es.filter((e) => e.s.uygunluk === "SUNULABILIR" && (d.eslesmeNotlari[`${e.t.id}~${e.p.id}`]?.durum ?? "YENI") === "YENI" && (benimOfis(e.t) || benimOfis(e.p)))
-    .map((e) => ({ tid: e.t.id, pid: e.p.id, skor: e.s.skor, baslik: e.p.veri.baslik ?? "", talepKisiId: kayitKisisi(e.t) }));
-  const sanal = sanalGorevler({ simdi, kayitlar: kisiler, eslesmeler: sicak, gorevler: saklanan, ilgilenenler: d.ilgilenenler ?? [] });
-  return gorevleriBirlestir(saklanan, sanal.filter((g) => !g.kayitId || kayitlar.has(g.kayitId)));
+  return (d.gorevler ?? []).filter((g) => !g.kayitId || kayitlar.has(g.kayitId));
 }
 export type { Ilgilenen };

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Demo — kayıt formu. Şemadan üretilir; mülk grubuna göre yalnızca anlamlı alanlar,
  * önce "önemli alanlar", gerisi "Tüm alanlar" altında. Bölümler varsayılan kapalı.
  */
@@ -322,7 +322,7 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
         <div className="alan genis"><label>Kaynak</label><KaynakSecici deger={kaynakOf({ ...f, tip })} degis={(k) => setF((x: any) => kaynakUygula({ ...x, tip }, k))} /></div>
         {/* v3.32 — ilk kaynak: yeni kayıtta seçilir, kayıttan sonra kilitlenir (yalnızca ofis yöneticisi düzeltir) */}
         <IlkKaynakAlani f={f} set={set} kayitliDeger={mevcut?.veri as any} />
-        <div className="alan"><label htmlFor="f-sahip">İlan sahibi</label><select id="f-sahip" value={f.ilanSahibiTipi} onChange={(e) => set("ilanSahibiTipi", e.target.value)}>{Object.entries(ILAN_SAHIBI_ETIKET).map(([k, e]) => <option key={k} value={k}>{e}</option>)}</select></div>
+        {!talep && <div className="alan"><label htmlFor="f-sahip">İlan sahibi</label><select id="f-sahip" value={f.ilanSahibiTipi} onChange={(e) => set("ilanSahibiTipi", e.target.value)}>{Object.entries(ILAN_SAHIBI_ETIKET).map(([k, e]) => <option key={k} value={k}>{e}</option>)}</select></div>}
         {!talep && <div className="alan"><label htmlFor="f-havuz">Havuz</label><select id="f-havuz" value={f.havuz} onChange={(e) => set("havuz", e.target.value)}>{Object.entries(HAVUZ_ETIKET).map(([k, e]) => <option key={k} value={k}>{e}</option>)}</select></div>}
         {/* v3.35 — Yetki belgesi: açılıp kapanan bölüm (yetkili, belge no, taşınmaz ID, bitiş) */}
         {!talep && f.havuz === "KENDI_PORTFOY" && <details className="alan genis yetki-bolum" open={!!(f.yetkili || f.yetkiBelgeNo || f.tasinmazNo)}>

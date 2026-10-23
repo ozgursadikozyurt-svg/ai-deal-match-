@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026 (v3.33'ten)
+ * Anahtar CRM v3.40 · 23 Ekim 2026 (v3.33'ten)
  * v3.36 — UYUM SEVİYESİ 1–5 (ekranda yüzde yerine) + gerekçe listesi (neden bu seviye). Ölçüm: 19 Eki 2026 canlı veri, 16.095 çift;
  *   "yanlış" işaretlenen 40 eşleşmenin 10'u 92–100 alıyordu. Düzeltmeler: döviz çevrimi, talepteki anlamsız değerler (0 kW, 5 kW,
  *   çatı / duvar tipi) şart sayılmaz, "ara kat" isteyene giriş / son kat tutmaz, fazla oda ve üst üste ödün en fazla Koşullu,
@@ -166,16 +166,16 @@ export interface Guven { seviye: GuvenSeviye; olculen: number; toplam: number; a
 export function eksikVeriUyarilari(t: OnizlemeKayit, p: OnizlemeKayit): string[] {
   const u: string[] = [];
   const talepAlan = t.minM2 == null && t.maxM2 == null, portfoyAlan = p.m2 == null;
-  if (talepAlan || portfoyAlan) u.push(`m² bilgisi yok (${talepAlan && portfoyAlan ? "talep ve portföy" : talepAlan ? "talep" : "portföy"})`);
+  if (talepAlan || portfoyAlan) u.push(talepAlan && portfoyAlan ? "Talepte ve portföyde m² yazılı değil" : talepAlan ? "Talepte m² yazılı değil" : "Portföyde m² yazılı değil");
   // oda yalnızca konut grubunda aranır (depo, arsa, dükkan için anlamsız uyarı verilmez)
-  if (matrisOf(t.mulkTipi) === "KONUT" && !t.odaSayisi && !p.odaSayisi) u.push("oda sayısı yok");
+  if (matrisOf(t.mulkTipi) === "KONUT" && !t.odaSayisi && !p.odaSayisi) u.push("Talepte ve portföyde oda sayısı yazılı değil");
   // v3.37 — Benim / "Bütçe m²'ye göre" talepte bütçe yokluğu "eksik" sayılmaz; v3.38: içeri aktarılmış talepte yine uyarı
-  if (t.maxFiyat == null && t.minFiyat == null && !t.butceSerbest) u.push("talepte bütçe yok");
-  if (p.fiyat == null) u.push("portföyde fiyat yok");
+  if (t.maxFiyat == null && t.minFiyat == null && !t.butceSerbest) u.push("Talepte bütçe yazılı değil");
+  if (p.fiyat == null) u.push("Portföyde fiyat yazılı değil");
   const mahalle = (x: OnizlemeKayit) => arananLok(x.lokasyonlar).some((l) => l.mahalleId != null || l.altBolgeId != null);
-  if (!mahalle(t) && !mahalle(p)) u.push("konum yalnızca ilçe düzeyinde");
+  if (!mahalle(t) && !mahalle(p)) u.push("Konum yalnızca ilçe düzeyinde (mahalle yazılı değil)");
   const oz = (x: OnizlemeKayit) => Object.keys(x.ozellik ?? {}).length;
-  if (oz(t) + oz(p) === 0) u.push("teknik özellik girilmemiş");
+  if (oz(t) + oz(p) === 0) u.push("Teknik özellik yazılı değil");
   return u;
 }
 import { MULK_TIPI_META as TIP_META } from "../domain/kategori";
@@ -787,7 +787,7 @@ export function eslesmeOnizle(t0: OnizlemeKayit, p0: OnizlemeKayit, b: LokasyonB
   const sartBilinmeyenler = satirlar.filter((x) => x.kritik && x.sonuc === "BILINMIYOR" && x.anahtar !== "fiyat" && x.anahtar !== "kullanimAmaclari" && x.anahtar !== "mulkTipi");
   if (sartBilinmeyenler.length) { skor -= SART_BILINMEYEN_CEZASI * sartBilinmeyenler.length; tavan(SART_BILINMEYEN_SKOR_TAVANI, `Şart ama portföyde yazmıyor: ${sartBilinmeyenler.map((x) => x.etiket).join(", ")}`); }
   const bilinmeyenIstekler = satirlar.filter((x) => x.sonuc === "BILINMIYOR" && !x.kritik && !ISTEK_DISI.includes(x.anahtar)).map((x) => x.etiket);
-  if (bilinmeyenIstekler.length) { skor -= Math.min(BILINMEYEN_ISTEK_TAVAN, BILINMEYEN_ISTEK_CEZASI * bilinmeyenIstekler.length); tavan(BILINMEYEN_ISTEK_SKOR_TAVANI, `Bilinmiyor (sorun): ${bilinmeyenIstekler.join(", ")}`); }
+  if (bilinmeyenIstekler.length) { skor -= Math.min(BILINMEYEN_ISTEK_TAVAN, BILINMEYEN_ISTEK_CEZASI * bilinmeyenIstekler.length); tavan(BILINMEYEN_ISTEK_SKOR_TAVANI, `Müşterinin istediği ama portföyde yazılı olmayan: ${bilinmeyenIstekler.join(", ")}`); }
   const karsilanmayanIstekler = satirlar.filter((x) => x.sonuc === "SAGLANMADI" && !x.kritik && !x.tercih && !ISTEK_DISI.includes(x.anahtar) && x.anahtar !== "istenenKatlar");
   // v3.28 — istenen özelliğin OLMADIĞI biliniyorsa: "bilinmiyor" (≤ 84) her zaman önünde kalır
   if (karsilanmayanIstekler.length) { skor -= Math.min(KARSILANMAYAN_ISTEK_TAVAN, KARSILANMAYAN_ISTEK_CEZASI * karsilanmayanIstekler.length); tavan(KARSILANMAYAN_ISTEK_SKOR_TAVANI, `İstenen yok: ${karsilanmayanIstekler.map((x) => `${x.etiket} (${x.portfoy})`).join(", ")}`); }

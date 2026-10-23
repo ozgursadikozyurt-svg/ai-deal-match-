@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.40 · 23 Ekim 2026 (v3.14'ten)
  * v3.20: davet bağlantısıyla katılma (?davet=KOD), açılışta /api/oturum (rol, plan, yetkiler), hesabı olmayana anlaşılır mesaj.
  * Canlı giriş noktası (dist/canli/uygulama.html): giriş → ilk kurulum denetimi → sunucudan durum → aynı demo ekranları, veri sunucuda.
  */
@@ -142,7 +142,9 @@ function Canli({ cfg }: { cfg: Yapilandirma }) {
         davetTemizle();
         if (!dr.ok && dr.status !== 409) { o.cikis(); return setFaz({ ad: "giris", mesaj: dj?.mesaj ?? "Davet kabul edilemedi" }); }
       }
-      let r = await api("/api/durum");
+      // v3.40 — parçalı açılış: önce küçük "diğer" parça (eşleşme takibi + ayarlar; aynı zamanda oturum denetimi), sonra kayıtlar ve kişiler sayfa sayfa.
+      // Tek büyük istek Cloudflare ücretsiz planın işlemci sınırını aşıyordu (günde 100+ kez 503).
+      let r = await api("/api/durum?parca=diger");
       if (r.status === 401 || r.status === 403) {
         const j: any = await r.json().catch(() => ({}));
         if (r.status === 403 && cfg.acikKayit && j?.hata === "HESAP_YOK") return setFaz({ ad: "kayit", eposta: o.eposta ?? undefined }); // v3.26
@@ -150,7 +152,23 @@ function Canli({ cfg }: { cfg: Yapilandirma }) {
         o.cikis(); return setFaz({ ad: "giris", mesaj: j?.mesaj && j.mesaj !== "Giriş gerekli" ? j.mesaj : undefined });
       }
       if (!r.ok) { const j: any = await r.json().catch(() => ({})); throw new Error(j?.mesaj ?? `Sunucu ${r.status}`); }
-      const sunucu = await r.json();
+      const diger = await r.json();
+      const sayfalar = async (parca: "kayit" | "kisi", anahtar: "kayitlar" | "kisiler"): Promise<any[]> => {
+        const hepsi: any[] = [];
+        for (let atla: number | null = 0; atla != null;) {
+          let j: any = null, son = "";
+          for (let deneme = 0; deneme < 3 && !j; deneme++) {
+            if (deneme) await new Promise((x) => setTimeout(x, 400 * deneme));
+            const rr = await api(`/api/durum?parca=${parca}&atla=${atla}`);
+            if (rr.ok) j = await rr.json(); else son = (await rr.json().catch(() => ({})))?.mesaj ?? `Sunucu ${rr.status}`;
+          }
+          if (!j) throw new Error(son || "Veriler alınamadı");
+          hepsi.push(...(j[anahtar] ?? [])); atla = typeof j.sonraki === "number" ? j.sonraki : null;
+        }
+        return hepsi;
+      };
+      // eski sunucu (parçasız) her şeyi tek seferde döndürür: o zaman ek istek atılmaz
+      const sunucu = Array.isArray(diger.kayitlar) && Array.isArray(diger.kisiler) ? diger : { ...diger, ...Object.fromEntries(await Promise.all([sayfalar("kayit", "kayitlar").then((x) => ["kayitlar", x]), sayfalar("kisi", "kisiler").then((x) => ["kisiler", x])])) };
       const durum = sunucudanDurum(sunucu);
       fotoEsle(durum.kayitlar as any);
       const k = kaydediciKur({ api, baslangic: durum, durum: setKaydet, yedekAnahtari: `anahtar.canli.bekleyen.${o.eposta ?? "?"}`, uyari: (m) => CANLI.bildir?.(m) });

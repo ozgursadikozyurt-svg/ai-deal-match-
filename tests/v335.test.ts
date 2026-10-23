@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.35 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * v3.35 — veritabanısız: işlem türü tahmini, aylık bana kalan (tahsilat ayı), Polaris dönüşümü, yetkiler, şema / migration, arayüz bağlantıları.
  */
 import { test } from "node:test";

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Antalya'ya özel piyasa katmanı: alt bölgeler, komşu ilçeler, alias sözlüğü.
  * Kaynak: Özgür'ün Notion CRM "Bölge" seçenekleri + WhatsApp grup kullanımları.
  * `dogrulandi: false` olanlar ilk kullanımda Ayarlar > Lokasyon ekranından onaylanmalı.

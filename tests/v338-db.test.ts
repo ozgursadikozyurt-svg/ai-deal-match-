@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * v3.38 — veritabanlı: kayit.durumTarihi ve kayit.butceSerbest; durum değişince sunucu tarihi yazar, değişmeyince korur.
  */
 import { test } from "node:test";

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * WhatsApp "Sohbeti dışa aktar" (.txt / .md / v3.31: .html / .json) ayrıştırıcı + ön filtre + tekrar ayıklama.
  * Yapay zekâya gitmeden ÖNCE çalışır: gürültüyü ve aynı ilanın başka gruplardaki kopyalarını ayıklar,
  * böylece AI maliyeti ve kullanıcının onaylayacağı kayıt sayısı düşer.

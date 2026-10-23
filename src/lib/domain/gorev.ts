@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * "Bugün" panosu (görevler) ve İlgilenenler — SAF kurallar: arayüz, sunucu ve testler aynı kodu kullanır (ağ, depo, React yok).
  *
  * Fikir: danışman sisteme eşleşme aramak için değil, önündeki sıcak görevleri eritmek için girer. Görevlerin çoğunu sistem üretir:
@@ -74,6 +74,28 @@ export function gorevUret(g: GorevGirdisi, simdi: Date): Gorev {
   return { id: g.id ?? yeniGorevId(), kural: g.kural, tur: g.tur, baslik: g.baslik, kisiId: g.kisiId ?? null, kayitId: g.kayitId ?? null, eslesme: g.eslesme ?? null, vade: g.vade, durum: "ACIK", otoAnahtar: g.otoAnahtar ?? null, olusturma: simdi.toISOString() };
 }
 
+/**
+ * v3.40 — Sistemin kendiliğinden ürettiği (kullanıcının istemediği) görev kuralları: aşama görevleri ve "sanal" görevler
+ * (sıcak eşleşme, 30 gün temas, talep süresi, yetki belgesi). Bunlar artık üretilmez; eski kayıtlar açılışta temizlenir.
+ * Kalanlar: ELLE (kendi eklediğiniz), SONRAKI ("Bunu göreve alalım mı?" ile eklenen), FIYAT (fiyat düşünce ilgilenenleri ara).
+ */
+export const OTOMATIK_KURALLAR: ReadonlySet<GorevKurali> = new Set<GorevKurali>(["YANIT", "IZLENIM", "GERI_DONUS", "TEKLIF", "EVRAK", "SICAK", "TALEP_SURE", "TEMAS", "YETKI"]);
+/** Otomatik üretilmiş görevleri atar; aynı kişi / kayıt / başlık / vadedeki yinelenen açık görevlerden yalnızca birini bırakır. */
+export function otomatikGorevleriTemizle(l: Gorev[]): Gorev[] {
+  const gorulen = new Set<string>();
+  const r: Gorev[] = [];
+  for (const g of l) {
+    if (OTOMATIK_KURALLAR.has(g.kural)) continue;
+    if (g.durum === "ACIK") {
+      const anahtar = [g.kural, g.kisiId ?? "", g.kayitId ?? "", g.eslesme ?? "", g.baslik, g.vade].join("|");
+      if (gorulen.has(anahtar)) continue;
+      gorulen.add(anahtar);
+    }
+    r.push(g);
+  }
+  return r.length === l.length ? l : r;
+}
+
 /** Küçük sayı = önce. Aynı gündeki görevlerde sıra: müşteriyle süren takipler → sıcak eşleşme / belge → süre → temas */
 const ONCELIK: Record<GorevKurali, number> = { TEKLIF: 0, GERI_DONUS: 1, IZLENIM: 1, YANIT: 1, SONRAKI: 1, FIYAT: 1, ELLE: 1, EVRAK: 1, SICAK: 2, YETKI: 2, TALEP_SURE: 3, TEMAS: 4 };
 export const gorevSirala = (a: Gorev, b: Gorev) => a.vade.localeCompare(b.vade) || ONCELIK[a.kural] - ONCELIK[b.kural] || a.olusturma.localeCompare(b.olusturma) || a.id.localeCompare(b.id);
@@ -93,15 +115,12 @@ export const pipelineAsama = (p?: string | null): IlgiDurumu | null =>
   ({ BILDIRILDI: "SUNULDU", GORUSULDU: "ILGILENDI", GOSTERIM: "GOSTERILDI", PAZARLIK: "TEKLIF", KAPANDI: "ANLASTI", REDDEDILDI: "VAZGECTI" } as Record<string, IlgiDurumu>)[p ?? ""] ?? null;
 
 interface AsamaKurali { gun: number; kural: GorevKurali; tur: GorevTuru; baslik: string }
-/** "Gösterim yapıldı → ertesi gün izlenimi sor, 2 gün sonra geri dönüş al" gibi kurallar — tek tablo */
-export const ASAMA_GOREVLERI: Record<IlgiDurumu, AsamaKurali[]> = {
-  ILGILENDI: [],
-  SUNULDU: [{ gun: 2, kural: "YANIT", tur: "ARA", baslik: "Sunuma yanıt al" }],
-  GOSTERILDI: [{ gun: 1, kural: "IZLENIM", tur: "ARA", baslik: "Gösterim izlenimini sor" }, { gun: 2, kural: "GERI_DONUS", tur: "ARA", baslik: "Geri dönüş al" }],
-  TEKLIF: [{ gun: 1, kural: "TEKLIF", tur: "ARA", baslik: "Pazarlığın son durumunu sor" }],
-  ANLASTI: [{ gun: 2, kural: "EVRAK", tur: "BELGE", baslik: "Kapora ve evrakları tamamla" }],
-  VAZGECTI: [],
-};
+/**
+ * v3.40 — Aşama değişince görev KENDİLİĞİNDEN açılmaz (eskiden "Gösterim → izlenimi sor + geri dönüş al" gibi kurallar her gün
+ * yeniden görev üretip Bugün listesini dolduruyordu). Görev artık yalnızca kullanıcı onaylayınca eklenir: durum değişince ya da not
+ * yazılınca "Bunu göreve alalım mı?" sorulur (demo/bugun.tsx › SonrakiIletisimSorusu). Tablo, eski görevlerin kapanması için duruyor.
+ */
+export const ASAMA_GOREVLERI: Record<IlgiDurumu, AsamaKurali[]> = { ILGILENDI: [], SUNULDU: [], GOSTERILDI: [], TEKLIF: [], ANLASTI: [], VAZGECTI: [] };
 
 export interface AsamaGirdisi {
   /** "es:<talep>~<portföy>" (takip düğmesi) ya da "il:<ilgilenenId>" (ilgilenen satırı): bu önekle başlayan açık görevler aşama değişince kapanır */

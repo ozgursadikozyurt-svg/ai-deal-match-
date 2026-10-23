@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Kayıt formunda mülk grubuna göre ÖNCE gösterilecek teknik alanlar (hızlı giriş).
  * Geri kalan, o grupta anlamlı alanlar "Tüm alanlar" altında açılır. Anlamsız alanlar hiç gösterilmez.
  * Sıra = ekrandaki sıra. Sayılar ve seçimler üstte, evet/hayır özellikleri tek satır çip olarak altta.

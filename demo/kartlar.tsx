@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.37 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Demo — eşleşme kartı, eşleştirme tercihleri (eski "Talep DNA" kartı), kapatılabilir bilgi kutusu.
  */
 import React, { useState } from "react";
@@ -145,7 +145,7 @@ export function EslesmeKarti({ e, sec }: { e: Eslesme; sec?: { acik: boolean; de
         {!engel && <HizliCevaplar e={e} />}
         {sorulacak.length > 0 && <span className="es2-n uyari">Sorulacak: {sorulacak.slice(0, 3).join(", ")}{sorulacak.length > 3 ? ` +${sorulacak.length - 3}` : ""}</span>}
         {/* v3.19 — eksik bilgi puanı düşürür; hangi bilgi eksik, kısaca */}
-        {eksik.length > 0 && <span className="es2-n uyari" title="Bu bilgiler tamamlanınca puan netleşir">Eksik: {eksik.slice(0, 3).join(", ")}{eksik.length > 3 ? ` +${eksik.length - 3}` : ""}</span>}
+        {eksik.length > 0 && <span className="es2-n uyari" title="Bu bilgiler tamamlanınca puan netleşir">Eksik bilgi: {eksik.slice(0, 3).join(" · ")}{eksik.length > 3 ? ` · +${eksik.length - 3} bilgi daha` : ""}</span>}
       </div>
     </div>
   );

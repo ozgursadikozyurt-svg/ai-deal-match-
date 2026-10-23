@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * v3.32 — veritabanlı: asistan rolü (görünürlük, silme / ayar / dışa aktarma kapısı, açtığı kaydın sahibi) ve
  * değiştirilemez ilk kaynak (sunucu zamanı, kilit, yönetici düzeltmesi audit_log'a), ilk yanıt damgası.
  */

@@ -1,3 +1,4 @@
+// Anahtar CRM v3.40 · 23 Ekim 2026
 // Polaris v7 · 21 Ekim 2026
 // GET /api/polaris/belge/:koleksiyon[?bas=YYYY-MM-DD&bit=YYYY-MM-DD] → [{ id, veri }]
 // bas/bit yalnızca belgenin "date" alanına göre süzer (days koleksiyonu). Yanıt Postgres'te JSON metni olarak

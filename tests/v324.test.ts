@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * v3.24 — Kaynak seçimi (Emlak grubu · Sahibinden · Portal · Kendi portföyüm) ↔ havuz / ilan sahibi / kanal;
  * Yapıştır incelemesinde süzgeçler + hazırlar önce + eklenenler listede kalır; Gelen Kutusu Veri Girişi sekmesi;
  * eşleşme detayında kişi iletişimi + orijinal metin; üst satır (Geri başlıkla aynı satırda); fotoğraf doğrudan yükleme.

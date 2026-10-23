@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.39 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * v3.39 — telefon: sabit ekran (yakınlaştırma ve yana kayma yok), Eşleşmeler başlığı ekranı taşırmaz, uyum süzgeci sürüklenen çubuk.
  */
 import { test } from "node:test";
@@ -11,7 +11,7 @@ import { SURUM, SURUM_GECMISI } from "../src/lib/surum";
 import { ac } from "./yardimci-arayuz";
 
 test("sürüm 3.39 ve ek belge", () => {
-  assert.equal(SURUM, "3.39"); assert.equal(SURUM_GECMISI[0].surum, "3.39"); assert.equal(SURUM_GECMISI[1].surum, "3.38");
+  assert.ok(SURUM_GECMISI.some((k) => k.surum === "3.39")); assert.ok(SURUM_GECMISI.some((k) => k.surum === "3.38")); void SURUM;
   assert.ok(fs.existsSync("docs/ANAHTAR_CRM_EK_v3.39_21Ekim2026.md"));
 });
 

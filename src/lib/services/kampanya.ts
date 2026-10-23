@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.34 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * KAMPANYA — reklam kampanyaları ve elle girilen aylık harcama.
  *
  * Basit bağ: bir kayıt kampanyaya `kayit.ilkKaynakDetay` = kampanya adı ile bağlanır. Bu yüzden ad oluşturulduktan sonra

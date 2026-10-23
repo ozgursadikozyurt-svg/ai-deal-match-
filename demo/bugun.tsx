@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * "Bugün" panosu — Ana Sayfa'da "★ Benim ve ofisim" kartının içinde. Danışmana her gün ne yapması gerektiğini söyler:
  * geciken + bugünkü görevler (en çok 15; ilk 5'i açık), her görevde üç düğme (Ulaşılamadı · Görüşüldü · İlgilenmiyor),
  * "Bu hafta" kapalı. Kurallar src/lib/domain/gorev.ts, durum işlemleri demo/bugun-eylem.ts.
@@ -167,20 +167,25 @@ export function BugunPanosu({ es, sahip }: { es: Eslesme[]; sahip: (v: Kayit["ve
   </div>;
 }
 
-/** Eşleşme detayı: takip durumu Görüşüldü / Koparıldı olunca "Bir sonraki iletişim ne zaman?" */
-export function SonrakiIletisimSorusu({ tid, pid, kapat }: { tid: string; pid: string; kapat: () => void }) {
+/**
+ * Eşleşme detayı: takip durumu (Bildirildi · Görüşüldü · Gösterim · Pazarlık) değişince ya da not yazılınca SORULUR:
+ * "Bunu göreve alalım mı?" — görev kendiliğinden açılmaz (v3.40). Not varsa görev metni olarak önerilir.
+ */
+export function SonrakiIletisimSorusu({ tid, pid, kapat, not: notMetni }: { tid: string; pid: string; kapat: () => void; not?: string }) {
   const { d, guncelle, bildir } = useDepo();
   const simdi = simdiOf();
   const anahtar = `${tid}~${pid}`;
   const talepKisi = kayitKisisi(d.kayitlar.find((k) => k.id === tid));
+  const [metin, setMetin] = useState((notMetni ?? "").trim().slice(0, 200));
   const sec = (gun: number | string) => {
-    guncelle((dd) => sonrakiIletisimEkle(dd, { baslik: "Sonraki iletişim", kisiId: talepKisi, kayitId: pid, eslesme: anahtar }, gun));
+    guncelle((dd) => sonrakiIletisimEkle(dd, { baslik: metin.trim() || "Sonraki iletişim", kisiId: talepKisi, kayitId: pid, eslesme: anahtar }, gun));
     const vade = typeof gun === "number" ? gunEkle(gunYaz(simdi), gun) : gun;
-    bildir(`Sonraki iletişim ${tarihYaz(vade + "T12:00:00")} için Bugün panosuna eklendi`); kapat();
+    bildir(`Görev eklendi — ${tarihYaz(vade + "T12:00:00")}`); kapat();
   };
-  return <section className="kart sonraki-soru" aria-label="Sonraki iletişim">
-    <b>Bir sonraki iletişim ne zaman?</b>
-    <div className="ipucu">Seçtiğiniz gün Ana Sayfa › Bugün panosuna görev olarak düşer.</div>
+  return <section className="kart sonraki-soru" aria-label="Göreve al">
+    <b>Bunu göreve alalım mı?</b>
+    <input aria-label="Görev metni" placeholder="Ne hatırlatılsın? Örn: Sunuma yanıt al" value={metin} onChange={(e) => setMetin(e.target.value)} maxLength={200} />
+    <div className="ipucu">Ne zaman hatırlatayım? Seçtiğiniz gün Bugün panosuna düşer.</div>
     <SonrakiSecici simdi={simdi} sec={sec} bos={{ etiket: "Gerek yok", yap: kapat }} />
   </section>;
 }

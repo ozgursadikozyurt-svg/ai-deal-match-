@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Demo — kayıt detayının altındaki açılır çekmece: talebin içinden çıkmadan uygun portföyleri
  * (portföyün içindeyken uygun talepleri) filtreleyip incelemek ve eşleşmeye almak için.
  */

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * TALEP DNA'SI — bir talebin eşleştirmeden önce çıkarılan "genetiği":
  *  - Aciliyet
  *  - Kritik (öldürücü) kriterler: karşılanmazsa portföy UYGUN_DEGIL
@@ -35,7 +35,11 @@ export const KRITER_SORUSU: Record<string, string> = {
   SANAYI_ELEKTRIGI: "Sanayi elektriği (trifaze) gerekli mi?", SOGUK_HAVA: "Soğuk hava gerekiyor mu, kaç derece ve kaç m²?", GIDAYA_UYGUNLUK: "Gıdaya uygun (hijyen, zemin) olması şart mı?",
   ACIK_ALAN: "Açık alan / saha ihtiyacı var mı, kaç m²?", OFIS_SOSYAL: "Ofis / sosyal alan gerekiyor mu?", CEPHE_VITRIN: "Cephe / vitrin genişliği önemli mi?",
   YAYA_TRAFIGI: "Yaya trafiği yoğun bir cadde mi olmalı?", ARAC_TRAFIGI: "Ana yol / araç trafiği önemli mi?", ZEMIN_KAT_GIRIS: "Zemin kat / düz giriş şart mı?",
-  OTOPARK: "Otopark gerekli mi, kaç araç?", ODA_SAYISI: "Kaç oda olmalı?", ASANSOR: "Asansör şart mı?", HAVUZ: "Havuz şart mı?", IMAR: "İmar durumu (konut / ticari / sanayi) ne olmalı?", KULLANIM_AMACI: "Mülkü ne amaçla kullanacak?",
+  OTOPARK: "Otopark gerekli mi, kaç araç?", ODA_SAYISI: "Kaç oda olmalı?",
+  // v3.40 — konut / ofis / ticari için
+  ESYA: "Eşyalı mı, eşyasız mı olmalı?", KAT: "Hangi katlar olur? (giriş / ara kat / üst kat)", BINA_YASI: "Bina yaşı en fazla kaç olmalı?",
+  ISINMA: "Isınma tipi (doğalgaz / klima…) için bir tercih var mı?", SITE_GUVENLIK: "Site içinde / güvenlikli olması şart mı?", BALKON_BAHCE: "Balkon veya bahçe şart mı?",
+  KREDI: "Krediyle mi alacak? (krediye uygunluk şart mı)", MANZARA: "Manzara (deniz, doğa…) önemli mi?", BANYO: "Kaç banyo olmalı?", ASANSOR: "Asansör şart mı?", HAVUZ: "Havuz şart mı?", IMAR: "İmar durumu (konut / ticari / sanayi) ne olmalı?", KULLANIM_AMACI: "Mülkü ne amaçla kullanacak?",
 };
 
 export interface AmacProfili { kod: string; etiket: string; oldurucu: Kriter[]; onemli: Kriter[] }
@@ -63,6 +67,32 @@ export const AMAC_PROFILLERI: Record<string, AmacProfili> = {
 };
 /** Kullanım amacı yazılmamışsa mülk ailesinden varsayılan profil */
 const AILE_PROFILI: Record<string, string> = { URETIM: "URETIM", DEPO: "DEPOLAMA", DUKKAN: "PERAKENDE", YEME_ICME: "RESTORAN_KAFE", OFIS: "OFIS", DAIRE: "KONUT", MUSTAKIL: "KONUT", ARSA: "ARSA", OTO: "OTO_SERVIS" };
+
+/**
+ * v3.40 — Mülk grubuna göre sorulacak bilgiler. Eskiden depo / üretim soruları (yükseklik, TIR girişi, elektrik…) kullanım amacından
+ * geldiği için kiralık daire talebinde de çıkıyordu. Artık her mülk grubunun kendi kritik ve önemli bilgisi vardır; bir grupta
+ * anlamsız olan kriterler (ör. dairede "TIR mı kamyon mu girecek?") hiç sorulmaz ve eşleşmeyi öldürmez.
+ */
+const GRUP_ONEMLI: Record<string, Kriter[]> = {
+  KONUT: ["KAT", "ESYA", "ASANSOR", "BINA_YASI", "SITE_GUVENLIK", "OTOPARK", "ISINMA", "BALKON_BAHCE", "KREDI"],
+  OFIS: ["OTOPARK", "KAT", "ASANSOR", "ISKAN", "BINA_YASI"],
+  TICARI: ["CEPHE_VITRIN", "ZEMIN_KAT_GIRIS", "YAYA_TRAFIGI", "OTOPARK", "RUHSAT"],
+  HIZMET: ["RUHSAT", "ISKAN", "OTOPARK"],
+  ARSA: ["IMAR"],
+  BINA: ["ISKAN", "OTOPARK"],
+};
+/** Yalnızca endüstriyel / depo işine özgü kriterler: konut, ofis, arsa, turizm ve devre mülk talebinde sorulmaz */
+const ENDUSTRIYEL_KRITERLER: ReadonlySet<string> = new Set(["YUKSEKLIK", "KAPI", "ARAC_ERISIMI", "RAMPA", "VINC", "ELEKTRIK", "TRAFO", "SANAYI_ELEKTRIGI", "YANGIN_SISTEMI", "SPRINKLER", "SOGUK_HAVA", "GIDAYA_UYGUNLUK", "CATI_DUVAR", "ACIK_ALAN", "KAPALI_ALAN"]);
+const ENDUSTRIYEL_ALANLAR: ReadonlySet<string> = new Set(["ENDUSTRIYEL", "BINA", "DIGER", "TICARI", "HIZMET"]);
+/** Yalnızca ticari işyerine özgü kriterler: konut ve arsada sorulmaz */
+const TICARI_KRITERLER: ReadonlySet<string> = new Set(["CEPHE_VITRIN", "YAYA_TRAFIGI", "ARAC_TRAFIGI", "OFIS_SOSYAL", "RUHSAT", "KULLANIM_AMACI"]);
+/** Bu kriter bu mülk grubunda sorulabilir mi? */
+export const kriterUygunMu = (k: Kriter, grup?: string): boolean => {
+  if (!grup) return true;
+  if (ENDUSTRIYEL_KRITERLER.has(k) && !ENDUSTRIYEL_ALANLAR.has(grup)) return false;
+  if (TICARI_KRITERLER.has(k) && (grup === "KONUT" || grup === "ARSA")) return false;
+  return true;
+};
 
 export interface DnaGirdi {
   tip: "PORTFOY" | "TALEP";
@@ -119,7 +149,11 @@ export function kriterDegeri(t: DnaGirdi, k: Kriter): string | null {
 }
 
 export function talepProfilleri(t: DnaGirdi): AmacProfili[] {
-  const amaclar = (t.ozellik?.kullanimAmaclari ?? []).filter((a) => AMAC_PROFILLERI[a]);
+  const grup = MULK_TIPI_META[t.mulkTipi as keyof typeof MULK_TIPI_META]?.grup;
+  // v3.40 — konut ve arsa talebinin profili mülkten gelir; depo / üretim "kullanım amacı" (forma önceden girilmiş ya da yapay zekâdan gelmiş olabilir) karışmaz
+  if (grup === "KONUT") return [AMAC_PROFILLERI.KONUT];
+  if (grup === "ARSA") return [AMAC_PROFILLERI.ARSA];
+  const amaclar = (t.ozellik?.kullanimAmaclari ?? []).filter((a) => AMAC_PROFILLERI[a] && a !== "KONUT" && a !== "ARSA");
   if (amaclar.length) return amaclar.map((a) => AMAC_PROFILLERI[a]);
   if (t.mulkTipi === "SOGUK_HAVA_DEPOSU") return [AMAC_PROFILLERI.SOGUK_ZINCIR];
   const kod = AILE_PROFILI[aileOf(t.mulkTipi as any)?.kod ?? ""];
@@ -135,6 +169,7 @@ export function talepDnasi(t: DnaGirdi): TalepDna {
   const kritik: DnaKriter[] = [];
   const ekle = (k: Kriter, kaynak: DnaKriter["kaynak"]) => {
     if (esnekSet.has(k) || kritik.some((x) => x.kriter === k)) return;
+    if (kaynak !== "TALEP" && !kriterUygunMu(k, grup)) return; // v3.40 — mülke uymayan amaç kriteri eşleşmeyi öldürmez
     const d = kriterDegeri(t, k);
     if (d == null && kaynak !== "TALEP") return; // değer yoksa karşılaştırılacak bir şey yok → eksik bilgi olur
     kritik.push({ kriter: k, etiket: KRITER_ADI[k] ?? k, deger: d ?? undefined, kaynak });
@@ -152,8 +187,12 @@ export function talepDnasi(t: DnaGirdi): TalepDna {
 
   // Eksik bilgi: temel (bölge, bütçe, alan/oda) + amaç profilinin öldürücü ve önemli kriterleri + yapay zekânın işaretledikleri
   const eksik: DnaEksik[] = [];
+  const islem = String((t as any).islemTipi ?? "");
   const eksikEkle = (k: Kriter, oldurucu: boolean) => {
     if (kriterDegeri(t, k) != null || eksik.some((x) => x.kriter === k)) return;
+    if (!kriterUygunMu(k, grup)) return; // v3.40 — dairede "TIR mı kamyon mu girecek?" gibi mülke uymayan soru sorulmaz
+    if (k === "ESYA" && islem === "SATILIK") return; // eşya durumu kiralıkta sorulur
+    if (k === "KREDI" && islem === "KIRALIK") return; // krediye uygunluk satılıkta sorulur
     eksik.push({ kriter: k, etiket: KRITER_ADI[k] ?? k, soru: KRITER_SORUSU[k] ?? `${KRITER_ADI[k] ?? k} bilgisi?`, oldurucu });
   };
   eksikEkle("LOKASYON", true);
@@ -161,6 +200,7 @@ export function talepDnasi(t: DnaGirdi): TalepDna {
   if (grup === "KONUT") { if (kriterDegeri(t, "ALAN") == null) eksikEkle("ODA_SAYISI", false); }
   else if (grup !== "TURIZM" && grup !== "DEVRE_MULK") eksikEkle("ALAN", true); // otelde ölçü oda / yatak sayısıdır
   for (const p of profiller) { p.oldurucu.forEach((k) => eksikEkle(k, true)); p.onemli.forEach((k) => eksikEkle(k, false)); }
+  for (const k of GRUP_ONEMLI[grup ?? ""] ?? []) eksikEkle(k, false); // v3.40 — mülk grubuna özgü bilgiler
   for (const k of o.eksikBilgiler ?? []) eksikEkle(k, acikKritik.has(k));
   eksik.sort((a, b) => Number(b.oldurucu) - Number(a.oldurucu));
 

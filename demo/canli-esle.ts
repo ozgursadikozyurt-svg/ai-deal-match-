@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Canlı — arayüz durumu (DepoDurumu) ile sunucu durumu (/api/durum) arasındaki eşleme ve fark hesabı. Saf işlevler (ağ yok): testlenebilir.
  *  sunucudanDurum: GET /api/durum cevabı → arayüzün beklediği durum
  *  imzaAl / planla: son kaydedilenle şimdiki durumu karşılaştırır, yalnızca değişenleri POST /api/durum parçalarına böler
@@ -10,7 +10,7 @@ import { ORNEK_VERI_SURUMU } from "./ornek-veri";
 import { aiAyarNormalize, paylasimNormalize, calismaIliNormalize } from "../src/lib/domain/ayarlar";
 import { ttlNormalize } from "../src/lib/domain/gecerlilik";
 import { rolNormalize } from "../src/lib/domain/roller";
-import { gorevlerNormalize, ilgilenenlerNormalize } from "../src/lib/domain/gorev";
+import { gorevlerNormalize, ilgilenenlerNormalize, otomatikGorevleriTemizle } from "../src/lib/domain/gorev";
 
 export interface SunucuDurumu {
   kayitlar: { id: string; olusturma: string; veri: Record<string, unknown>; notionId?: string | null; notlar?: Kayit["notlar"]; fotolar?: { id: string; ad: string; en: number; boy: number; boyut: number }[] }[];
@@ -33,7 +33,7 @@ export function sunucudanDurum(s: SunucuDurumu): DepoDurumu {
     ayarlar: { ttl: ttlNormalize(s.ayarlar?.ttl), ai: aiAyarNormalize(s.ayarlar?.ai), paylasim: paylasimNormalize(s.ayarlar?.paylasim), calismaIli: calismaIliNormalize(s.ayarlar?.calismaIli), sahiplik: sahiplikNormalize(s.ayarlar?.sahiplik) },
     ogrenilen: a.ogrenilen ?? [], adaylar: a.adaylar ?? [], aktifIceAktarma: null, iceAktarmaGecmisi: a.iceAktarmaGecmisi ?? [],
     roller: rolNormalize(s.ayarlar?.roller),
-    gorevler: gorevlerNormalize(s.ayarlar?.gorevler), ilgilenenler: ilgilenenlerNormalize(s.ayarlar?.ilgilenenler),
+    gorevler: otomatikGorevleriTemizle(gorevlerNormalize(s.ayarlar?.gorevler)) /* v3.40 — eski otomatik görevler açılışta atılır */, ilgilenenler: ilgilenenlerNormalize(s.ayarlar?.ilgilenenler),
     kisiler: s.kisiler.map((k) => nullAt(k)) as unknown as Kisi[],
     islenmisMesajlar: a.islenmisMesajlar ?? [], dosyaIzleri: a.dosyaIzleri ?? {}, favoriler: a.favoriler ?? [],
     baglantilar: { google: bosGoogleBaglanti(), notion: bosBaglanti() }, senkronGecmisi: [], cakismalar: [], googleBekleyen: [], googleCanli: null,

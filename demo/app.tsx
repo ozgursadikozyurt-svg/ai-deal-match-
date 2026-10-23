@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -60,7 +60,7 @@ import { googleOtomatik } from "./google-baglanti";
 import { Logo, LogoIsaret, Ikon, SolMenu, AltCubuk, type NavOge } from "./kabuk";
 import { MARKA } from "../src/lib/marka";
 import { bosBaglanti, bosGoogleBaglanti } from "./depo";
-import { AiAyarlari, PaylasimAyarlari, CalismaIliAyari } from "./ayarlar-ek";
+import { PaylasimAyarlari, CalismaIliAyari } from "./ayarlar-ek";
 import { CanliAyarKarti } from "./canli-ayar";
 import { Fotograflar } from "./fotograflar";
 import { PortfoyPaylas } from "./paylas";
@@ -254,7 +254,9 @@ function Detay({ id }: { id: string }) {
   const [paylasAcik, setPaylasAcik] = useState(false);
   if (!k) return <p className="bos">Kayıt bulunamadı.</p>;
   const v = k.veri, o = (v.ozellik ?? {}) as Record<string, any>, talep = v.tip === "TALEP";
-  const benim = es.filter((e) => (talep ? e.t.id : e.p.id) === id).sort((a, b) => (talep ? katmanSirasi(a.p.veri) - katmanSirasi(b.p.veri) : 0) || 0);
+  // v3.40 — önce uygunluk, sonra uyum (seviye → skor): yüksek oranlılar en üstte; havuz katmanı yalnızca eşitlikte
+  const UYG_SIRA: Record<string, number> = { SUNULABILIR: 0, KOSULLU: 1, UYGUN_DEGIL: 2 };
+  const benim = es.filter((e) => (talep ? e.t.id : e.p.id) === id).sort((a, b) => (UYG_SIRA[a.s.uygunluk] - UYG_SIRA[b.s.uygunluk]) || (b.s.seviye - a.s.seviye) || (b.s.skor - a.s.skor) || (talep ? katmanSirasi(a.p.veri) - katmanSirasi(b.p.veri) : 0));
   const firsat = !talep && havuzKatmani(v as any) === "WEB" ? portfoyEdinmeFirsati(benim.map((e) => e.s.skor)) : null;
   const gruplar = GRUP_SIRASI.map((g) => [g, (Object.keys(MULK_OZELLIK_META) as Alan[]).filter((a) => (MULK_OZELLIK_META[a] as any).grup === g && o[a] != null && !(Array.isArray(o[a]) && !o[a].length))] as const).filter(([, a]) => a.length);
   const durumYap = (durum: Veri["durum"]) => { kayitKaydet({ ...k, veri: { ...v, durum } }); bildir(etiket(durum) + " yapıldı"); };
@@ -398,9 +400,7 @@ function Eslesmeler() {
   const [fk, setFk] = useKalici<FirsatKademe | "">("eslesmeler.fk", "");          // v3.19 — fırsat kademesi filtresi
   const [sr, setSr] = useKalici<Siralama>("eslesmeler.sr", { alan: "skor", yon: "azalan" }); // v3.38 — varsayılan: uyum (eskiden fırsat önceliği)
   const [kimin, setKimin] = useKalici<"" | "BENIM" | "OFISIM" | "BENIM_PORTFOY" | "BENIM_TALEP">("eslesmeler.kimin", ""); // v3.22
-  // v3.27 — güveni düşük (talepte / portföyde çok az kriter ölçülebilmiş) eşleşmeler varsayılan olarak gizli; tek dokunuşla açılır
-  const [azVeriGoster, setAzVeriGoster] = useKalici<boolean>("eslesmeler.azVeri", false);
-  const azVeri = (e: Eslesme) => e.s.guven?.seviye === "DUSUK";
+  // v3.40 — az verili eşleşmeler artık hiç oluşmuyor (useEslesmeler eler); "+N az verili" düğmesi kaldırıldı
   const sahip = useSahiplik();
   const [secimModu, setSecimModu] = useState(false);            // v3.19 — toplu işlem için seçim
   const [secili, setSecili] = useState<Set<string>>(() => new Set());
@@ -440,8 +440,7 @@ function Eslesmeler() {
     { alan: "sure", etiket: "Talebin kalan süresi", deger: (e) => tn(e.t.veri.validUntil), varsayilanYon: "artan" },
   ];
   const temel = es.filter((e) => (!fk || e.f.kademe === fk) && kiminUyar(e, kimin) && (u === "KOPUK" ? kopukMu(e) : !kopukMu(e) && (u === "TUMU" || (u === "UYGUN" ? e.s.uygunluk !== "UYGUN_DEGIL" : e.s.uygunluk === u))));
-  const gizliAzVeri = u === "KOPUK" || azVeriGoster ? 0 : temel.filter(azVeri).length;
-  const temel2 = gizliAzVeri ? temel.filter((e) => !azVeri(e)) : temel;
+  const temel2 = temel;
   // v3.38 — talep başına en iyi N: her talebin eşleşmeleri uyuma göre (seviye → skor → fırsat) dizilir, ilk N listede kalır; gerisi talebin detayında
   const tbIzinli = useMemo(() => {
     if (!tbl || u === "KOPUK") return null;
@@ -467,8 +466,6 @@ function Eslesmeler() {
   return <div className="yigin">
     {/* v3.22 — toplu işlem menüsü (⋯) başlık satırına taşındı; seçici satırında Skor'a yer açıldı */}
     <div className="satir-ara es-baslik"><h2>Eşleşmeler</h2><div className="satir"><span className="ipucu">{liste.length} eşleşme</span>
-      {gizliAzVeri > 0 && <button className="btn kucuk" title="Talepte ya da portföyde çok az bilgi olduğu için puanı güvenilir olmayan eşleşmeler" onClick={() => setAzVeriGoster(true)}>+{gizliAzVeri} az verili</button>}
-      {azVeriGoster && u !== "KOPUK" && <button className="btn kucuk" onClick={() => setAzVeriGoster(false)}>Az verilileri gizle</button>}
       {tbGizli > 0 && <button className="btn kucuk" id="tb-tumu" title={`Her talebin en iyi ${tbl} eşleşmesi gösteriliyor; gerisi talebin detayında`} onClick={() => setTbl(0)}>+{tbGizli} (talep başına {tbl}'dan fazlası)</button>}
       {!tbl && u !== "KOPUK" && <button className="btn kucuk" onClick={() => setTbl(TALEP_BASI_ESLESME)}>Talep başına en iyi {TALEP_BASI_ESLESME}</button>}
       {!secimModu && <HizliMenu ad="Toplu işlemler" ogeler={[
@@ -552,11 +549,11 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
   const [not, setNot] = useState(n.not);
   // v3.37 — operasyon notu yazılıp kaydedilmeden çıkılırsa sorulur
   const notBirak = useKaydedilmemis(not.trim() !== (n.not ?? "").trim(), "Eşleşme operasyon notu", () => { yazNot(); return true; });
-  const yazNot = () => { guncelle((dd) => ({ ...dd, eslesmeNotlari: { ...dd.eslesmeNotlari, [anahtar]: { ...(dd.eslesmeNotlari[anahtar] ?? n), not } } })); notBirak(); bildir("Not kaydedildi"); };
+  const yazNot = () => { guncelle((dd) => ({ ...dd, eslesmeNotlari: { ...dd.eslesmeNotlari, [anahtar]: { ...(dd.eslesmeNotlari[anahtar] ?? n), not } } })); notBirak(); bildir("Not kaydedildi"); if (not.trim() && n.durum !== "YENI" && n.durum !== "KAPANDI" && n.durum !== "REDDEDILDI") setSor(true); };
   if (!e) return <div className="yigin"><p className="bos">Bu eşleşme artık yok (kayıtlardan biri pasif ya da değişti).</p></div>;
   const [sor, setSor] = useState(false);
   const yaz = (x: Partial<typeof n>) => guncelle((dd) => ({ ...dd, eslesmeNotlari: { ...dd.eslesmeNotlari, [anahtar]: { ...n, ...x } } }));
-  const durumDegis = (k: PipelineDurum, l: string) => { if (n.durum === k) return; guncelle((dd) => eslesmeDurumunuUygula(dd, tid, pid, k)); bildir("Durum: " + l); setSor(k === "GORUSULDU" || k === "REDDEDILDI"); };
+  const durumDegis = (k: PipelineDurum, l: string) => { if (n.durum === k) return; guncelle((dd) => eslesmeDurumunuUygula(dd, tid, pid, k)); bildir("Durum: " + l); setSor(["BILDIRILDI", "GORUSULDU", "GOSTERIM", "PAZARLIK", "REDDEDILDI"].includes(k)); }; // v3.40 — görev kendiliğinden açılmaz; sorulur
   const sorulacak = [...new Set([...e.s.kriterler.filter((k) => k.sonuc === "BILINMIYOR").map((k) => k.etiket + " (portföy sahibine)"), ...e.s.dna.eksik.map((x) => x.etiket + " (müşteriye)")])];
   const u = UYGUNLUK[e.s.uygunluk];
   return <div className="yigin">
@@ -572,7 +569,7 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
       {e.s.kritikEngeller.length > 0 && <div className="hata-satir">Olmazsa olmaz karşılanmıyor: {e.s.kritikEngeller.join(", ")}</div>}
       {/* v3.36 — seviye gerekçesi */}
       <div className="gerekce-kutu"><div className="ust-etiket">Neden {e.s.seviye}/5?</div><Gerekceler s={e.s} /><div className="ipucu">{SEVIYE_ACIKLAMA[e.s.seviye]}</div></div></div></section>
-    {sor && <SonrakiIletisimSorusu tid={tid} pid={pid} kapat={() => setSor(false)} />}
+    {sor && <SonrakiIletisimSorusu tid={tid} pid={pid} not={not} kapat={() => setSor(false)} />}
     <div className="iki-kolon"><Taraf k={e.t} rol="Talep" ham karsi={e.p} /><Taraf k={e.p} rol="Portföy" karsi={e.t} /></div>
     <section className="kart">
       <h3>Kriter dökümü</h3>
@@ -585,7 +582,7 @@ function EslesmeDetay({ tid, pid }: { tid: string; pid: string }) {
     <section className="kart">
       <h3>Takip</h3>
       <div className="uc sar">{PIPELINE.map(([k, l]) => <button key={k} className={cx(n.durum === k && "on")} onClick={() => durumDegis(k, l)}>{l}</button>)}</div>
-      {sor && <SonrakiIletisimSorusu tid={tid} pid={pid} kapat={() => setSor(false)} />}
+      {sor && <SonrakiIletisimSorusu tid={tid} pid={pid} not={not} kapat={() => setSor(false)} />}
       <EslesmeGorevleri tid={tid} pid={pid} />
       <label className="alan-etiket" htmlFor="es-not">Operasyon notu</label>
       <textarea id="es-not" rows={3} value={not} onChange={(ev) => setNot(ev.target.value)} placeholder="Görüşme sonrası notunuz…" />
@@ -625,7 +622,6 @@ function Ayarlar() {
     {!yetkiAktif("ofis.ayarlar") && <section className="kart"><p className="ipucu">🔒 {aktifRolEtiketi()} olarak ayarları görebilirsiniz; değiştirmek ofis yöneticisine aittir.</p></section>}
     <fieldset className="yigin" disabled={!yetkiAktif("ofis.ayarlar")} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
     <SahiplikAyarlari />
-    <AiAyarlari />
     <PaylasimAyarlari />
     <CalismaIliAyari />
     <RolYonetimi />

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Kod dosyalarının en üstündeki sürüm satırını src/lib/surum.ts'teki sürüme günceller (yoksa ekler).
  * Çalıştır: npm run surum:damgala   (her sürüm sonunda, npm run demo'dan önce)
  * Migration dosyalarına dokunmaz — onlar oluşturuldukları sürümde kalır.

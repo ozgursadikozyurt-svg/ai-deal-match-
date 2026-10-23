@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * v3.37 — Özgür'ün 21 Ekim istekleri:
  *   1) talepte bütçe yoksa eşleşme puanı ekstra düşmez (portföyde fiyat yoksa ceza kalır)
  *   2) kaydedilmemiş değişiklik varken başka ekrana geçerken "kaydedelim mi?"
@@ -49,7 +49,7 @@ test("portföyde fiyat yoksa ceza aynen: bütçesiz talepte de en fazla 79 ve 'P
   const s = eslesmeOnizle(T({ butceSerbest: true }), P({ fiyat: null }), BAGLAM);
   assert.ok(s.skor <= FIYATSIZ_SKOR_TAVANI && s.seviye <= 4, String(s.skor));
   assert.ok(s.gerekceler.some((g) => /Portföyde fiyat yok/.test(g)));
-  assert.ok(s.veriEksikleri.includes("portföyde fiyat yok"));
+  assert.ok(s.veriEksikleri.includes("Portföyde fiyat yazılı değil"));
 });
 
 // ───── 2) İlan no ─────

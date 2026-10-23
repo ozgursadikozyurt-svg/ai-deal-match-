@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Demo — ekranların ortak parçaları: depo bağlamı, küçük bileşenler, eşleşme hesabı, konum öneri kutusu.
  */
 import React, { createContext, useContext, useMemo, useRef, useState } from "react";
@@ -147,27 +147,67 @@ export function Bolum({ baslik, ozet, acik = false, children, id }: { baslik: st
 // ───────── Eşleşme hesabı ─────────
 /** f: v3.19 fırsat önceliği — kim ↔ kim (mülk sahibi/müşteri öncelikli, emlakçı↔emlakçı ikinci planda) */
 export interface Eslesme { t: Kayit; p: Kayit; s: OnizlemeSonucu; f: FirsatSonuc; /** v3.27 — aynı ilanın diğer kayıtları (tek satırda gösterilir) */ kopyalar?: Kayit[] }
+/**
+ * v3.40 — HIZ: eşleşme hesabı (her talep × her portföy) eskiden her ekranda, ekran her açıldığında yeniden yapılıyordu
+ * (Talepler, Portföyler, Eşleşmeler, Ana Sayfa ayrı ayrı); bir notu kaydetmek de hepsini baştan hesaplatıyordu.
+ * Şimdi (1) sonuç ekranlar arasında ORTAK önbellekte tutulur, girdiler aynı kaldıkça yeniden hesaplanmaz;
+ * (2) bir kayıt değişince yalnızca o kaydın çiftleri yeniden hesaplanır (çift önbelleği kayıtların `veri` nesnesine bağlıdır).
+ * v3.40 — "az verili" eşleşmeler (güven DÜŞÜK: talepte ya da portföyde ölçülebilen kriter çok az) hiç oluşturulmaz.
+ */
+interface CiftSonucu { s: OnizlemeSonucu; f: FirsatSonuc }
+interface CiftKaydi { tok: object; ts: unknown; ps: unknown; kt: unknown; kp: unknown; r: CiftSonucu | null }
+const CIFT_ONBELLEK = new WeakMap<object, WeakMap<object, CiftKaydi>>();
+let BAGLAM_TOK: object = {};
+let ESLESME_ORTAK: { girdi: unknown[]; sonuc: Eslesme[] } | null = null;
+const ayniGirdi = (a: unknown[], b: unknown[]) => a.length === b.length && a.every((x, i) => x === b[i]);
+
+function eslesmeleriHesapla(d: DepoDurumu): Eslesme[] {
+  const gun = new Date().toDateString();
+  const girdi: unknown[] = [d.kayitlar, d.kisiler, d.ogrenilen, d.ayarlar.sahiplik, d.ayarlar.paylasim, gun];
+  if (ESLESME_ORTAK && ayniGirdi(ESLESME_ORTAK.girdi, girdi)) return ESLESME_ORTAK.sonuc;
+  // bağlam (öğrenilen konumlar, sahiplik, paylaşım, gün) değiştiyse tüm çift sonuçları geçersizdir
+  const g = ESLESME_ORTAK?.girdi;
+  if (!g || g[2] !== girdi[2] || g[3] !== girdi[3] || g[4] !== girdi[4] || g[5] !== girdi[5]) BAGLAM_TOK = {};
+  const tok = BAGLAM_TOK;
+  const aktif = d.kayitlar.filter((k) => k.veri.durum === "ACTIVE");
+  const T = aktif.filter((k) => k.veri.tip === "TALEP"), P = aktif.filter((k) => k.veri.tip === "PORTFOY");
+  const r: Eslesme[] = [];
+  const kimler = new Map<string, ReturnType<typeof kimOf>>();
+  const kim = (k: Kayit) => { let x = kimler.get(k.id); if (!x) { x = kimOf(k.veri as any, d.kisiler); kimler.set(k.id, x); } return x; };
+  // v3.22.1 — ★ Benim / ◆ Ofisim olan taraf fırsat önceliğine girer (src/lib/eslestirme/firsat.ts)
+  const sc = sahiplikCozucu(d), sahipler = new Map<string, "BENIM" | "OFIS" | null>();
+  const sahip = (k: Kayit) => { if (!sahipler.has(k.id)) sahipler.set(k.id, sc(k.veri).tur); return sahipler.get(k.id)!; };
+  for (const t of T) {
+    let satir = CIFT_ONBELLEK.get(t.veri as object);
+    if (!satir) { satir = new WeakMap(); CIFT_ONBELLEK.set(t.veri as object, satir); }
+    const kt = kim(t).tur, ts = sahip(t);
+    for (const p of P) {
+      const kp = kim(p).tur, ps = sahip(p);
+      let c = satir.get(p.veri as object);
+      if (!c || c.tok !== tok || c.ts !== ts || c.ps !== ps || c.kt !== kt || c.kp !== kp) {
+        let sonuc: CiftSonucu | null = null;
+        if (temelUyum(t.veri as any, p.veri as any)) {
+          const f = firsatDegerlendir(kt, kp, { islemTipi: String(p.veri.islemTipi), fiyat: p.veri.fiyat ?? null, butce: t.veri.maxFiyat ?? null, talepSahip: ts, portfoySahip: ps });
+          sonuc = { s: eslesmeOnizle(butceSerbestle(t.veri as any, ts === "BENIM"), p.veri as any, BAGLAM), f }; // v3.38
+        }
+        c = { tok, ts, ps, kt, kp, r: sonuc }; satir.set(p.veri as object, c);
+      }
+      // v3.40 — az verili (güven DÜŞÜK) eşleşme listeye hiç girmez
+      if (c.r && c.r.s.guven?.seviye !== "DUSUK") r.push({ t, p, s: c.r.s, f: c.r.f });
+    }
+  }
+  const sira: Record<Uygunluk, number> = { SUNULABILIR: 0, KOSULLU: 1, UYGUN_DEGIL: 2 };
+  // v3.38 — önce uygunluk, sonra uyum (seviye → skor): kriterleri dolu ve iyi tutan eşleşmeler en üstte; fırsat kademesi yalnızca eşitlikte
+  // (Özgür, 21 Eki 2026: "iyi değerleri oluşanları puanları önce yukarıdan sıralamalısın"). v3.27 — mükerrer portföyler tek satır.
+  const sonuc = mukerrerleriTopla(r.sort((a, b) => sira[a.s.uygunluk] - sira[b.s.uygunluk] || b.s.seviye - a.s.seviye || b.s.skor - a.s.skor || b.f.sira - a.f.sira));
+  ESLESME_ORTAK = { girdi, sonuc };
+  return sonuc;
+}
+
 /** v3.8: koparılan eşleşmeler (durum REDDEDILDI) varsayılan olarak hariç; Eşleşmeler ekranı ve eşleşme detayı dahil eder */
 export function useEslesmeler(koparilanDahil = false): Eslesme[] {
   const { d } = useDepo();
-  const tum = useMemo(() => {
-    const aktif = d.kayitlar.filter((k) => k.veri.durum === "ACTIVE");
-    const T = aktif.filter((k) => k.veri.tip === "TALEP"), P = aktif.filter((k) => k.veri.tip === "PORTFOY");
-    const r: Eslesme[] = [];
-    const kimler = new Map<string, ReturnType<typeof kimOf>>();
-    const kim = (k: Kayit) => { let x = kimler.get(k.id); if (!x) { x = kimOf(k.veri as any, d.kisiler); kimler.set(k.id, x); } return x; };
-    // v3.22.1 — ★ Benim / ◆ Ofisim olan taraf fırsat önceliğine girer (src/lib/eslestirme/firsat.ts)
-    const sc = sahiplikCozucu(d), sahipler = new Map<string, "BENIM" | "OFIS" | null>();
-    const sahip = (k: Kayit) => { if (!sahipler.has(k.id)) sahipler.set(k.id, sc(k.veri).tur); return sahipler.get(k.id)!; };
-    for (const t of T) for (const p of P) if (temelUyum(t.veri as any, p.veri as any)) {
-      const f = firsatDegerlendir(kim(t).tur, kim(p).tur, { islemTipi: String(p.veri.islemTipi), fiyat: p.veri.fiyat ?? null, butce: t.veri.maxFiyat ?? null, talepSahip: sahip(t), portfoySahip: sahip(p) });
-      r.push({ t, p, s: eslesmeOnizle(butceSerbestle(t.veri as any, sahip(t) === "BENIM"), p.veri as any, BAGLAM), f }); // v3.38
-    }
-    const sira: Record<Uygunluk, number> = { SUNULABILIR: 0, KOSULLU: 1, UYGUN_DEGIL: 2 };
-    // v3.38 — önce uygunluk, sonra uyum (seviye → skor): kriterleri dolu ve iyi tutan eşleşmeler en üstte; fırsat kademesi yalnızca eşitlikte
-    // (Özgür, 21 Eki 2026: "iyi değerleri oluşanları puanları önce yukarıdan sıralamalısın"). v3.27 — mükerrer portföyler tek satır.
-    return mukerrerleriTopla(r.sort((a, b) => sira[a.s.uygunluk] - sira[b.s.uygunluk] || b.s.seviye - a.s.seviye || b.s.skor - a.s.skor || b.f.sira - a.f.sira));
-  }, [d.kayitlar, d.kisiler, d.ogrenilen, d.ayarlar.sahiplik, d.ayarlar.paylasim]);
+  const tum = useMemo(() => eslesmeleriHesapla(d), [d.kayitlar, d.kisiler, d.ogrenilen, d.ayarlar.sahiplik, d.ayarlar.paylasim]);
   return useMemo(() => (koparilanDahil ? tum : tum.filter((e) => d.eslesmeNotlari[`${e.t.id}~${e.p.id}`]?.durum !== "REDDEDILDI")), [tum, d.eslesmeNotlari, koparilanDahil]);
 }
 export const eKey = (tid: string, pid: string) => `${tid}~${pid}`;

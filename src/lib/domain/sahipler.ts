@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Mülk sahipleri: Kişiler ekranındaki "Mülk sahipleri" süzgecinin ve kişi kartlarındaki sahip özetinin hesabı.
  *
  * Özgür (21 Eki 2026): "Geçmişe dönük bazen mülk sahiplerini tekrar arıyorum — bir talebe istinaden depo sahibinin kiracısı çıkmış

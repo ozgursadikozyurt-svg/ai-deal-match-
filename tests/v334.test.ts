@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.34 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * v3.34 — veritabanısız: kampanya yetkisi, maliyet hesabı, girdi doğrulaması, ofis kiracılığı, şema ve migration.
  */
 import { test } from "node:test";

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.33 · 19 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Gelen kutusu — veri katmanı. Ekran (demo/gelen-kutusu.tsx) yalnızca bu arayüzü bilir:
  *   canlıda dosyalar sunucudadır (/api/gelen; ham dosya Supabase Storage'da), demoda bu tarayıcıdadır (örnek dosyalarla başlar).
  * Atlananlar (aynı ilan yeniden sorulmasın diye hatırlanan anahtarlar) da buradan okunur / yazılır.

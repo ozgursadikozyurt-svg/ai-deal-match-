@@ -1,4 +1,4 @@
-// Anahtar CRM v3.33 · 19 Ekim 2026
+// Anahtar CRM v3.40 · 23 Ekim 2026
 // Gelen kutusunda "atla / temizle" denen kayıtların anahtarları — aynı ilan sonraki dökümde yeniden sorulmaz.
 // GET    /api/gelen/atlanan                      → { anahtarlar: [...] }
 // POST   /api/gelen/atlanan { anahtarlar: [...] } → ekler (parça parça gönderilir; tek istekte en çok 2.000)

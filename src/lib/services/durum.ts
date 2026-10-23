@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026 (v3.14'ten)
+ * Anahtar CRM v3.40 · 23 Ekim 2026 (v3.14'ten)
  * AŞAMA 7 — Canlı sürümün veri köprüsü. Arayüz (demo ile aynı ekranlar) tüm durumu tek seferde okur
  * (`durumGetir`), değişiklikleri parça parça yazar (`degisiklikUygula`). Veritabanı ilişkisel kalır:
  * Notion/Google senkronu, toplu giriş, dışa aktarma ve eşleştirme servisleri aynı tablolarla çalışmaya devam eder.
@@ -52,28 +52,59 @@ export async function kisileriGetir(prisma: PrismaClient, sonra?: Date | null) {
   const satirlar = await prisma.kisi.findMany({ where, select: KISI_SEC, orderBy: { adSoyad: "asc" } });
   return { kisiler: satirlar.map(kisiSatiri), zaman, artimli: !!where };
 }
-export async function durumGetir(prisma: PrismaClient) {
-  const zaman = new Date().toISOString(); // kişi okumasından ÖNCE alınır: sonraki artımlı çağrı hiçbir değişikliği kaçırmaz
-  const [kayitlar, kisiler, eslesmeler, ayarlar] = await Promise.all([
-    prisma.kayit.findMany({ include: { lokasyonlar: { orderBy: { sira: "asc" } }, ozellik: true, kisiBaglari: { orderBy: { birincil: "desc" } }, gorusmeNotlari: { orderBy: { tarih: "desc" } }, fotolar: { orderBy: { sira: "asc" } } }, orderBy: { createdAt: "desc" } }),
-    prisma.kisi.findMany({ select: KISI_SEC, orderBy: { adSoyad: "asc" } }),
-    prisma.match.findMany({ where: { OR: [{ durum: { not: "BEKLIYOR" } }, { operasyonNotu: { not: null } }], portfoyId: { not: null } } }),
-    prisma.ayar.findMany({ where: { anahtar: { in: AYAR_ANAHTARLARI } } }),
-  ]);
-  return {
-    kisiZamani: zaman,
-    kayitlar: kayitlar.map((k) => {
+const KAYIT_INCLUDE = { lokasyonlar: { orderBy: { sira: "asc" } }, ozellik: true, kisiBaglari: { orderBy: { birincil: "desc" } }, gorusmeNotlari: { orderBy: { tarih: "desc" } }, fotolar: { orderBy: { sira: "asc" } } } as const;
+/** Veritabanı kaydı → arayüz kaydı */
+const kayitCikti = (k: any) => {
       const veri: Record<string, unknown> = Object.fromEntries(KAYIT_ALANLARI.map((a) => [a, sade((k as any)[a])]));
-      veri.lokasyonlar = k.lokasyonlar.map((l) => ({ ilId: l.ilId, ilceId: l.ilceId, mahalleId: l.mahalleId, altBolgeId: l.altBolgeId, birincil: l.birincil, ...(l.haric ? { haric: true } : {}) }));
-      veri.kisiler = k.kisiBaglari.map((b) => ({ kisiId: b.kisiId, rol: b.rol }));
+      veri.lokasyonlar = k.lokasyonlar.map((l: any) => ({ ilId: l.ilId, ilceId: l.ilceId, mahalleId: l.mahalleId, altBolgeId: l.altBolgeId, birincil: l.birincil, ...(l.haric ? { haric: true } : {}) }));
+      veri.kisiler = k.kisiBaglari.map((b: any) => ({ kisiId: b.kisiId, rol: b.rol }));
       if (k.ozellik) veri.ozellik = Object.fromEntries(OZELLIK_ALANLARI.map((a) => [a, sade((k.ozellik as any)[a])]).filter(([, v]) => v != null && !(Array.isArray(v) && !v.length)));
-      return { id: k.id, olusturma: k.createdAt.toISOString(), veri, notionId: k.notionId, fotolar: k.fotolar.map((f) => ({ id: f.id, ad: f.ad, en: f.en, boy: f.boy, boyut: f.boyut })), notlar: k.gorusmeNotlari.map((n) => ({ id: n.id, tarih: n.tarih.toISOString(), tur: n.tur, metin: n.metin, kisiId: n.kisiId })) };
-    }),
-    kisiler: kisiler.map(kisiSatiri),
+      return { id: k.id, olusturma: k.createdAt.toISOString(), veri, notionId: k.notionId, fotolar: k.fotolar.map((f: any) => ({ id: f.id, ad: f.ad, en: f.en, boy: f.boy, boyut: f.boyut })), notlar: k.gorusmeNotlari.map((n: any) => ({ id: n.id, tarih: n.tarih.toISOString(), tur: n.tur, metin: n.metin, kisiId: n.kisiId })) };
+    };
+/** Eşleşme takibi + ayarlar + arayüz durumu (kayıt ve kişi listeleri dışındaki her şey) */
+const digerCikti = (eslesmeler: any[], ayarlar: any[]) => ({
     eslesmeNotlari: Object.fromEntries(eslesmeler.map((m) => [`${m.talepId}~${m.portfoyId}`, { durum: m.durum === "BEKLIYOR" ? "YENI" : m.durum, not: m.operasyonNotu ?? "", ...(m.kopmaNedeni ? { neden: m.kopmaNedeni } : {}), ...(m.koparilma ? { tarih: m.koparilma.toISOString() } : {}) }])),
     ayarlar: { ttl: TtlAyarSchema.parse({ ...TTL_VARSAYILAN, ...((ayarlar.find((a) => a.anahtar === "ttl")?.deger as object) ?? {}) }), ai: aiAyarNormalize(ayarlar.find((a) => a.anahtar === "ai")?.deger), paylasim: paylasimNormalize(ayarlar.find((a) => a.anahtar === "paylasim")?.deger), calismaIli: calismaIliNormalize(ayarlar.find((a) => a.anahtar === "calismaIli")?.deger), roller: rolNormalize(ayarlar.find((a) => a.anahtar === "roller")?.deger), sahiplik: sahiplikNormalize(ayarlar.find((a) => a.anahtar === "sahiplik")?.deger), gorevler: gorevlerNormalize(ayarlar.find((a) => a.anahtar === "gorevler")?.deger), ilgilenenler: ilgilenenlerNormalize(ayarlar.find((a) => a.anahtar === "ilgilenenler")?.deger) },
     arayuz: (ayarlar.find((a) => a.anahtar === ARAYUZ)?.deger ?? {}) as Record<string, unknown>,
-  };
+});
+const DIGER_SORGULARI = (prisma: PrismaClient) => [
+  prisma.match.findMany({ where: { OR: [{ durum: { not: "BEKLIYOR" } }, { operasyonNotu: { not: null } }], portfoyId: { not: null } } }),
+  prisma.ayar.findMany({ where: { anahtar: { in: AYAR_ANAHTARLARI } } }),
+] as const;
+
+export async function durumGetir(prisma: PrismaClient) {
+  const zaman = new Date().toISOString(); // kişi okumasından ÖNCE alınır: sonraki artımlı çağrı hiçbir değişikliği kaçırmaz
+  const [kayitlar, kisiler, eslesmeler, ayarlar] = await Promise.all([
+    prisma.kayit.findMany({ include: KAYIT_INCLUDE, orderBy: { createdAt: "desc" } }),
+    prisma.kisi.findMany({ select: KISI_SEC, orderBy: { adSoyad: "asc" } }),
+    ...DIGER_SORGULARI(prisma),
+  ]);
+  return { kisiZamani: zaman, kayitlar: kayitlar.map(kayitCikti), kisiler: kisiler.map(kisiSatiri), ...digerCikti(eslesmeler, ayarlar) };
+}
+
+/**
+ * v3.40 — PARÇALI AÇILIŞ. Tüm veriyi tek istekte çekmek (tüm kayıtlar + ~7.800 kişi + eşleşme + ayar) Cloudflare ücretsiz planın istek başına
+ * işlemci sınırını (10 ms) aşıyordu: günde 100'den fazla "Exceeded CPU Time Limits" (503). Arayüz artık veriyi küçük parçalarla alır:
+ *   ?parca=diger                → eşleşme takibi + ayarlar + arayüz durumu + kisiZamani
+ *   ?parca=kayit&atla=0&al=60   → kayıtlar (sayfa sayfa)   ·   ?parca=kisi&atla=0&al=1000 → kişiler (sayfa sayfa)
+ * Yanıttaki `sonraki` bir sonraki sayfanın `atla` değeridir (null = bitti). Parametresiz GET eskisi gibi her şeyi tek seferde verir.
+ */
+export const DURUM_KAYIT_PARCA = 60, DURUM_KISI_PARCA = 1000;
+export async function durumParcasiGetir(prisma: PrismaClient, parca: "kayit" | "kisi" | "diger", atla = 0, al?: number) {
+  const skip = Math.max(0, Math.floor(atla) || 0);
+  if (parca === "diger") {
+    const zaman = new Date().toISOString();
+    const [eslesmeler, ayarlar] = await Promise.all(DIGER_SORGULARI(prisma));
+    return { kisiZamani: zaman, ...digerCikti(eslesmeler, ayarlar) };
+  }
+  if (parca === "kisi") {
+    const take = Math.min(Math.max(1, Math.floor(al ?? DURUM_KISI_PARCA) || DURUM_KISI_PARCA), 2000);
+    const satirlar = await prisma.kisi.findMany({ select: KISI_SEC, orderBy: [{ adSoyad: "asc" }, { id: "asc" }], skip, take });
+    return { kisiler: satirlar.map(kisiSatiri), sonraki: satirlar.length === take ? skip + take : null };
+  }
+  const take = Math.min(Math.max(1, Math.floor(al ?? DURUM_KAYIT_PARCA) || DURUM_KAYIT_PARCA), 200);
+  const satirlar = await prisma.kayit.findMany({ include: KAYIT_INCLUDE, orderBy: [{ createdAt: "desc" }, { id: "asc" }], skip, take });
+  return { kayitlar: satirlar.map(kayitCikti), sonraki: satirlar.length === take ? skip + take : null };
 }
 
 // ───────── Yazma ─────────

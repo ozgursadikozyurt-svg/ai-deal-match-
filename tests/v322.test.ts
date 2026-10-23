@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.38 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * v3.22 — "HARİÇ" bölge · bütçesiz talebin skoru · Benim / Ofisim işareti ve süzgeci · portföy kartında küçük fotoğraf ·
  * Eşleşmeler'de yatay skor şeridi.
  */
@@ -91,13 +91,13 @@ test("v3.38 — bütçesiz talep: içeri aktarılmışsa en fazla 3/5 + 'Eksik: 
   // içeri aktarılmış (işaretsiz) bütçesiz talep: Özgür 21 Eki — "bütçe yoklarda eşleştirme puanını düşür"
   const iceri = eslesmeOnizle({ ...T15, butceSerbest: null, isaret: null }, p, BAGLAM);
   assert.ok(iceri.skor <= BUTCESIZ_ICERI_SKOR_TAVANI && iceri.seviye <= 3, `${iceri.skor} ${iceri.seviye}`);
-  assert.ok(iceri.veriEksikleri.includes("talepte bütçe yok"));
+  assert.ok(iceri.veriEksikleri.includes("Talepte bütçe yazılı değil"));
   assert.ok(iceri.gerekceler.some((g) => /Bütçesiz talep \(içeri aktarılmış\)/.test(g)), iceri.gerekceler.join(" | "));
   // "Bütçe m²'ye göre" ya da ★ Benim: v3.37 kuralı (nötr)
   for (const v of [{ ...T15, butceSerbest: true }, butceSerbestle({ ...T15, isaret: "BENIM" }), butceSerbestle(T15, true)]) {
     const s = eslesmeOnizle(v, p, BAGLAM);
     assert.ok(s.skor > FIYATSIZ_SKOR_TAVANI, String(s.skor));
-    assert.ok(!s.veriEksikleri.includes("talepte bütçe yok"));
+    assert.ok(!s.veriEksikleri.includes("Talepte bütçe yazılı değil"));
     assert.ok(s.gerekceler.some((g) => /bütçe yok — puanı düşürmez/.test(g)), s.gerekceler.join(" | "));
   }
   // portföyde fiyat yoksa ceza her durumda kalır

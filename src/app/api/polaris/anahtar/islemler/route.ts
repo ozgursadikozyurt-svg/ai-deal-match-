@@ -1,3 +1,4 @@
+// Anahtar CRM v3.40 · 23 Ekim 2026
 // Polaris v7 · 21 Ekim 2026
 // GET /api/polaris/anahtar/islemler?yil=2026 → o yıl tahsil edilen (ya da tahsil edilmemiş ama o yıl yapılan) işlemler.
 // Polaris'in İşlemler sekmesi ve P&L satır 3 bunu okur ("Anahtar'dan güncelle" + günde bir otomatik). Salt okunur.

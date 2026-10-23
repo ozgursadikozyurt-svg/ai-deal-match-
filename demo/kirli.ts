@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.37 · 21 Ekim 2026
+ * Anahtar CRM v3.40 · 23 Ekim 2026
  * Demo — kaydedilmemiş değişiklik koruması.
  *
  * Özgür (21 Eki 2026): "Talep, portföy, işlem ya da kişi kaydederken yanlışlıkla başka bir menüye tıklayınca yaptıklarım kayboluyor;
