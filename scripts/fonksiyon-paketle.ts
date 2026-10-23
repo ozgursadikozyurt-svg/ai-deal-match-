@@ -34,7 +34,7 @@ const r = await build({
   minify: process.env.KUCULTME !== "0",
   legalComments: "none",
   metafile: true,
-  banner: { js: `// Anahtar CRM — Supabase Edge Function paketi (otomatik üretilir: npm run fonksiyon:paketle). Elle düzenlemeyin.\nimport { createRequire as __cr } from "node:module"; const require = __cr(import.meta.url);` },
+  banner: { js: `// Anahtar CRM — Supabase Edge Function paketi (otomatik üretilir: npm run fonksiyon:paketle). Elle düzenlemeyin.\nimport { createRequire as __cr } from "node:module"; const require = __cr(import.meta.url);\n// Supabase çalışma ortamında Node genelleri tanımlı değil (Buffer, process, global, setImmediate): paket kendisi tanımlar\nimport { Buffer as __Buffer } from "node:buffer"; import __process from "node:process"; import { setImmediate as __si, clearImmediate as __ci } from "node:timers";\nglobalThis.Buffer ??= __Buffer; globalThis.process ??= __process; globalThis.global ??= globalThis; globalThis.setImmediate ??= __si; globalThis.clearImmediate ??= __ci;` },
   define: { "process.env.NODE_ENV": '"production"' },
   logLevel: "warning",
 });
