@@ -52,3 +52,15 @@ jobs:
           cat /tmp/y.json; echo
           # oturumsuz istek uygulamanın kendi 401'ini almalı (fonksiyon açıldı ve rota çalıştı demektir)
           [ "$kod" = "401" ] || { echo "::error::Fonksiyon beklenen yanıtı vermedi ($kod)"; exit 1; }
+      - name: Uçtan uca (anahtarcrm.com → Cloudflare → Supabase → veritabanı)
+        continue-on-error: true
+        run: |
+          # Cloudflare'in yeni sürümü birkaç dakika sonra devreye girebilir: 4 dakikaya kadar dener. Sonuç not olarak yazılır.
+          for i in $(seq 1 16); do
+            kod=$(curl -s -D /tmp/b.txt -o /tmp/g.txt -w "%{http_code}" https://anahtarcrm.com/api/saglik)
+            sunucu=$(grep -i "^x-anahtar-sunucu" /tmp/b.txt | tr -d '\r' | cut -d' ' -f2)
+            kapi=$(grep -i "^x-anahtar-kapi-durum" /tmp/b.txt | tr -d '\r' | cut -d' ' -f2)
+            [ "$sunucu" = "supabase" ] && break
+            sleep 15
+          done
+          echo "::notice title=Uçtan uca::HTTP $kod · sunucu=${sunucu:-cloudflare} · kapı=${kapi:-?} · $(head -c 300 /tmp/g.txt)"

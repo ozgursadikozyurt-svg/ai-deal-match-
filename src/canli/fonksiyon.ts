@@ -42,9 +42,19 @@ export function ortamKur(kendi: Record<string, string>, iletilen: Record<string,
   return o as unknown as Env;
 }
 
+/** Yanıta tanı işareti: istek Supabase'de işlendi mi, aracının kapısı geçerli miydi (gizli değer içermez) */
+const isaretle = (r: Response, guven: boolean) => {
+  try { r.headers.set("x-anahtar-sunucu", "supabase"); r.headers.set("x-anahtar-kapi-durum", guven ? "gecerli" : "yok"); return r; }
+  catch { const h = new Headers(r.headers); h.set("x-anahtar-sunucu", "supabase"); h.set("x-anahtar-kapi-durum", guven ? "gecerli" : "yok"); return new Response(r.body, { status: r.status, statusText: r.statusText, headers: h }); }
+};
+
 export async function fonksiyonIsle(req: Request, kendi: Record<string, string>): Promise<Response> {
   const kapi = req.headers.get(BASLIK_KAPI) ?? "";
   const guven = await kapiGecerliMi(kapi, kendi);
+  return isaretle(await fonksiyonIsleIc(req, kendi, guven), guven);
+}
+
+async function fonksiyonIsleIc(req: Request, kendi: Record<string, string>, guven: boolean): Promise<Response> {
   const env = ortamKur(kendi, ortamCoz(req.headers.get(BASLIK_ORTAM)), guven);
   for (const [k, v] of Object.entries(env)) if (typeof v === "string") g.process.env[k] = v;
 
