@@ -45,3 +45,14 @@ tarayıcı ──► anahtarcrm.com (Cloudflare: statik dosyalar + /api aracıs�
 
 ### Testler
 `tests/v342.test.ts` — aracı başlıkları, Türkçe gizli değer taşıma, geçit hatası ayrımı, iletme, fonksiyon yoksa yerelde işleme, kapı doğrulaması, iç yolların korunması. Ayrıca paket Deno 2.9'da yerel veritabanına karşı uçtan uca denendi (okuma, yazma, zamanlayıcı, oturumsuz 401).
+
+### İlk yayında çıkanlar ve çözümler (23 Ekim 2026)
+| Belirti | Neden | Çözüm |
+|---|---|---|
+| `413 request entity too large` | API ile yüklemede paket sınırı | `--use-docker`: paket sıkıştırılıp (eszip) yüklenir |
+| `Buffer is not defined` | Supabase çalışma ortamında Node genelleri yok | `scripts/fonksiyon-on.js` Buffer / global / setImmediate tanımlar |
+| `process.pid.toString` hatası | `process.pid` yok | process vekili eksik alanlara varsayılan verir |
+| `NotSupported … setEnv` | Ortam değişkenine yazılamaz | process.env yazılabilir bir kopya |
+
+Yerel deneme: `scripts/fonksiyon-on.js` kısıtları taklit edilerek (salt okunur env, pid yok, Buffer yok) Deno'da uçtan uca denendi.
+Canlı denetim (CI): `https://anahtarcrm.com/api/saglik` → HTTP 200 · `x-anahtar-sunucu: supabase` · `x-anahtar-kapi-durum: gecerli` · `{"ok":true,"vt":true}`.
