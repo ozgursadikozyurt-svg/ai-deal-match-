@@ -1,6 +1,6 @@
 {
   "name": "anahtarcrm",
-  "version": "3.41.0",
+  "version": "3.42.0",
   "description": "Anahtar CRM — yapay zekâ destekli talep / portföy eşleştirme (canlı sürüm: Cloudflare Workers + Supabase)",
   "scripts": {
     "db:generate": "prisma generate",
@@ -24,7 +24,8 @@
     "canli:test:depo": "tsx scripts/canli-depo-testi.ts",
     "canli:test:google": "tsx scripts/canli-google-testi.ts",
     "canli:test:giris": "tsx scripts/canli-jwks-testi.ts",
-    "canli:test:arayuz": "tsx scripts/canli-yedek-uret.ts && node scripts/canli-arayuz-testi.mjs"
+    "canli:test:arayuz": "tsx scripts/canli-yedek-uret.ts && node scripts/canli-arayuz-testi.mjs",
+    "fonksiyon:paketle": "npm run canli:rotalar && npm run canli:gomulu && tsx scripts/fonksiyon-paketle.ts"
   },
   "license": "UNLICENSED",
   "devDependencies": {
@@ -58,6 +59,7 @@
   "imports": {
     "#prisma-istemci": {
       "workerd": "./src/generated/prisma-worker/client.ts",
+      "deno": "./src/generated/prisma-deno/client.ts",
       "default": "./src/generated/prisma/client.ts"
     }
   }

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * v3.38 — Özgür'ün 21 Ekim (2) istekleri:
  *   1) bütçesiz talep: yalnızca ★ Benim ya da "Bütçe m²'ye göre" işaretliyse puan düşmez; içeri aktarılmışsa en fazla 3/5
  *   2) pasife alınma tarihi (durumTarihi) ve "en uzun süredir pasif" sıralamaları

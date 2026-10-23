@@ -1,4 +1,4 @@
-// Anahtar CRM v3.41 · 23 Ekim 2026
+// Anahtar CRM v3.42 · 23 Ekim 2026
 // Anahtar CRM — arama motoru / sosyal paylaşım görselleri: public/favicon.svg'den favicon.ico, favicon-48.png, ikon-512 (değişmez) ve og-gorsel.png (1200x630) üretir.
 // Çalıştır: node scripts/seo-gorselleri.mjs   (logo değişirse yeniden çalıştırın)
 import fs from "node:fs"; import path from "node:path"; import sharp from "sharp";

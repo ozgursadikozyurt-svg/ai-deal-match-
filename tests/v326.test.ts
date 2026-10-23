@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026 — Benim süresiz, süresi yaklaşanlar (+30), gelen kutusu gün süzgeci, kart yanında paylaşım seçimi,
+ * Anahtar CRM v3.42 · 23 Ekim 2026 — Benim süresiz, süresi yaklaşanlar (+30), gelen kutusu gün süzgeci, kart yanında paylaşım seçimi,
  * açıklama, kartta kişi tekrarı, Görevler ekranı, açık kayıt (kayıt ol) şeması
  */
 import { test as nodeTest } from "node:test";

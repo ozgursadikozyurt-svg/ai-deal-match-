@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * v3.36 — eşleştirme uyum seviyesi (1–5) ve gerekçe; 19 Ekim canlı verisinde yanlış okunan talepler (parser); döviz; talepteki
  * anlamsız istekler; fazla oda / üst üste ödün; Geri tuşu (tarayıcı geçmişi); dosyanın tamamını yorumlama; WhatsApp portföyü Partner;
  * kaydetme günlüğü; veri düzeltmesi migration'ı.

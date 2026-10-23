@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * v3.35 — veritabanlı: yetki belgesi alanları kaydedilir ve geri okunur; randevu (asistan açar, sonuç girer); işlem (yalnızca yönetici), tekrar aktarımda aynı Polaris satırı tekilleşir.
  */
 import { test } from "node:test";

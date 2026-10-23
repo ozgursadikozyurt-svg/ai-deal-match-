@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * v3.37 — Özgür'ün 21 Ekim istekleri:
  *   1) talepte bütçe yoksa eşleşme puanı ekstra düşmez (portföyde fiyat yoksa ceza kalır)
  *   2) kaydedilmemiş değişiklik varken başka ekrana geçerken "kaydedelim mi?"

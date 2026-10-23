@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.41";
+export const SURUM = "3.42";
 export const TARIH = "23 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.41_23Ekim2026";
+export const DOSYA_EKI = "v3.42_23Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,24 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.42",
+    tarih: "23 Ekim 2026",
+    baslik: "Ücretsiz plan mimarisi: sunucu kodu Supabase'e taşındı, Cloudflare yalnızca aracı (503 / işlemci sınırı kalıcı çözüm)",
+    degisenler: [
+      "Neden: Cloudflare ücretsiz planı istek başına 10 ms işlemci verir. Ölçüm: Prisma ile en boş istek bile 12–28 ms, sıradan istekler 20–100 ms → sayfalama ne yapılırsa yapılsın 503. Bu yüzden v3.40 / v3.41 yetmedi.",
+      "Yeni yapı: tarayıcı yine anahtarcrm.com'a gider; Cloudflare isteği (~1 ms) Supabase Edge Function \"api\"ye iletir; asıl iş orada çalışır (istek başına 2 sn sınır, ücretsiz). Adres, giriş, Google bağlantısı, gelen kutusu adresi değişmez.",
+      "Gizli değerler (AI, Google, CRON…) Cloudflare'de kalır; aracı onları her istekte iletir, fonksiyon yalnızca Supabase service_role anahtarıyla gelen istekte bunlara güvenir.",
+      "Zamanlayıcı (gece işleri, yedek, Google eşitlemesi) ve alan adına gelen e-postalar da fonksiyona iletilir.",
+      "Güvenlik ağı: fonksiyon henüz yayında değilse ya da açılamazsa Cloudflare isteği eskisi gibi kendisi işler — uygulama hiç kapanmaz.",
+      "Yayın: GitHub Actions (.github/workflows/supabase-fonksiyon.yml) main'e her gönderimde fonksiyonu paketleyip Supabase'e yükler. Bir kez SUPABASE_ACCESS_TOKEN eklenmesi gerekir.",
+    ],
+    testEt: [
+      "Sayfayı yenileyin: uygulama açılmalı, 503 gelmemeli; Talepler / Portföyler / Rehber açılmalı.",
+      "Bir talebi düzenleyip kaydedin, sayfayı yenileyin: değişiklik durmalı.",
+      "Supabase › Edge Functions › api › Invocations: istekler orada görünmeli (fonksiyon çalışıyor demektir).",
+    ],
+  },
   {
     surum: "3.41",
     tarih: "23 Ekim 2026",

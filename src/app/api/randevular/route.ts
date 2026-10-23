@@ -1,4 +1,4 @@
-// Anahtar CRM v3.41 · 23 Ekim 2026 — randevu (gösterim / görüşme)
+// Anahtar CRM v3.42 · 23 Ekim 2026 — randevu (gösterim / görüşme)
 // GET ?kayitId= → o talep / portföyün randevuları · POST → yeni · PATCH ?id= → sonuç, tarih, not
 import { prisma } from "@/lib/db";
 import { ok, hata, sorgu } from "@/lib/http/yanit";

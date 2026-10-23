@@ -1,4 +1,4 @@
-// Anahtar CRM v3.41 · 23 Ekim 2026
+// Anahtar CRM v3.42 · 23 Ekim 2026
 // GET /api/meta/enumlar → UI dropdown/filtre bileşenleri için tüm enum + Türkçe etiket + teknik alan meta
 import * as E from "@/generated/prisma/enums";
 import {

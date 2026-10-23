@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * İŞLEM (kapanan satış / kiralama) ve komisyonu. Yalnızca "islem.yonet" (ofis yöneticisi): asistan ve danışman göremez.
  * Polaris bu tabloyu Supabase üzerinden yalnızca okur (sonraki adım). Kurallar: src/lib/domain/islem.ts
  */

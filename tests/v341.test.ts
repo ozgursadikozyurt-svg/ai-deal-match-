@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * Rehber parça parça: "Devam et" bir sonraki sayfayı çeker, kaydedilmemiş yerel işi bozmaz; aynı anda ikinci çağrı süren işi bekler.
  */
 import test from "node:test";
@@ -8,7 +8,7 @@ import { SURUM, SURUM_GECMISI } from "../src/lib/surum";
 import { CANLI } from "../demo/depo";
 import { REHBER, rehberiYukle, rehberTamMi, KISI_PARCA_ADEDI } from "../demo/kisi-parca";
 
-test("sürüm 3.41 kayıtlı", () => { assert.equal(SURUM, "3.41"); assert.equal(SURUM_GECMISI[0].surum, "3.41"); });
+test("sürüm 3.41 kayıtlı", () => { assert.ok(SURUM_GECMISI.some((x) => x.surum === "3.41")); void SURUM; });
 
 test("Devam et: sayfalar sırayla gelir, sonraki null olunca rehber tamam; tekrar çağrı ağa gitmez", async () => {
   const istekler: string[] = [];

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * v3.25 — veritabanlı: Bugün panosu görevleri ve İlgilenenler, ofis ayarı (Ayar) içinde saklanır; göç yok.
  */
 import { test } from "node:test";

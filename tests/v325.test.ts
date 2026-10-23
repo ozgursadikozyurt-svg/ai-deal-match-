@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026 — Bugün panosu, İlgilenenler, kompakt form
+ * Anahtar CRM v3.42 · 23 Ekim 2026 — Bugün panosu, İlgilenenler, kompakt form
  */
 import { test as nodeTest } from "node:test";
 import assert from "node:assert/strict";

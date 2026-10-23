@@ -1,4 +1,4 @@
--- Anahtar CRM v3.41 · 23 Ekim 2026
+-- Anahtar CRM v3.42 · 23 Ekim 2026
 -- ---------------------------------------------------------------------------
 -- Prisma'nın ifade edemediği bütünlük kuralları (elle eklenir, migration sonuna)
 -- ---------------------------------------------------------------------------

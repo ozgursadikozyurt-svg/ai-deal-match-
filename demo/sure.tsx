@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * Süre işleri: kartta "+30 gün" (süresi 5 gün ve altı kalanlarda), Ana Sayfa'da kısa "Süresi yaklaşanlar" özeti ve
  * ayrı "Süresi yaklaşanlar" ekranı (başında Toplu +30). ★ Benim kayıtlar süresizdir, bu listelere girmez.
  * Ayrıca kart açıklaması (kısaca, açılır kapanır).

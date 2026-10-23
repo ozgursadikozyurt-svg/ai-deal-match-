@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * v3.33 — eşleştirme puanı: şartı bilinmeyen alta iner, kat uymuyorsa liste sonu, kW = kVA = kwa, ilan metninden güç;
  * bina yaşı "7-8 yaşına kadar" → 8; Eşleşmeler'de mülk türü / işlem süzgeci portföye uygulanır.
  */

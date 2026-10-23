@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * Açılışta kayıt onarımı — eski sürümlerin yanlış yazdığı alanlar, kayıt bir kez açılınca düzeltilir.
  * Canlıda düzeltilen kayıtlar normal kayıt kuyruğuyla sunucuya da yazılır (demo/canli.tsx).
  *

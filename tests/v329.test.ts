@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026 — fazla oda bütçe içindeyse sunulur; "asansör / havuz şart" öldürücü; Barınaklar Bulvarı
+ * Anahtar CRM v3.42 · 23 Ekim 2026 — fazla oda bütçe içindeyse sunulur; "asansör / havuz şart" öldürücü; Barınaklar Bulvarı
  * (cadde / bulvar alt bölgesi şerittir); veritabanı yolu (Hyperdrive + yerleşim); Vercel otomatik yayını kapalı.
  */
 import { test } from "node:test";

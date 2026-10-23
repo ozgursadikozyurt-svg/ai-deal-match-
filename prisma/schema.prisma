@@ -1,4 +1,4 @@
-// Anahtar CRM v3.41 · 23 Ekim 2026
+// Anahtar CRM v3.42 · 23 Ekim 2026
 // ============================================================================
 //  Anahtar.ai — Prisma Şeması (AŞAMA 2 v3.1; v3.3: konut, kaynak, konum öğrenme, ayarlar; v3.4: kişi bağları, işlenmiş mesaj; v3.5: yetkili portföy)
 //  Tarih: 30 Eylül 2026  |  Önceki: v2.0 (14–18 Eylül 2026)
@@ -26,6 +26,13 @@ generator client_worker {
   provider = "prisma-client"
   output   = "../src/generated/prisma-worker"
   runtime  = "workerd"
+}
+
+// v3.42 — Supabase Edge Function (Deno) için ayrı istemci; supabase/functions/api paketi bunu kullanır (bkz. scripts/fonksiyon-paketle.ts)
+generator client_deno {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma-deno"
+  runtime  = "deno"
 }
 
 // Prisma 7: bağlantı URL'leri prisma.config.ts'de (Migrate) ve PrismaClient adapter'ında (runtime)

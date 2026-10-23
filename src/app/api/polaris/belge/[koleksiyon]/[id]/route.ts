@@ -1,4 +1,4 @@
-// Anahtar CRM v3.41 · 23 Ekim 2026
+// Anahtar CRM v3.42 · 23 Ekim 2026
 // Polaris v7 · 21 Ekim 2026
 // GET    /api/polaris/belge/:koleksiyon/:id → { var: true, veri } | { var: false }
 // PUT    /api/polaris/belge/:koleksiyon/:id  (gövde: belgenin JSON'u) → { ok: true }

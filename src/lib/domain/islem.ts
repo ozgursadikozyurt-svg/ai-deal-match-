@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * İŞLEM ve RANDEVU — tarayıcı ile sunucunun ortak, bağımlılıksız kuralları.
  *
  * P&L kuralı (docs/ANAHTAR_POLARIS_KARAR): "bana kalan" tahsilat tarihinin ayına yazılır; tahsilat tarihi boşsa "bekleyen".

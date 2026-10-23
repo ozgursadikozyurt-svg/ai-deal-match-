@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * v3.32 — veritabanısız: ilk kaynak tahmini ve kilidi, ilk yanıt, asistan rolünün yetkileri ve görünürlük süzgeci.
  */
 import { test } from "node:test";

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026
+ * Anahtar CRM v3.42 · 23 Ekim 2026
  * vCard (.vcf) → kişi. WhatsApp'ta paylaşılan kişi kartları ve telefon rehberi dışa aktarımı için.
  */
 import { telE164 } from "../senkron/birlestir";

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.41 · 23 Ekim 2026
+// Anahtar CRM v3.42 · 23 Ekim 2026
 // Polaris v7 · 21 Ekim 2026
 // POST /api/polaris/ai { istem, sistem?, json? } → { metin, model }
 // Polaris'in mentoru, haftalık değerlendirme yorumu ve "AI ile ders çıkar" bu çağrıyı kullanır.

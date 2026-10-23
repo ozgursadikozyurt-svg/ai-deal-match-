@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026 — Dikkat şeridi (Ana Sayfa en üstü): süresi dolan / 5 gün / 14 gün, Dolanlara +30 ve Geri al
+ * Anahtar CRM v3.42 · 23 Ekim 2026 — Dikkat şeridi (Ana Sayfa en üstü): süresi dolan / 5 gün / 14 gün, Dolanlara +30 ve Geri al
  */
 import { test as nodeTest } from "node:test";
 import assert from "node:assert/strict";

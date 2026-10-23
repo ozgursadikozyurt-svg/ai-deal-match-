@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.41 · 23 Ekim 2026 (v3.20'den)
+ * Anahtar CRM v3.42 · 23 Ekim 2026 (v3.20'den)
  * AŞAMA 7 — Cloudflare Worker girişi. Tek proje: arayüz (statik dosyalar, ASSETS) + /api (sunucu kodu) + zamanlanmış işler.
  *  - /api/yapilandirma, /api/saglik → açık (giriş ekranının ihtiyacı / sağlık kontrolü)
  *  - /api/davet/kabul → giriş şart, ofis şart değil (kişi henüz bir ofiste değil)
@@ -29,6 +29,7 @@ import { tamYedek, yedegiDepola } from "../lib/services/yedek";
 import { tumOfislerdeGoogleSenkron } from "../lib/services/senkron";
 import { gelenPostaIsle, gelenTemizlik, type GelenPosta } from "../lib/services/gelen";
 import { veritabaniAdresi, hyperdriveHatasiniIsle } from "./veritabani";
+import { uzakAdres, araciBasliklari, gecitHatasiMi, IC_ZAMANLAYICI, IC_EPOSTA } from "./uzak";
 
 export interface Env {
   ASSETS: { fetch: (r: Request) => Promise<Response> };
@@ -116,41 +117,96 @@ export async function apiIsle(req: Request, env: Env): Promise<Response> {
   });
 }
 
+/** Zamanlanmış işler (tüm ofisler, platform bağlamı). v3.42 — Supabase fonksiyonu da aynı işlevi çağırır (src/canli/fonksiyon.ts). */
+export async function zamanlanmisIs(cron: string, env: Env): Promise<void> {
+  await istekIcinde(veritabaniAdresi(env), () => platformOlarak(async () => {
+    if (cron.startsWith("0 3")) {
+      // Supabase Free 7 gün işlem görmeyen projeyi durdurur → günlük küçük sorgu + REST isteği
+      await prisma.$queryRawUnsafe("SELECT 1");
+      await fetch(`${env.SUPABASE_URL.replace(/\/$/, "")}/rest/v1/`, { headers: { apikey: env.SUPABASE_ANON_KEY } }).catch(() => {});
+      await prisma.kayit.updateMany({ where: { durum: "ACTIVE", validUntil: { lt: new Date() } }, data: { durum: "EXPIRED", durumTarihi: new Date() } }); // v3.38
+      // v3.23 — gelen kutusu: 45 günden eski ham dosyalar ve 1 yıldan eski "atlandı" anahtarları
+      await gelenTemizlik(prisma).catch((e) => console.error("Gelen kutusu temizliği:", e));
+    } else if (cron.startsWith("0 4")) {
+      await yedegiDepola(JSON.stringify(await tamYedek(prisma)), env);
+    } else {
+      // v3.21 — Google Kişiler: en uzun süredir eşitlenmeyen ofisler önce; her ofis kendi bağlamında (günde bir, artımlı)
+      if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) await tumOfislerdeGoogleSenkron(prisma, { enFazla: 5, butceMs: 12_000 });
+    }
+  }));
+}
+
+/** Gelen e-postayı işler (yerelde). v3.42 — fonksiyon da bunu kullanır. */
+export async function epostaIsle(message: GelenPosta, env: Env): Promise<void> {
+  try { await istekIcinde(veritabaniAdresi(env), () => gelenPostaIsle(prisma, message)); }
+  catch (e) { hyperdriveHatasiniIsle(e); console.error("Gelen e-posta kaydedilemedi:", e); message.setReject("Temporary failure, please retry"); }
+}
+
+const yerelApi = async (req: Request, env: Env) => {
+  try { return await apiIsle(req, env); } catch (e) { hyperdriveHatasiniIsle(e); return json({ hata: "SUNUCU", mesaj: String((e as Error)?.message ?? e).slice(0, 400) }, 500); }
+};
+
+/**
+ * v3.42 — ARACI: /api/* isteğini Supabase fonksiyonuna iletir (bkz. src/canli/uzak.ts). Fonksiyon yoksa / açılamadıysa yerelde işler.
+ * Burada yapılan iş: başlık kopyalama + gövdeyi iletme (~1 ms). Ücretsiz planın 10 ms sınırı aşılmaz.
+ */
+async function aracilikEt(req: Request, env: Env): Promise<Response> {
+  const url = new URL(req.url);
+  const uzak = uzakAdres(env);
+  if (!uzak || url.pathname === "/api/yapilandirma") return yerelApi(req, env);
+  const govde = req.method === "GET" || req.method === "HEAD" ? undefined : await req.arrayBuffer();
+  let r: Response | null = null;
+  try {
+    r = await fetch(uzak + url.pathname.replace(/^\/api/, "") + url.search, { method: req.method, headers: araciBasliklari(env, req.url, req.headers), body: govde, redirect: "manual" });
+  } catch (e) { console.error("Supabase fonksiyonuna ulaşılamadı, yerelde işleniyor:", e); }
+  if (r && !(await gecitHatasiMi(r))) {
+    const h = new Headers(r.headers); h.delete("content-encoding"); h.delete("content-length");
+    return new Response(r.body, { status: r.status, statusText: r.statusText, headers: h });
+  }
+  if (r) console.error("Supabase fonksiyonu hata verdi (", r.status, "), yerelde işleniyor");
+  return yerelApi(new Request(req.url, { method: req.method, headers: req.headers, body: govde }), env);
+}
+
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     ortamiYukle(env);
-    if (new URL(req.url).pathname.startsWith("/api/")) {
-      try { return await apiIsle(req, env); } catch (e) { hyperdriveHatasiniIsle(e); return json({ hata: "SUNUCU", mesaj: String((e as Error)?.message ?? e).slice(0, 400) }, 500); }
-    }
+    if (new URL(req.url).pathname.startsWith("/api/")) return aracilikEt(req, env);
     return env.ASSETS.fetch(req);
   },
   /**
    * v3.23 — Alan adına gelen e-posta (Cloudflare Email Routing › "Send to a Worker"). İşin tamamı services/gelen.ts › gelenPostaIsle'dedir:
-   * posta açılmadan (.eml) ofisin gelen kutusuna konur. Beklenmeyen hata (veritabanı / depo) geçici sayılır ve gönderene bildirilir.
+   * posta açılmadan (.eml) ofisin gelen kutusuna konur. v3.42 — Supabase fonksiyonuna iletilir; ulaşılamazsa yerelde.
    */
   async email(message: GelenPosta, env: Env): Promise<void> {
     ortamiYukle(env);
-    try { await istekIcinde(veritabaniAdresi(env), () => gelenPostaIsle(prisma, message)); }
-    catch (e) { hyperdriveHatasiniIsle(e); console.error("Gelen e-posta kaydedilemedi:", e); message.setReject("Temporary failure, please retry"); }
+    const uzak = uzakAdres(env);
+    if (uzak) {
+      try {
+        const veri = message.raw instanceof Uint8Array ? message.raw : new Uint8Array(await new Response(message.raw).arrayBuffer());
+        const h = araciBasliklari(env, "https://eposta.local/api" + IC_EPOSTA, { "content-type": "message/rfc822", "x-eposta-from": message.from, "x-eposta-to": message.to, "x-eposta-subject": message.headers.get("subject") ?? "" });
+        const r = await fetch(uzak + IC_EPOSTA, { method: "POST", headers: h, body: veri as unknown as BodyInit });
+        if (!(await gecitHatasiMi(r))) {
+          const j: any = await r.json().catch(() => ({}));
+          if (j?.red) message.setReject(String(j.red));
+          else if (!r.ok) message.setReject("Temporary failure, please retry");
+          return;
+        }
+        return epostaIsle({ ...message, raw: veri, headers: message.headers, setReject: (n: string) => message.setReject(n) }, env);
+      } catch (e) { console.error("E-posta fonksiyona iletilemedi:", e); }
+    }
+    return epostaIsle(message, env);
   },
   async scheduled(ev: { cron: string }, env: Env, ctx: { waitUntil: (p: Promise<unknown>) => void }) {
     ortamiYukle(env);
-    // Zamanlayıcı tüm ofisler için çalışır → platform bağlamı (ofis süzgeci uygulanmaz)
-    ctx.waitUntil(istekIcinde(veritabaniAdresi(env), () => platformOlarak(async () => {
-      if (ev.cron.startsWith("0 3")) {
-        // Supabase Free 7 gün işlem görmeyen projeyi durdurur → günlük küçük sorgu + REST isteği
-        await prisma.$queryRawUnsafe("SELECT 1");
-        await fetch(`${env.SUPABASE_URL.replace(/\/$/, "")}/rest/v1/`, { headers: { apikey: env.SUPABASE_ANON_KEY } }).catch(() => {});
-        await prisma.kayit.updateMany({ where: { durum: "ACTIVE", validUntil: { lt: new Date() } }, data: { durum: "EXPIRED", durumTarihi: new Date() } }); // v3.38
-        // v3.23 — gelen kutusu: 45 günden eski ham dosyalar ve 1 yıldan eski "atlandı" anahtarları
-        await gelenTemizlik(prisma).catch((e) => console.error("Gelen kutusu temizliği:", e));
-      } else if (ev.cron.startsWith("0 4")) {
-        await yedegiDepola(JSON.stringify(await tamYedek(prisma)), env);
-      } else {
-        // v3.21 — Google Kişiler: en uzun süredir eşitlenmeyen ofisler önce; her ofis kendi bağlamında.
-        // v3.22.2 — günde bir ("0 5 * * *"); Google'ın artımlı anahtarıyla yalnızca son eşitlemeden beri değişenler gelir.
-        if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) await tumOfislerdeGoogleSenkron(prisma, { enFazla: 5, butceMs: 12_000 });
+    const uzak = uzakAdres(env);
+    ctx.waitUntil((async () => {
+      if (uzak) {
+        try {
+          const r = await fetch(uzak + IC_ZAMANLAYICI, { method: "POST", headers: araciBasliklari(env, "https://zamanlayici.local/api" + IC_ZAMANLAYICI, { "content-type": "application/json" }), body: JSON.stringify({ cron: ev.cron }) });
+          if (!(await gecitHatasiMi(r))) { if (!r.ok) console.error("Zamanlanmış iş (fonksiyon):", r.status, await r.text().catch(() => "")); return; }
+        } catch (e) { console.error("Zamanlayıcı fonksiyona iletilemedi:", e); }
       }
-    })));
+      await zamanlanmisIs(ev.cron, env);
+    })());
   },
 };
