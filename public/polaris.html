@@ -249,6 +249,19 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--brand);flex:none;
 .krow .lc{font-size:12px;color:var(--muted);white-space:nowrap;text-align:right}
 .krow .an{font-size:11px;font-weight:700;color:var(--brand)}
 .klist{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+/* Kişiler: onay kutuları yalnız "Seç" modunda; açılır öneri kartları; telefon satırdan aranır */
+.klist:not(.selmode) .krow{grid-template-columns:minmax(0,1fr) auto}
+.klist:not(.selmode) .krow>input[type=checkbox]{display:none}
+.krow .sub .kph a{color:var(--brand);font-weight:600;text-decoration:none}
+.krow .sub .rtag.more{--c:var(--muted)}
+.kcards{align-items:start}
+.kdet{padding:0}
+.kdet>summary{display:flex;gap:8px;align-items:center;padding:14px 16px;cursor:pointer;list-style:none;font-weight:700;font-size:16px}
+.kdet>summary::-webkit-details-marker{display:none}
+.kdet>summary::before{content:"▸";color:var(--muted);transition:transform .15s}
+.kdet[open]>summary::before{transform:rotate(90deg)}
+.kdet>.kdbody{padding:0 16px 16px}
+@media (max-width:640px){.krow{padding:13px 12px;min-height:58px}.krow .sub .co{max-width:100%}.sechead h2{font-size:23px}.sechead .row{width:100%}.sechead .row .btn{flex:1;justify-content:center}}
 .rtag{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c);white-space:nowrap}
 .bulk{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:25;margin-top:10px;background:var(--ink);color:var(--surface);border-radius:14px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .bulk select,.bulk button{min-height:36px;border-radius:9px;font-size:13.5px}
@@ -503,10 +516,10 @@ dl.gloss dt{font-weight:700;padding-right:14px}
 
   <!-- KİŞİLER -->
   <section id="tab-kisiler" hidden>
-    <div class="sechead"><div><span class="label">Excel + Notion + Anahtar CRM</span><h2>Kişiler</h2></div><div class="row"><span class="small muted" id="anState"></span><button class="btn ghost" type="button" id="anSync">Anahtar CRM ile eşitle</button><button class="btn ghost" type="button" id="kAddOpen">+ Yeni kişi</button></div></div>
-    <div class="grid2" style="margin-bottom:14px">
-      <div class="card"><h3>Bu hafta arayacağın 10 kişi <span class="spacer"></span><button class="btn sm" type="button" id="kPickBtn">10 kişi öner</button></h3><p class="hint" style="margin-bottom:6px">Rol ve gruba göre seçilir: önce yatırımcılar, satıcılar ve kiraya verenler; önce sıcaklar.</p><ul class="picks" id="kPicks"></ul></div>
-      <div class="card"><h3>Ziyaret zamanı gelen referanslar</h3><p class="hint" style="margin-bottom:6px">İş ortağı rolündeki kişiler (muhasebeci, avukat, bankacı, sigortacı). 30 günü geçen ya da hiç görüşülmeyen önce gelir.</p><ul class="picks" id="kRefs"></ul></div>
+    <div class="sechead"><div><span class="label">Excel + Notion + Anahtar CRM</span><h2>Kişiler</h2><span class="small muted" id="anState"></span></div><div class="row"><button class="btn" type="button" id="kAddOpen">+ Yeni kişi</button><button class="btn ghost" type="button" id="anSync">Anahtar ile eşitle</button></div></div>
+    <div class="grid2 kcards" style="margin-bottom:14px">
+      <details class="card kdet" id="kDetPicks"><summary><span>Bu hafta arayacağın 10 kişi</span><span class="tag" id="kPickN"></span></summary><div class="kdbody"><div class="row" style="margin:0 0 8px"><button class="btn sm" type="button" id="kPickBtn">10 kişi öner</button></div><p class="hint" style="margin-bottom:6px">Telefonu olan, emlakçı olmayan ve son 7 günde aranmamış kişilerden seçilir. Sıra: önce sıcaklar, sonra yatırımcı, satıcı, kiraya verenler. Aynı öncelikteki kişiler her seferinde rastgele gelir; "Karıştır" yeni 10 kişi getirir (bu hafta aradıkların kalır).</p><ul class="picks" id="kPicks"></ul></div></details>
+      <details class="card kdet" id="kDetRefs"><summary><span>Ziyaret zamanı gelen referanslar</span><span class="tag" id="kRefN"></span></summary><div class="kdbody"><p class="hint" style="margin-bottom:6px">"İş ortağı" rolündeki kişiler (muhasebeci, avukat, bankacı, sigortacı). Rolü olmayanlar yalnız kayıtlarında bu mesleklerden biri geçiyorsa gelir; satırda nedeni yazar. Ziyaret süresini Ayarlar'dan değiştirirsin. İstemediğin kişide "Gösterme"ye bas.</p><ul class="picks" id="kRefs"></ul></div></details>
     </div>
     <div class="kbar">
       <div class="row"><input type="search" id="kSearch" placeholder="İsim, telefon, şirket ya da not ara" style="flex:1;min-width:220px"><select id="kSort" aria-label="Sıralama"><option value="ad">Ad A→Z</option><option value="adz">Ad Z→A</option><option value="temas">Son temas</option><option value="oncelik">Arama önceliği</option></select></div>
@@ -518,7 +531,8 @@ dl.gloss dt{font-weight:700;padding-right:14px}
       <div class="fgroup"><span>Grup</span><div class="chips" id="fGrp"></div></div>
       </div></details>
     </div>
-    <div class="row" style="margin:4px 2px 8px"><label class="row small" style="gap:6px"><input type="checkbox" id="kAll"> Görünenleri seç</label><span class="small muted" id="kCount"></span><span class="spacer"></span><button class="link small" type="button" id="kSelAll">Filtredeki tümünü seç</button></div>
+    <div class="row" style="margin:4px 2px 8px"><span class="small muted" id="kCount"></span><span class="spacer"></span><button class="link small" type="button" id="kSelMode">Seç</button></div>
+    <div class="row" id="kSelTools" style="margin:0 2px 8px" hidden><label class="row small" style="gap:6px"><input type="checkbox" id="kAll"> Görünenleri seç</label><span class="spacer"></span><button class="link small" type="button" id="kSelAll">Filtredeki tümünü seç</button></div>
     <div class="klist" id="kList"></div>
     <div class="row" style="justify-content:center;margin-top:10px"><button class="btn ghost" type="button" id="kMore" hidden>Daha fazla göster</button></div>
     <div class="bulk" id="kBulk" hidden></div>
@@ -1617,7 +1631,7 @@ function pickLine(){
   if(!picks.length)return `<div class="small" style="margin-top:8px">Bu haftanın 10 kişisi henüz seçilmedi. <button class="link" type="button" data-kpickgo="1">Şimdi seç</button></div>`;
   const open=picks.filter(k=>!calledSince(k,WEEK_KEY));
   if(!open.length)return '<p class="small" style="margin-top:8px;color:var(--ok);font-weight:600">Bu haftanın listesindeki herkesi aradın.</p>';
-  return `<ul class="mini"><li class="hint" style="border:0">Sıradaki ${Math.min(5,open.length)} kişi · ${picks.length-open.length}/${picks.length} arandı</li>${open.slice(0,5).map(k=>`<li><span class="dot" style="--c:${GR_C[k.g]||'var(--muted)'}"></span><span class="t">${k.t?`<a href="tel:${esc(String(k.t).replace(/[^\d+]/g,''))}">${esc(k.a)}</a>`:esc(k.a)}<span class="sub">${esc(roleText(k))}${k.t?' · '+esc(k.t):''}</span></span><button class="link small" type="button" data-kopen="${esc(k.i)}" data-log="1">Görüştüm</button></li>`).join('')}</ul>`;
+  return `<ul class="mini"><li class="hint" style="border:0;flex-wrap:wrap">Sıradaki ${Math.min(5,open.length)} kişi · ${picks.length-open.length}/${picks.length} arandı<span class="spacer" style="flex:1"></span><button class="link small" type="button" data-pickshuf="1" title="Listeyi rastgele yenile">↻ Karıştır</button></li>${open.slice(0,5).map(k=>`<li><span class="dot" style="--c:${GR_C[k.g]||'var(--muted)'}"></span><span class="t">${k.t?`<a href="tel:${esc(String(k.t).replace(/[^\d+]/g,''))}">${esc(k.a)}</a>`:esc(k.a)}<span class="sub">${esc(roleText(k))}${k.t?' · '+esc(k.t):''}</span></span><span class="acts"><button class="link small" type="button" data-kopen="${esc(k.i)}" data-log="1">Görüştüm</button><button class="link small" type="button" data-pickout="${esc(k.i)}" style="color:var(--muted)" title="Bu hafta listeden çıkar, yerine yenisi gelsin">Çıkar</button></span></li>`).join('')}</ul>`;
 }
 const REF_SH={};
 const REF_LBL={'banka|sigorta':'bankacı ve sigortacılar','muhasebe|smmm|mali|avukat|hukuk|banka':'muhasebeci, avukat ve bankacılar'};
@@ -1628,7 +1642,7 @@ function refLine(pref,key){
   if(REF_SH[key]){const ok=new Set(due.map(k=>k.i));due=REF_SH[key].filter(i=>ok.has(i)).map(i=>K_BY[i])}
   const re=refPrefRe(pref);due=due.slice(0,4);
   if(!due.length)return '<p class="hint" style="margin-top:8px">Ziyaret zamanı gelen tanıdık referans yok.</p>';
-  return `<ul class="mini"><li class="hint" style="border:0;flex-wrap:wrap">Randevu alamazsan: ziyaret zamanı gelen tanıdıkların${pref&&REF_LBL[pref]?' · önce '+REF_LBL[pref]:''}<span class="spacer" style="flex:1"></span><button class="link small" type="button" data-refshuf="${esc(key)}" title="Başka kişiler göster">↻ Yenile</button></li>${due.map(k=>{const m=re&&re.test(refTxt(k));return `<li><span class="dot" style="--c:${m?'var(--ok)':'var(--c-referans)'}"></span><span class="t"><button class="link" type="button" data-kopen="${esc(k.i)}" style="text-align:left">${esc(k.a)}</button><span class="sub">${esc(k.u||roleText(k))}${' · '}${lastContact(k)?'son görüşme '+fmtD(lastContact(k)):'hiç görüşme kaydı yok'}</span></span><span class="acts"><button class="link small" type="button" data-refvisit="${esc(k.i)}">Ziyaret ettim</button><button class="link small" type="button" data-refskip="${esc(k.i)}" style="color:var(--muted)">Sona al</button></span></li>`}).join('')}</ul>`;
+  return `<ul class="mini"><li class="hint" style="border:0;flex-wrap:wrap">Randevu alamazsan: ziyaret zamanı gelen tanıdıkların${pref&&REF_LBL[pref]?' · önce '+REF_LBL[pref]:''}<span class="spacer" style="flex:1"></span><button class="link small" type="button" data-refshuf="${esc(key)}" title="Başka kişiler göster">↻ Yenile</button></li>${due.map(k=>{const m=re&&re.test(refTxt(k));return `<li><span class="dot" style="--c:${m?'var(--ok)':'var(--c-referans)'}"></span><span class="t"><button class="link" type="button" data-kopen="${esc(k.i)}" style="text-align:left">${esc(k.a)}</button><span class="sub">${esc(refWhy(k,re))}${' · '}${lastContact(k)?'son görüşme '+fmtD(lastContact(k)):'hiç görüşme kaydı yok'}</span></span><span class="acts"><button class="link small" type="button" data-refvisit="${esc(k.i)}">Ziyaret ettim</button><button class="link small" type="button" data-refskip="${esc(k.i)}" style="color:var(--muted)">Sona al</button><button class="link small" type="button" data-refhide="${esc(k.i)}" style="color:var(--bad)" title="Bu kişiyi referans listesinde bir daha gösterme">Gösterme</button></span></li>`}).join('')}</ul>`;
 }
 function renderToday(){renderGuide();renderHero();renderBoard();renderResults();renderMentor();renderBadge()}
 
@@ -1785,14 +1799,21 @@ function suggest(k){const l=lastContact(k);if(!l)return['uyuyan','kayıtlı gör
 const roleW=k=>{const r=k.r||[];if(r.includes('yatirimcipp'))return 0;if(r.some(x=>['yatirimci','alsat','satici','kirayaveren'].includes(x)))return 1;if(r.some(x=>['alici','kiraci','muteahhit','firma'].includes(x)))return 2;if(r.includes('isortagi'))return 3;if(r.includes('emlakci'))return 5;return 3};
 const grpW=k=>({sicak:0,ilik:1,soguk:2,uyuyan:3})[k.g||suggest(k)[0]];
 const rank=k=>grpW(k)*3+roleW(k)+(k.t?0:3);
-const refPrefRe=p=>p?new RegExp(p.split('|').map(normTR).join('|')):null;
+/* Anahtar sözcük kelimenin başında aranır ("mali" artık "Kemali" içinde eşleşmez; "mali" yalnız "mali müşavir" demektir). Grup 1 = eşleşen sözcük. */
+const refPrefRe=p=>p?new RegExp('(?:^|[^a-z0-9])('+p.split('|').map(t=>{t=normTR(t).trim();return t==='mali'?'mali\\s*musavir':t}).join('|')+')'):null;
+function refWhy(k,re){
+  if((k.r||[]).includes('isortagi'))return k.u||'İş ortağı';
+  const m=re&&re.exec(refTxt(k));
+  return (k.u?k.u+' · ':'')+(m?'rolü yok, kayıtta "'+m[1]+'" geçiyor':'rolü yok');
+}
 const refTxt=k=>normTR([k.a,k.u,k.n,k.nn,k.uz].join(' '));
 const refEff=k=>{const l=lastContact(k)||'';return k.rs&&k.rs>l?k.rs:l};
 function refDue(pref){const lim=addDays(TODAY,-(+A.refGun||30));const re=refPrefRe(pref);
-  const L=D.kisi.filter(k=>(k.r||[]).includes('isortagi')||(re&&!(k.r||[]).some(r=>r!=='isortagi')&&re.test(refTxt(k)))).filter(k=>{const l=lastContact(k);return !l||l<lim});
+  const L=D.kisi.filter(k=>!k.rx&&((k.r||[]).includes('isortagi')||(re&&!(k.r||[]).some(r=>r!=='isortagi')&&re.test(refTxt(k))))).filter(k=>{const l=lastContact(k);return !l||l<lim});
   const m=re?new Set(L.filter(k=>re.test(refTxt(k))).map(k=>k.i)):new Set();
   return L.sort((a,b)=>(m.has(b.i)-m.has(a.i))||refEff(a).localeCompare(refEff(b)))}
 function refSkip(id){const k=K_BY[id];if(!k)return;k.rs=TODAY;saveK(k);Object.keys(REF_SH).forEach(x=>{REF_SH[x]=REF_SH[x].filter(i=>i!==id).concat(id)});renderToday();if(!$('#tab-kisiler').hidden)renderKisiler();toast(k.a+' listenin sonuna alındı')}
+function refHide(id){const k=K_BY[id];if(!k)return;k.rx=1;saveK(k);Object.keys(REF_SH).forEach(x=>{REF_SH[x]=REF_SH[x].filter(i=>i!==id)});renderToday();if(!$('#tab-kisiler').hidden)renderKisiler();toast(k.a+' referans listesinden çıkarıldı. Geri almak için kişi kartını aç.')}
 function refShuffle(key){const it=ITEMS.find(i=>i.key===key);const pref=typeof it?.refs==='string'?it.refs:'';const re=refPrefRe(pref);const due=refDue(pref);
   const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
   const m=due.filter(k=>re&&re.test(refTxt(k))),o=due.filter(k=>!(re&&re.test(refTxt(k))));
@@ -1812,7 +1833,7 @@ function kMatch(k,skip){
   if(skip!=='grp'&&KF.grp&&(KF.grp==='none'?k.g:k.g!==KF.grp))return false;
   return true;
 }
-let K_FILT=[];
+let K_FILT=[],K_SELMODE=false,K_DET_INIT=false;
 function kFilter(){
   const q=normTR(KF.q.trim());const qd=KF.q.replace(/\D/g,'');
   let L=D.kisi.filter(k=>kMatch(k));
@@ -1838,17 +1859,20 @@ function renderKisiler(){
   $('#fGrp').innerHTML=chipsHTML([['','Tümü'],...GR.map(g=>[g[0],g[1]]),['none','Gruplanmamış']],KF.grp,'grp',cnt('grp',(k,v)=>!v||(v==='none'?!k.g:k.g===v)));
   const L=kFilter();
   $('#kCount').textContent=L.length.toLocaleString('tr-TR')+' kişi'+(K_SEL.size?' · '+K_SEL.size+' seçili':'');
+  if(K_SEL.size)K_SELMODE=true;
+  $('#kList').classList.toggle('selmode',K_SELMODE);$('#kSelTools').hidden=!K_SELMODE;$('#kSelMode').textContent=K_SELMODE?'Seçimi bitir':'Seç';
   $('#kList').innerHTML=L.slice(0,K_SHOW).map(kRow).join('')||'<div class="empty">Bu filtreye uyan kişi yok.</div>';
   $('#kMore').hidden=L.length<=K_SHOW;$('#kMore').textContent='Daha fazla göster ('+(L.length-K_SHOW).toLocaleString('tr-TR')+' kaldı)';
   $('#kAll').checked=L.slice(0,K_SHOW).length>0&&L.slice(0,K_SHOW).every(k=>K_SEL.has(k.i));
   renderBulk();renderPicks();renderRefs();
+  if(!K_DET_INIT){K_DET_INIT=true;const wide=window.matchMedia&&window.matchMedia('(min-width:760px)').matches;$('#kDetPicks').open=wide;$('#kDetRefs').open=wide}
   const n=D.kisi.length,ex=D.kisi.filter(k=>(k.k||[]).includes('excel')).length;
   $('#kNote').textContent=`Toplam ${n.toLocaleString('tr-TR')} kişi: Excel listesi ${ex}, Notion ve Anahtar CRM (16 Ekim dışa aktarımı) birleştirildi. Aynı telefon numarası tek kişi sayıldı ve roller birleştirildi. Kaynak bilgisi Anahtar'ın kayıt numarasından tahmin edildi; Anahtar'daki Google / WhatsApp / Elle sayılarıyla birkaç yüz kişi farklı olabilir.`;
 }
 function kRow(k){
   const sel=K_SEL.has(k.i);const l=lastContact(k);
   const an=anOf(k);
-  return `<div class="krow ${sel?'sel':''}" data-kopen="${esc(k.i)}"><input type="checkbox" data-ksel="${esc(k.i)}" ${sel?'checked':''} aria-label="Seç"><div style="min-width:0"><div class="nm">${k.g?`<span class="dot" style="--c:${GR_C[k.g]};margin-right:6px"></span>`:''}${esc(k.a)}</div><div class="sub"><span class="kph">${esc(k.t||'telefon yok')}</span>${k.u?`<span class="co">${esc(k.u)}</span>`:''}${(k.r||[]).map(r=>`<span class="rtag" style="--c:${ROLE_C[r]}">${ROLE_AD[r]}</span>`).join('')}${an&&(an.tp||an.pf)?`<span class="an">${an.tp?an.tp+' talep':''}${an.tp&&an.pf?' · ':''}${an.pf?an.pf+' portföy':''}</span>`:''}</div></div><div class="lc">${l?fmtDay(l):''}</div></div>`;
+  return `<div class="krow ${sel?'sel':''}" data-kopen="${esc(k.i)}"><input type="checkbox" data-ksel="${esc(k.i)}" ${sel?'checked':''} aria-label="Seç"><div style="min-width:0"><div class="nm">${k.g?`<span class="dot" style="--c:${GR_C[k.g]};margin-right:6px"></span>`:''}${esc(k.a)}</div><div class="sub"><span class="kph">${k.t?`<a href="tel:${esc(String(k.t).replace(/[^\d+]/g,''))}">${esc(k.t)}</a>`:'telefon yok'}</span>${k.u?`<span class="co">${esc(k.u)}</span>`:''}${(k.r||[]).slice(0,2).map(r=>`<span class="rtag" style="--c:${ROLE_C[r]}">${ROLE_AD[r]}</span>`).join('')}${(k.r||[]).length>2?`<span class="rtag more">+${(k.r||[]).length-2}</span>`:''}${an&&(an.tp||an.pf)?`<span class="an">${an.tp?an.tp+' talep':''}${an.tp&&an.pf?' · ':''}${an.pf?an.pf+' portföy':''}</span>`:''}</div></div><div class="lc">${l?fmtDay(l):''}</div></div>`;
 }
 function renderBulk(){
   const b=$('#kBulk');if(!K_SEL.size){b.hidden=true;return}b.hidden=false;
@@ -1857,28 +1881,68 @@ function renderBulk(){
 function bulkApply(fn){const ch=new Set();K_SEL.forEach(id=>{const k=K_BY[id];if(k){fn(k);ch.add(k._c)}});ch.forEach(markChunk);renderKisiler()}
 function renderPicks(){
   const picks=(S.week?.picks||[]).map(id=>K_BY[id]).filter(Boolean);
-  $('#kPicks').innerHTML=picks.length?picks.map(k=>{const ok=calledSince(k,WEEK_KEY);return `<li class="${ok?'ok':''}"><span class="nm">${k.g?`<span class="dot" style="--c:${GR_C[k.g]}"></span> `:''}${esc(k.a)} <span class="hint">${esc(roleText(k))}</span></span><button class="link small" type="button" data-kopen="${esc(k.i)}" ${ok?'':'data-log="1"'}>${ok?'Arandı':'Görüştüm'}</button></li>`}).join(''):'<li class="hint">Henüz seçilmedi. "10 kişi öner"e bas ya da listeden seçip "Bu haftaya ekle" de.</li>';
+  const pb=$('#kPickBtn');if(pb)pb.textContent=picks.length?'↻ Karıştır':'10 kişi öner';
+  const pn=$('#kPickN');if(pn){const dn=picks.filter(k=>calledSince(k,WEEK_KEY)).length;pn.textContent=picks.length?dn+'/'+picks.length+' arandı':'seçilmedi';pn.className='tag '+(picks.length&&dn===picks.length?'ok':'')}
+  $('#kPicks').innerHTML=picks.length?picks.map(k=>{const ok=calledSince(k,WEEK_KEY);return `<li class="${ok?'ok':''}"><span class="nm">${k.g?`<span class="dot" style="--c:${GR_C[k.g]}"></span> `:''}${esc(k.a)} <span class="hint">${esc(roleText(k))}</span></span><span class="acts"><button class="link small" type="button" data-kopen="${esc(k.i)}" ${ok?'':'data-log="1"'}>${ok?'Arandı':'Görüştüm'}</button>${ok?'':`<button class="link small" type="button" data-pickout="${esc(k.i)}" style="color:var(--muted)" title="Bu hafta listeden çıkar, yerine yenisi gelsin">Çıkar</button>`}</span></li>`}).join(''):'<li class="hint">Henüz seçilmedi. "10 kişi öner"e bas ya da listeden seçip "Bu haftaya ekle" de.</li>';
 }
 function renderRefs(){
-  const due=refDue().slice(0,6);
-  $('#kRefs').innerHTML=due.length?due.map(k=>`<li><span class="nm"><button class="link" type="button" data-kopen="${esc(k.i)}" style="text-align:left">${esc(k.a)}</button> <span class="hint">${esc(k.u||'')} · ${lastContact(k)?fmtD(lastContact(k)):'görüşme kaydı yok'}</span></span><span class="acts"><button class="link small" type="button" data-refvisit="${esc(k.i)}">Ziyaret ettim</button><button class="link small" type="button" data-refskip="${esc(k.i)}" style="color:var(--muted)">Sona al</button></span></li>`).join(''):'<li class="hint">Ziyaret zamanı gelen referans yok.</li>';
+  const all=refDue(),due=all.slice(0,6);
+  const rn=$('#kRefN');if(rn){rn.textContent=all.length+' kişi';rn.className='tag '+(all.length?'warn':'ok')}
+  $('#kRefs').innerHTML=due.length?due.map(k=>`<li><span class="nm"><button class="link" type="button" data-kopen="${esc(k.i)}" style="text-align:left">${esc(k.a)}</button> <span class="hint">${esc(refWhy(k,null))} · ${lastContact(k)?fmtD(lastContact(k)):'görüşme kaydı yok'}</span></span><span class="acts"><button class="link small" type="button" data-refvisit="${esc(k.i)}">Ziyaret ettim</button><button class="link small" type="button" data-refskip="${esc(k.i)}" style="color:var(--muted)">Sona al</button><button class="link small" type="button" data-refhide="${esc(k.i)}" style="color:var(--bad)" title="Bu kişiyi referans listesinde bir daha gösterme">Gösterme</button></span></li>`).join(''):'<li class="hint">Ziyaret zamanı gelen referans yok.</li>';
+}
+/* Haftanın 10 kişisi.
+   Adaylar: telefonu var, emlakçı değil, son 7 günde aranmamış, rolü olan ya da Excel listesinden gelen; "Önerme" işaretliler ve bu hafta çıkarılanlar hariç.
+   Sıra: önce grup (sıcak → ılık → soğuk → uyuyan), sonra rol (yatırımcı, satıcı, kiraya veren önde). Aynı öncelikteki kişiler her seferinde rastgele dizilir. */
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function pickPool(excl){
+  const out=new Set(S.week?.out||[]);const since=addDays(TODAY,-7);
+  return D.kisi.filter(k=>k.t&&!k.px&&!out.has(k.i)&&!(excl&&excl.has(k.i))&&roleW(k)<5&&!calledSince(k,since)&&((k.r||[]).length||(k.k||[]).includes('excel')));
+}
+function pickBest(n,excl){
+  const by={};pickPool(excl).forEach(k=>{(by[rank(k)]=by[rank(k)]||[]).push(k)});
+  return Object.keys(by).map(Number).sort((a,b)=>a-b).flatMap(r=>shuf(by[r])).slice(0,n);
 }
 function pickTen(){
-  const L=D.kisi.filter(k=>k.t&&roleW(k)<5&&!calledSince(k,addDays(TODAY,-7))&&((k.r||[]).length||(k.k||[]).includes('excel'))).sort((a,b)=>rank(a)-rank(b)).slice(0,10);
-  S.week={...(S.week||{week:WEEK_KEY,answers:{}}),picks:L.map(k=>k.i)};saveDoc('weeks',WEEK_KEY,S.week);renderKisiler();renderToday();toast('Bu haftanın 10 kişisi seçildi');
+  const cur=(S.week?.picks||[]).map(id=>K_BY[id]).filter(Boolean);
+  const kept=cur.filter(k=>calledSince(k,WEEK_KEY));            /* bu hafta aranmışlar listede kalır */
+  const drop=new Set(cur.map(k=>k.i));                           /* eski liste yeniden gelmesin */
+  const fresh=pickBest(Math.max(0,10-kept.length),drop);
+  S.week={...(S.week||{week:WEEK_KEY,answers:{}}),picks:[...kept,...fresh].map(k=>k.i)};saveDoc('weeks',WEEK_KEY,S.week);renderKisiler();renderToday();
+  toast(cur.length?'Liste karıştırıldı: yeni kişiler geldi':'Bu haftanın 10 kişisi seçildi');
 }
-let K_OPEN=null,K_LOGOPEN=false;
+function pickOut(id){
+  const k=K_BY[id];S.week={...(S.week||{week:WEEK_KEY,answers:{}})};
+  S.week.picks=(S.week.picks||[]).filter(i=>i!==id);S.week.out=[...new Set([...(S.week.out||[]),id])];
+  const nx=pickBest(1,new Set(S.week.picks))[0];if(nx)S.week.picks.push(nx.i);
+  saveDoc('weeks',WEEK_KEY,S.week);renderKisiler();renderToday();
+  toast((k?k.a:'Kişi')+' bu haftanın listesinden çıkarıldı'+(nx?' · yerine '+nx.a+' geldi':''));
+}
+let K_OPEN=null,K_LOGOPEN=false;const K_AI={};
+/* AI ile arama hazırlığı: kişinin rolü, grubu, notları ve son görüşmeleriyle kısa bir açılış cümlesi, 3 soru ve tek hedef üretir. Ad ve telefon gönderilmeden maskelenir. */
+async function kAiPrep(id){
+  const k=K_BY[id];if(!k)return;
+  if(!SAMPLE){toast('Yapay zekâ şu an kullanılamıyor');return}
+  const box=$('#kAiOut');box.hidden=false;box.textContent='Hazırlanıyor…';
+  const an=anOf(k)||{};const [sg,why]=suggest(k);
+  const son=(k.lg||[]).slice(-3).map(x=>fmtD(x.t)+': '+(x.not||'görüşüldü')).join('\n');
+  const prompt='Ben Antalya\'da yalnızca ticari ve sanayi mülkleriyle çalışan bir gayrimenkul danışmanıyım. Şu kişiyi arayacağım; kısa ve net bir arama hazırlığı yaz.\n'
+   +'Kişi: '+k.a+'\nRol: '+roleText(k)+'\nŞirket / iş: '+(k.u||'-')+'\nGrup: '+GR_AD[k.g||sg]+' ('+why+')\nAnahtar CRM: '+(an.tp||0)+' talep, '+(an.pf||0)+' portföy\nNot: '+((k.n||'')+' '+(k.nn||'')).trim()+'\nSon görüşmeler:\n'+(son||'kayıt yok')
+   +'\n\nŞunu ver: 1) 15 saniyelik açılış cümlesi, 2) sorulacak 3 kısa soru, 3) bu aramadan istenen tek sonuç. Toplam 120 kelimeyi geçme, başlık kullanma, numaralandır.';
+  try{const r=await SAMPLE(prompt,{cache:false});K_AI[id]=r.text}catch(e){K_AI[id]='Yapay zekâ şu an cevap vermedi: '+((e&&(e.message||e.text))||'hata')}
+  const b=$('#kAiOut');if(K_OPEN===id&&b){b.hidden=false;b.textContent=K_AI[id]}
+}
 function openKisi(id,log){
   const k=K_BY[id];if(!k)return;K_OPEN=id;K_LOGOPEN=!!log;
   $('#pbGroup').textContent=roleText(k);$('#pbTitle').textContent=k.a;
   const tel=k.t||'';const wa=waNum(tel);const [sg,why]=suggest(k);const l=lastContact(k);
   const rows=[['Kaynak',(k.k||[]).map(s=>(SRCS.find(x=>x[0]===s)||[0,s])[1]).join(', ')],['Anahtar kayıt no',k.ax],['Ziyaret tarihi (Excel)',k.z&&fmtD(k.z)],['Tel. ile son arama (Excel)',k.ar&&fmtD(k.ar)],['Yatırımcı-Alsat (Excel)',k.y],['Anahtar son iletişim',k.sl&&fmtD(k.sl)],['2026 işlemleri (Excel)',(k.is||[]).map(fmtD).join(', ')],['Notion notu',k.nn],['Eklenme',k.ek&&fmtD(k.ek)]].filter(r=>r[1]);
   const picked=(S.week?.picks||[]).includes(id);
-  let h=`<div class="kact" style="margin:6px 0 12px">${tel?`<a class="call" href="tel:${esc(tel.replace(/[^\d+]/g,''))}">Ara · ${esc(tel)}</a>${wa?`<a href="https://wa.me/${wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}`:''}<button type="button" class="primary" data-klog="1">Görüştüm</button><button type="button" data-kpick="${esc(id)}">${picked?'Bu haftadan çıkar':'Bu haftaya ekle'}</button></div>`;
+  let h=`<div class="kact" style="margin:6px 0 12px">${tel?`<a class="call" href="tel:${esc(tel.replace(/[^\d+]/g,''))}">Ara · ${esc(tel)}</a>${wa?`<a href="https://wa.me/${wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}`:''}<button type="button" class="primary" data-klog="1">Görüştüm</button><button type="button" data-kpick="${esc(id)}">${picked?'Bu haftadan çıkar':'Bu haftaya ekle'}</button>${SAMPLE?'<button type="button" data-kaiprep="1">AI ile arama hazırlığı</button>':''}</div><div id="kAiOut" class="past" style="white-space:pre-wrap;margin:0 0 12px" ${K_AI[id]?'':'hidden'}>${esc(K_AI[id]||'')}</div>`;
   if(K_LOGOPEN)h+=`<div class="card" style="background:var(--sunk);box-shadow:none;margin-bottom:12px"><label class="label" for="lf-not">Ne konuştunuz? Sonraki adım?</label><textarea id="lf-not" rows="3" style="margin-top:6px"></textarea><label class="row small" style="margin-top:8px;gap:8px"><input type="checkbox" id="lf-say" checked> Bugünün sonuçlarına +1 ekle: <select id="lf-met" style="min-height:34px">${['sahip','musteri','referans'].map(m=>`<option value="${m}" ${defaultMet(k)===m?'selected':''}>${MET_ID[m].ad}</option>`).join('')}</select></label><label class="row small" style="margin-top:6px;gap:8px"><input type="checkbox" id="lf-task"> Takip görevi oluştur: <input type="date" id="lf-date" value="${addDays(TODAY,7)}" style="width:auto;min-height:34px"></label><div class="row" style="margin-top:10px"><button class="btn sm" type="button" data-klogsave="1">Kaydet</button><button class="btn ghost sm" type="button" data-klogcancel="1">Vazgeç</button></div></div>`;
   if(k.ol&&!k.es)h+=`<div class="past" style="background:var(--warn-soft)">Notion'da olası eşleşme: <b>${esc(k.ol.ad)}</b>${k.ol.tel?' · '+esc(k.ol.tel):''}. ${esc(k.ol.neden||'')} <div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-kmatch="1">Aynı kişi</button><button class="btn ghost sm" type="button" data-kmatch="0">Değil</button></div></div>`;
   h+=`<h5>Grup</h5><div class="gseg" role="group" aria-label="Grup">${GR.map(g=>`<button type="button" style="--c:${g[2]}" data-kgrp="${g[0]}" aria-pressed="${k.g===g[0]}">${g[1]}</button>`).join('')}</div><p class="hint" style="margin-top:6px">${k.ga&&k.g?'Grup otomatik verildi. ':''}Öneri: ${GR_AD[sg]} (${esc(why)})</p>`;
   h+=`<h5>Roller</h5><div class="rolepick">${ROLES.map(r=>`<button type="button" style="--c:${r[2]}" data-krol="${r[0]}" aria-pressed="${(k.r||[]).includes(r[0])}">${r[1]}</button>`).join('')}</div>`;
+  h+=`<h5>Öneri listeleri</h5><div class="kact"><button type="button" data-ktog="px" aria-pressed="${!!k.px}">${k.px?'✓ Haftalık aramalarda gösterme':'Haftalık aramalarda gösterme'}</button><button type="button" data-ktog="rx" aria-pressed="${!!k.rx}">${k.rx?'✓ Referans listesinde gösterme':'Referans listesinde gösterme'}</button></div><p class="hint" style="margin-top:6px">İşaretlersen bu kişi "Bu hafta arayacağın 10 kişi" ya da "Ziyaret zamanı gelen referanslar" önerilerinde çıkmaz. Kişi silinmez; işareti kaldırınca geri gelir.</p>`;
   const fi=(id,l,v,ty,cl)=>`<label class="${cl||''}">${l}<input type="${ty||'text'}" id="ke-${id}" value="${esc(v||'')}"></label>`;
   h+=`<h5>Bilgiler</h5><div class="kedit">${fi('a','Ad soyad',k.a,'text','full')}${fi('t','Telefon',k.t,'tel')}${fi('t2','İkinci telefon',k.t2,'tel')}${fi('e','E-posta',k.e,'email')}${fi('u','Şirket / iş',k.u)}${fi('l','Konum',k.l)}${fi('uz','Uzmanlık',k.uz)}<label class="full">Not<textarea id="ke-n" rows="3">${esc(k.n||'')}</textarea></label></div><div class="row" style="margin-top:8px"><button class="btn sm" type="button" data-ksave="1">Bilgileri kaydet</button><span class="small muted" id="keState"></span></div>`;
   h+=rows.length?`<dl class="kv" style="margin-top:12px">${rows.map(r=>`<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join('')}</dl>`:'';
@@ -2209,7 +2273,7 @@ document.addEventListener('click',async e=>{
   const grp=e.target.closest('[data-plgrp]');if(grp){const k=grp.dataset.plgrp;OPEN[k]=!OPEN[k];if(k.startsWith('p26'))renderPL();else renderArsiv();return}
   const ie=e.target.closest('[data-iedit]');if(ie&&!e.target.closest('button[data-iedit]')){openIslem(ie.dataset.iedit);return}
   if(e.target.matches('[data-ksel]')){const id=e.target.dataset.ksel;e.target.checked?K_SEL.add(id):K_SEL.delete(id);e.target.closest('.krow').classList.toggle('sel',e.target.checked);$('#kCount').textContent=K_FILT.length.toLocaleString('tr-TR')+' kişi'+(K_SEL.size?' · '+K_SEL.size+' seçili':'');renderBulk();return}
-  const kr=e.target.closest('.krow[data-kopen]');if(kr&&!e.target.closest('input')){openKisi(kr.dataset.kopen);return}
+  const kr=e.target.closest('.krow[data-kopen]');if(kr&&!e.target.closest('input,a')){openKisi(kr.dataset.kopen);return}
   const b=e.target.closest('button');if(!b)return;const d=b.dataset;
   if(d.tab){showTab(d.tab);return}
   if(d.tabgo){closeDrawer();showTab(d.tabgo);window.scrollTo({top:0});return}
@@ -2241,6 +2305,11 @@ document.addEventListener('click',async e=>{
   if(d.kpickgo){showTab('kisiler');pickTen();return}
   if(d.refvisit){refVisit(d.refvisit);toast('Ziyaret kaydedildi');return}
   if(d.refskip){refSkip(d.refskip);return}
+  if(d.refhide){refHide(d.refhide);return}
+  if(d.pickshuf){pickTen();return}
+  if(d.kaiprep){if(K_OPEN)kAiPrep(K_OPEN);return}
+  if(d.pickout){pickOut(d.pickout);return}
+  if(d.ktog){const kk=K_BY[K_OPEN];if(kk){if(kk[d.ktog])delete kk[d.ktog];else kk[d.ktog]=1;saveK(kk);openKisi(kk.i);renderKisiler();renderToday()}return}
   if(d.refshuf){refShuffle(d.refshuf);return}
   if(d.ik!=null){IF.k=d.ik;renderIslemler();return}
   if(d.ay){AY=d.ay;renderArsiv();return}
@@ -2301,6 +2370,7 @@ document.addEventListener('click',e=>{
   if(id==='kSelAll'){K_FILT.forEach(k=>K_SEL.add(k.i));renderKisiler()}
   if(id==='kMore'){K_SHOW+=100;renderKisiler()}
   if(id==='kPickBtn')pickTen();
+  if(id==='kSelMode'){K_SELMODE=!K_SELMODE;if(!K_SELMODE)K_SEL.clear();renderKisiler();return}
   if(id==='kAddOpen'){$('#kAddForm').reset();$('#na-rol').innerHTML=ROLES.map(r=>`<button type="button" style="--c:${r[2]}" data-narol="${r[0]}" aria-pressed="false">${r[1]}</button>`).join('');$('#kAddModal').hidden=false;$('#na-ad').focus()}
   if(e.target.dataset?.narol){e.target.setAttribute('aria-pressed',e.target.getAttribute('aria-pressed')==='true'?'false':'true')}
   if(id==='wPrev')loadWeek(addDays(S.wk,-7));
