@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -42,7 +42,7 @@ import { AnahtarDugmesi, Izleme, favTalep, favPortfoy, favEslesme } from "./favo
 import { kopmaEtiket } from "../src/lib/eslestirme/kopar";
 import { IletisimDugmeleri } from "./kisiler";
 import { selamMetni } from "../src/lib/iletisim";
-import { FiltrePaneli, bosFiltre, filtreUygula, SiralaDugmesi, kayitSiralama, siralaUygula, type Filtre, type Siralama } from "./filtre";
+import { FiltrePaneli, bosFiltre, filtreUygula, eslesmeFiltreUygula, eslesmeSiralama, SiralaDugmesi, kayitSiralama, siralaUygula, type Filtre, type Siralama } from "./filtre";
 import { useKalici, kaliciSil } from "./kalici";
 import { HizliSecici, HizliMenu, SkorSecici } from "./hizli-filtre";
 import { Kisiler, KisiKarti, KisiSecici, KAYIT_ROLLERI, rolleriUygula } from "./kisiler";
@@ -408,15 +408,8 @@ function Eslesmeler() {
   const kisiAd = (id: string) => d.kisiler.find((k) => k.id === id)?.adSoyad ?? "";
   const kisiRol = (id: string) => d.kisiler.find((k) => k.id === id)?.roller ?? [];
   const es = hepsi.filter((e) => {
-    const ara = f.ara.toLocaleLowerCase("tr");
-    if (ara && !`${baslikOf(e.t.veri)} ${baslikOf(e.p.veri)} ${e.t.veri.gondeAdi ?? ""} ${e.p.veri.gondeAdi ?? ""} ${[...e.t.veri.lokasyonlar, ...e.p.veri.lokasyonlar].map(lokEtiket).join(" ")}`.toLocaleLowerCase("tr").includes(ara)) return false;
-    // v3.33 — mülk türü ve işlem PORTFÖYE (önerilen mülke) uygulanır: "Daire / Dükkan" seçiliyken "Depo/Mağaza" talebine önerilen depo
-    // görünüyordu (talebin alternatif tipi Dükkan olduğu için talep tarafı süzgeçten geçiyordu). Portföyün kendi tipi esas alınır.
-    if (f.aileler.length && !f.aileler.includes(aileOf(e.p.veri.mulkTipi as any).kod)) return false;
-    if (f.islemler.length && !f.islemler.some((i) => String(e.p.veri.islemTipi).includes(i))) return false;
-    // v3.16: diğer süzgeçler iki tarafa birden uygulanır (talep ya da portföy tutarsa)
-    const f2 = { ...f, ara: "", aileler: [], islemler: [] };
-    if (!filtreUygula(e.p.veri, f2, kisiAd, kisiRol) && !filtreUygula(e.t.veri, f2, kisiAd, kisiRol)) return false;
+    // v3.43 — ortak kural filtre.tsx'te (İzleme ekranı da aynısını kullanır)
+    if (!eslesmeFiltreUygula(e.t.veri, e.p.veri, f, kisiAd, kisiRol)) return false;
     if (minSkor && e.s.seviye < minSkor) return false;
     if (takip.length && !takip.includes(d.eslesmeNotlari[eKey(e.t.id, e.p.id)]?.durum ?? "YENI")) return false;
     return true;
@@ -427,18 +420,8 @@ function Eslesmeler() {
   const say = (x: Uygunluk) => es.filter((e) => !kopukMu(e) && e.s.uygunluk === x).length;
   const firsatSay = (k: FirsatKademe) => es.filter((e) => !kopukMu(e) && e.s.uygunluk !== "UYGUN_DEGIL" && e.f.kademe === k).length;
   const kopukSay = es.filter(kopukMu).length;
-  const tn = (x?: unknown) => (x ? new Date(x as any).getTime() || null : null);
-  const esSecenek: import("../src/lib/siralama").SiralamaSecenegi<Eslesme>[] = [
-    // v3.19 — varsayılan: uygunluk → fırsat kademesi (sahibinden ↔ müşteri önde) → skor
-    { alan: "firsat", etiket: "Fırsat önceliği", deger: (e) => (e.s.uygunluk === "SUNULABILIR" ? 2 : e.s.uygunluk === "KOSULLU" ? 1 : 0) * 1e7 + e.s.seviye * 1e6 /* v3.36 */ + e.f.sira * 1e3 + e.s.skor, varsayilanYon: "azalan" },
-    { alan: "komisyon", etiket: "Tahmini komisyon", deger: (e) => e.f.tahminiKomisyon ?? null, varsayilanYon: "azalan" },
-    { alan: "skor", etiket: "Uyum (en iyi önce)", deger: (e) => e.s.seviye * 1e6 + e.s.skor * 1e3 + e.f.sira, varsayilanYon: "azalan" }, // v3.38 — seviye → skor → fırsat
-    { alan: "fiyat", etiket: "Portföy fiyatı", deger: (e) => e.p.veri.fiyat ?? null, varsayilanYon: "azalan" },
-    { alan: "butce", etiket: "Talep bütçesi", deger: (e) => e.t.veri.maxFiyat ?? null, varsayilanYon: "azalan" },
-    { alan: "m2", etiket: "m²", deger: (e) => e.p.veri.m2 ?? null, varsayilanYon: "azalan" },
-    { alan: "giris", etiket: "Kayda giriş", deger: (e) => Math.max(tn(e.t.olusturma) ?? 0, tn(e.p.olusturma) ?? 0), varsayilanYon: "azalan" },
-    { alan: "sure", etiket: "Talebin kalan süresi", deger: (e) => tn(e.t.veri.validUntil), varsayilanYon: "artan" },
-  ];
+  // v3.43 — sıralama seçenekleri filtre.tsx'te ortaklaştı (İzleme ekranı da aynısını kullanır)
+  const esSecenek = eslesmeSiralama() as import("../src/lib/siralama").SiralamaSecenegi<Eslesme>[];
   const temel = es.filter((e) => (!fk || e.f.kademe === fk) && kiminUyar(e, kimin) && (u === "KOPUK" ? kopukMu(e) : !kopukMu(e) && (u === "TUMU" || (u === "UYGUN" ? e.s.uygunluk !== "UYGUN_DEGIL" : e.s.uygunluk === u))));
   const temel2 = temel;
   // v3.38 — talep başına en iyi N: her talebin eşleşmeleri uyuma göre (seviye → skor → fırsat) dizilir, ilk N listede kalır; gerisi talebin detayında

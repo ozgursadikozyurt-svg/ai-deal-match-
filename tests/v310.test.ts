@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * v3.10 — para simgeleri, güven kuralı, telefon standardı, çoklu mülk tipi, Türkiye geneli konum,
  * yapay zekâ ayarları + sağlayıcı istemcisi, portföy föyü (metin + PDF), fotoğraf kuralları ve depo istemcisi.
  */

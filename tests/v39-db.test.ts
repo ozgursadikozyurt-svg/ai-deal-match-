@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * v3.9 — veritabanlı: POST /api/ai/yorumla veritabanındaki lokasyon indeksiyle metni yorumlar, kayıt açmaz.
  */
 import { test } from "node:test";

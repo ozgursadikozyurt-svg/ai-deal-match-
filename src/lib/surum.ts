@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.42";
-export const TARIH = "23 Ekim 2026";
+export const SURUM = "3.43";
+export const TARIH = "25 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.42_23Ekim2026";
+export const DOSYA_EKI = "v3.43_25Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,25 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.43",
+    tarih: "25 Ekim 2026",
+    baslik: "İzleme ekranına ayrıntılı arama + filtre; sade \"Sırala\" düğmesi; eşleşme kartında kıyas şeridi; tüm ekranlarda mobil sağlamlaştırma",
+    degisenler: [
+      "İzleme ekranı artık diğer listeler gibi: üstte arama kutusu, \"Filtrele\" paneli (mülk türü, işlem, konum, fiyat, alan, oda, kişi, kaynak…) ve \"Sırala\". Sekme sayıları (Talepler / Portföyler / Eşleşmeler) filtreye göre güncellenir; başlıkta \"3 / 12 kayıt\" yazar.",
+      "İzlemede filtre taleplere ve portföylere doğrudan, eşleşmelere Eşleşmeler ekranındaki kuralla uygulanır (mülk türü ve işlem portföye bakar, arama iki tarafı birden tarar). Kural tek yerde toplandı, iki ekran aynı kodu kullanıyor.",
+      "Sıralama düğmesi artık seçili sıralamanın uzun adını yazmıyor (\"↓ Uyum (en iyi önce)\" dar ekranda filtre çubuğunu taşırıyor ve kırpılıyordu). Düğme sade \"↓ Sırala\"; seçili seçenek menünün başında yazılı ve listede ✓ işaretli, varsayılandan farklıysa düğme vurgulanıyor. \"Uyum (en iyi önce)\" eşleşme sıralamasının ilk ve varsayılan seçeneği.",
+      "Eşleşme kartında KIYAS ŞERİDİ: belirleyici ölçütler \"istenen → olan\" biçiminde yan yana, farkıyla birlikte — Bütçe (bütçe içinde / %12 üstünde), Alan (aralıkta / %20 küçük), Oda, Kat. Eskiden bu karşılaştırmayı kullanıcı iki bloğa bakıp kafadan yapıyordu.",
+      "Eşleşme kartı içerik: talep tarafında aciliyet ve kalan süre (\"5 gün kaldı\", 3 günden azsa kırmızı); taraf etiketlerinde \"müşteri istiyor\" / \"önerilen mülk\"; \"Not var\" rozeti yerine notun kendisi ve son hareketin tazeliği (\"3 gün önce\").",
+      "Mobil: sayfa hiçbir ekranda yana kaymıyor (overflow-x:clip — kaydırma kutusu yaratmadığından yapışkan toplu işlem çubuğu çalışmaya devam eder), uzun metinler (bağlantı, e-posta, ilan no, mahalle listesi) kutuyu taşırmıyor, kapat / anahtar / çip silme düğmeleri parmakla tutulacak boyutta, 360 px telefonlar için ayrı sıkışık düzen.",
+    ],
+    testEt: [
+      "İzleme: üstte arama ve \"Filtrele\" görünmeli; bir kelime yazın, listedeki kayıtlar ve sekme sayıları azalmalı, başlıkta \"n / toplam kayıt\" çıkmalı.",
+      "Eşleşmeler: filtre çubuğundaki düğme \"↓ Sırala\" yazmalı; basınca menüde en üstte \"Uyum (en iyi önce)\" ✓ işaretli olmalı.",
+      "Eşleşme kartı: Talep ve Portföy bloklarının altında Bütçe / Alan satırları çıkmalı; bütçeyi aşan bir portföyde \"%… üstünde\" kırmızı yazmalı.",
+      "Telefonda Ana Sayfa, Talepler, Portföyler, Eşleşmeler, İzleme, Kişiler, Veri Girişi, Görevler ve Ayarlar'ı gezin: hiçbirinde sayfa sağa sola kaymamalı.",
+    ],
+  },
   {
     surum: "3.42",
     tarih: "23 Ekim 2026",

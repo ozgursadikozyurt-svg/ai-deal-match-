@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * İŞLEMLER — kapanan satış / kiralama ve komisyon (yalnızca ofis yöneticisi: islem.yonet).
  * P&L kuralı: "bana kalan" tahsilat ayına yazılır; tahsilat tarihi boşsa "bekleyen" (src/lib/domain/islem.ts).
  * Canlıda /api/islemler; demoda örnek veri (kalıcı değil). Polaris'ten taşınan satırlarda "Polaris" etiketi görünür.

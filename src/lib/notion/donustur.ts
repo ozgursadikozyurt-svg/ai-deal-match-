@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Notion API sayfası → Anahtar taslağı (kişi / portföy / talep). Veritabanısız, saf fonksiyonlar;
  * demo ve sunucu senkron işi aynı kodu kullanır. Enum çevirileri: ./eslestirme.ts
  */

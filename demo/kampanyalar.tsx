@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * KAMPANYALAR — Yönetim'de kampanya listesi + elle aylık harcama; kayıt formunda kampanya seçimi için ad listesi.
  * Basit bağ: kayıt kampanyaya `ilkKaynakDetay` = kampanya adı ile bağlanır (servis: src/lib/services/kampanya.ts). Ad değişmez, kampanya "kapatılır".
  * Canlıda /api/kampanyalar; demoda örnek veri (kalıcı değil).

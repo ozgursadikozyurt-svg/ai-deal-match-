@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Demo — ortak filtre paneli (Talepler, Portföyler, Eşleşmeler, talep içi portföy çekmecesi).
  * Her alan çoklu seçim. Mülk türü seçilince o türe özel filtreler çıkar (ONEMLI_ALANLAR).
  * v3.5 — Kompakt: ekranda tek satır (arama · Acil · Filtrele rozeti) + tek satır kayan aktif çipler.
@@ -102,6 +102,26 @@ export function filtreUygula(v: Veri, f: Filtre, kisiAd?: (id: string) => string
   }
   return true;
 }
+/**
+ * v3.43 — Eşleşmeye filtre uygulama (Eşleşmeler ve İzleme ekranları aynı kuralı kullanır).
+ * Arama iki tarafta birden aranır; mülk türü ve işlem PORTFÖYE (önerilen mülke) uygulanır;
+ * kalan süzgeçler taraflardan biri tutarsa geçer.
+ */
+export function eslesmeFiltreUygula(
+  t: Veri, p: Veri, f: Filtre,
+  kisiAd?: (id: string) => string, kisiRol?: (id: string) => string[], sahip?: (v: Veri) => Sahiplik | null,
+): boolean {
+  const ara = f.ara.toLocaleLowerCase("tr");
+  if (ara) {
+    const metin = `${baslikOf(t)} ${baslikOf(p)} ${t.gondeAdi ?? ""} ${p.gondeAdi ?? ""} ${[...t.lokasyonlar, ...p.lokasyonlar].map(lokEtiket).join(" ")} ${(t.kisiler ?? []).concat(p.kisiler ?? []).map((b) => kisiAd?.(b.kisiId) ?? "").join(" ")} ${t.portalIlanNo ?? ""} ${p.portalIlanNo ?? ""}`;
+    if (!metin.toLocaleLowerCase("tr").includes(ara)) return false;
+  }
+  if (f.aileler.length && !f.aileler.includes(aileOf(p.mulkTipi as any).kod)) return false;
+  if (f.islemler.length && !f.islemler.some((i) => String(p.islemTipi).includes(i))) return false;
+  const f2 = { ...f, ara: "", aileler: [], islemler: [] };
+  return filtreUygula(p, f2, kisiAd, kisiRol, sahip) || filtreUygula(t, f2, kisiAd, kisiRol, sahip);
+}
+
 export const aktifFiltreSayisi = (f: Filtre) => f.aileler.length + f.islemler.length + f.konumlar.length + f.durumlar.length + f.kisiler.length + f.kanallar.length + f.odalar.length + (f.fiyatMin != null ? 1 : 0) + (f.fiyatMax != null ? 1 : 0) + (f.m2Min != null ? 1 : 0) + (f.m2Max != null ? 1 : 0) + (f.acil ? 1 : 0) + (f.takas ? 1 : 0) + (f.roller ?? []).length + (f.sahiplik ? 1 : 0) + Object.values(f.ozellik).filter((v) => v != null && v !== "" && !(Array.isArray(v) && !v.length)).length;
 
 function CokluCip({ secenekler, secili, degis, ton }: { secenekler: [string, string, number?][]; secili: string[]; degis: (x: string[]) => void; ton?: (k: string) => string }) {
@@ -224,17 +244,22 @@ import { sirala as siralaUygula, yonEtiket, type Siralama, type SiralamaSecenegi
 export { siralaUygula, type Siralama };
 import type { Kayit, Kisi } from "./depo";
 
-/** Filtre çubuğundaki "Sırala" düğmesi: alan seçilir, yön (büyükten küçüğe / küçükten büyüğe) değiştirilir */
+/**
+ * Filtre çubuğundaki "Sırala" düğmesi: alan seçilir, yön (büyükten küçüğe / küçükten büyüğe) değiştirilir.
+ * v3.43 — düğme artık seçili sıralamanın uzun adını ("↓ Uyum (en iyi önce)") yazmaz; dar ekranda filtre
+ * çubuğunu taşırıyordu. Düğme sade "Sırala"; seçili seçenek menünün içinde ✓ ile işaretli ve üstte yazılı.
+ */
 export function SiralaDugmesi<T>({ secenekler, s, set }: { secenekler: SiralamaSecenegi<T>[]; s: Siralama; set: (s: Siralama) => void }) {
   const [acik, setAcik] = useState(false);
   const sec = secenekler.find((x) => x.alan === s.alan) ?? secenekler[0];
+  const varsayilan = sec.alan === secenekler[0].alan && s.yon === secenekler[0].varsayilanYon;
   return <div className="sirala">
-    <button type="button" className="fc-btn sirala-btn" onClick={() => setAcik(!acik)} aria-haspopup="menu" aria-expanded={acik} title={`Sıralama: ${sec.etiket}, ${yonEtiket(sec.alan, s.yon)}`}>
-      <span aria-hidden="true">{s.yon === "azalan" ? "↓" : "↑"}</span> <span className="sirala-et">{sec.etiket}</span>
+    <button type="button" className={cx("fc-btn sirala-btn", !varsayilan && "on")} onClick={() => setAcik(!acik)} aria-haspopup="menu" aria-expanded={acik} title={`Sıralama: ${sec.etiket}, ${yonEtiket(sec.alan, s.yon)}`}>
+      <span aria-hidden="true">{s.yon === "azalan" ? "↓" : "↑"}</span> <span className="sirala-et">Sırala</span>
     </button>
     {acik && <><div className="sirala-perde" onClick={() => setAcik(false)} />
       <div className="sirala-menu" role="menu">
-        <div className="sirala-baslik">Sırala</div>
+        <div className="sirala-baslik">Sırala<small>{sec.etiket} · {yonEtiket(sec.alan, s.yon)}</small></div>
         {secenekler.map((x) => <button type="button" key={x.alan} role="menuitemradio" aria-checked={x.alan === s.alan} className={cx("sirala-oge", x.alan === s.alan && "on")} onClick={() => set(x.alan === s.alan ? s : { alan: x.alan, yon: x.varsayilanYon })}>{x.etiket}{x.alan === s.alan && <span aria-hidden="true">✓</span>}</button>)}
         <div className="uc sirala-yon">{(["azalan", "artan"] as Yon[]).map((y) => <button type="button" key={y} className={cx(s.yon === y && "on")} onClick={() => { set({ ...s, yon: y }); setAcik(false); }}>{y === "azalan" ? "↓ " : "↑ "}{yonEtiket(sec.alan, y)}</button>)}</div>
       </div></>}
@@ -257,6 +282,24 @@ export function kayitSiralama(tip?: "TALEP" | "PORTFOY"): SiralamaSecenegi<Kayit
   l.push({ alan: "baslik", etiket: "Başlık", deger: (k) => k.veri.baslik ?? null, varsayilanYon: "artan" });
   return l;
 }
+/**
+ * v3.43 — Eşleşme sıralama seçenekleri (Eşleşmeler ve İzleme ekranları ortak kullanır).
+ * İlk seçenek varsayılandır: uyum (seviye → skor → fırsat).
+ */
+export function eslesmeSiralama(): SiralamaSecenegi<EslesmeGibi>[] {
+  return [
+    { alan: "skor", etiket: "Uyum (en iyi önce)", deger: (e) => e.s.seviye * 1e6 + e.s.skor * 1e3 + e.f.sira, varsayilanYon: "azalan" },
+    { alan: "firsat", etiket: "Fırsat önceliği", deger: (e) => (e.s.uygunluk === "SUNULABILIR" ? 2 : e.s.uygunluk === "KOSULLU" ? 1 : 0) * 1e7 + e.s.seviye * 1e6 + e.f.sira * 1e3 + e.s.skor, varsayilanYon: "azalan" },
+    { alan: "komisyon", etiket: "Tahmini komisyon", deger: (e) => e.f.tahminiKomisyon ?? null, varsayilanYon: "azalan" },
+    { alan: "fiyat", etiket: "Portföy fiyatı", deger: (e) => e.p.veri.fiyat ?? null, varsayilanYon: "azalan" },
+    { alan: "butce", etiket: "Talep bütçesi", deger: (e) => e.t.veri.maxFiyat ?? null, varsayilanYon: "azalan" },
+    { alan: "m2", etiket: "m²", deger: (e) => e.p.veri.m2 ?? null, varsayilanYon: "azalan" },
+    { alan: "giris", etiket: "Kayda giriş", deger: (e) => Math.max(tarihNo(e.t.olusturma) ?? 0, tarihNo(e.p.olusturma) ?? 0), varsayilanYon: "azalan" },
+    { alan: "sure", etiket: "Talebin kalan süresi", deger: (e) => tarihNo(e.t.veri.validUntil), varsayilanYon: "artan" },
+  ];
+}
+interface EslesmeGibi { t: Kayit; p: Kayit; s: { seviye: number; skor: number; uygunluk: string }; f: { sira: number; tahminiKomisyon?: number | null } }
+
 export function kisiSiralama(kayitSayisi: (id: string) => number, kapanma?: (id: string) => number | null): SiralamaSecenegi<Kisi>[] {
   return [
     // v3.38 — mülk sahipleri: portföyü en uzun süredir pasif / arşiv olan önce (kiracısı çıkmış olabilecek ilk sahip en üstte)

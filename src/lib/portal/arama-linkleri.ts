@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Talepten portallarda arama bağlantısı üretir (Sahibinden, Emlakjet, Hepsiemlak).
  * Kullanıcı bağlantıyı açıp portalda KENDİSİ bakar: otomatik veri çekme (scraping) yapılmaz — üç portalın
  * kullanım koşulları otomatik veri çekmeyi yasaklıyor (bkz. PORTAL_ENTEGRASYON_ARASTIRMASI).

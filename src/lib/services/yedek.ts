@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Tam yedek (JSON) — Ayarlar'daki indirme, /api/disa-aktar?bicim=json ve haftalık otomatik yedek aynı içeriği üretir.
  * Haftalık yedek Supabase Storage'daki özel "yedekler" kovasına yazılır (Supabase Free'de otomatik yedek olmadığı için);
  * son 12 yedek tutulur. SUPABASE_SERVICE_ROLE_KEY yoksa atlanır.

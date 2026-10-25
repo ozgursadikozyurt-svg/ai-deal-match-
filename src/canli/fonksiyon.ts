@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * SUPABASE EDGE FUNCTION GİRİŞİ ("api") — asıl sunucu kodu burada çalışır (istek başına 2 sn işlemci; Cloudflare ücretsizde 10 ms).
  * Paket: scripts/fonksiyon-paketle.ts → supabase/functions/api/index.js (Prisma'nın Deno istemcisi, tek dosya).
  * Yayın: .github/workflows/supabase-fonksiyon.yml (main'e her gönderimde). Ayrıntı: src/canli/uzak.ts.

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * (1) Mülk grubuna göre kritik bilgi: kiralık dairede depo soruları çıkmaz; depoda çıkmaya devam eder.
  * (2) Otomatik görevler: eski sistem görevleri açılışta temizlenir, yinelenenler tekleşir; elle / "göreve alalım" görevleri kalır.
  */

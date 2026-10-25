@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * İlk kaynak — formda seçici (yeni kayıtta ya da boşsa bir kez), kilitliyse yalnızca gösterim; detayda kaynak satırları.
  * Kurallar src/lib/domain/ilk-kaynak.ts'te; sunucu aynı kuralı ayrıca uygular (src/lib/services/durum.ts).
  */

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Supabase Edge Function paketi: src/canli/fonksiyon.ts → supabase/functions/api/index.js (tek dosya, Deno).
  * Prisma'nın Deno istemcisi (src/generated/prisma-deno, sorgu derleyicisi base64 gömülü) "#prisma-istemci" → deno koşuluyla seçilir.
  * Node yerleşik modülleri "node:" önekiyle dışarıda bırakılır (Deno bunları kendisi sağlar).

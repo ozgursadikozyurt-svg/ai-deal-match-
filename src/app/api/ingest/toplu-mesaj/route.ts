@@ -1,4 +1,4 @@
-// Anahtar CRM v3.42 · 23 Ekim 2026
+// Anahtar CRM v3.43 · 25 Ekim 2026
 // POST /api/ingest/toplu-mesaj { metin } → mesajdaki ayrı kayıtlar (kişi, ayrıştırılmış alanlar, konum ifadeleri, miras alınanlar)
 import { z } from "zod";
 import { prisma } from "@/lib/db";

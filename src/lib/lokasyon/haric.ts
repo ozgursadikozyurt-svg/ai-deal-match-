@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * "Hurma, Sarısu HARİÇ" — talepte hariç tutulan bölgeler.
  *
  * Eskiden hariç denilen yerler yalnızca konumlardan çıkarılıyordu; geriye konum kalmayınca talep "il geneli"ne düşüyor,

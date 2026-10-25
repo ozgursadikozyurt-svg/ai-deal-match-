@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Metinde kiranın YILLIK olduğunu söyleyen ifade var mı? ("yıllık kira 1.000.000", "kirası yıllık", "1.300.000 TL/yıl").
  * Ölçüm (13 Eki 2026): portal tablosundan gelen kiralık depolarda periyot her zaman "aylık" yazılıyordu; "YILLIK KİRA 1.000.000"
  * başlıklı ilan ayda 1 milyon görünüyor ve bütçesi 150 bin olan talebe hiç gösterilmiyordu.

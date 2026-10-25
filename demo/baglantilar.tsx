@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026 (v3.13'ten)
+ * Anahtar CRM v3.43 · 25 Ekim 2026 (v3.13'ten)
  * Bağlantılar — Google Kişiler (v3.21: çift yönlü, "Google ile bağlan" tek düğme). Demo ve canlı AYNI ekran:
  *   demo  → gerçek hesaba bağlanmaz; örnek rehberle sunucudaki planlayıcıların aynısı çalışır (demo/senkron-demo.ts)
  *   canlı → sunucuya bağlanır (demo/google-baglanti.ts): bağlan → Google izin ekranı → dönüş → ilk içe aktarma (ilerlemeli)

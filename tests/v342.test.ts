@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Ücretsiz plan mimarisi: Cloudflare yalnızca aracı, asıl iş Supabase Edge Function'da.
  * (1) aracı başlıkları / ortam paketi  (2) Supabase geçit hatası ayrımı  (3) aracı: iletme + fonksiyon yoksa yerelde işleme
  * (4) fonksiyon: kapı doğrulaması, iç yollar kapı ister, ortam birleştirme
@@ -10,11 +10,11 @@ import { uzakAdres, ortamPaketle, ortamCoz, araciBasliklari, gecitHatasiMi, BASL
 (globalThis as any).__ANAHTAR_TEST__ = true;
 import worker from "../src/canli/worker";
 import { kapiGecerliMi, ortamKur, fonksiyonIsle } from "../src/canli/fonksiyon";
-import { SURUM } from "../src/lib/surum";
+import { SURUM, SURUM_GECMISI } from "../src/lib/surum";
 
 const ENV: any = { SUPABASE_URL: "https://ref.supabase.co/", SUPABASE_ANON_KEY: "anon", SUPABASE_SERVICE_ROLE_KEY: "servis-0123456789abcdefghij", AI_API_KEY: "ğüşİ-anahtar", ASSETS: { fetch: async () => new Response("statik") } };
 
-test("sürüm 3.42", () => assert.equal(SURUM, "3.42"));
+test("sürüm 3.42", () => { assert.ok(SURUM_GECMISI.some((x) => x.surum === "3.42")); void SURUM; });
 
 test("fonksiyon adresi: SUPABASE_URL'den türetilir; API_UZAK=0 kapatır, https adresi değiştirir", () => {
   assert.equal(uzakAdres(ENV), "https://ref.supabase.co/functions/v1/api");

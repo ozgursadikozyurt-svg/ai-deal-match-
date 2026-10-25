@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Verileri dışa aktarma — arşiv, yedek ya da başka bir CRM'e taşıma için. Demo ve sunucu aynı kodu kullanır.
  * CSV: Excel'in Türkçe ayarıyla doğrudan açılır (UTF-8 BOM + noktalı virgül). JSON: tam yedek (her alan).
  */

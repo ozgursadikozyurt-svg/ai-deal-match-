@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * v3.33 — eşleştirme puanı: şartı bilinmeyen alta iner, kat uymuyorsa liste sonu, kW = kVA = kwa, ilan metninden güç;
  * bina yaşı "7-8 yaşına kadar" → 8; Eşleşmeler'de mülk türü / işlem süzgeci portföye uygulanır.
  */
@@ -62,7 +62,9 @@ test("bina yaşı: 'sıfırdan 7-8 yaşına kadar' → 8; 'sıfır bina' → 0; 
   assert.equal(binaYasiOku("sıfır bina"), 0); assert.equal(binaYasiOku("en fazla 10 yaş"), 10); assert.equal(binaYasiOku("15 yıllık"), 15);
 });
 test("Eşleşmeler: mülk türü ve işlem süzgeci portföyün kendi tipine uygulanır", () => {
-  const s = fs.readFileSync("demo/app.tsx", "utf8");
-  assert.match(s, /f\.aileler\.length && !f\.aileler\.includes\(aileOf\(e\.p\.veri\.mulkTipi as any\)\.kod\)/);
+  // v3.43 — kural filtre.tsx'teki eslesmeFiltreUygula'ya taşındı (Eşleşmeler + İzleme ortak kullanır)
+  const s = fs.readFileSync("demo/filtre.tsx", "utf8");
+  assert.match(s, /f\.aileler\.length && !f\.aileler\.includes\(aileOf\(p\.mulkTipi as any\)\.kod\)/);
   assert.match(s, /aileler: \[\], islemler: \[\]/);
+  assert.match(fs.readFileSync("demo/app.tsx", "utf8"), /eslesmeFiltreUygula\(e\.t\.veri, e\.p\.veri, f/);
 });

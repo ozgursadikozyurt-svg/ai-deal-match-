@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * ÜCRETSİZ PLAN MİMARİSİ — Cloudflare Worker yalnızca ARACI, asıl sunucu kodu Supabase Edge Function'da ("api").
  *
  * Neden: Cloudflare Workers ücretsiz planı istek başına 10 ms işlemci süresi verir. Ölçüm (23 Ekim 2026, scripts/islemci-olc.ts):

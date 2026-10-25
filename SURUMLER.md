@@ -5,6 +5,37 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.43 · 25 Ekim 2026 — İzleme ekranına ayrıntılı arama + filtre; sade "Sırala" düğmesi; eşleşme kartında kıyas şeridi; tüm ekranlarda mobil sağlamlaştırma
+
+- İzleme ekranı artık diğer listeler gibi: üstte arama kutusu, "Filtrele" paneli (mülk türü, işlem, konum, fiyat, alan, oda, kişi, kaynak…) ve "Sırala". Sekme sayıları (Talepler / Portföyler / Eşleşmeler) filtreye göre güncellenir; başlıkta "3 / 12 kayıt" yazar.
+- İzlemede filtre taleplere ve portföylere doğrudan, eşleşmelere Eşleşmeler ekranındaki kuralla uygulanır (mülk türü ve işlem portföye bakar, arama iki tarafı birden tarar). Kural tek yerde toplandı, iki ekran aynı kodu kullanıyor.
+- Sıralama düğmesi artık seçili sıralamanın uzun adını yazmıyor ("↓ Uyum (en iyi önce)" dar ekranda filtre çubuğunu taşırıyor ve kırpılıyordu). Düğme sade "↓ Sırala"; seçili seçenek menünün başında yazılı ve listede ✓ işaretli, varsayılandan farklıysa düğme vurgulanıyor. "Uyum (en iyi önce)" eşleşme sıralamasının ilk ve varsayılan seçeneği.
+- Eşleşme kartında KIYAS ŞERİDİ: belirleyici ölçütler "istenen → olan" biçiminde yan yana, farkıyla birlikte — Bütçe (bütçe içinde / %12 üstünde), Alan (aralıkta / %20 küçük), Oda, Kat. Eskiden bu karşılaştırmayı kullanıcı iki bloğa bakıp kafadan yapıyordu.
+- Eşleşme kartı içerik: talep tarafında aciliyet ve kalan süre ("5 gün kaldı", 3 günden azsa kırmızı); taraf etiketlerinde "müşteri istiyor" / "önerilen mülk"; "Not var" rozeti yerine notun kendisi ve son hareketin tazeliği ("3 gün önce").
+- Mobil: sayfa hiçbir ekranda yana kaymıyor (overflow-x:clip — kaydırma kutusu yaratmadığından yapışkan toplu işlem çubuğu çalışmaya devam eder), uzun metinler (bağlantı, e-posta, ilan no, mahalle listesi) kutuyu taşırmıyor, kapat / anahtar / çip silme düğmeleri parmakla tutulacak boyutta, 360 px telefonlar için ayrı sıkışık düzen.
+
+**Demo'da test edilecekler**
+
+- [ ] İzleme: üstte arama ve "Filtrele" görünmeli; bir kelime yazın, listedeki kayıtlar ve sekme sayıları azalmalı, başlıkta "n / toplam kayıt" çıkmalı.
+- [ ] Eşleşmeler: filtre çubuğundaki düğme "↓ Sırala" yazmalı; basınca menüde en üstte "Uyum (en iyi önce)" ✓ işaretli olmalı.
+- [ ] Eşleşme kartı: Talep ve Portföy bloklarının altında Bütçe / Alan satırları çıkmalı; bütçeyi aşan bir portföyde "%… üstünde" kırmızı yazmalı.
+- [ ] Telefonda Ana Sayfa, Talepler, Portföyler, Eşleşmeler, İzleme, Kişiler, Veri Girişi, Görevler ve Ayarlar'ı gezin: hiçbirinde sayfa sağa sola kaymamalı.
+
+## v3.42 · 23 Ekim 2026 — Ücretsiz plan mimarisi: sunucu kodu Supabase'e taşındı, Cloudflare yalnızca aracı (503 / işlemci sınırı kalıcı çözüm)
+
+- Neden: Cloudflare ücretsiz planı istek başına 10 ms işlemci verir. Ölçüm: Prisma ile en boş istek bile 12–28 ms, sıradan istekler 20–100 ms → sayfalama ne yapılırsa yapılsın 503. Bu yüzden v3.40 / v3.41 yetmedi.
+- Yeni yapı: tarayıcı yine anahtarcrm.com'a gider; Cloudflare isteği (~1 ms) Supabase Edge Function "api"ye iletir; asıl iş orada çalışır (istek başına 2 sn sınır, ücretsiz). Adres, giriş, Google bağlantısı, gelen kutusu adresi değişmez.
+- Gizli değerler (AI, Google, CRON…) Cloudflare'de kalır; aracı onları her istekte iletir, fonksiyon yalnızca Supabase service_role anahtarıyla gelen istekte bunlara güvenir.
+- Zamanlayıcı (gece işleri, yedek, Google eşitlemesi) ve alan adına gelen e-postalar da fonksiyona iletilir.
+- Güvenlik ağı: fonksiyon henüz yayında değilse ya da açılamazsa Cloudflare isteği eskisi gibi kendisi işler — uygulama hiç kapanmaz.
+- Yayın: GitHub Actions (.github/workflows/supabase-fonksiyon.yml) main'e her gönderimde fonksiyonu paketleyip Supabase'e yükler. Bir kez SUPABASE_ACCESS_TOKEN eklenmesi gerekir.
+
+**Demo'da test edilecekler**
+
+- [ ] Sayfayı yenileyin: uygulama açılmalı, 503 gelmemeli; Talepler / Portföyler / Rehber açılmalı.
+- [ ] Bir talebi düzenleyip kaydedin, sayfayı yenileyin: değişiklik durmalı.
+- [ ] Supabase › Edge Functions › api › Invocations: istekler orada görünmeli (fonksiyon çalışıyor demektir).
+
 ## v3.41 · 23 Ekim 2026 — Rehber parça parça: açılışta yalnızca talep / portföye bağlı kişiler, kalanı "Devam et" ile (503 / CPU sınırına karşı)
 
 - Uygulama açılışında artık ~7.800 kişinin hepsi indirilmez: yalnızca bir talebe / portföye bağlı kişiler gelir (ilgili=1). Kayıtlar (talep + portföy) eskisi gibi tam yüklenir; eşleşme hesabı etkilenmez.

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.42 · 23 Ekim 2026
+// Anahtar CRM v3.43 · 25 Ekim 2026
 // POST   /api/kayit/:id/kisiler { kisiId, rol }  → kişiyi kayda bağla
 // DELETE /api/kayit/:id/kisiler?kisiId=&rol=     → bağı kaldır
 import { prisma } from "@/lib/db";

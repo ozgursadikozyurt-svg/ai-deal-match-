@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * DENEY TABANI — v3.10 motorunun dondurulmuş kopyası (yalnızca scripts/deney/model-karsilastir.ts kullanır; uygulama kullanmaz).
  * EŞLEŞTİRME MOTORU v2 (v3.5) — veritabanı ve yapay zekâ gerektirmeyen saf fonksiyon.
  * Metin benzerliği değil, ticari gayrimenkulün katı kuralları (Killer Criteria):

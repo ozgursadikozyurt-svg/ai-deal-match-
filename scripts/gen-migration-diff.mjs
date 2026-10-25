@@ -1,4 +1,4 @@
-// Anahtar CRM v3.42 · 23 Ekim 2026
+// Anahtar CRM v3.43 · 25 Ekim 2026
 // Önceki şema → güncel şema arasındaki ARTIMLI migration SQL'ini üretir (WASM schema-engine; binary gerekmez).
 // Kullanım: DIRECT_URL=... node scripts/gen-migration-diff.mjs <eski-schema.prisma> prisma/migrations/<ad>/migration.sql [ek.sql]
 import fs from "node:fs";

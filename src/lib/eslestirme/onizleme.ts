@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026 (v3.33'ten)
+ * Anahtar CRM v3.43 · 25 Ekim 2026 (v3.33'ten)
  * v3.36 — UYUM SEVİYESİ 1–5 (ekranda yüzde yerine) + gerekçe listesi (neden bu seviye). Ölçüm: 19 Eki 2026 canlı veri, 16.095 çift;
  *   "yanlış" işaretlenen 40 eşleşmenin 10'u 92–100 alıyordu. Düzeltmeler: döviz çevrimi, talepteki anlamsız değerler (0 kW, 5 kW,
  *   çatı / duvar tipi) şart sayılmaz, "ara kat" isteyene giriş / son kat tutmaz, fazla oda ve üst üste ödün en fazla Koşullu,

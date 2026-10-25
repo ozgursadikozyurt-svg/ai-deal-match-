@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026 — eşleştirme kalitesi: tip ailesi (otomatik / seçmeli), satışta bütçe tabanı,
+ * Anahtar CRM v3.43 · 25 Ekim 2026 — eşleştirme kalitesi: tip ailesi (otomatik / seçmeli), satışta bütçe tabanı,
  * yıllık girilmiş kira, güven göstergesi, tip çelişkisi, mükerrer ilan; içe aktarmada yıllık kira okuma.
  * Senaryolar 13 Ekim 2026 canlı veri incelemesinden (62 talep × 410 portföy) alındı.
  */

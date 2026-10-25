@@ -682,6 +682,24 @@ main.sarici{padding-block:18px 32px}
 .es2-n{font-size:.78rem;padding:.2rem .6rem;border-radius:7px;background:var(--panel);border:1px solid var(--line);color:var(--mut)}
 .es2-n.uyari{background:var(--uyari-bg);color:var(--uyari);border-color:transparent}
 .es2-n.kotu{background:var(--kotu-bg);color:var(--kotu);border-color:transparent}
+.es2-n.not{background:var(--panel);border-color:var(--line);color:var(--fg);flex:1 1 100%;overflow-wrap:anywhere}
+.sirala-baslik{display:flex;flex-direction:column;gap:1px}
+.sirala-baslik small{font-weight:500;font-size:.72rem;color:var(--mut);text-transform:none;letter-spacing:0;overflow-wrap:anywhere}
+.sirala-menu{max-width:calc(100vw - 28px)}
+/* v3.43 — kıyas şeridi: istenen → olan, farkıyla birlikte */
+.es2-kiyas{display:flex;flex-direction:column;gap:1px;padding:8px 14px;background:var(--panel2);border-top:1px solid var(--cizgi2)}
+.ek-satir{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;font-size:.82rem;line-height:1.5;min-width:0}
+.ek-ad{flex:none;width:3.6rem;font-weight:650;color:var(--mut);font-size:.74rem;letter-spacing:.02em;text-transform:uppercase}
+.ek-ist{color:var(--mut);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ek-ok{flex:none;color:var(--mut);opacity:.65}
+.ek-var{font-weight:650;color:var(--fg);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ek-not{flex:none;margin-inline-start:auto;font-size:.74rem;font-weight:600;padding:.08rem .45rem;border-radius:6px;background:var(--panel);border:1px solid var(--line);color:var(--mut);white-space:nowrap}
+.ek-satir.t-iyi .ek-not{background:var(--iyi-bg);color:var(--iyi);border-color:transparent}
+.ek-satir.t-uyari .ek-not{background:var(--uyari-bg);color:var(--uyari);border-color:transparent}
+.ek-satir.t-kotu .ek-not{background:var(--kotu-bg);color:var(--kotu);border-color:transparent}
+.es2-et-alt{font-style:normal;font-weight:500;font-size:.66rem;letter-spacing:.02em;text-transform:none;color:var(--mut)}
+.es2-sure{font-weight:650;color:var(--uyari)}.es2-sure.acil{color:var(--kotu)}
+@media(max-width:420px){.es2-et-alt{display:none}.ek-ad{width:3rem}.ek-not{margin-inline-start:0}}
 /* v3.27 — Var / Yok hızlı cevap: tek çip, iki küçük düğme */
 .hc{display:inline-flex;align-items:center;gap:2px;font-size:.78rem;padding:1px 2px 1px .55rem;border-radius:7px;background:var(--uyari-bg);color:var(--uyari)}
 .hc-ad{margin-right:.25rem}
@@ -819,7 +837,8 @@ input[type=range]{padding:0;accent-color:var(--acc)}
   .fc-btn,.fc-hizli{padding:0 .6rem;border-radius:9px;gap:4px}
   .fc-rozet{min-width:1.05rem;height:1.05rem;font-size:.64rem}
   .sirala-btn{padding:0 .5rem}
-  .sirala-et{display:inline-block;vertical-align:bottom;white-space:nowrap;max-width:3.9rem;overflow:hidden;text-overflow:ellipsis}
+  /* v3.43 — düğme artık sabit "Sırala" yazıyor; dar ekranda da kırpılmaz */
+  .sirala-et{display:inline-block;vertical-align:bottom;white-space:nowrap}
   /* v3.13 — telefonda arama kutusu kendi satırında tam genişlik; Acil / Filtrele / Sırala altında */
   .fc{flex-wrap:wrap}
   .fc-ara{flex:1 1 100%}
@@ -1115,6 +1134,39 @@ main.sarici>.genel-geri+*>h2:first-child{display:flex;align-items:center}
 @media (prefers-color-scheme:dark){.dikkat-cip.kotu{color:#ffb4b4}.dikkat-cip.uyari{color:#ffd98a}}
 /* v3.30 — Benim ve ofisim kutuları telefonda da tek satır (dört kutu): Bugün panosu ekranın üst yarısına çıkar */
 @media (max-width:520px){.benim-kisayol .bk-izgara{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.benim-kisayol .bk-oge{padding:7px 5px;align-items:center;text-align:center}.benim-kisayol .bk-oge b{font-size:1.1rem}.benim-kisayol .bk-oge span{font-size:.68rem;line-height:1.15}}
+
+/* ───── v3.43 · 25 Ekim 2026 — Mobil sağlamlaştırma (tüm ekranlar) ─────
+   Amaç: hiçbir ekranda sayfanın tamamı yana kaymasın, uzun metin (ilan no, e-posta,
+   bağlantı, mahalle listesi) kutuyu taşırmasın, dokunma hedefleri parmakla tutulsun.
+   Bilerek yana kaydırılan kutular (.filtre, .tablo-sar, .aktif-filtreler) etkilenmez. */
+@media (max-width:959px){
+  /* Sayfa düzeyinde yatay kayma yok. clip kullanılıyor: kaydırma kutusu YARATMAZ,
+     bu yüzden içerideki position:sticky çubuklar (toplu işlem çubuğu) çalışmaya devam eder. */
+  html,body{max-width:100%;overflow-x:clip}
+  .icerik,main.sarici{overflow-x:clip}
+  /* Esnek satırlarda uzun çocuk kutuyu itmesin — kırpılsın ya da alta sarsın */
+  .satir>*,.satir-ara>*,.kk-govde>*,.es2-bas>*{min-width:0}
+  .satir{flex-wrap:wrap}
+  /* Bölünmeyen uzun diziler (bağlantı, e-posta, ilan no, dosya adı) */
+  .kk-baslik,.kk-alt,.es2-n,.ipucu,.d-aciklama,.kart-aciklama span,.taraf-bas,.fs-icerik,.cip.aktif{overflow-wrap:anywhere}
+  .tablo-sar{max-width:100%}
+  /* Parmakla tutulabilir hedefler */
+  select{max-width:100%}
+  /* Eşleşme kartı üst satırı: sağdaki iki düğmenin (anahtar + kopar) altına girmesin */
+  .es2-durum{padding-right:84px}
+  .x-btn{width:36px;height:36px}
+  .anahtar-btn{min-width:36px;min-height:36px;display:inline-grid;place-items:center}
+  .cip .sil{min-width:28px;min-height:28px;justify-content:center}
+}
+/* Çok dar telefonlar (≤360px): en sıkışık satırlar */
+@media (max-width:360px){
+  .sarici{padding-inline:12px}
+  .es2-ust{gap:8px}
+  .es2-durum{padding-right:80px}
+  .alt-cubuk small{font-size:.63rem}
+  .sekme4 button,.sekme3 button{padding:.6rem .2rem;font-size:.82rem}
+  .fb{padding:.4rem .7rem}
+}
 </style>
 <div id="kok"></div>
 <noscript>Bu demo için JavaScript gereklidir.</noscript>

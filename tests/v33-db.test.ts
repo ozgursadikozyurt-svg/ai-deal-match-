@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * v3.3 — veritabanlı testler: yeni migration (ayar, konut kolonları, kaynak bilgisi, referans alias), süre uzatma.
  * scripts/test-db.sh içinden çalışır (PGlite).
  */

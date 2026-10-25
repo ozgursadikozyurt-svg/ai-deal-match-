@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Rehber parça parça: "Devam et" bir sonraki sayfayı çeker, kaydedilmemiş yerel işi bozmaz; aynı anda ikinci çağrı süren işi bekler.
  */
 import test from "node:test";

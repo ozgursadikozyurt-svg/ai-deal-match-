@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * İlan numarası (sahibinden, hepsiemlak, emlakjet): formda yazılan / yapıştırılan değerden numara ve bağlantı çıkarır,
  * ekranlarda gösterilecek bağlantıyı üretir.
  *

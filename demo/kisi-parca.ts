@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Rehber parça parça yüklenir (Cloudflare ücretsiz plan işlemci sınırı). Açılışta yalnızca bir talebe / portföye bağlı kişiler gelir;
  * geri kalanı Rehber ekranındaki "Devam et" düğmesiyle (ya da kişi eşleştirmesi gereken ekranlarda kendiliğinden) çekilir.
  * Gelen kişiler `kisileriDegisenleriBirlestir` ile eklenir: kaydedilmemiş yerel iş korunur, gelmeyen kişi "silinmiş" sayılmaz.

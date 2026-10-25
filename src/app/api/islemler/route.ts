@@ -1,4 +1,4 @@
-// Anahtar CRM v3.42 · 23 Ekim 2026 — işlem ve komisyon (yalnızca ofis yöneticisi: islem.yonet)
+// Anahtar CRM v3.43 · 25 Ekim 2026 — işlem ve komisyon (yalnızca ofis yöneticisi: islem.yonet)
 // GET → liste · POST → yeni · PATCH ?id= → güncelle (tam kayıt) · DELETE ?id= → sil
 import { prisma } from "@/lib/db";
 import { ok, hata, sorgu } from "@/lib/http/yanit";

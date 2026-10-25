@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.42 · 23 Ekim 2026
+ * Anahtar CRM v3.43 · 25 Ekim 2026
  * Polaris v7 · 21 Ekim 2026
  * Polaris (Özgür'ün kişisel çalışma rehberi) — anahtarcrm.com/polaris. Arayüz: public/polaris.html.
  * Veri: public.polaris_belge (koleksiyon / belge / jsonb). Anahtar CRM'in ofis tablolarından ayrıdır;
