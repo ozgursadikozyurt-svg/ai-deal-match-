@@ -54,3 +54,7 @@ export const paylasimNormalize = (x: unknown): PaylasimAyar => { const p = Payla
 /** Konum yazılırken ve metin çözülürken varsayılan il (plaka kodu). 7 = Antalya. */
 export const CALISMA_ILI_VARSAYILAN = 7;
 export const calismaIliNormalize = (x: unknown): number => (typeof x === "number" && Number.isInteger(x) && x >= 1 && x <= 81 ? x : CALISMA_ILI_VARSAYILAN);
+// ───────── v3.44 · Yıllık "bana kalan" hedefi ─────────
+/** İşlemler ekranındaki "Yıl hedefine kalan" kutusunun hedefi (TL). Polaris'teki yilHedef ile aynı işi görür. */
+export const YIL_HEDEFI_VARSAYILAN = 2_500_000;
+export const yilHedefiNormalize = (x: unknown): number => (typeof x === "number" && Number.isFinite(x) && x > 0 && x <= 1_000_000_000 ? Math.round(x) : YIL_HEDEFI_VARSAYILAN);

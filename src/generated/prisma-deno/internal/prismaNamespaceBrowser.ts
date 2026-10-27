@@ -60,6 +60,7 @@ export const ModelName = {
   KampanyaHarcama: 'KampanyaHarcama',
   Randevu: 'Randevu',
   Islem: 'Islem',
+  IslemKisi: 'IslemKisi',
   Il: 'Il',
   Ilce: 'Ilce',
   Mahalle: 'Mahalle',
@@ -247,6 +248,11 @@ export const IslemScalarFieldEnum = {
   talepId: 'talepId',
   portfoyId: 'portfoyId',
   kisiId: 'kisiId',
+  paylasilanKisiId: 'paylasilanKisiId',
+  paylasilanAd: 'paylasilanAd',
+  paylasilanTelefon: 'paylasilanTelefon',
+  referansKisiId: 'referansKisiId',
+  referansAd: 'referansAd',
   disKaynak: 'disKaynak',
   disKimlik: 'disKimlik',
   createdAt: 'createdAt',
@@ -254,6 +260,17 @@ export const IslemScalarFieldEnum = {
 } as const
 
 export type IslemScalarFieldEnum = (typeof IslemScalarFieldEnum)[keyof typeof IslemScalarFieldEnum]
+
+
+export const IslemKisiScalarFieldEnum = {
+  id: 'id',
+  islemId: 'islemId',
+  kisiId: 'kisiId',
+  rol: 'rol',
+  createdAt: 'createdAt'
+} as const
+
+export type IslemKisiScalarFieldEnum = (typeof IslemKisiScalarFieldEnum)[keyof typeof IslemKisiScalarFieldEnum]
 
 
 export const IlScalarFieldEnum = {

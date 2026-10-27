@@ -67,6 +67,12 @@ export type Randevu = Prisma.RandevuModel
  */
 export type Islem = Prisma.IslemModel
 /**
+ * Model IslemKisi
+ * v3.44 — İşlemin tarafları (Polaris'teki "Taraflar (rehberden)" alanı).
+ * rol: ALICI_KIRACI | SATICI_KIRAYA_VEREN | REFERANS | PAYLASILAN_DANISMAN | DIGER
+ */
+export type IslemKisi = Prisma.IslemKisiModel
+/**
  * Model Il
  * 
  */

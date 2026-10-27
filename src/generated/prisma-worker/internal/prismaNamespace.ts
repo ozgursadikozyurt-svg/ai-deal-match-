@@ -406,6 +406,7 @@ export const ModelName = {
   KampanyaHarcama: 'KampanyaHarcama',
   Randevu: 'Randevu',
   Islem: 'Islem',
+  IslemKisi: 'IslemKisi',
   Il: 'Il',
   Ilce: 'Ilce',
   Mahalle: 'Mahalle',
@@ -447,7 +448,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "ofis" | "gelenDosya" | "gelenAtlanan" | "kullanici" | "davet" | "kampanya" | "kampanyaHarcama" | "randevu" | "islem" | "il" | "ilce" | "mahalle" | "altBolge" | "altBolgeMahalle" | "ilceKomsuluk" | "lokasyonAlias" | "lokasyonAday" | "ayar" | "kayitLokasyon" | "kayit" | "mulkOzellik" | "kisi" | "kayitKisi" | "islenmisMesaj" | "match" | "portalIlan" | "auditLog" | "ingestionLog" | "entegrasyon" | "senkronHaric" | "senkronCalisma" | "senkronCakisma" | "notionSyncLog" | "kayitNot" | "kayitFoto"
+    modelProps: "ofis" | "gelenDosya" | "gelenAtlanan" | "kullanici" | "davet" | "kampanya" | "kampanyaHarcama" | "randevu" | "islem" | "islemKisi" | "il" | "ilce" | "mahalle" | "altBolge" | "altBolgeMahalle" | "ilceKomsuluk" | "lokasyonAlias" | "lokasyonAday" | "ayar" | "kayitLokasyon" | "kayit" | "mulkOzellik" | "kisi" | "kayitKisi" | "islenmisMesaj" | "match" | "portalIlan" | "auditLog" | "ingestionLog" | "entegrasyon" | "senkronHaric" | "senkronCalisma" | "senkronCakisma" | "notionSyncLog" | "kayitNot" | "kayitFoto"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1114,6 +1115,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.IslemCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.IslemCountAggregateOutputType> | number
+        }
+      }
+    }
+    IslemKisi: {
+      payload: Prisma.$IslemKisiPayload<ExtArgs>
+      fields: Prisma.IslemKisiFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.IslemKisiFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemKisiPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.IslemKisiFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemKisiPayload>
+        }
+        findFirst: {
+          args: Prisma.IslemKisiFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemKisiPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.IslemKisiFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemKisiPayload>
+        }
+        findMany: {
+          args: Prisma.IslemKisiFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemKisiPayload>[]
+        }
+        create: {
+          args: Prisma.IslemKisiCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemKisiPayload>
+        }
+        createMany: {
+          args: Prisma.IslemKisiCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.IslemKisiCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemKisiPayload>[]
+        }
+        delete: {
+          args: Prisma.IslemKisiDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemKisiPayload>
+        }
+        update: {
+          args: Prisma.IslemKisiUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemKisiPayload>
+        }
+        deleteMany: {
+          args: Prisma.IslemKisiDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.IslemKisiUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.IslemKisiUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemKisiPayload>[]
+        }
+        upsert: {
+          args: Prisma.IslemKisiUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IslemKisiPayload>
+        }
+        aggregate: {
+          args: Prisma.IslemKisiAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateIslemKisi>
+        }
+        groupBy: {
+          args: Prisma.IslemKisiGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IslemKisiGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.IslemKisiCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IslemKisiCountAggregateOutputType> | number
         }
       }
     }
@@ -3223,6 +3298,11 @@ export const IslemScalarFieldEnum = {
   talepId: 'talepId',
   portfoyId: 'portfoyId',
   kisiId: 'kisiId',
+  paylasilanKisiId: 'paylasilanKisiId',
+  paylasilanAd: 'paylasilanAd',
+  paylasilanTelefon: 'paylasilanTelefon',
+  referansKisiId: 'referansKisiId',
+  referansAd: 'referansAd',
   disKaynak: 'disKaynak',
   disKimlik: 'disKimlik',
   createdAt: 'createdAt',
@@ -3230,6 +3310,17 @@ export const IslemScalarFieldEnum = {
 } as const
 
 export type IslemScalarFieldEnum = (typeof IslemScalarFieldEnum)[keyof typeof IslemScalarFieldEnum]
+
+
+export const IslemKisiScalarFieldEnum = {
+  id: 'id',
+  islemId: 'islemId',
+  kisiId: 'kisiId',
+  rol: 'rol',
+  createdAt: 'createdAt'
+} as const
+
+export type IslemKisiScalarFieldEnum = (typeof IslemKisiScalarFieldEnum)[keyof typeof IslemKisiScalarFieldEnum]
 
 
 export const IlScalarFieldEnum = {
@@ -4849,6 +4940,7 @@ export type GlobalOmitConfig = {
   kampanyaHarcama?: Prisma.KampanyaHarcamaOmit
   randevu?: Prisma.RandevuOmit
   islem?: Prisma.IslemOmit
+  islemKisi?: Prisma.IslemKisiOmit
   il?: Prisma.IlOmit
   ilce?: Prisma.IlceOmit
   mahalle?: Prisma.MahalleOmit

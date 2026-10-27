@@ -335,6 +335,9 @@ export type KisiWhereInput = {
   kayitNotlari?: Prisma.KayitNotListRelationFilter
   kayitlar?: Prisma.KayitListRelationFilter
   kayitBaglari?: Prisma.KayitKisiListRelationFilter
+  islemTaraflari?: Prisma.IslemKisiListRelationFilter
+  islemPaylasimlari?: Prisma.IslemListRelationFilter
+  islemReferanslari?: Prisma.IslemListRelationFilter
 }
 
 export type KisiOrderByWithRelationInput = {
@@ -369,6 +372,9 @@ export type KisiOrderByWithRelationInput = {
   kayitNotlari?: Prisma.KayitNotOrderByRelationAggregateInput
   kayitlar?: Prisma.KayitOrderByRelationAggregateInput
   kayitBaglari?: Prisma.KayitKisiOrderByRelationAggregateInput
+  islemTaraflari?: Prisma.IslemKisiOrderByRelationAggregateInput
+  islemPaylasimlari?: Prisma.IslemOrderByRelationAggregateInput
+  islemReferanslari?: Prisma.IslemOrderByRelationAggregateInput
 }
 
 export type KisiWhereUniqueInput = Prisma.AtLeast<{
@@ -409,6 +415,9 @@ export type KisiWhereUniqueInput = Prisma.AtLeast<{
   kayitNotlari?: Prisma.KayitNotListRelationFilter
   kayitlar?: Prisma.KayitListRelationFilter
   kayitBaglari?: Prisma.KayitKisiListRelationFilter
+  islemTaraflari?: Prisma.IslemKisiListRelationFilter
+  islemPaylasimlari?: Prisma.IslemListRelationFilter
+  islemReferanslari?: Prisma.IslemListRelationFilter
 }, "id" | "ofisId_telefon" | "ofisId_googleResourceName" | "ofisId_notionId">
 
 export type KisiOrderByWithAggregationInput = {
@@ -505,6 +514,9 @@ export type KisiCreateInput = {
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutKisiInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutKisiInput
   kayitBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiUncheckedCreateInput = {
@@ -537,6 +549,9 @@ export type KisiUncheckedCreateInput = {
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutKisiInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutKisiInput
   kayitBaglari?: Prisma.KayitKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemUncheckedCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemUncheckedCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiUpdateInput = {
@@ -569,6 +584,9 @@ export type KisiUpdateInput = {
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutKisiNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutKisiNestedInput
   kayitBaglari?: Prisma.KayitKisiUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiUncheckedUpdateInput = {
@@ -601,6 +619,9 @@ export type KisiUncheckedUpdateInput = {
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutKisiNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutKisiNestedInput
   kayitBaglari?: Prisma.KayitKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUncheckedUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUncheckedUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiCreateManyInput = {
@@ -703,6 +724,11 @@ export type KisiNullableScalarRelationFilter = {
   isNot?: Prisma.KisiWhereInput | null
 }
 
+export type KisiScalarRelationFilter = {
+  is?: Prisma.KisiWhereInput
+  isNot?: Prisma.KisiWhereInput
+}
+
 export type KisiOfisIdTelefonCompoundUniqueInput = {
   ofisId: string
   telefon: string
@@ -795,11 +821,6 @@ export type KisiMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
-export type KisiScalarRelationFilter = {
-  is?: Prisma.KisiWhereInput
-  isNot?: Prisma.KisiWhereInput
-}
-
 export type KisiCreateNestedManyWithoutOfisInput = {
   create?: Prisma.XOR<Prisma.KisiCreateWithoutOfisInput, Prisma.KisiUncheckedCreateWithoutOfisInput> | Prisma.KisiCreateWithoutOfisInput[] | Prisma.KisiUncheckedCreateWithoutOfisInput[]
   connectOrCreate?: Prisma.KisiCreateOrConnectWithoutOfisInput | Prisma.KisiCreateOrConnectWithoutOfisInput[]
@@ -882,6 +903,52 @@ export type KisiUncheckedUpdateManyWithoutSahipKullaniciNestedInput = {
   update?: Prisma.KisiUpdateWithWhereUniqueWithoutSahipKullaniciInput | Prisma.KisiUpdateWithWhereUniqueWithoutSahipKullaniciInput[]
   updateMany?: Prisma.KisiUpdateManyWithWhereWithoutSahipKullaniciInput | Prisma.KisiUpdateManyWithWhereWithoutSahipKullaniciInput[]
   deleteMany?: Prisma.KisiScalarWhereInput | Prisma.KisiScalarWhereInput[]
+}
+
+export type KisiCreateNestedOneWithoutIslemPaylasimlariInput = {
+  create?: Prisma.XOR<Prisma.KisiCreateWithoutIslemPaylasimlariInput, Prisma.KisiUncheckedCreateWithoutIslemPaylasimlariInput>
+  connectOrCreate?: Prisma.KisiCreateOrConnectWithoutIslemPaylasimlariInput
+  connect?: Prisma.KisiWhereUniqueInput
+}
+
+export type KisiCreateNestedOneWithoutIslemReferanslariInput = {
+  create?: Prisma.XOR<Prisma.KisiCreateWithoutIslemReferanslariInput, Prisma.KisiUncheckedCreateWithoutIslemReferanslariInput>
+  connectOrCreate?: Prisma.KisiCreateOrConnectWithoutIslemReferanslariInput
+  connect?: Prisma.KisiWhereUniqueInput
+}
+
+export type KisiUpdateOneWithoutIslemPaylasimlariNestedInput = {
+  create?: Prisma.XOR<Prisma.KisiCreateWithoutIslemPaylasimlariInput, Prisma.KisiUncheckedCreateWithoutIslemPaylasimlariInput>
+  connectOrCreate?: Prisma.KisiCreateOrConnectWithoutIslemPaylasimlariInput
+  upsert?: Prisma.KisiUpsertWithoutIslemPaylasimlariInput
+  disconnect?: Prisma.KisiWhereInput | boolean
+  delete?: Prisma.KisiWhereInput | boolean
+  connect?: Prisma.KisiWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.KisiUpdateToOneWithWhereWithoutIslemPaylasimlariInput, Prisma.KisiUpdateWithoutIslemPaylasimlariInput>, Prisma.KisiUncheckedUpdateWithoutIslemPaylasimlariInput>
+}
+
+export type KisiUpdateOneWithoutIslemReferanslariNestedInput = {
+  create?: Prisma.XOR<Prisma.KisiCreateWithoutIslemReferanslariInput, Prisma.KisiUncheckedCreateWithoutIslemReferanslariInput>
+  connectOrCreate?: Prisma.KisiCreateOrConnectWithoutIslemReferanslariInput
+  upsert?: Prisma.KisiUpsertWithoutIslemReferanslariInput
+  disconnect?: Prisma.KisiWhereInput | boolean
+  delete?: Prisma.KisiWhereInput | boolean
+  connect?: Prisma.KisiWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.KisiUpdateToOneWithWhereWithoutIslemReferanslariInput, Prisma.KisiUpdateWithoutIslemReferanslariInput>, Prisma.KisiUncheckedUpdateWithoutIslemReferanslariInput>
+}
+
+export type KisiCreateNestedOneWithoutIslemTaraflariInput = {
+  create?: Prisma.XOR<Prisma.KisiCreateWithoutIslemTaraflariInput, Prisma.KisiUncheckedCreateWithoutIslemTaraflariInput>
+  connectOrCreate?: Prisma.KisiCreateOrConnectWithoutIslemTaraflariInput
+  connect?: Prisma.KisiWhereUniqueInput
+}
+
+export type KisiUpdateOneRequiredWithoutIslemTaraflariNestedInput = {
+  create?: Prisma.XOR<Prisma.KisiCreateWithoutIslemTaraflariInput, Prisma.KisiUncheckedCreateWithoutIslemTaraflariInput>
+  connectOrCreate?: Prisma.KisiCreateOrConnectWithoutIslemTaraflariInput
+  upsert?: Prisma.KisiUpsertWithoutIslemTaraflariInput
+  connect?: Prisma.KisiWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.KisiUpdateToOneWithWhereWithoutIslemTaraflariInput, Prisma.KisiUpdateWithoutIslemTaraflariInput>, Prisma.KisiUncheckedUpdateWithoutIslemTaraflariInput>
 }
 
 export type KisiCreateNestedOneWithoutKayitlarInput = {
@@ -990,6 +1057,9 @@ export type KisiCreateWithoutOfisInput = {
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutKisiInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutKisiInput
   kayitBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiUncheckedCreateWithoutOfisInput = {
@@ -1021,6 +1091,9 @@ export type KisiUncheckedCreateWithoutOfisInput = {
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutKisiInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutKisiInput
   kayitBaglari?: Prisma.KayitKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemUncheckedCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemUncheckedCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiCreateOrConnectWithoutOfisInput = {
@@ -1110,6 +1183,9 @@ export type KisiCreateWithoutSahipKullaniciInput = {
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutKisiInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutKisiInput
   kayitBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiUncheckedCreateWithoutSahipKullaniciInput = {
@@ -1141,6 +1217,9 @@ export type KisiUncheckedCreateWithoutSahipKullaniciInput = {
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutKisiInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutKisiInput
   kayitBaglari?: Prisma.KayitKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemUncheckedCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemUncheckedCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiCreateOrConnectWithoutSahipKullaniciInput = {
@@ -1167,6 +1246,462 @@ export type KisiUpdateWithWhereUniqueWithoutSahipKullaniciInput = {
 export type KisiUpdateManyWithWhereWithoutSahipKullaniciInput = {
   where: Prisma.KisiScalarWhereInput
   data: Prisma.XOR<Prisma.KisiUpdateManyMutationInput, Prisma.KisiUncheckedUpdateManyWithoutSahipKullaniciInput>
+}
+
+export type KisiCreateWithoutIslemPaylasimlariInput = {
+  id?: string
+  gorunurluk?: $Enums.Gorunurluk
+  adSoyad: string
+  telefon?: string | null
+  ikincilTelefon?: string | null
+  email?: string | null
+  sirket?: string | null
+  roller?: Prisma.KisiCreaterollerInput | string[]
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  kaynak?: $Enums.KisiKaynagi
+  notlar?: string | null
+  googleResourceName?: string | null
+  notionId?: string | null
+  googleEtag?: string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
+  uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
+  referans?: string | null
+  whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
+  sonIletisim?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKisilerInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKisilerInput
+  kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutKisiInput
+  kayitlar?: Prisma.KayitCreateNestedManyWithoutKisiInput
+  kayitBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiCreateNestedManyWithoutKisiInput
+  islemReferanslari?: Prisma.IslemCreateNestedManyWithoutReferansKisiInput
+}
+
+export type KisiUncheckedCreateWithoutIslemPaylasimlariInput = {
+  id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
+  adSoyad: string
+  telefon?: string | null
+  ikincilTelefon?: string | null
+  email?: string | null
+  sirket?: string | null
+  roller?: Prisma.KisiCreaterollerInput | string[]
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  kaynak?: $Enums.KisiKaynagi
+  notlar?: string | null
+  googleResourceName?: string | null
+  notionId?: string | null
+  googleEtag?: string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
+  uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
+  referans?: string | null
+  whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
+  sonIletisim?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutKisiInput
+  kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutKisiInput
+  kayitBaglari?: Prisma.KayitKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemReferanslari?: Prisma.IslemUncheckedCreateNestedManyWithoutReferansKisiInput
+}
+
+export type KisiCreateOrConnectWithoutIslemPaylasimlariInput = {
+  where: Prisma.KisiWhereUniqueInput
+  create: Prisma.XOR<Prisma.KisiCreateWithoutIslemPaylasimlariInput, Prisma.KisiUncheckedCreateWithoutIslemPaylasimlariInput>
+}
+
+export type KisiCreateWithoutIslemReferanslariInput = {
+  id?: string
+  gorunurluk?: $Enums.Gorunurluk
+  adSoyad: string
+  telefon?: string | null
+  ikincilTelefon?: string | null
+  email?: string | null
+  sirket?: string | null
+  roller?: Prisma.KisiCreaterollerInput | string[]
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  kaynak?: $Enums.KisiKaynagi
+  notlar?: string | null
+  googleResourceName?: string | null
+  notionId?: string | null
+  googleEtag?: string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
+  uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
+  referans?: string | null
+  whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
+  sonIletisim?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKisilerInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKisilerInput
+  kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutKisiInput
+  kayitlar?: Prisma.KayitCreateNestedManyWithoutKisiInput
+  kayitBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemCreateNestedManyWithoutPaylasilanKisiInput
+}
+
+export type KisiUncheckedCreateWithoutIslemReferanslariInput = {
+  id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
+  adSoyad: string
+  telefon?: string | null
+  ikincilTelefon?: string | null
+  email?: string | null
+  sirket?: string | null
+  roller?: Prisma.KisiCreaterollerInput | string[]
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  kaynak?: $Enums.KisiKaynagi
+  notlar?: string | null
+  googleResourceName?: string | null
+  notionId?: string | null
+  googleEtag?: string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
+  uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
+  referans?: string | null
+  whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
+  sonIletisim?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutKisiInput
+  kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutKisiInput
+  kayitBaglari?: Prisma.KayitKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemUncheckedCreateNestedManyWithoutPaylasilanKisiInput
+}
+
+export type KisiCreateOrConnectWithoutIslemReferanslariInput = {
+  where: Prisma.KisiWhereUniqueInput
+  create: Prisma.XOR<Prisma.KisiCreateWithoutIslemReferanslariInput, Prisma.KisiUncheckedCreateWithoutIslemReferanslariInput>
+}
+
+export type KisiUpsertWithoutIslemPaylasimlariInput = {
+  update: Prisma.XOR<Prisma.KisiUpdateWithoutIslemPaylasimlariInput, Prisma.KisiUncheckedUpdateWithoutIslemPaylasimlariInput>
+  create: Prisma.XOR<Prisma.KisiCreateWithoutIslemPaylasimlariInput, Prisma.KisiUncheckedCreateWithoutIslemPaylasimlariInput>
+  where?: Prisma.KisiWhereInput
+}
+
+export type KisiUpdateToOneWithWhereWithoutIslemPaylasimlariInput = {
+  where?: Prisma.KisiWhereInput
+  data: Prisma.XOR<Prisma.KisiUpdateWithoutIslemPaylasimlariInput, Prisma.KisiUncheckedUpdateWithoutIslemPaylasimlariInput>
+}
+
+export type KisiUpdateWithoutIslemPaylasimlariInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  adSoyad?: Prisma.StringFieldUpdateOperationsInput | string
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roller?: Prisma.KisiUpdaterollerInput | string[]
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleResourceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEtag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
+  referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
+  sonIletisim?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKisilerNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKisilerNestedInput
+  kayitNotlari?: Prisma.KayitNotUpdateManyWithoutKisiNestedInput
+  kayitlar?: Prisma.KayitUpdateManyWithoutKisiNestedInput
+  kayitBaglari?: Prisma.KayitKisiUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUpdateManyWithoutKisiNestedInput
+  islemReferanslari?: Prisma.IslemUpdateManyWithoutReferansKisiNestedInput
+}
+
+export type KisiUncheckedUpdateWithoutIslemPaylasimlariInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  adSoyad?: Prisma.StringFieldUpdateOperationsInput | string
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roller?: Prisma.KisiUpdaterollerInput | string[]
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleResourceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEtag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
+  referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
+  sonIletisim?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutKisiNestedInput
+  kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutKisiNestedInput
+  kayitBaglari?: Prisma.KayitKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemReferanslari?: Prisma.IslemUncheckedUpdateManyWithoutReferansKisiNestedInput
+}
+
+export type KisiUpsertWithoutIslemReferanslariInput = {
+  update: Prisma.XOR<Prisma.KisiUpdateWithoutIslemReferanslariInput, Prisma.KisiUncheckedUpdateWithoutIslemReferanslariInput>
+  create: Prisma.XOR<Prisma.KisiCreateWithoutIslemReferanslariInput, Prisma.KisiUncheckedCreateWithoutIslemReferanslariInput>
+  where?: Prisma.KisiWhereInput
+}
+
+export type KisiUpdateToOneWithWhereWithoutIslemReferanslariInput = {
+  where?: Prisma.KisiWhereInput
+  data: Prisma.XOR<Prisma.KisiUpdateWithoutIslemReferanslariInput, Prisma.KisiUncheckedUpdateWithoutIslemReferanslariInput>
+}
+
+export type KisiUpdateWithoutIslemReferanslariInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  adSoyad?: Prisma.StringFieldUpdateOperationsInput | string
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roller?: Prisma.KisiUpdaterollerInput | string[]
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleResourceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEtag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
+  referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
+  sonIletisim?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKisilerNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKisilerNestedInput
+  kayitNotlari?: Prisma.KayitNotUpdateManyWithoutKisiNestedInput
+  kayitlar?: Prisma.KayitUpdateManyWithoutKisiNestedInput
+  kayitBaglari?: Prisma.KayitKisiUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUpdateManyWithoutPaylasilanKisiNestedInput
+}
+
+export type KisiUncheckedUpdateWithoutIslemReferanslariInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  adSoyad?: Prisma.StringFieldUpdateOperationsInput | string
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roller?: Prisma.KisiUpdaterollerInput | string[]
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleResourceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEtag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
+  referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
+  sonIletisim?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutKisiNestedInput
+  kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutKisiNestedInput
+  kayitBaglari?: Prisma.KayitKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUncheckedUpdateManyWithoutPaylasilanKisiNestedInput
+}
+
+export type KisiCreateWithoutIslemTaraflariInput = {
+  id?: string
+  gorunurluk?: $Enums.Gorunurluk
+  adSoyad: string
+  telefon?: string | null
+  ikincilTelefon?: string | null
+  email?: string | null
+  sirket?: string | null
+  roller?: Prisma.KisiCreaterollerInput | string[]
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  kaynak?: $Enums.KisiKaynagi
+  notlar?: string | null
+  googleResourceName?: string | null
+  notionId?: string | null
+  googleEtag?: string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
+  uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
+  referans?: string | null
+  whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
+  sonIletisim?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ofis?: Prisma.OfisCreateNestedOneWithoutKisilerInput
+  sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKisilerInput
+  kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutKisiInput
+  kayitlar?: Prisma.KayitCreateNestedManyWithoutKisiInput
+  kayitBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemCreateNestedManyWithoutReferansKisiInput
+}
+
+export type KisiUncheckedCreateWithoutIslemTaraflariInput = {
+  id?: string
+  ofisId?: string
+  sahipKullaniciId?: string | null
+  gorunurluk?: $Enums.Gorunurluk
+  adSoyad: string
+  telefon?: string | null
+  ikincilTelefon?: string | null
+  email?: string | null
+  sirket?: string | null
+  roller?: Prisma.KisiCreaterollerInput | string[]
+  ilanSahibiTipi?: $Enums.IlanSahibiTipi
+  kaynak?: $Enums.KisiKaynagi
+  notlar?: string | null
+  googleResourceName?: string | null
+  notionId?: string | null
+  googleEtag?: string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Date | string | null
+  googleBekliyor?: Date | string | null
+  uzmanlikAileleri?: Prisma.KisiCreateuzmanlikAileleriInput | string[]
+  referans?: string | null
+  whatsappGruplari?: Prisma.KisiCreatewhatsappGruplariInput | string[]
+  sonIletisim?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutKisiInput
+  kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutKisiInput
+  kayitBaglari?: Prisma.KayitKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemUncheckedCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemUncheckedCreateNestedManyWithoutReferansKisiInput
+}
+
+export type KisiCreateOrConnectWithoutIslemTaraflariInput = {
+  where: Prisma.KisiWhereUniqueInput
+  create: Prisma.XOR<Prisma.KisiCreateWithoutIslemTaraflariInput, Prisma.KisiUncheckedCreateWithoutIslemTaraflariInput>
+}
+
+export type KisiUpsertWithoutIslemTaraflariInput = {
+  update: Prisma.XOR<Prisma.KisiUpdateWithoutIslemTaraflariInput, Prisma.KisiUncheckedUpdateWithoutIslemTaraflariInput>
+  create: Prisma.XOR<Prisma.KisiCreateWithoutIslemTaraflariInput, Prisma.KisiUncheckedCreateWithoutIslemTaraflariInput>
+  where?: Prisma.KisiWhereInput
+}
+
+export type KisiUpdateToOneWithWhereWithoutIslemTaraflariInput = {
+  where?: Prisma.KisiWhereInput
+  data: Prisma.XOR<Prisma.KisiUpdateWithoutIslemTaraflariInput, Prisma.KisiUncheckedUpdateWithoutIslemTaraflariInput>
+}
+
+export type KisiUpdateWithoutIslemTaraflariInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  adSoyad?: Prisma.StringFieldUpdateOperationsInput | string
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roller?: Prisma.KisiUpdaterollerInput | string[]
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleResourceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEtag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
+  referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
+  sonIletisim?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ofis?: Prisma.OfisUpdateOneRequiredWithoutKisilerNestedInput
+  sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKisilerNestedInput
+  kayitNotlari?: Prisma.KayitNotUpdateManyWithoutKisiNestedInput
+  kayitlar?: Prisma.KayitUpdateManyWithoutKisiNestedInput
+  kayitBaglari?: Prisma.KayitKisiUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUpdateManyWithoutReferansKisiNestedInput
+}
+
+export type KisiUncheckedUpdateWithoutIslemTaraflariInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ofisId?: Prisma.StringFieldUpdateOperationsInput | string
+  sahipKullaniciId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gorunurluk?: Prisma.EnumGorunurlukFieldUpdateOperationsInput | $Enums.Gorunurluk
+  adSoyad?: Prisma.StringFieldUpdateOperationsInput | string
+  telefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ikincilTelefon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sirket?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roller?: Prisma.KisiUpdaterollerInput | string[]
+  ilanSahibiTipi?: Prisma.EnumIlanSahibiTipiFieldUpdateOperationsInput | $Enums.IlanSahibiTipi
+  kaynak?: Prisma.EnumKisiKaynagiFieldUpdateOperationsInput | $Enums.KisiKaynagi
+  notlar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleResourceName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEtag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  notionSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  kaynaktaSilindi?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleBekliyor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uzmanlikAileleri?: Prisma.KisiUpdateuzmanlikAileleriInput | string[]
+  referans?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappGruplari?: Prisma.KisiUpdatewhatsappGruplariInput | string[]
+  sonIletisim?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutKisiNestedInput
+  kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutKisiNestedInput
+  kayitBaglari?: Prisma.KayitKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUncheckedUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUncheckedUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiCreateWithoutKayitlarInput = {
@@ -1198,6 +1733,9 @@ export type KisiCreateWithoutKayitlarInput = {
   sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKisilerInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutKisiInput
   kayitBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiUncheckedCreateWithoutKayitlarInput = {
@@ -1229,6 +1767,9 @@ export type KisiUncheckedCreateWithoutKayitlarInput = {
   updatedAt?: Date | string
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutKisiInput
   kayitBaglari?: Prisma.KayitKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemUncheckedCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemUncheckedCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiCreateOrConnectWithoutKayitlarInput = {
@@ -1276,6 +1817,9 @@ export type KisiUpdateWithoutKayitlarInput = {
   sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKisilerNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutKisiNestedInput
   kayitBaglari?: Prisma.KayitKisiUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiUncheckedUpdateWithoutKayitlarInput = {
@@ -1307,6 +1851,9 @@ export type KisiUncheckedUpdateWithoutKayitlarInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutKisiNestedInput
   kayitBaglari?: Prisma.KayitKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUncheckedUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUncheckedUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiCreateWithoutKayitBaglariInput = {
@@ -1338,6 +1885,9 @@ export type KisiCreateWithoutKayitBaglariInput = {
   sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKisilerInput
   kayitNotlari?: Prisma.KayitNotCreateNestedManyWithoutKisiInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiUncheckedCreateWithoutKayitBaglariInput = {
@@ -1369,6 +1919,9 @@ export type KisiUncheckedCreateWithoutKayitBaglariInput = {
   updatedAt?: Date | string
   kayitNotlari?: Prisma.KayitNotUncheckedCreateNestedManyWithoutKisiInput
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemUncheckedCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemUncheckedCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiCreateOrConnectWithoutKayitBaglariInput = {
@@ -1416,6 +1969,9 @@ export type KisiUpdateWithoutKayitBaglariInput = {
   sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKisilerNestedInput
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutKisiNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiUncheckedUpdateWithoutKayitBaglariInput = {
@@ -1447,6 +2003,9 @@ export type KisiUncheckedUpdateWithoutKayitBaglariInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutKisiNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUncheckedUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUncheckedUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiCreateWithoutKayitNotlariInput = {
@@ -1478,6 +2037,9 @@ export type KisiCreateWithoutKayitNotlariInput = {
   sahipKullanici?: Prisma.KullaniciCreateNestedOneWithoutSahipKisilerInput
   kayitlar?: Prisma.KayitCreateNestedManyWithoutKisiInput
   kayitBaglari?: Prisma.KayitKisiCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiUncheckedCreateWithoutKayitNotlariInput = {
@@ -1509,6 +2071,9 @@ export type KisiUncheckedCreateWithoutKayitNotlariInput = {
   updatedAt?: Date | string
   kayitlar?: Prisma.KayitUncheckedCreateNestedManyWithoutKisiInput
   kayitBaglari?: Prisma.KayitKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedCreateNestedManyWithoutKisiInput
+  islemPaylasimlari?: Prisma.IslemUncheckedCreateNestedManyWithoutPaylasilanKisiInput
+  islemReferanslari?: Prisma.IslemUncheckedCreateNestedManyWithoutReferansKisiInput
 }
 
 export type KisiCreateOrConnectWithoutKayitNotlariInput = {
@@ -1556,6 +2121,9 @@ export type KisiUpdateWithoutKayitNotlariInput = {
   sahipKullanici?: Prisma.KullaniciUpdateOneWithoutSahipKisilerNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutKisiNestedInput
   kayitBaglari?: Prisma.KayitKisiUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiUncheckedUpdateWithoutKayitNotlariInput = {
@@ -1587,6 +2155,9 @@ export type KisiUncheckedUpdateWithoutKayitNotlariInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutKisiNestedInput
   kayitBaglari?: Prisma.KayitKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUncheckedUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUncheckedUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiCreateManyOfisInput = {
@@ -1646,6 +2217,9 @@ export type KisiUpdateWithoutOfisInput = {
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutKisiNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutKisiNestedInput
   kayitBaglari?: Prisma.KayitKisiUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiUncheckedUpdateWithoutOfisInput = {
@@ -1677,6 +2251,9 @@ export type KisiUncheckedUpdateWithoutOfisInput = {
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutKisiNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutKisiNestedInput
   kayitBaglari?: Prisma.KayitKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUncheckedUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUncheckedUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiUncheckedUpdateManyWithoutOfisInput = {
@@ -1764,6 +2341,9 @@ export type KisiUpdateWithoutSahipKullaniciInput = {
   kayitNotlari?: Prisma.KayitNotUpdateManyWithoutKisiNestedInput
   kayitlar?: Prisma.KayitUpdateManyWithoutKisiNestedInput
   kayitBaglari?: Prisma.KayitKisiUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiUncheckedUpdateWithoutSahipKullaniciInput = {
@@ -1795,6 +2375,9 @@ export type KisiUncheckedUpdateWithoutSahipKullaniciInput = {
   kayitNotlari?: Prisma.KayitNotUncheckedUpdateManyWithoutKisiNestedInput
   kayitlar?: Prisma.KayitUncheckedUpdateManyWithoutKisiNestedInput
   kayitBaglari?: Prisma.KayitKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemTaraflari?: Prisma.IslemKisiUncheckedUpdateManyWithoutKisiNestedInput
+  islemPaylasimlari?: Prisma.IslemUncheckedUpdateManyWithoutPaylasilanKisiNestedInput
+  islemReferanslari?: Prisma.IslemUncheckedUpdateManyWithoutReferansKisiNestedInput
 }
 
 export type KisiUncheckedUpdateManyWithoutSahipKullaniciInput = {
@@ -1834,12 +2417,18 @@ export type KisiCountOutputType = {
   kayitNotlari: number
   kayitlar: number
   kayitBaglari: number
+  islemTaraflari: number
+  islemPaylasimlari: number
+  islemReferanslari: number
 }
 
 export type KisiCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   kayitNotlari?: boolean | KisiCountOutputTypeCountKayitNotlariArgs
   kayitlar?: boolean | KisiCountOutputTypeCountKayitlarArgs
   kayitBaglari?: boolean | KisiCountOutputTypeCountKayitBaglariArgs
+  islemTaraflari?: boolean | KisiCountOutputTypeCountIslemTaraflariArgs
+  islemPaylasimlari?: boolean | KisiCountOutputTypeCountIslemPaylasimlariArgs
+  islemReferanslari?: boolean | KisiCountOutputTypeCountIslemReferanslariArgs
 }
 
 /**
@@ -1871,6 +2460,27 @@ export type KisiCountOutputTypeCountKayitlarArgs<ExtArgs extends runtime.Types.E
  */
 export type KisiCountOutputTypeCountKayitBaglariArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.KayitKisiWhereInput
+}
+
+/**
+ * KisiCountOutputType without action
+ */
+export type KisiCountOutputTypeCountIslemTaraflariArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IslemKisiWhereInput
+}
+
+/**
+ * KisiCountOutputType without action
+ */
+export type KisiCountOutputTypeCountIslemPaylasimlariArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IslemWhereInput
+}
+
+/**
+ * KisiCountOutputType without action
+ */
+export type KisiCountOutputTypeCountIslemReferanslariArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IslemWhereInput
 }
 
 
@@ -1906,6 +2516,9 @@ export type KisiSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   kayitNotlari?: boolean | Prisma.Kisi$kayitNotlariArgs<ExtArgs>
   kayitlar?: boolean | Prisma.Kisi$kayitlarArgs<ExtArgs>
   kayitBaglari?: boolean | Prisma.Kisi$kayitBaglariArgs<ExtArgs>
+  islemTaraflari?: boolean | Prisma.Kisi$islemTaraflariArgs<ExtArgs>
+  islemPaylasimlari?: boolean | Prisma.Kisi$islemPaylasimlariArgs<ExtArgs>
+  islemReferanslari?: boolean | Prisma.Kisi$islemReferanslariArgs<ExtArgs>
   _count?: boolean | Prisma.KisiCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kisi"]>
 
@@ -2007,6 +2620,9 @@ export type KisiInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   kayitNotlari?: boolean | Prisma.Kisi$kayitNotlariArgs<ExtArgs>
   kayitlar?: boolean | Prisma.Kisi$kayitlarArgs<ExtArgs>
   kayitBaglari?: boolean | Prisma.Kisi$kayitBaglariArgs<ExtArgs>
+  islemTaraflari?: boolean | Prisma.Kisi$islemTaraflariArgs<ExtArgs>
+  islemPaylasimlari?: boolean | Prisma.Kisi$islemPaylasimlariArgs<ExtArgs>
+  islemReferanslari?: boolean | Prisma.Kisi$islemReferanslariArgs<ExtArgs>
   _count?: boolean | Prisma.KisiCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type KisiIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2029,6 +2645,12 @@ export type $KisiPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     kayitNotlari: Prisma.$KayitNotPayload<ExtArgs>[]
     kayitlar: Prisma.$KayitPayload<ExtArgs>[]
     kayitBaglari: Prisma.$KayitKisiPayload<ExtArgs>[]
+    /**
+     * v3.44 — işlemlerdeki bağlar: taraf, paylaşılan danışman, referans
+     */
+    islemTaraflari: Prisma.$IslemKisiPayload<ExtArgs>[]
+    islemPaylasimlari: Prisma.$IslemPayload<ExtArgs>[]
+    islemReferanslari: Prisma.$IslemPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2472,6 +3094,9 @@ export interface Prisma__KisiClient<T, Null = never, ExtArgs extends runtime.Typ
   kayitNotlari<T extends Prisma.Kisi$kayitNotlariArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Kisi$kayitNotlariArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KayitNotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   kayitlar<T extends Prisma.Kisi$kayitlarArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Kisi$kayitlarArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KayitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   kayitBaglari<T extends Prisma.Kisi$kayitBaglariArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Kisi$kayitBaglariArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KayitKisiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  islemTaraflari<T extends Prisma.Kisi$islemTaraflariArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Kisi$islemTaraflariArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IslemKisiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  islemPaylasimlari<T extends Prisma.Kisi$islemPaylasimlariArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Kisi$islemPaylasimlariArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IslemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  islemReferanslari<T extends Prisma.Kisi$islemReferanslariArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Kisi$islemReferanslariArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IslemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3016,6 +3641,78 @@ export type Kisi$kayitBaglariArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.KayitKisiScalarFieldEnum | Prisma.KayitKisiScalarFieldEnum[]
+}
+
+/**
+ * Kisi.islemTaraflari
+ */
+export type Kisi$islemTaraflariArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IslemKisi
+   */
+  select?: Prisma.IslemKisiSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the IslemKisi
+   */
+  omit?: Prisma.IslemKisiOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslemKisiInclude<ExtArgs> | null
+  where?: Prisma.IslemKisiWhereInput
+  orderBy?: Prisma.IslemKisiOrderByWithRelationInput | Prisma.IslemKisiOrderByWithRelationInput[]
+  cursor?: Prisma.IslemKisiWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IslemKisiScalarFieldEnum | Prisma.IslemKisiScalarFieldEnum[]
+}
+
+/**
+ * Kisi.islemPaylasimlari
+ */
+export type Kisi$islemPaylasimlariArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Islem
+   */
+  select?: Prisma.IslemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Islem
+   */
+  omit?: Prisma.IslemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslemInclude<ExtArgs> | null
+  where?: Prisma.IslemWhereInput
+  orderBy?: Prisma.IslemOrderByWithRelationInput | Prisma.IslemOrderByWithRelationInput[]
+  cursor?: Prisma.IslemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IslemScalarFieldEnum | Prisma.IslemScalarFieldEnum[]
+}
+
+/**
+ * Kisi.islemReferanslari
+ */
+export type Kisi$islemReferanslariArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Islem
+   */
+  select?: Prisma.IslemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Islem
+   */
+  omit?: Prisma.IslemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IslemInclude<ExtArgs> | null
+  where?: Prisma.IslemWhereInput
+  orderBy?: Prisma.IslemOrderByWithRelationInput | Prisma.IslemOrderByWithRelationInput[]
+  cursor?: Prisma.IslemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IslemScalarFieldEnum | Prisma.IslemScalarFieldEnum[]
 }
 
 /**

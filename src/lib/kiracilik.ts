@@ -61,7 +61,7 @@ export const OFIS_MODELLERI: ReadonlySet<string> = new Set([
  * Doğrudan sorgulanmaları yasak değildir ama ofis süzgeci uygulanamaz — bu yüzden
  * tests/v320-db.test.ts bu modellerin kodda doğrudan sorgulanmadığını denetler.
  */
-export const EBEVEYN_MODELLERI: ReadonlySet<string> = new Set(["mulkOzellik", "kayitLokasyon", "kayitKisi"]);
+export const EBEVEYN_MODELLERI: ReadonlySet<string> = new Set(["mulkOzellik", "kayitLokasyon", "kayitKisi", "islemKisi"]);
 
 /** Tüm ofislerin paylaştığı başvuru verisi (il / ilçe / mahalle / alt bölge sözlükleri) — salt okunur. */
 export const GENEL_MODELLER: ReadonlySet<string> = new Set([

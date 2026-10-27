@@ -1167,6 +1167,77 @@ main.sarici>.genel-geri+*>h2:first-child{display:flex;align-items:center}
   .sekme4 button,.sekme3 button{padding:.6rem .2rem;font-size:.82rem}
   .fb{padding:.4rem .7rem}
 }
+
+/* ─────────────────────────────────────────────────────────────
+   v3.44 — İŞLEMLER ekranı (Polaris "İş planı · işlemler" düzeni)
+   Renkli özet kutuları, geniş ekranda tablo / telefonda kart listesi,
+   bağımlılıksız SVG grafikler.
+   ───────────────────────────────────────────────────────────── */
+p.hata{background:var(--kotu-bg);color:var(--kotu);border-radius:var(--r);padding:10px 12px;font-size:.88rem;margin:0}
+
+/* Özet kutuları — üstte renkli şerit */
+.ozet-kutular{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.ozet{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--c,var(--acc));border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.ozet span{font-size:.75rem;color:var(--mut);line-height:1.3}
+.ozet b{font:600 1.25rem/1.1 var(--m);font-variant-numeric:tabular-nums;color:var(--c,var(--fg));overflow-wrap:anywhere}
+
+/* Süzgeç çubuğu */
+.suzgec-cubugu{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.suzgec-cubugu input[type=search]{flex:1 1 200px;min-width:0}
+.suzgec-cubugu select{flex:0 0 auto}
+
+/* Tablo — geniş ekran */
+.islem-tablo-sar{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);overflow-x:auto}
+.islem-tablo{min-width:1040px;font-size:.82rem}
+.islem-tablo th{position:sticky;top:0;background:var(--lacivert);color:#fff;z-index:1;white-space:nowrap}
+.islem-tablo th.n,.islem-tablo td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.islem-tablo tbody tr{cursor:pointer}
+.islem-tablo tbody tr:nth-child(even){background:var(--panel2)}
+.islem-tablo tbody tr:hover,.islem-tablo tbody tr:focus-visible{background:var(--acc-soft);outline:none}
+.islem-tablo td.ts{white-space:nowrap;color:var(--mut)}
+.islem-tablo td.liste{min-width:220px;font-weight:500}
+.islem-tablo td.bk{font-weight:700;color:var(--iyi)}
+.islem-tablo td.ac{min-width:200px;font-size:.78rem}
+.islem-tablo td.kucuk-hucre{font-size:.78rem;min-width:120px}
+.islem-tablo tfoot td{background:var(--lacivert);color:#fff;font-weight:700;border-bottom:0;position:sticky;bottom:0}
+.islem-tablo tfoot td.n{text-align:right;font-variant-numeric:tabular-nums}
+.ic-bag{background:none;border:0;padding:0;color:var(--mavi);font:inherit;text-align:left;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.not-etiket{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:3px}
+
+/* Kart listesi — telefon */
+.islem-kartlar{display:none;flex-direction:column;gap:8px}
+.islem-kart{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--c,var(--acc));border-radius:var(--r);padding:10px 12px;display:flex;flex-direction:column;gap:3px;text-align:left;width:100%;cursor:pointer}
+.islem-kart b.liste{font-size:.92rem;overflow-wrap:anywhere}
+.islem-kart-toplam{display:flex;justify-content:space-between;background:var(--lacivert);color:#fff;border-radius:var(--r);padding:10px 12px;font-weight:700}
+
+/* Grafikler */
+.grafik-ikili{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cubuklar{display:grid;gap:3px;align-items:end;height:190px;margin-top:8px}
+.cubuk{background:none;border:0;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;height:100%;cursor:pointer;min-width:0}
+.cubuk .dolgu{display:block;width:100%;background:var(--mavi-bg);border-radius:4px 4px 0 0;transition:background .15s}
+.cubuk:hover .dolgu{background:color-mix(in srgb,var(--mavi) 45%,transparent)}
+.cubuk.on .dolgu{background:var(--mavi)}
+.cubuk .deger{font:600 .68rem var(--m);color:var(--mut);white-space:nowrap;height:1em}
+.cubuk .ad{font-size:.68rem;color:var(--mut)}
+.cubuk.on .ad{color:var(--fg);font-weight:700}
+.halka-sar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.halka{width:140px;height:140px;flex:0 0 auto}
+.halka-orta{font:700 15px var(--m);fill:var(--fg)}
+.halka-alt{font:400 8px var(--f);fill:var(--mut)}
+.halka-liste{list-style:none;margin:0;padding:0;flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.halka-liste li{display:flex;align-items:center;gap:8px;font-size:.82rem;border-bottom:1px solid var(--line);padding-bottom:5px}
+.halka-liste li:last-child{border-bottom:0}
+.halka-liste i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.halka-liste span{flex:1;min-width:0;color:var(--mut)}
+.halka-liste b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.halka-liste small{color:var(--mut);width:40px;text-align:right}
+
+@media (max-width:899px){
+  .grafik-ikili{grid-template-columns:1fr}
+  .islem-tablo-sar{display:none}
+  .islem-kartlar{display:flex}
+  .ozet b{font-size:1.1rem}
+}
 </style>
 <div id="kok"></div>
 <noscript>Bu demo için JavaScript gereklidir.</noscript>

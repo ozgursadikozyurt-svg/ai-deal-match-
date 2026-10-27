@@ -5,6 +5,25 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.44 · 27 Ekim 2026 — İşlemler ekranı Polaris düzeninde yeniden kuruldu: renkli özet kutuları, tablo + grafikler, ayrıntılı işlem detayı (paylaşılan kişi, referans, taraflar)
+
+- İşlem detayı artık Polaris'teki kadar ayrıntılı: TÜR (Satış / Kiralama / Diğer), Paylaşım yapılan kişi ve telefonu, Referans (işi kim getirdi?) ve rehberden TARAFLAR — Alıcı / kiracı, Satıcı / kiraya veren, Referans, Paylaşılan danışman, Diğer. Paylaşılan kişi ve referans rehberden seçilebilir ya da serbest yazılabilir; rehberden seçilince telefon kendiliğinden gelir.
+- İşlemler ekranı Polaris'teki "İş planı · işlemler" düzeninde: altı renkli özet kutusu (Toplam "Bana Kalan", Aylık ortalama, Yıl hedefine kalan, Satış · n işlem, Kiralama · n işlem, Reklamdan gelen), arama + Hepsi / Satış / Kiralama / Diğer cipleri ve ay seçimi.
+- Geniş ekranda renkli tablo (Tarih, Ay, Tür, Liste, Bana Kalan, Fiyat, Paylaşımlı, Paylaşılan kişi, Ofise, Referans, Taraflar, Açıklama, Reklam) ve altında koyu TOTAL satırı; telefonda aynı veriler renk şeritli kart listesi olarak. Satıra dokununca düzenleme formu açılır.
+- Açıklama notundan renkli etiketler otomatik çıkıyor (Faturalı / Faturasız, Nakit / elden, Ofisle paylaşıldı / paylaşılmadı). Notun kendisine dokunulmuyor; etiketler yazarken formda da görünüyor.
+- İki grafik: "Aylara göre gelir" çubuk grafiği (çubuğa dokun → o ayı seç) ve "Gelirin paylaşımı" halka grafiği (bana kalan / paylaşım / ofise, yüzdeleriyle). Bağımlılıksız SVG; karanlık temada da doğru görünür.
+- "Kimden iş geldi?" tablosu: işlemlere eklenen referans ve taraflardan kişi bazlı iş sayısı ve bana kalan toplamı; kişi adına dokununca rehber kartı açılır.
+- Yıllık hedef artık ayar: Ayarlar'daki yilHedefi (varsayılan 2.500.000 TL) "Yıl hedefine kalan" kutusunu besler. Süzülen listenin CSV'si indirilebilir.
+- Polaris'in okuduğu uçta (/api/polaris/anahtar/islemler) paylaşılan kişi, referans ve taraflar da gönderiliyor; iki uygulamanın "Kimden iş geldi?" ve sütun görünümleri aynı veriyi gösteriyor. Tutar alanları, P&L kuralı (ay = tahsilat ayı) ve geçmiş rakamlar değişmedi.
+
+**Demo'da test edilecekler**
+
+- [ ] Ayarlar › İşlemler: "+ Yeni işlem" deyin; formda Tür, Paylaşım yapılan kişi + Telefonu, Referans ve Taraflar alanları görünmeli. Bir taraf ekleyip rolünü seçin, kaydedin.
+- [ ] Açıklamaya "Elden nakit alındı, fatura kesilmedi" yazın: form altında Faturasız ve Nakit / elden etiketleri çıkmalı; kayıttan sonra tabloda da görünmeli.
+- [ ] Üstteki altı özet kutusunun rakamlarını kontrol edin; "Aylara göre gelir" grafiğinde bir çubuğa dokunun — liste, TOTAL satırı ve halka grafiği o aya düşmeli, "Bütün yılı göster" ile geri dönmeli.
+- [ ] Telefonda açın: tablo yerine renk şeritli kartlar çıkmalı, sayfa yana kaymamalı.
+- [ ] "Kimden iş geldi?" tablosunda eklediğiniz referans / taraf kişisi görünmeli; adına dokununca rehber kartı açılmalı.
+
 ## v3.43 · 25 Ekim 2026 — İzleme ekranına ayrıntılı arama + filtre; sade "Sırala" düğmesi; eşleşme kartında kıyas şeridi; tüm ekranlarda mobil sağlamlaştırma
 
 - İzleme ekranı artık diğer listeler gibi: üstte arama kutusu, "Filtrele" paneli (mülk türü, işlem, konum, fiyat, alan, oda, kişi, kaynak…) ve "Sırala". Sekme sayıları (Talepler / Portföyler / Eşleşmeler) filtreye göre güncellenir; başlıkta "3 / 12 kayıt" yazar.

@@ -850,6 +850,19 @@ model Islem {
   talepId          String?
   portfoyId        String?
   kisiId           String?
+  /// v3.44 — komisyonu paylaştığım danışman / emlakçı (rehberden). Serbest ad da yazılabilir: paylasilanAd.
+  paylasilanKisiId String?
+  paylasilanKisi   Kisi?     @relation("IslemPaylasilan", fields: [paylasilanKisiId], references: [id], onDelete: SetNull)
+  /// v3.44 — rehberde olmayan paylaşılan kişi için serbest ad
+  paylasilanAd     String?
+  /// v3.44 — paylaşılan kişinin işlem anındaki telefonu (rehber değişse de kayıtta kalır)
+  paylasilanTelefon String?
+  /// v3.44 — işi kim getirdi (referans). Rehberden kişi ya da serbest ad.
+  referansKisiId   String?
+  referansKisi     Kisi?     @relation("IslemReferans", fields: [referansKisiId], references: [id], onDelete: SetNull)
+  referansAd       String?
+  /// v3.44 — işlemin tarafları (alıcı, satıcı, referans…) rehberden
+  taraflar         IslemKisi[]
   disKaynak        String?
   disKimlik        String?
   createdAt        DateTime  @default(now())
@@ -858,7 +871,25 @@ model Islem {
   @@unique([ofisId, disKaynak, disKimlik])
   @@index([ofisId, tarih])
   @@index([ofisId, tahsilatTarihi])
+  @@index([ofisId, referansKisiId])
+  @@index([ofisId, paylasilanKisiId])
   @@map("islem")
+}
+
+/// v3.44 — İşlemin tarafları (Polaris'teki "Taraflar (rehberden)" alanı).
+/// rol: ALICI_KIRACI | SATICI_KIRAYA_VEREN | REFERANS | PAYLASILAN_DANISMAN | DIGER
+model IslemKisi {
+  id        String   @id @default(cuid())
+  islemId   String
+  kisiId    String
+  rol       String   @default("DIGER")
+  islem     Islem    @relation(fields: [islemId], references: [id], onDelete: Cascade)
+  kisi      Kisi     @relation("IslemTarafi", fields: [kisiId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([islemId, kisiId, rol])
+  @@index([kisiId])
+  @@map("islem_kisi")
 }
 
 // ============================================================================
@@ -1439,6 +1470,10 @@ model Kisi {
 
   kayitlar  Kayit[]
   kayitBaglari KayitKisi[]
+  /// v3.44 — işlemlerdeki bağlar: taraf, paylaşılan danışman, referans
+  islemTaraflari    IslemKisi[] @relation("IslemTarafi")
+  islemPaylasimlari Islem[]     @relation("IslemPaylasilan")
+  islemReferanslari Islem[]     @relation("IslemReferans")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
