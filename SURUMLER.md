@@ -5,6 +5,20 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.44.1 · 27 Ekim 2026 — İşlemlerde iki düzeltme: kişi eklerken yabancı anahtar hatası, bozuk aylık gelir grafiği
+
+- HATA: işleme taraf / paylaşılan kişi / referans eklenince "Foreign key constraint violated: islem_kisi_kisiId_fkey" hatası alınıyor ve işlem hiç kaydedilmiyordu. Sebep: rehbere yeni eklenen kişi arayüzde hemen görünür ama sunucuya birkaç saniye sonra yazılır; o aradaki kişi seçilince veritabanında henüz yoktur.
+- Çözüm: kişi bağları yazılmadan önce sunucuda doğrulanıyor. Bağ kurulamazsa işlem yine kaydediliyor, kişi adıyla saklanıyor ve ekranda "… rehberde henüz sunucuya yazılmamış, adıyla kaydedildi" uyarısı çıkıyor. Kişi eşitlendikten sonra işlem açılıp yeniden seçilince bağ kurulur. Hiçbir bilgi kaybolmuyor.
+- Taraf artık rehberde olmayan bir ad ile de eklenebiliyor (Polaris'te olduğu gibi yalnızca rehber şartı kalktı); kişi sonradan silinirse taraf satırı adıyla duruyor, yalnızca bağ boşalıyor.
+- HATA: "Aylara göre gelir" grafiği bozuk çiziliyordu (çubukların üstünde yeşil kapsüller, kayık aylar). Sebep: grafikte kullanılan ".cubuk", ".deger" ve ".ad" sınıf adları uygulamadaki ilerleme çubuğu ve kart bileşenleriyle çakışıyordu. Grafiğin sınıfları "gc-" ön ekiyle ayrıldı.
+- "Kimden iş geldi?" tablosundaki sayı sütunları artık sağa dayalı.
+
+**Demo'da test edilecekler**
+
+- [ ] İşlemler › bir işlemi açın, Taraflar'a rehberden kişi ekleyip kaydedin: hata çıkmamalı, taraf satırda görünmeli.
+- [ ] Rehbere yeni bir kişi ekleyip hemen bir işleme taraf olarak ekleyin: işlem kaydedilmeli; bağlanamadıysa turuncu uyarı çıkmalı ve ad yine görünmeli.
+- [ ] "Aylara göre gelir" grafiğine bakın: çubuklar aşağıdan yukarı, ay adları altta, seçili ay koyu mavi olmalı.
+
 ## v3.44 · 27 Ekim 2026 — İşlemler ekranı Polaris düzeninde yeniden kuruldu: renkli özet kutuları, tablo + grafikler, ayrıntılı işlem detayı (paylaşılan kişi, referans, taraflar)
 
 - İşlem detayı artık Polaris'teki kadar ayrıntılı: TÜR (Satış / Kiralama / Diğer), Paylaşım yapılan kişi ve telefonu, Referans (işi kim getirdi?) ve rehberden TARAFLAR — Alıcı / kiracı, Satıcı / kiraya veren, Referans, Paylaşılan danışman, Diğer. Paylaşılan kişi ve referans rehberden seçilebilir ya da serbest yazılabilir; rehberden seçilince telefon kendiliğinden gelir.

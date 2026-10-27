@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.44 · 27 Ekim 2026
+ * Anahtar CRM v3.44.1 · 27 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.44";
+export const SURUM = "3.44.1";
 export const TARIH = "27 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.44_27Ekim2026";
+export const DOSYA_EKI = "v3.44.1_27Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,23 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.44.1",
+    tarih: "27 Ekim 2026",
+    baslik: "İşlemlerde iki düzeltme: kişi eklerken yabancı anahtar hatası, bozuk aylık gelir grafiği",
+    degisenler: [
+      "HATA: işleme taraf / paylaşılan kişi / referans eklenince \"Foreign key constraint violated: islem_kisi_kisiId_fkey\" hatası alınıyor ve işlem hiç kaydedilmiyordu. Sebep: rehbere yeni eklenen kişi arayüzde hemen görünür ama sunucuya birkaç saniye sonra yazılır; o aradaki kişi seçilince veritabanında henüz yoktur.",
+      "Çözüm: kişi bağları yazılmadan önce sunucuda doğrulanıyor. Bağ kurulamazsa işlem yine kaydediliyor, kişi adıyla saklanıyor ve ekranda \"… rehberde henüz sunucuya yazılmamış, adıyla kaydedildi\" uyarısı çıkıyor. Kişi eşitlendikten sonra işlem açılıp yeniden seçilince bağ kurulur. Hiçbir bilgi kaybolmuyor.",
+      "Taraf artık rehberde olmayan bir ad ile de eklenebiliyor (Polaris'te olduğu gibi yalnızca rehber şartı kalktı); kişi sonradan silinirse taraf satırı adıyla duruyor, yalnızca bağ boşalıyor.",
+      "HATA: \"Aylara göre gelir\" grafiği bozuk çiziliyordu (çubukların üstünde yeşil kapsüller, kayık aylar). Sebep: grafikte kullanılan \".cubuk\", \".deger\" ve \".ad\" sınıf adları uygulamadaki ilerleme çubuğu ve kart bileşenleriyle çakışıyordu. Grafiğin sınıfları \"gc-\" ön ekiyle ayrıldı.",
+      "\"Kimden iş geldi?\" tablosundaki sayı sütunları artık sağa dayalı.",
+    ],
+    testEt: [
+      "İşlemler › bir işlemi açın, Taraflar'a rehberden kişi ekleyip kaydedin: hata çıkmamalı, taraf satırda görünmeli.",
+      "Rehbere yeni bir kişi ekleyip hemen bir işleme taraf olarak ekleyin: işlem kaydedilmeli; bağlanamadıysa turuncu uyarı çıkmalı ve ad yine görünmeli.",
+      "\"Aylara göre gelir\" grafiğine bakın: çubuklar aşağıdan yukarı, ay adları altta, seçili ay koyu mavi olmalı.",
+    ],
+  },
   {
     surum: "3.44",
     tarih: "27 Ekim 2026",

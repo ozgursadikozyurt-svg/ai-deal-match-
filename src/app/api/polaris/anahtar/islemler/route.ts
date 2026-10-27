@@ -1,4 +1,4 @@
-// Anahtar CRM v3.44 · 27 Ekim 2026
+// Anahtar CRM v3.44.1 · 27 Ekim 2026
 // Polaris v7 · 21 Ekim 2026
 // GET /api/polaris/anahtar/islemler?yil=2026 → o yıl tahsil edilen (ya da tahsil edilmemiş ama o yıl yapılan) işlemler.
 // Polaris'in İşlemler sekmesi ve P&L satır 3 bunu okur ("Anahtar'dan güncelle" + günde bir otomatik). Salt okunur.
@@ -21,7 +21,7 @@ export async function GET(req: Request) {
       select: { id: true, disKaynak: true, disKimlik: true, tarih: true, tahsilatTarihi: true, tur: true, baslik: true, bedel: true, paylasilan: true, ofisPayi: true, banaKalan: true, aciklama: true, reklam: true,
         paylasilanAd: true, paylasilanTelefon: true, referansAd: true,
         paylasilanKisi: { select: { adSoyad: true, telefon: true } }, referansKisi: { select: { adSoyad: true } },
-        taraflar: { select: { rol: true, kisi: { select: { id: true, adSoyad: true } } } } },
+        taraflar: { select: { rol: true, ad: true, kisi: { select: { id: true, adSoyad: true } } } } },
     });
     const gun = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : null);
     const sayi = (v: unknown) => (v == null ? null : Number(v));
@@ -30,7 +30,7 @@ export async function GET(req: Request) {
       bedel: sayi(x.bedel), pay: sayi(x.paylasilan), ofis: sayi(x.ofisPayi), bk: sayi(x.banaKalan), aciklama: x.aciklama, reklam: x.reklam,
       pk: x.paylasilanKisi || x.paylasilanAd ? { a: x.paylasilanKisi?.adSoyad ?? x.paylasilanAd, t: x.paylasilanTelefon ?? x.paylasilanKisi?.telefon ?? null } : null,
       ref: x.referansKisi?.adSoyad ?? x.referansAd ?? null,
-      tf: x.taraflar.length ? x.taraflar.map((t) => ({ i: t.kisi.id, a: t.kisi.adSoyad, rol: t.rol })) : null,
+      tf: x.taraflar.length ? x.taraflar.map((t) => ({ i: t.kisi?.id ?? null, a: t.kisi?.adSoyad ?? t.ad, rol: t.rol })) : null,
     })));
   } catch (e) { return hata(e); }
 }

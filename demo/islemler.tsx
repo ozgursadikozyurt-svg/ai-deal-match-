@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.44 · 27 Ekim 2026
+ * Anahtar CRM v3.44.1 · 27 Ekim 2026
  * İŞLEMLER — kapanan satış / kiralama ve komisyon (yalnızca ofis yöneticisi: islem.yonet).
  *
  * v3.44 — ekran Polaris'teki "İş planı · İşlemler" düzeninde yeniden kuruldu:
@@ -12,6 +12,10 @@
  * Form Polaris'teki kadar ayrıntılı: tür (Satış/Kiralama/Diğer), paylaşılan kişi + telefonu,
  * referans (işi kim getirdi) ve rehberden taraflar.
  * P&L kuralı değişmedi: "bana kalan" tahsilat ayına yazılır; tahsilat tarihi boşsa "bekleyen" (src/lib/domain/islem.ts).
+ *
+ * v3.44.1 — Taraf, paylaşılan kişi ve referans için ad her zaman sunucuya gönderilir. Rehberdeki kişi
+ * henüz sunucuya yazılmamışsa (ya da silinmişse) sunucu bağı kurmaz ama adı saklar; işlem kaydedilir
+ * ve kullanıcıya hangi kişinin bağlanamadığı söylenir. Eskiden bu durum kaydı tümden engelliyordu.
  */
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useKaydedilmemis, useIlkHal } from "./kirli";
@@ -24,7 +28,7 @@ import {
 } from "../src/lib/domain/islem";
 import { YIL_HEDEFI_VARSAYILAN } from "../src/lib/domain/ayarlar";
 
-export interface IslemTarafi { kisiId: string; rol: TarafRolu; ad?: string; telefon?: string | null }
+export interface IslemTarafi { kisiId: string | null; rol: TarafRolu; ad?: string; telefon?: string | null }
 export interface Islem {
   id: string; tarih: string; tahsilatTarihi: string | null; tur: IslemTuru; baslik: string;
   bedel: number | null; paylasilan: number | null; ofisPayi: number | null; banaKalan: number | null;
@@ -62,13 +66,13 @@ function AyGrafigi({ aylar, secili, sec, ayAdet }: { aylar: number[]; secili: nu
   const veri = aylar.slice(0, son);
   const enb = Math.max(1, ...veri);
   const enIyi = veri.reduce((b, v, i) => (v > veri[b] ? i : b), 0);
-  return <div className="cizim">
-    <div className="cubuklar" style={{ gridTemplateColumns: `repeat(${veri.length},1fr)` }}>
-      {veri.map((v, i) => <button key={i} type="button" className={"cubuk" + (secili === i ? " on" : "")} aria-pressed={secili === i}
+  return <div>
+    <div className="gc-izgara" style={{ gridTemplateColumns: `repeat(${veri.length},1fr)` }}>
+      {veri.map((v, i) => <button key={i} type="button" className={"gc-sutun" + (secili === i ? " on" : "")} aria-pressed={secili === i}
         title={`${AY_TAM[i]} · ${TL(v)} · ${ayAdet(i)} işlem`} onClick={() => sec(secili === i ? null : i)}>
-        <span className="deger">{v && (i === enIyi || i === secili || i === veri.length - 1) ? KISA(v) : ""}</span>
-        <span className="dolgu" style={{ height: `${Math.max(v ? 3 : 0, (v / enb) * 100)}%` }} />
-        <span className="ad">{AYLAR[i]}</span>
+        <span className="gc-deger">{v && (i === enIyi || i === secili || i === veri.length - 1) ? KISA(v) : ""}</span>
+        <span className="gc-dolgu" style={{ height: `${Math.max(v ? 3 : 0, (v / enb) * 100)}%` }} />
+        <span className="gc-ay">{AYLAR[i]}</span>
       </button>)}
     </div>
     <p className="ipucu">Çubuğa dokun: o ayı seç. Rakamlar "bana kalan", TL.</p>
@@ -182,16 +186,24 @@ export function IslemlerEkrani() {
         bedel: sayiOku(f.bedel), paylasilan: sayiOku(f.paylasilan), ofisPayi: sayiOku(f.ofisPayi), banaKalan: sayiOku(f.banaKalan),
         aciklama: f.aciklama.trim() || null, reklam: f.reklam, talepKaynagi: f.reklam ? "REKLAM" : null,
         talepId: f.talep ? adIle.get(f.talep) ?? null : null, portfoyId: f.portfoy ? adIle.get(f.portfoy) ?? null : null,
-        paylasilanKisiId: pk?.id ?? null, paylasilanAd: pk ? null : f.paylasilanAd.trim() || null, paylasilanTelefon: f.paylasilanTelefon.trim() || pk?.telefon || null,
-        referansKisiId: rk?.id ?? null, referansAd: rk ? null : f.referansAd.trim() || null,
-        taraflar: f.taraflar.map((t) => ({ kisiId: t.kisiId, rol: t.rol })),
+        // ad her zaman gönderilir: bağ kurulamazsa sunucu adı saklar (v3.44.1)
+        paylasilanKisiId: pk?.id ?? null, paylasilanAd: f.paylasilanAd.trim() || null, paylasilanTelefon: f.paylasilanTelefon.trim() || pk?.telefon || null,
+        referansKisiId: rk?.id ?? null, referansAd: f.referansAd.trim() || null,
+        taraflar: f.taraflar.map((t) => ({ kisiId: t.kisiId, ad: t.ad ?? null, rol: t.rol })),
       };
-      if (canli) { await api(duzen.id ? `/api/islemler?id=${duzen.id}` : "/api/islemler", { method: duzen.id ? "PATCH" : "POST", json: govde }); await yukle(); }
+      let bagsiz: string[] = [];
+      if (canli) {
+        const y = await api<{ bagsiz?: string[] }>(duzen.id ? `/api/islemler?id=${duzen.id}` : "/api/islemler", { method: duzen.id ? "PATCH" : "POST", json: govde });
+        bagsiz = y?.bagsiz ?? [];
+        await yukle();
+      }
       else {
         const yerel = { ...govde, paylasilanAd: pk?.adSoyad ?? govde.paylasilanAd, referansAd: rk?.adSoyad ?? govde.referansAd, taraflar: f.taraflar } as unknown as Islem;
         setListe((l) => (duzen.id ? l.map((x) => (x.id === duzen.id ? { ...x, ...yerel } : x)) : [{ ...yerel, id: "di" + Date.now() }, ...l]));
       }
       bildir(duzen.id ? "İşlem güncellendi" : "İşlem eklendi");
+      // Rehberdeki kişi henüz sunucuya yazılmadıysa bağ kurulamaz; işlem yine kaydedilir, ad durur.
+      if (bagsiz.length) setHata(`İşlem kaydedildi. ${[...new Set(bagsiz)].join(", ")} rehberde henüz sunucuya yazılmamış, bu yüzden adıyla kaydedildi — kişi eşitlendikten sonra işlemi açıp yeniden seçerseniz bağ kurulur.`);
       kapatForm();
       return true;
     } catch (e: any) { setHata(e?.message ?? "Kaydedilemedi"); return false; }
@@ -206,11 +218,13 @@ export function IslemlerEkrani() {
   const setF = (k: keyof Form, v: any) => setDuzen((x) => x && { ...x, f: { ...x.f, [k]: v, ...(k === "baslik" && !x.f.turElle ? { tur: turTahmini(v) } : {}), ...(k === "tarih" && !x.id ? { tahsilatTarihi: v } : {}) } });
   const tarafEkle = () => setDuzen((x) => {
     if (!x) return x;
-    const k = kisiBul(x.f.tarafAd);
-    if (!k) { setHata("Tarafı rehberden seçin — bu ad rehberde yok. Kişiler ekranından ekleyebilirsiniz."); return x; }
-    if (x.f.taraflar.some((t) => t.kisiId === k.id && t.rol === x.f.tarafRol)) return { ...x, f: { ...x.f, tarafAd: "" } };
+    const yazilan = x.f.tarafAd.trim();
+    if (!yazilan) return x;
+    const k = kisiBul(yazilan);
+    const ad = k?.adSoyad ?? yazilan;
+    if (x.f.taraflar.some((t) => (k ? t.kisiId === k.id : t.ad === ad) && t.rol === x.f.tarafRol)) return { ...x, f: { ...x.f, tarafAd: "" } };
     setHata(undefined);
-    return { ...x, f: { ...x.f, taraflar: [...x.f.taraflar, { kisiId: k.id, rol: x.f.tarafRol, ad: k.adSoyad, telefon: k.telefon }], tarafAd: "" } };
+    return { ...x, f: { ...x.f, taraflar: [...x.f.taraflar, { kisiId: k?.id ?? null, rol: x.f.tarafRol, ad, telefon: k?.telefon ?? null }], tarafAd: "" } };
   });
   const tarafSil = (i: number) => setDuzen((x) => x && { ...x, f: { ...x.f, taraflar: x.f.taraflar.filter((_, j) => j !== i) } });
 
@@ -260,11 +274,11 @@ export function IslemlerEkrani() {
         <div className="alan genis">
           <label>Taraflar <small className="ipucu">· rehberden</small></label>
           <div className="cip-satir">
-            {duzen.f.taraflar.length ? duzen.f.taraflar.map((t, i) => <span key={t.kisiId + t.rol} className="cip">{t.ad || "Kişi"} <small>{TARAF_ROLU_ETIKET[t.rol]}</small><button type="button" className="sil" aria-label={`${t.ad} tarafını kaldır`} onClick={() => tarafSil(i)}>×</button></span>)
+            {duzen.f.taraflar.length ? duzen.f.taraflar.map((t, i) => <span key={(t.kisiId ?? t.ad) + t.rol} className="cip">{t.ad || "Kişi"} <small>{TARAF_ROLU_ETIKET[t.rol]}</small><button type="button" className="sil" aria-label={`${t.ad} tarafını kaldır`} onClick={() => tarafSil(i)}>×</button></span>)
               : <span className="ipucu">Henüz taraf eklenmedi.</span>}
           </div>
           <div className="satir sar" style={{ marginTop: 6 }}>
-            <input aria-label="Taraf kişisi" list="i-kisiler" value={duzen.f.tarafAd} onChange={(e) => setF("tarafAd", e.target.value)} placeholder="Rehberden kişi" style={{ flex: "1 1 180px", minWidth: 0 }} />
+            <input aria-label="Taraf kişisi" list="i-kisiler" value={duzen.f.tarafAd} onChange={(e) => setF("tarafAd", e.target.value)} placeholder="Rehberden seçin ya da yazın" style={{ flex: "1 1 180px", minWidth: 0 }} />
             <select aria-label="Taraf rolü" value={duzen.f.tarafRol} onChange={(e) => setF("tarafRol", e.target.value as TarafRolu)}>{TARAF_ROLLERI.map((r) => <option key={r} value={r}>{TARAF_ROLU_ETIKET[r]}</option>)}</select>
             <button type="button" className="btn" onClick={tarafEkle}>Ekle</button>
           </div>
@@ -336,7 +350,7 @@ export function IslemlerEkrani() {
               <td className="kucuk-hucre"><KisiBag id={x.paylasilanKisiId} ad={x.paylasilanAd} />{x.paylasilanTelefon && <div className="ipucu">{x.paylasilanTelefon}</div>}</td>
               <td className="n">{TL(x.ofisPayi)}</td>
               <td className="kucuk-hucre"><KisiBag id={x.referansKisiId} ad={x.referansAd} /></td>
-              <td className="kucuk-hucre">{(x.taraflar ?? []).map((t) => <div key={t.kisiId + t.rol}><KisiBag id={t.kisiId} ad={t.ad} /> <small className="ipucu">{TARAF_ROLU_ETIKET[t.rol]}</small></div>)}</td>
+              <td className="kucuk-hucre">{(x.taraflar ?? []).map((t) => <div key={(t.kisiId ?? t.ad) + t.rol}><KisiBag id={t.kisiId} ad={t.ad} /> <small className="ipucu">{TARAF_ROLU_ETIKET[t.rol]}</small></div>)}</td>
               <td className="ac">{notEtiketleri(x.aciklama).map((e) => <span key={e.etiket} className={"pill p-" + e.ton}>{e.etiket}</span>)}{x.aciklama && <div>{x.aciklama}</div>}</td>
               <td>{x.reklam && <span className="pill p-uyari">Reklam</span>}</td>
             </tr>)}

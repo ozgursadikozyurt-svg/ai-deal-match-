@@ -724,11 +724,6 @@ export type KisiNullableScalarRelationFilter = {
   isNot?: Prisma.KisiWhereInput | null
 }
 
-export type KisiScalarRelationFilter = {
-  is?: Prisma.KisiWhereInput
-  isNot?: Prisma.KisiWhereInput
-}
-
 export type KisiOfisIdTelefonCompoundUniqueInput = {
   ofisId: string
   telefon: string
@@ -819,6 +814,11 @@ export type KisiMinOrderByAggregateInput = {
   sonIletisim?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type KisiScalarRelationFilter = {
+  is?: Prisma.KisiWhereInput
+  isNot?: Prisma.KisiWhereInput
 }
 
 export type KisiCreateNestedManyWithoutOfisInput = {
@@ -943,10 +943,12 @@ export type KisiCreateNestedOneWithoutIslemTaraflariInput = {
   connect?: Prisma.KisiWhereUniqueInput
 }
 
-export type KisiUpdateOneRequiredWithoutIslemTaraflariNestedInput = {
+export type KisiUpdateOneWithoutIslemTaraflariNestedInput = {
   create?: Prisma.XOR<Prisma.KisiCreateWithoutIslemTaraflariInput, Prisma.KisiUncheckedCreateWithoutIslemTaraflariInput>
   connectOrCreate?: Prisma.KisiCreateOrConnectWithoutIslemTaraflariInput
   upsert?: Prisma.KisiUpsertWithoutIslemTaraflariInput
+  disconnect?: Prisma.KisiWhereInput | boolean
+  delete?: Prisma.KisiWhereInput | boolean
   connect?: Prisma.KisiWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.KisiUpdateToOneWithWhereWithoutIslemTaraflariInput, Prisma.KisiUpdateWithoutIslemTaraflariInput>, Prisma.KisiUncheckedUpdateWithoutIslemTaraflariInput>
 }

@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.44 · 27 Ekim 2026
+ * Anahtar CRM v3.44.1 · 27 Ekim 2026
  * v3.44 — veritabanlı: işlem detayında paylaşılan kişi (+ telefon), referans ve taraflar kaydedilir,
  * geri okunur, güncellemede tam kayıt olarak değişir; işlem silinince taraf bağları da gider.
  */
@@ -58,9 +58,9 @@ test("işlem güncelleme: taraflar tam kayıt olarak değişir, kopya taraf yaz�
   const k1 = await kisiYap("Taraf A 344", "+905440000346");
   const k2 = await kisiYap("Taraf B 344", "+905440000347");
   const temel = { tarih: "2026-09-01", tur: "SATIS" as const, baslik: "Güncelleme denemesi (test344)", banaKalan: 1000 };
-  const { id } = await islemOlustur(prisma, { ...temel, taraflar: [{ kisiId: k1.id, rol: "ALICI_KIRACI" }] });
+  const { id } = await islemOlustur(prisma, { ...temel, taraflar: [{ kisiId: k1.id, ad: "Taraf A 344", rol: "ALICI_KIRACI" }] });
 
-  await islemGuncelle(prisma, id, { ...temel, taraflar: [{ kisiId: k2.id, rol: "SATICI_KIRAYA_VEREN" }, { kisiId: k2.id, rol: "SATICI_KIRAYA_VEREN" }] });
+  await islemGuncelle(prisma, id, { ...temel, taraflar: [{ kisiId: k2.id, ad: "Taraf B 344", rol: "SATICI_KIRAYA_VEREN" }, { kisiId: k2.id, ad: "Taraf B 344", rol: "SATICI_KIRAYA_VEREN" }] });
   const x = (await islemListesi(prisma)).find((i: any) => i.id === id)!;
   assert.equal(x.taraflar.length, 1, "aynı kişi + rol iki kez yazılmamalı");
   assert.equal(x.taraflar[0].kisiId, k2.id);
@@ -83,4 +83,48 @@ test("rehberden seçilen kişi silinirse işlem durur, bağ boşalır", async ()
   assert.equal(x.referansKisiId, null);
   assert.equal(x.banaKalan, 500);
   await islemSil(prisma, id);
+});
+
+// ───────── v3.44.1 ─────────
+
+test("v3.44.1: rehberde olmayan kişi seçilirse işlem yine kaydedilir, taraf adıyla durur", async () => {
+  const { id, bagsiz } = await islemOlustur(prisma, {
+    tarih: "2026-07-01", tur: "KIRALAMA", baslik: "Eşitlenmemiş kişi denemesi (test3441)", banaKalan: 2000,
+    // sunucuda olmayan kimlikler (arayüzde yeni eklenmiş, henüz yazılmamış kişiler)
+    paylasilanKisiId: "yerel_olmayan_1", paylasilanAd: "Yerel Danışman",
+    referansKisiId: "yerel_olmayan_2", referansAd: "Yerel Referans",
+    taraflar: [{ kisiId: "yerel_olmayan_3", ad: "Yerel Alıcı", rol: "ALICI_KIRACI" }],
+  });
+  assert.ok(id, "işlem kaydedilmeli — yabancı anahtar hatası vermemeli");
+  assert.equal(bagsiz.length, 3, "bağlanamayan üç kişi bildirilmeli");
+  const x = (await islemListesi(prisma)).find((i: any) => i.id === id)!;
+  assert.equal(x.paylasilanKisiId, null);
+  assert.equal(x.paylasilanAd, "Yerel Danışman", "ad korunmalı");
+  assert.equal(x.referansAd, "Yerel Referans");
+  assert.equal(x.taraflar.length, 1);
+  assert.equal(x.taraflar[0].kisiId, null);
+  assert.equal(x.taraflar[0].ad, "Yerel Alıcı");
+  // adı olan taraf "Kimden iş geldi?" tablosunda da görünür
+  assert.ok(kimdenIsGeldi([x as any]).some((o) => o.ad === "Yerel Alıcı"));
+  await islemSil(prisma, id);
+});
+
+test("v3.44.1: kişi sonradan silinse bile taraf satırı adıyla kalır", async () => {
+  const k = await kisiYap("Sonra Silinen 3441", "+905440000349");
+  const { id } = await islemOlustur(prisma, {
+    tarih: "2026-06-01", tur: "SATIS", baslik: "Taraf kişisi silme denemesi (test3441)", banaKalan: 300,
+    taraflar: [{ kisiId: k.id, ad: "Sonra Silinen 3441", rol: "SATICI_KIRAYA_VEREN" }],
+  });
+  await prisma.kisi.delete({ where: { id: k.id } });
+  const x = (await islemListesi(prisma)).find((i: any) => i.id === id)!;
+  assert.equal(x.taraflar.length, 1, "taraf satırı silinmemeli");
+  assert.equal(x.taraflar[0].kisiId, null, "yalnızca bağ boşalmalı");
+  await islemSil(prisma, id);
+});
+
+test("v3.44.1: kişisi de adı da olmayan taraf reddedilir", async () => {
+  await assert.rejects(() => islemOlustur(prisma, {
+    tarih: "2026-06-02", tur: "DIGER", baslik: "Boş taraf denemesi (test3441)", banaKalan: 1,
+    taraflar: [{ rol: "DIGER" }],
+  }));
 });

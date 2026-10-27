@@ -21,9 +21,10 @@ const durum = (): DepoDurumu => ({ veriSurumu: "t", kayitlar: ornek.kayitlar, es
 const ctx = (d: DepoDurumu): Ctx => ({ d, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, geri: () => {}, geriVar: false, sample: null } as Ctx);
 const ciz = () => renderToStaticMarkup(React.createElement(C.Provider, { value: ctx(durum()) }, React.createElement(IslemlerEkrani)));
 
-test("sürüm 3.44 kayıtlı", () => {
-  assert.equal(SURUM, "3.44");
+test("sürüm 3.44 ve düzeltmesi kayıtlı", () => {
+  assert.ok(SURUM.startsWith("3.44"), SURUM);
   assert.ok(SURUM_GECMISI.some((x) => x.surum === "3.44"));
+  assert.ok(SURUM_GECMISI.some((x) => x.surum === "3.44.1"));
 });
 
 test("açıklamadan renkli etiketler çıkar; not metnine dokunulmaz", () => {
@@ -116,8 +117,21 @@ test("ekran: örnek işlemin etiketleri tablodan okunuyor", () => {
 
 test("stil: İşlemler ekranının sınıfları sayfa.html'de tanımlı", () => {
   const css = fs.readFileSync("demo/sayfa.html", "utf8");
-  for (const s of [".ozet-kutular", ".islem-tablo", ".islem-kartlar", ".cubuklar", ".halka-liste", ".suzgec-cubugu", ".ic-bag"]) assert.ok(css.includes(s), s + " stili yok");
+  for (const s of [".ozet-kutular", ".islem-tablo", ".islem-kartlar", ".gc-izgara", ".halka-liste", ".suzgec-cubugu", ".ic-bag"]) assert.ok(css.includes(s), s + " stili yok");
   // telefonda tablo gizlenir, kartlar görünür
   const mobil = css.slice(css.lastIndexOf("@media (max-width:899px)"));
   assert.ok(mobil.includes(".islem-tablo-sar{display:none}") && mobil.includes(".islem-kartlar{display:flex}"), "mobil kuralı yok");
+});
+
+// ───────── v3.44.1 ─────────
+
+test("v3.44.1: grafik sınıfları uygulamadaki başka bileşenlerle çakışmıyor", () => {
+  const css = fs.readFileSync("demo/sayfa.html", "utf8");
+  const ekran = fs.readFileSync("demo/islemler.tsx", "utf8");
+  // ".cubuk" uygulamada ilerleme çubuğu; ".deger" ve ".ad" başka kartlarda kullanılıyor.
+  for (const c of ['className="cubuk', 'className={"cubuk', 'className="deger"', 'className="dolgu"', 'className="ad"'])
+    assert.ok(!ekran.includes(c), `çakışan sınıf kullanılmış: ${c}`);
+  for (const c of [".gc-izgara", ".gc-sutun", ".gc-dolgu", ".gc-deger", ".gc-ay"]) assert.ok(css.includes(c), c + " stili yok");
+  // eski ilerleme çubuğu kuralı yerinde durmalı
+  assert.ok(css.includes(".cubuk{flex:1 1 200px"), "mevcut .cubuk kuralı bozulmuş");
 });

@@ -881,10 +881,14 @@ model Islem {
 model IslemKisi {
   id        String   @id @default(cuid())
   islemId   String
-  kisiId    String
+  /// v3.44.1 — rehberdeki kişi. Boş olabilir: henüz sunucuya yazılmamış ya da sonradan
+  /// silinmiş bir kişi, işlem bozulmasın diye yalnızca adıyla saklanır.
+  kisiId    String?
+  /// v3.44.1 — rehbere bağlanamayan taraf için serbest ad
+  ad        String?
   rol       String   @default("DIGER")
   islem     Islem    @relation(fields: [islemId], references: [id], onDelete: Cascade)
-  kisi      Kisi     @relation("IslemTarafi", fields: [kisiId], references: [id], onDelete: Cascade)
+  kisi      Kisi?    @relation("IslemTarafi", fields: [kisiId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
 
   @@unique([islemId, kisiId, rol])

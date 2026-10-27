@@ -3316,6 +3316,7 @@ export const IslemKisiScalarFieldEnum = {
   id: 'id',
   islemId: 'islemId',
   kisiId: 'kisiId',
+  ad: 'ad',
   rol: 'rol',
   createdAt: 'createdAt'
 } as const

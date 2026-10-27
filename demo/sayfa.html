@@ -1201,6 +1201,7 @@ p.hata{background:var(--kotu-bg);color:var(--kotu);border-radius:var(--r);paddin
 .islem-tablo td.kucuk-hucre{font-size:.78rem;min-width:120px}
 .islem-tablo tfoot td{background:var(--lacivert);color:#fff;font-weight:700;border-bottom:0;position:sticky;bottom:0}
 .islem-tablo tfoot td.n{text-align:right;font-variant-numeric:tabular-nums}
+.kart table th.n,.kart table td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ic-bag{background:none;border:0;padding:0;color:var(--mavi);font:inherit;text-align:left;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 .not-etiket{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:3px}
 
@@ -1212,14 +1213,16 @@ p.hata{background:var(--kotu-bg);color:var(--kotu);border-radius:var(--r);paddin
 
 /* Grafikler */
 .grafik-ikili{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.cubuklar{display:grid;gap:3px;align-items:end;height:190px;margin-top:8px}
-.cubuk{background:none;border:0;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;height:100%;cursor:pointer;min-width:0}
-.cubuk .dolgu{display:block;width:100%;background:var(--mavi-bg);border-radius:4px 4px 0 0;transition:background .15s}
-.cubuk:hover .dolgu{background:color-mix(in srgb,var(--mavi) 45%,transparent)}
-.cubuk.on .dolgu{background:var(--mavi)}
-.cubuk .deger{font:600 .68rem var(--m);color:var(--mut);white-space:nowrap;height:1em}
-.cubuk .ad{font-size:.68rem;color:var(--mut)}
-.cubuk.on .ad{color:var(--fg);font-weight:700}
+/* NOT: sınıf adları "gc-" ön ekli — ".cubuk", ".deger", ".ad" uygulamada başka
+   bileşenlerde kullanılıyor; ön ek olmadan o kurallar grafiği bozuyordu (v3.44.1). */
+.gc-izgara{display:grid;gap:3px;align-items:end;height:190px;margin-top:8px}
+.gc-sutun{background:none;border:0;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;height:100%;cursor:pointer;min-width:0;border-radius:0;overflow:visible}
+.gc-dolgu{display:block;width:100%;background:var(--mavi-bg);border-radius:4px 4px 0 0;transition:background .15s}
+.gc-sutun:hover .gc-dolgu{background:color-mix(in srgb,var(--mavi) 45%,transparent)}
+.gc-sutun.on .gc-dolgu{background:var(--mavi)}
+.gc-deger{font:600 .68rem var(--m);color:var(--mut);white-space:nowrap;height:1em}
+.gc-ay{font-size:.68rem;color:var(--mut)}
+.gc-sutun.on .gc-ay{color:var(--fg);font-weight:700}
 .halka-sar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:8px}
 .halka{width:140px;height:140px;flex:0 0 auto}
 .halka-orta{font:700 15px var(--m);fill:var(--fg)}

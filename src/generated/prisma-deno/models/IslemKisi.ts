@@ -29,6 +29,7 @@ export type IslemKisiMinAggregateOutputType = {
   id: string | null
   islemId: string | null
   kisiId: string | null
+  ad: string | null
   rol: string | null
   createdAt: Date | null
 }
@@ -37,6 +38,7 @@ export type IslemKisiMaxAggregateOutputType = {
   id: string | null
   islemId: string | null
   kisiId: string | null
+  ad: string | null
   rol: string | null
   createdAt: Date | null
 }
@@ -45,6 +47,7 @@ export type IslemKisiCountAggregateOutputType = {
   id: number
   islemId: number
   kisiId: number
+  ad: number
   rol: number
   createdAt: number
   _all: number
@@ -55,6 +58,7 @@ export type IslemKisiMinAggregateInputType = {
   id?: true
   islemId?: true
   kisiId?: true
+  ad?: true
   rol?: true
   createdAt?: true
 }
@@ -63,6 +67,7 @@ export type IslemKisiMaxAggregateInputType = {
   id?: true
   islemId?: true
   kisiId?: true
+  ad?: true
   rol?: true
   createdAt?: true
 }
@@ -71,6 +76,7 @@ export type IslemKisiCountAggregateInputType = {
   id?: true
   islemId?: true
   kisiId?: true
+  ad?: true
   rol?: true
   createdAt?: true
   _all?: true
@@ -151,7 +157,8 @@ export type IslemKisiGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 export type IslemKisiGroupByOutputType = {
   id: string
   islemId: string
-  kisiId: string
+  kisiId: string | null
+  ad: string | null
   rol: string
   createdAt: Date
   _count: IslemKisiCountAggregateOutputType | null
@@ -180,17 +187,19 @@ export type IslemKisiWhereInput = {
   NOT?: Prisma.IslemKisiWhereInput | Prisma.IslemKisiWhereInput[]
   id?: Prisma.StringFilter<"IslemKisi"> | string
   islemId?: Prisma.StringFilter<"IslemKisi"> | string
-  kisiId?: Prisma.StringFilter<"IslemKisi"> | string
+  kisiId?: Prisma.StringNullableFilter<"IslemKisi"> | string | null
+  ad?: Prisma.StringNullableFilter<"IslemKisi"> | string | null
   rol?: Prisma.StringFilter<"IslemKisi"> | string
   createdAt?: Prisma.DateTimeFilter<"IslemKisi"> | Date | string
   islem?: Prisma.XOR<Prisma.IslemScalarRelationFilter, Prisma.IslemWhereInput>
-  kisi?: Prisma.XOR<Prisma.KisiScalarRelationFilter, Prisma.KisiWhereInput>
+  kisi?: Prisma.XOR<Prisma.KisiNullableScalarRelationFilter, Prisma.KisiWhereInput> | null
 }
 
 export type IslemKisiOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   islemId?: Prisma.SortOrder
-  kisiId?: Prisma.SortOrder
+  kisiId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ad?: Prisma.SortOrderInput | Prisma.SortOrder
   rol?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   islem?: Prisma.IslemOrderByWithRelationInput
@@ -204,17 +213,19 @@ export type IslemKisiWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.IslemKisiWhereInput[]
   NOT?: Prisma.IslemKisiWhereInput | Prisma.IslemKisiWhereInput[]
   islemId?: Prisma.StringFilter<"IslemKisi"> | string
-  kisiId?: Prisma.StringFilter<"IslemKisi"> | string
+  kisiId?: Prisma.StringNullableFilter<"IslemKisi"> | string | null
+  ad?: Prisma.StringNullableFilter<"IslemKisi"> | string | null
   rol?: Prisma.StringFilter<"IslemKisi"> | string
   createdAt?: Prisma.DateTimeFilter<"IslemKisi"> | Date | string
   islem?: Prisma.XOR<Prisma.IslemScalarRelationFilter, Prisma.IslemWhereInput>
-  kisi?: Prisma.XOR<Prisma.KisiScalarRelationFilter, Prisma.KisiWhereInput>
+  kisi?: Prisma.XOR<Prisma.KisiNullableScalarRelationFilter, Prisma.KisiWhereInput> | null
 }, "id" | "islemId_kisiId_rol">
 
 export type IslemKisiOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   islemId?: Prisma.SortOrder
-  kisiId?: Prisma.SortOrder
+  kisiId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ad?: Prisma.SortOrderInput | Prisma.SortOrder
   rol?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.IslemKisiCountOrderByAggregateInput
@@ -228,39 +239,44 @@ export type IslemKisiScalarWhereWithAggregatesInput = {
   NOT?: Prisma.IslemKisiScalarWhereWithAggregatesInput | Prisma.IslemKisiScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"IslemKisi"> | string
   islemId?: Prisma.StringWithAggregatesFilter<"IslemKisi"> | string
-  kisiId?: Prisma.StringWithAggregatesFilter<"IslemKisi"> | string
+  kisiId?: Prisma.StringNullableWithAggregatesFilter<"IslemKisi"> | string | null
+  ad?: Prisma.StringNullableWithAggregatesFilter<"IslemKisi"> | string | null
   rol?: Prisma.StringWithAggregatesFilter<"IslemKisi"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"IslemKisi"> | Date | string
 }
 
 export type IslemKisiCreateInput = {
   id?: string
+  ad?: string | null
   rol?: string
   createdAt?: Date | string
   islem: Prisma.IslemCreateNestedOneWithoutTaraflarInput
-  kisi: Prisma.KisiCreateNestedOneWithoutIslemTaraflariInput
+  kisi?: Prisma.KisiCreateNestedOneWithoutIslemTaraflariInput
 }
 
 export type IslemKisiUncheckedCreateInput = {
   id?: string
   islemId: string
-  kisiId: string
+  kisiId?: string | null
+  ad?: string | null
   rol?: string
   createdAt?: Date | string
 }
 
 export type IslemKisiUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   islem?: Prisma.IslemUpdateOneRequiredWithoutTaraflarNestedInput
-  kisi?: Prisma.KisiUpdateOneRequiredWithoutIslemTaraflariNestedInput
+  kisi?: Prisma.KisiUpdateOneWithoutIslemTaraflariNestedInput
 }
 
 export type IslemKisiUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   islemId?: Prisma.StringFieldUpdateOperationsInput | string
-  kisiId?: Prisma.StringFieldUpdateOperationsInput | string
+  kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -268,13 +284,15 @@ export type IslemKisiUncheckedUpdateInput = {
 export type IslemKisiCreateManyInput = {
   id?: string
   islemId: string
-  kisiId: string
+  kisiId?: string | null
+  ad?: string | null
   rol?: string
   createdAt?: Date | string
 }
 
 export type IslemKisiUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -282,7 +300,8 @@ export type IslemKisiUpdateManyMutationInput = {
 export type IslemKisiUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   islemId?: Prisma.StringFieldUpdateOperationsInput | string
-  kisiId?: Prisma.StringFieldUpdateOperationsInput | string
+  kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -307,6 +326,7 @@ export type IslemKisiCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   islemId?: Prisma.SortOrder
   kisiId?: Prisma.SortOrder
+  ad?: Prisma.SortOrder
   rol?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -315,6 +335,7 @@ export type IslemKisiMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   islemId?: Prisma.SortOrder
   kisiId?: Prisma.SortOrder
+  ad?: Prisma.SortOrder
   rol?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -323,6 +344,7 @@ export type IslemKisiMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   islemId?: Prisma.SortOrder
   kisiId?: Prisma.SortOrder
+  ad?: Prisma.SortOrder
   rol?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -413,14 +435,16 @@ export type IslemKisiUncheckedUpdateManyWithoutKisiNestedInput = {
 
 export type IslemKisiCreateWithoutIslemInput = {
   id?: string
+  ad?: string | null
   rol?: string
   createdAt?: Date | string
-  kisi: Prisma.KisiCreateNestedOneWithoutIslemTaraflariInput
+  kisi?: Prisma.KisiCreateNestedOneWithoutIslemTaraflariInput
 }
 
 export type IslemKisiUncheckedCreateWithoutIslemInput = {
   id?: string
-  kisiId: string
+  kisiId?: string | null
+  ad?: string | null
   rol?: string
   createdAt?: Date | string
 }
@@ -457,13 +481,15 @@ export type IslemKisiScalarWhereInput = {
   NOT?: Prisma.IslemKisiScalarWhereInput | Prisma.IslemKisiScalarWhereInput[]
   id?: Prisma.StringFilter<"IslemKisi"> | string
   islemId?: Prisma.StringFilter<"IslemKisi"> | string
-  kisiId?: Prisma.StringFilter<"IslemKisi"> | string
+  kisiId?: Prisma.StringNullableFilter<"IslemKisi"> | string | null
+  ad?: Prisma.StringNullableFilter<"IslemKisi"> | string | null
   rol?: Prisma.StringFilter<"IslemKisi"> | string
   createdAt?: Prisma.DateTimeFilter<"IslemKisi"> | Date | string
 }
 
 export type IslemKisiCreateWithoutKisiInput = {
   id?: string
+  ad?: string | null
   rol?: string
   createdAt?: Date | string
   islem: Prisma.IslemCreateNestedOneWithoutTaraflarInput
@@ -472,6 +498,7 @@ export type IslemKisiCreateWithoutKisiInput = {
 export type IslemKisiUncheckedCreateWithoutKisiInput = {
   id?: string
   islemId: string
+  ad?: string | null
   rol?: string
   createdAt?: Date | string
 }
@@ -504,28 +531,32 @@ export type IslemKisiUpdateManyWithWhereWithoutKisiInput = {
 
 export type IslemKisiCreateManyIslemInput = {
   id?: string
-  kisiId: string
+  kisiId?: string | null
+  ad?: string | null
   rol?: string
   createdAt?: Date | string
 }
 
 export type IslemKisiUpdateWithoutIslemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  kisi?: Prisma.KisiUpdateOneRequiredWithoutIslemTaraflariNestedInput
+  kisi?: Prisma.KisiUpdateOneWithoutIslemTaraflariNestedInput
 }
 
 export type IslemKisiUncheckedUpdateWithoutIslemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  kisiId?: Prisma.StringFieldUpdateOperationsInput | string
+  kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type IslemKisiUncheckedUpdateManyWithoutIslemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  kisiId?: Prisma.StringFieldUpdateOperationsInput | string
+  kisiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -533,12 +564,14 @@ export type IslemKisiUncheckedUpdateManyWithoutIslemInput = {
 export type IslemKisiCreateManyKisiInput = {
   id?: string
   islemId: string
+  ad?: string | null
   rol?: string
   createdAt?: Date | string
 }
 
 export type IslemKisiUpdateWithoutKisiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   islem?: Prisma.IslemUpdateOneRequiredWithoutTaraflarNestedInput
@@ -547,6 +580,7 @@ export type IslemKisiUpdateWithoutKisiInput = {
 export type IslemKisiUncheckedUpdateWithoutKisiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   islemId?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -554,6 +588,7 @@ export type IslemKisiUncheckedUpdateWithoutKisiInput = {
 export type IslemKisiUncheckedUpdateManyWithoutKisiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   islemId?: Prisma.StringFieldUpdateOperationsInput | string
+  ad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rol?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -564,64 +599,76 @@ export type IslemKisiSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   id?: boolean
   islemId?: boolean
   kisiId?: boolean
+  ad?: boolean
   rol?: boolean
   createdAt?: boolean
   islem?: boolean | Prisma.IslemDefaultArgs<ExtArgs>
-  kisi?: boolean | Prisma.KisiDefaultArgs<ExtArgs>
+  kisi?: boolean | Prisma.IslemKisi$kisiArgs<ExtArgs>
 }, ExtArgs["result"]["islemKisi"]>
 
 export type IslemKisiSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   islemId?: boolean
   kisiId?: boolean
+  ad?: boolean
   rol?: boolean
   createdAt?: boolean
   islem?: boolean | Prisma.IslemDefaultArgs<ExtArgs>
-  kisi?: boolean | Prisma.KisiDefaultArgs<ExtArgs>
+  kisi?: boolean | Prisma.IslemKisi$kisiArgs<ExtArgs>
 }, ExtArgs["result"]["islemKisi"]>
 
 export type IslemKisiSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   islemId?: boolean
   kisiId?: boolean
+  ad?: boolean
   rol?: boolean
   createdAt?: boolean
   islem?: boolean | Prisma.IslemDefaultArgs<ExtArgs>
-  kisi?: boolean | Prisma.KisiDefaultArgs<ExtArgs>
+  kisi?: boolean | Prisma.IslemKisi$kisiArgs<ExtArgs>
 }, ExtArgs["result"]["islemKisi"]>
 
 export type IslemKisiSelectScalar = {
   id?: boolean
   islemId?: boolean
   kisiId?: boolean
+  ad?: boolean
   rol?: boolean
   createdAt?: boolean
 }
 
-export type IslemKisiOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "islemId" | "kisiId" | "rol" | "createdAt", ExtArgs["result"]["islemKisi"]>
+export type IslemKisiOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "islemId" | "kisiId" | "ad" | "rol" | "createdAt", ExtArgs["result"]["islemKisi"]>
 export type IslemKisiInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   islem?: boolean | Prisma.IslemDefaultArgs<ExtArgs>
-  kisi?: boolean | Prisma.KisiDefaultArgs<ExtArgs>
+  kisi?: boolean | Prisma.IslemKisi$kisiArgs<ExtArgs>
 }
 export type IslemKisiIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   islem?: boolean | Prisma.IslemDefaultArgs<ExtArgs>
-  kisi?: boolean | Prisma.KisiDefaultArgs<ExtArgs>
+  kisi?: boolean | Prisma.IslemKisi$kisiArgs<ExtArgs>
 }
 export type IslemKisiIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   islem?: boolean | Prisma.IslemDefaultArgs<ExtArgs>
-  kisi?: boolean | Prisma.KisiDefaultArgs<ExtArgs>
+  kisi?: boolean | Prisma.IslemKisi$kisiArgs<ExtArgs>
 }
 
 export type $IslemKisiPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "IslemKisi"
   objects: {
     islem: Prisma.$IslemPayload<ExtArgs>
-    kisi: Prisma.$KisiPayload<ExtArgs>
+    kisi: Prisma.$KisiPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     islemId: string
-    kisiId: string
+    /**
+     * v3.44.1 — rehberdeki kişi. Boş olabilir: henüz sunucuya yazılmamış ya da sonradan
+     * silinmiş bir kişi, işlem bozulmasın diye yalnızca adıyla saklanır.
+     */
+    kisiId: string | null
+    /**
+     * v3.44.1 — rehbere bağlanamayan taraf için serbest ad
+     */
+    ad: string | null
     rol: string
     createdAt: Date
   }, ExtArgs["result"]["islemKisi"]>
@@ -1019,7 +1066,7 @@ readonly fields: IslemKisiFieldRefs;
 export interface Prisma__IslemKisiClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   islem<T extends Prisma.IslemDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.IslemDefaultArgs<ExtArgs>>): Prisma.Prisma__IslemClient<runtime.Types.Result.GetResult<Prisma.$IslemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  kisi<T extends Prisma.KisiDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KisiDefaultArgs<ExtArgs>>): Prisma.Prisma__KisiClient<runtime.Types.Result.GetResult<Prisma.$KisiPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  kisi<T extends Prisma.IslemKisi$kisiArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.IslemKisi$kisiArgs<ExtArgs>>): Prisma.Prisma__KisiClient<runtime.Types.Result.GetResult<Prisma.$KisiPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1052,6 +1099,7 @@ export interface IslemKisiFieldRefs {
   readonly id: Prisma.FieldRef<"IslemKisi", 'String'>
   readonly islemId: Prisma.FieldRef<"IslemKisi", 'String'>
   readonly kisiId: Prisma.FieldRef<"IslemKisi", 'String'>
+  readonly ad: Prisma.FieldRef<"IslemKisi", 'String'>
   readonly rol: Prisma.FieldRef<"IslemKisi", 'String'>
   readonly createdAt: Prisma.FieldRef<"IslemKisi", 'DateTime'>
 }
@@ -1452,6 +1500,25 @@ export type IslemKisiDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Limit how many IslemKisis to delete.
    */
   limit?: number
+}
+
+/**
+ * IslemKisi.kisi
+ */
+export type IslemKisi$kisiArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Kisi
+   */
+  select?: Prisma.KisiSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Kisi
+   */
+  omit?: Prisma.KisiOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KisiInclude<ExtArgs> | null
+  where?: Prisma.KisiWhereInput
 }
 
 /**
