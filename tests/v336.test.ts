@@ -146,7 +146,8 @@ test("WhatsApp'ta 'SAHİBİNDEN SATILIK' yazan meslektaş ilanı Partner (Emlak 
   const elle = "Lara'da 2+1 satılık daire 5.500.000 TL";
   assert.equal(taslakYap(elle, { ...hizliAyristir(elle), ilanSahibiTipi: "MALIK" } as any, null).taslak.havuz, "KENDI_PORTFOY");
   const ia = fs.readFileSync("demo/ice-aktarma.tsx", "utf8");
-  assert.match(ia, /taslak\.havuz = ben \? "KENDI_PORTFOY" : "PARTNER"/, "sohbet dosyası: yalnızca kendi mesajınız Kendi portföyüm");
+  // v3.45 — kural ortak dosyaya taşındı (src/lib/domain/sohbet-kaynagi.ts); davranış aynı, yeri değişti.
+  assert.match(ia, /sohbetKaynagiUygula/, "sohbet dosyası ortak kaynak kuralını çağırmalı");
   assert.match(ia, /<TopluKaynakSecici/); assert.match(fs.readFileSync("demo/gelen-kutusu.tsx", "utf8"), /<TopluKaynakSecici/);
   assert.match(fs.readFileSync("demo/app.tsx", "utf8"), /Toplu düzelt/);
 });

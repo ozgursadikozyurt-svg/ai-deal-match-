@@ -21,8 +21,7 @@ const durum = (): DepoDurumu => ({ veriSurumu: "t", kayitlar: ornek.kayitlar, es
 const ctx = (d: DepoDurumu): Ctx => ({ d, guncelle: () => {}, kayitKaydet: () => {}, bildir: () => {}, ornekHatalari: [], git: () => {}, geri: () => {}, geriVar: false, sample: null } as Ctx);
 const ciz = () => renderToStaticMarkup(React.createElement(C.Provider, { value: ctx(durum()) }, React.createElement(IslemlerEkrani)));
 
-test("sürüm 3.44 ve düzeltmesi kayıtlı", () => {
-  assert.ok(SURUM.startsWith("3.44"), SURUM);
+test("sürüm 3.44 ve 3.44.1 günlükte kayıtlı", () => {
   assert.ok(SURUM_GECMISI.some((x) => x.surum === "3.44"));
   assert.ok(SURUM_GECMISI.some((x) => x.surum === "3.44.1"));
 });
@@ -86,10 +85,11 @@ test("taraf rolleri Polaris'teki listeyle aynı", () => {
   assert.notEqual(ISLEM_TURU_TON.SATIS, ISLEM_TURU_TON.KIRALAMA);
 });
 
-test("ekran: altı özet kutusu, tür cipleri, ay seçimi ve CSV düğmesi", () => {
+test("ekran: altı rakam, tür cipleri, ay seçimi ve CSV düğmesi", () => {
   const h = ciz();
-  for (const s of ['Toplam &quot;Bana Kalan&quot;', "Aylık ortalama", "Yıl hedefine kalan", "Satış · ", "Kiralama · ", "Reklamdan gelen"]) assert.ok(h.includes(s), s + " kutusu yok");
-  assert.equal((h.match(/class="ozet"/g) ?? []).length, 6);
+  // v3.45 — altı renkli kutu tek bir rakam şeridine dönüştü; rakamların kendisi aynı
+  for (const s of ["bana kalan (tahsil edilen)", "Aylık ortalama", "Yıl hedefine kalan", "Satış", "Kiralama", "Reklamdan gelen"]) assert.ok(h.includes(s), s + " rakamı yok");
+  assert.equal((h.match(/class="rakam[ "]/g) ?? []).length, 6);
   for (const s of ["Hepsi", "Bütün aylar", "CSV indir", "+ Yeni işlem"]) assert.ok(h.includes(s), s + " yok");
 });
 
@@ -117,10 +117,11 @@ test("ekran: örnek işlemin etiketleri tablodan okunuyor", () => {
 
 test("stil: İşlemler ekranının sınıfları sayfa.html'de tanımlı", () => {
   const css = fs.readFileSync("demo/sayfa.html", "utf8");
-  for (const s of [".ozet-kutular", ".islem-tablo", ".islem-kartlar", ".gc-izgara", ".halka-liste", ".suzgec-cubugu", ".ic-bag"]) assert.ok(css.includes(s), s + " stili yok");
+  for (const s of [".rakam-serit", ".islem-tablo", ".islem-kartlar", ".gc-izgara", ".halka-liste", ".suzgec-cubugu", ".ic-bag"]) assert.ok(css.includes(s), s + " stili yok");
   // telefonda tablo gizlenir, kartlar görünür
-  const mobil = css.slice(css.lastIndexOf("@media (max-width:899px)"));
-  assert.ok(mobil.includes(".islem-tablo-sar{display:none}") && mobil.includes(".islem-kartlar{display:flex}"), "mobil kuralı yok");
+  // telefonda tablo gizlenir, kartlar görünür (899px bloklarından birinde)
+  const mobilBloklar = css.split("@media (max-width:899px)").slice(1);
+  assert.ok(mobilBloklar.some((b) => b.includes(".islem-tablo-sar{display:none}") && b.includes(".islem-kartlar{display:flex}")), "mobil kuralı yok");
 });
 
 // ───────── v3.44.1 ─────────

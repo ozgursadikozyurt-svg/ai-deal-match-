@@ -62,18 +62,20 @@ async function api<T>(yol: string, init?: { method?: string; json?: unknown }): 
 
 // ───────── Grafikler (bağımlılıksız SVG) ─────────
 function AyGrafigi({ aylar, secili, sec, ayAdet }: { aylar: number[]; secili: number | null; sec: (i: number | null) => void; ayAdet: (i: number) => number }) {
-  const son = Math.max(1, aylar.reduce((s, v, i) => (v ? i + 1 : s), new Date().getMonth() + 1));
-  const veri = aylar.slice(0, son);
-  const enb = Math.max(1, ...veri);
-  const enIyi = veri.reduce((b, v, i) => (v > veri[b] ? i : b), 0);
+  // Yılın tamamı gösterilir: boş ay da yerini korur (soluk iz) — sezon boşlukları ancak böyle görünür.
+  const enb = Math.max(1, ...aylar);
+  const enIyi = aylar.reduce((b, v, i) => (v > aylar[b] ? i : b), 0);
   return <div>
-    <div className="gc-izgara" style={{ gridTemplateColumns: `repeat(${veri.length},1fr)` }}>
-      {veri.map((v, i) => <button key={i} type="button" className={"gc-sutun" + (secili === i ? " on" : "")} aria-pressed={secili === i}
-        title={`${AY_TAM[i]} · ${TL(v)} · ${ayAdet(i)} işlem`} onClick={() => sec(secili === i ? null : i)}>
-        <span className="gc-deger">{v && (i === enIyi || i === secili || i === veri.length - 1) ? KISA(v) : ""}</span>
-        <span className="gc-dolgu" style={{ height: `${Math.max(v ? 3 : 0, (v / enb) * 100)}%` }} />
-        <span className="gc-ay">{AYLAR[i]}</span>
-      </button>)}
+    <div className="gc-sarmal">
+      {[1, 0.5].map((o) => <div key={o} className="gc-cizgi" style={{ bottom: `${o * 78 + 15}%` }} aria-hidden />)}
+      <div className="gc-izgara" style={{ gridTemplateColumns: `repeat(${aylar.length},1fr)` }}>
+        {aylar.map((v, i) => <button key={i} type="button" className={"gc-sutun" + (secili === i ? " on" : "")} aria-pressed={secili === i}
+          title={`${AY_TAM[i]} · ${TL(v)} · ${ayAdet(i)} işlem`} onClick={() => sec(secili === i ? null : i)}>
+          <span className="gc-deger">{v && (i === secili || (secili == null && i === enIyi)) ? KISA(v) : ""}</span>
+          <span className="gc-iz"><span className="gc-dolgu" style={{ height: `${v ? Math.max(3, (v / enb) * 100) : 0}%` }} /></span>
+          <span className="gc-ay">{AYLAR[i]}</span>
+        </button>)}
+      </div>
     </div>
     <p className="ipucu">Çubuğa dokun: o ayı seç. Rakamlar "bana kalan", TL.</p>
   </div>;
@@ -305,15 +307,16 @@ export function IslemlerEkrani() {
 
     {yillar.length > 1 && <div className="satir sar">{yillar.map((y) => <button key={y} className={"btn kucuk" + (y === yil ? " birincil" : "")} aria-pressed={y === yil} onClick={() => { setYil(y); setAy(null); }}>{y}</button>)}</div>}
 
-    <div className="ozet-kutular">
-      <div className="ozet" style={{ ["--c" as any]: "var(--iyi)" }}><span>Toplam "Bana Kalan"</span><b>{TL(ozet.toplam)}</b></div>
-      <div className="ozet" style={{ ["--c" as any]: "var(--mavi)" }}><span>Aylık ortalama (toplam ÷ {ozet.ayNo})</span><b>{TL(ozet.aylikOrtalama)}</b></div>
-      <div className="ozet" style={{ ["--c" as any]: "var(--kotu)" }}><span>Yıl hedefine kalan</span><b>{TL(ozet.kalan)}</b></div>
-      <div className="ozet" style={{ ["--c" as any]: "var(--yesil)" }}><span>Satış · {satislar.length} işlem</span><b>{TL(topla(satislar))}</b></div>
-      <div className="ozet" style={{ ["--c" as any]: "var(--kiralik)" }}><span>Kiralama · {kiralar.length} işlem</span><b>{TL(topla(kiralar))}</b></div>
-      <div className="ozet" style={{ ["--c" as any]: "var(--uyari)" }}><span>Reklamdan gelen</span><b>{yilinkiler.filter((x) => x.reklam).length}</b></div>
+    <div className="rakam-serit">
+      <div className="rakam kahraman"><span>{yil} · bana kalan (tahsil edilen)</span><b>{TL(ozet.toplam)}</b>
+        {ozet.bekleyen > 0 && <small>+{TL(ozet.bekleyen)} tahsil edilmedi</small>}</div>
+      <div className="rakam"><span>Aylık ortalama</span><b>{TL(ozet.aylikOrtalama)}</b><small>{ozet.ayNo} ay</small></div>
+      <div className={"rakam" + (ozet.kalan > 0 ? " acik" : "")}><span>Yıl hedefine kalan</span><b>{TL(ozet.kalan)}</b>
+        <small>{ozet.kalan > 0 ? `ayda ${TL(ozet.gerekenAylik)} · ${ozet.kalanAy} ay` : "hedef tamam"}</small></div>
+      <div className="rakam"><span>Satış</span><b>{TL(topla(satislar))}</b><small>{satislar.length} işlem</small></div>
+      <div className="rakam"><span>Kiralama</span><b>{TL(topla(kiralar))}</b><small>{kiralar.length} işlem</small></div>
+      <div className="rakam"><span>Reklamdan gelen</span><b>{yilinkiler.filter((x) => x.reklam).length}</b><small>işlem</small></div>
     </div>
-    {ozet.bekleyen > 0 && <p className="ipucu">Ayrıca <b>{TL(ozet.bekleyen)}</b> tahsil edilmemiş komisyon var; hedefe ve aylık grafiğe tahsil edildiğinde girer.</p>}
 
     <div className="suzgec-cubugu">
       <input type="search" aria-label="İşlem ara" value={ara} onChange={(e) => setAra(e.target.value)} placeholder="İşlem, kişi ya da not ara" />
@@ -386,9 +389,9 @@ export function IslemlerEkrani() {
       <section className="kart">
         <h3>Gelirin paylaşımı <small className="ipucu">· {ay == null ? `${yil} tümü` : `${AY_TAM[ay]} ${yil}`}</small></h3>
         <HalkaGrafigi dilimler={[
-          { ad: "Bana kalan", deger: topl("banaKalan"), ton: "mavi" },
-          { ad: "Paylaşım (diğer danışman)", deger: Math.abs(topl("paylasilan")), ton: "satilik" },
-          { ad: "Ofise", deger: Math.abs(topl("ofisPayi")), ton: "iyi" },
+          { ad: "Bana kalan", deger: topl("banaKalan"), ton: "acc" },
+          { ad: "Paylaşım (diğer danışman)", deger: Math.abs(topl("paylasilan")), ton: "pirinc" },
+          { ad: "Ofise", deger: Math.abs(topl("ofisPayi")), ton: "mut" },
         ]} />
         {ay != null && <button className="btn kucuk" onClick={() => setAy(null)}>Bütün yılı göster</button>}
       </section>

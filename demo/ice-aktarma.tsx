@@ -38,10 +38,11 @@ export { ICE_AKTARMA_DEVIR };
 import { GelenKutusu, useGelenRozet } from "./gelen-kutusu";
 import { KaynakSecici, TopluKaynakSecici } from "./kaynak-secici";
 import { kaynakOf, kaynakUygula } from "../src/lib/domain/kaynak";
+import { sohbetKaynagiUygula, benimMesajim, kimlikKur, type BenimKimligim } from "../src/lib/domain/sohbet-kaynagi";
 const SON_GUN_SECENEK: [number | null, string][] = [[7, "Son 7 gün"], [30, "Son 30 gün"], [90, "Son 90 gün"], [null, "Tümü"]];
 
 // ───────── Yapay zekâ kaydı → form taslağı + sınıflandırma ─────────
-function taslakOlustur(k: any, m: WaMesaj | undefined, ingestionId: string) {
+function taslakOlustur(k: any, m: WaMesaj | undefined, ingestionId: string, kimlik: BenimKimligim) {
   const r = coz(k.lokasyonIfadeleri ?? []);
   const lok = cozulenToKayitLok(r.lokasyonlar, k.tip === "PORTFOY").map(({ etiket, seviye, ...l }) => l);
   const { lokasyonIfadeleri, kisiAdi, telefon, firma, mesajNo, ozet, ...geri } = k;
@@ -50,14 +51,14 @@ function taslakOlustur(k: any, m: WaMesaj | undefined, ingestionId: string) {
     ...geri, lokasyonlar: lok, lokasyonHam: (lokasyonIfadeleri ?? []).join(", "),
     gondeAdi: kisiAdi ?? (m && !telNormalize(m.gonderen)?.startsWith("+") ? m.gonderen : null), gondeTelefon: telNormalize(telefon) ?? gonderenTel, gondeSirket: firma ?? null,
     hamMetin: m?.metin, veriKanali: "WHATSAPP", kayitGrubu: m?.grup, mesajTarihi: m?.tarih, kaynakDosya: m?.dosya, ingestionId,
-    // v3.16 — WhatsApp emlakçı grubundan gelen portföy: ilan sahibi "emlakçı", havuz "partner" (kendi portföyüm değil);
-    // malik olduğu açıkça yazılıysa (ilanSahibiTipi: MALIK) dokunulmaz.
-    ...(geri.tip === "PORTFOY" && (geri as any).ilanSahibiTipi !== "MALIK" ? { ilanSahibiTipi: (geri as any).ilanSahibiTipi && (geri as any).ilanSahibiTipi !== "BILINMIYOR" ? (geri as any).ilanSahibiTipi : "EMLAKCI", havuz: "PARTNER" } : {}),
-    // v3.36 — "sahibinden" yazsa da grupta paylaşılan ilan Kendi portföyüm değildir: havuz Partner, ilan sahibi bilgisi (MALIK) korunur
-    ...(geri.tip === "PORTFOY" && (geri as any).ilanSahibiTipi === "MALIK" && !(geri as any).portalUrl ? { havuz: "PARTNER" } : {}),
+    // v3.16 — WhatsApp emlakçı grubundan gelen portföyde ilan sahibi "emlakçı" sayılır;
+    // malik olduğu açıkça yazılıysa (ilanSahibiTipi: MALIK) dokunulmaz. Havuzu v3.45'ten beri ortak kural yazar.
+    ...(geri.tip === "PORTFOY" && (geri as any).ilanSahibiTipi !== "MALIK" ? { ilanSahibiTipi: (geri as any).ilanSahibiTipi && (geri as any).ilanSahibiTipi !== "BILINMIYOR" ? (geri as any).ilanSahibiTipi : "EMLAKCI" } : {}),
     baslik: ozet ? String(ozet).slice(0, 160) : undefined,
   };
-  return { taslak, cozulemeyen: r.cozulemeyen, cozulen: r.lokasyonlar };
+  // v3.45 — kaynak kararı tek yerde: sohbetten gelen talep de portföy de Emlak grubu, kendi mesajım Kendi portföyüm
+  const kk = sohbetKaynagiUygula(taslak, { gonderen: m?.gonderen ?? null, telefon: m?.telefon ?? taslak.gondeTelefon ?? null, ad: taslak.gondeAdi ?? null }, kimlik);
+  return { taslak: kk.taslak, cozulemeyen: r.cozulemeyen, cozulen: r.lokasyonlar, benim: kk.benim };
 }
 function siniflandir(taslak: any, cozulemeyen: string[], kayitlar: Kayit[], ttl: DepoDurumu["ayarlar"]["ttl"]): Pick<IceAktarmaAdayi, "durum" | "nedenler" | "hatalar" | "benzerKayitId"> & { veri?: Veri } {
   const baslangic = BUGUN; // v3.16 — geri sayım mesajın tarihinden değil, kaydın sisteme girdiği günden başlar
@@ -82,20 +83,24 @@ function siniflandir(taslak: any, cozulemeyen: string[], kayitlar: Kayit[], ttl:
 export function kuralAdaylari(mesajlar: WaMesaj[], d: DepoDurumu, ingestionId: string, cozulenKayit: Kayit[]): IceAktarmaAdayi[] {
   const izler = mevcutAnahtarlar(d as any);
   const kayitliMetinler = kayitliMetinIzleri(cozulenKayit);
+  const kimlik = kimlikKur(d.ayarlar?.paylasim);
   const cikti: IceAktarmaAdayi[] = [];
   for (const m of mesajlar) {
     if (m.durum !== "ADAY") continue;
     const y = mesajiYorumla(m.metin, INDEKS as any);
-    const ben = /^siz$|^you$/i.test(m.gonderen);
+    // v3.45 — "ben" artık yalnızca dışa aktarmanın "Siz / You" yazarı değil: kendi telefonum ve adım da sayılır
+    // (Ayarlar › paylaşım imzası). Kural: src/lib/domain/sohbet-kaynagi.ts
+    const ben = benimMesajim({ gonderen: m.gonderen, telefon: m.telefon }, kimlik);
     const adGibi = !m.telefon && !ben && /\p{L}{2}/u.test(m.gonderen);
     for (const p of y.parcalar) {
       p.tarih = m.tarih; p.grup = m.grup; p.telefon = p.telefon ?? m.telefon ?? null;
       p.kisiAdi = p.kisiAdi ?? (adGibi ? m.gonderen : null);
       if (ben) p.notlar.push("Kendi mesajınız");
       const s = satirKur(p, { tipIpucu: y.tipIpucu } as any, "OTO", d, izler, kayitliMetinler, null, () => []);
-      const taslak: any = { ...s.taslak, kaynakDosya: m.dosya, ingestionId, veriKanali: "WHATSAPP" };
-      // v3.36 — sohbet dosyasından gelen portföy meslektaş paylaşımıdır (Partner); yalnızca kendi mesajınız Kendi portföyüm
-      if (taslak.tip === "PORTFOY" && !taslak.portalUrl) taslak.havuz = ben ? "KENDI_PORTFOY" : "PARTNER";
+      // v3.45 — sohbetten gelen talep de portföy de Emlak grubu; kendi mesajım Kendi portföyüm (ortak kural)
+      const k = sohbetKaynagiUygula({ ...s.taslak, kaynakDosya: m.dosya, ingestionId, veriKanali: "WHATSAPP" },
+        { gonderen: m.gonderen, telefon: m.telefon }, kimlik);
+      const taslak: any = k.taslak;
       const nedenler = [...s.kontrol, ...p.uyarilar.filter((u) => !s.kontrol.includes(u))];
       if (s.durum === "TEKRAR") nedenler.unshift("Havuzda zaten var gibi görünüyor");
       cikti.push({
@@ -345,9 +350,10 @@ export function TopluIceAktarma() {
       } else for (const k of p.data.kayitlar) {
         const m = paket[(k.mesajNo ?? 1) - 1] ?? paket[0];
         const duz = aiKaydiniDuzelt(k, m, p.data.kayitlar.filter((x) => (x.mesajNo ?? 1) === (k.mesajNo ?? 1)).length);
-        const { taslak, cozulemeyen, cozulen } = taslakOlustur(duz.k, m, ia.id);
+        const { taslak, cozulemeyen, cozulen, benim } = taslakOlustur(duz.k, m, ia.id, kimlikKur(d.ayarlar?.paylasim));
         const s = siniflandir(taslak, cozulemeyen, kayitlarGuncel, d.ayarlar.ttl);
         if (duz.notlar.length) { s.nedenler.push(...duz.notlar); if (s.durum === "HAZIR") s.durum = "KONTROL"; }
+        if (benim) s.nedenler.push("Mesaj sizden: Kendi portföyüm olarak işaretlendi");
         if (cozulemeyen.length) yeniKonumAdaylari = adaylariGuncelle(yeniKonumAdaylari ?? [], cozulemeyen, cozulen, m.metin, m.tarih ? new Date(m.tarih) : BUGUN);
         yeniAdaylar.push({ id: "A" + Math.random().toString(36).slice(2, 8), mesajId: m.id, durum: s.durum, nedenler: s.nedenler, hatalar: s.hatalar, benzerKayitId: s.benzerKayitId, taslak, cozulemeyen, guven: taslakGuveni(taslak, s.nedenler.length), kaynak: "AI" });
       }

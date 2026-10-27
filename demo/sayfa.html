@@ -1175,71 +1175,179 @@ main.sarici>.genel-geri+*>h2:first-child{display:flex;align-items:center}
    ───────────────────────────────────────────────────────────── */
 p.hata{background:var(--kotu-bg);color:var(--kotu);border-radius:var(--r);padding:10px 12px;font-size:.88rem;margin:0}
 
-/* Özet kutuları — üstte renkli şerit */
-.ozet-kutular{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
-.ozet{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--c,var(--acc));border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.ozet span{font-size:.75rem;color:var(--mut);line-height:1.3}
-.ozet b{font:600 1.25rem/1.1 var(--m);font-variant-numeric:tabular-nums;color:var(--c,var(--fg));overflow-wrap:anywhere}
+/* Rakam şeridi — altı kutu değil, tek bir okunur şerit.
+   İlk hücre KAHRAMAN: yılın net rakamı. Diğerleri sakin; renk yalnızca
+   hedef açığında (uyarı) ve seçili türde kullanılır. */
+.rakam-serit{display:grid;grid-template-columns:1.5fr 1fr 1.25fr 1fr 1fr .85fr;background:var(--panel);border:1px solid var(--cizgi-ince);border-radius:var(--r);box-shadow:var(--g1);overflow:hidden}
+.rakam{display:flex;flex-direction:column;gap:3px;padding:14px 16px;min-width:0;border-left:1px solid var(--cizgi-ince)}
+.rakam:first-child{border-left:0}
+.rakam span{font-size:.76rem;color:var(--mut);line-height:1.35}
+.rakam b{font-family:var(--d);font-size:1.25rem;white-space:nowrap;line-height:1.15;font-variant-numeric:tabular-nums;letter-spacing:-.02em;overflow-wrap:anywhere}
+.rakam.kahraman{background:linear-gradient(180deg,var(--acc-soft),transparent 70%)}
+.rakam.kahraman b{font-size:clamp(1.5rem,2.2vw,1.95rem);color:var(--acc)}
+.rakam.acik b{color:var(--pirinc-koyu)}
+.rakam small{font-size:.72rem;color:var(--mut);font-variant-numeric:tabular-nums}
 
 /* Süzgeç çubuğu */
-.suzgec-cubugu{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
-.suzgec-cubugu input[type=search]{flex:1 1 200px;min-width:0}
-.suzgec-cubugu select{flex:0 0 auto}
+.suzgec-cubugu{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--cizgi-ince);border-radius:var(--r);box-shadow:var(--g1);padding:10px 12px}
+.suzgec-cubugu input[type=search]{flex:1 1 220px;min-width:0}
+.suzgec-cubugu select{flex:0 0 auto;width:auto;min-width:148px}
 
-/* Tablo — geniş ekran */
-.islem-tablo-sar{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);overflow-x:auto}
-.islem-tablo{min-width:1040px;font-size:.82rem}
-.islem-tablo th{position:sticky;top:0;background:var(--lacivert);color:#fff;z-index:1;white-space:nowrap}
+/* Tablo — defter mantığı: koyu bant yok, güçlü alt çizgili sakin başlık;
+   toplam satırı çift çizgiyle ayrılmış, kalın ama siyah değil. */
+.islem-tablo-sar{border:1px solid var(--cizgi-ince);border-radius:var(--r);background:var(--panel);box-shadow:var(--g1);overflow-x:auto}
+.islem-tablo{min-width:1040px;font-size:.84rem}
+.islem-tablo th{position:sticky;top:0;z-index:1;white-space:nowrap;background:var(--panel2);color:var(--mut);
+  border-bottom:1.5px solid color-mix(in srgb,var(--fg) 22%,transparent);padding-block:.55rem}
 .islem-tablo th.n,.islem-tablo td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.islem-tablo tbody tr{cursor:pointer}
-.islem-tablo tbody tr:nth-child(even){background:var(--panel2)}
+.islem-tablo tbody tr{cursor:pointer;transition:background var(--gecis)}
+.islem-tablo tbody tr:nth-child(even){background:color-mix(in srgb,var(--panel2) 55%,transparent)}
 .islem-tablo tbody tr:hover,.islem-tablo tbody tr:focus-visible{background:var(--acc-soft);outline:none}
+.islem-tablo td{border-bottom:1px solid var(--cizgi-ince)}
 .islem-tablo td.ts{white-space:nowrap;color:var(--mut)}
-.islem-tablo td.liste{min-width:220px;font-weight:500}
-.islem-tablo td.bk{font-weight:700;color:var(--iyi)}
+.islem-tablo td.liste{min-width:230px;font-weight:550}
+.islem-tablo td.bk{font-weight:700;font-family:var(--d);font-size:.92rem}
 .islem-tablo td.ac{min-width:200px;font-size:.78rem}
 .islem-tablo td.kucuk-hucre{font-size:.78rem;min-width:120px}
-.islem-tablo tfoot td{background:var(--lacivert);color:#fff;font-weight:700;border-bottom:0;position:sticky;bottom:0}
-.islem-tablo tfoot td.n{text-align:right;font-variant-numeric:tabular-nums}
+.islem-tablo tfoot td{position:sticky;bottom:0;background:var(--panel2);font-weight:700;white-space:nowrap;
+  border-top:2px solid color-mix(in srgb,var(--fg) 30%,transparent);border-bottom:0}
+.islem-tablo tfoot td.n{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--d)}
 .kart table th.n,.kart table td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.ic-bag{background:none;border:0;padding:0;color:var(--mavi);font:inherit;text-align:left;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.ic-bag{background:none;border:0;padding:0;color:var(--acc);font:inherit;font-weight:550;text-align:left;cursor:pointer;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+.ic-bag:hover{text-decoration-thickness:2px}
 .not-etiket{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:3px}
 
 /* Kart listesi — telefon */
 .islem-kartlar{display:none;flex-direction:column;gap:8px}
-.islem-kart{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--c,var(--acc));border-radius:var(--r);padding:10px 12px;display:flex;flex-direction:column;gap:3px;text-align:left;width:100%;cursor:pointer}
-.islem-kart b.liste{font-size:.92rem;overflow-wrap:anywhere}
-.islem-kart-toplam{display:flex;justify-content:space-between;background:var(--lacivert);color:#fff;border-radius:var(--r);padding:10px 12px;font-weight:700}
+.islem-kart{background:var(--panel);border:1px solid var(--cizgi-ince);border-left:3px solid var(--c,var(--acc));border-radius:var(--r);box-shadow:var(--g1);padding:11px 13px;display:flex;flex-direction:column;gap:3px;text-align:left;width:100%;cursor:pointer}
+.islem-kart:active{transform:translateY(1px)}
+.islem-kart b.liste{font-size:.94rem;overflow-wrap:anywhere}
+.islem-kart>.satir-ara b{font-family:var(--d);font-variant-numeric:tabular-nums}
+.islem-kart-toplam{display:flex;justify-content:space-between;background:var(--panel2);border:1px solid var(--cizgi-ince);
+  border-top:2px solid color-mix(in srgb,var(--fg) 30%,transparent);border-radius:var(--r);padding:11px 13px;font-weight:700}
+.islem-kart-toplam b{font-family:var(--d);font-variant-numeric:tabular-nums}
 
-/* Grafikler */
-.grafik-ikili{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-/* NOT: sınıf adları "gc-" ön ekli — ".cubuk", ".deger", ".ad" uygulamada başka
-   bileşenlerde kullanılıyor; ön ek olmadan o kurallar grafiği bozuyordu (v3.44.1). */
-.gc-izgara{display:grid;gap:3px;align-items:end;height:190px;margin-top:8px}
-.gc-sutun{background:none;border:0;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;height:100%;cursor:pointer;min-width:0;border-radius:0;overflow:visible}
-.gc-dolgu{display:block;width:100%;background:var(--mavi-bg);border-radius:4px 4px 0 0;transition:background .15s}
-.gc-sutun:hover .gc-dolgu{background:color-mix(in srgb,var(--mavi) 45%,transparent)}
-.gc-sutun.on .gc-dolgu{background:var(--mavi)}
-.gc-deger{font:600 .68rem var(--m);color:var(--mut);white-space:nowrap;height:1em}
-.gc-ay{font-size:.68rem;color:var(--mut)}
-.gc-sutun.on .gc-ay{color:var(--fg);font-weight:700}
-.halka-sar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:8px}
-.halka{width:140px;height:140px;flex:0 0 auto}
-.halka-orta{font:700 15px var(--m);fill:var(--fg)}
-.halka-alt{font:400 8px var(--f);fill:var(--mut)}
-.halka-liste{list-style:none;margin:0;padding:0;flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:6px}
-.halka-liste li{display:flex;align-items:center;gap:8px;font-size:.82rem;border-bottom:1px solid var(--line);padding-bottom:5px}
+/* ── Grafikler ──
+   Aylık grafik yılın tamamını gösterir: veri olmayan ay da yerini korur (soluk iz),
+   böylece sezon boşlukları görünür. Taban çizgisi ve iki ızgara çizgisi ölçek verir. */
+.gc-sarmal{position:relative;margin-top:10px}
+.gc-izgara{display:grid;gap:5px;align-items:end;height:184px;position:relative;z-index:1}
+.gc-cizgi{position:absolute;left:0;right:0;border-top:1px dashed var(--cizgi-ince);z-index:0}
+.gc-sutun{background:none;border:0;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%;cursor:pointer;min-width:0;border-radius:0;box-shadow:none}
+.gc-iz{flex:1;width:100%;display:flex;align-items:flex-end;background:color-mix(in srgb,var(--panel2) 35%,transparent);border-radius:5px 5px 0 0}
+.gc-dolgu{display:block;width:100%;background:color-mix(in srgb,var(--acc) 38%,transparent);border-radius:5px 5px 0 0;transition:background var(--gecis)}
+.gc-sutun:hover .gc-dolgu{background:color-mix(in srgb,var(--acc) 62%,transparent)}
+.gc-sutun.on .gc-dolgu{background:var(--acc)}
+.gc-deger{font-family:var(--d);font-size:.7rem;color:var(--mut);white-space:nowrap;height:1em;font-variant-numeric:tabular-nums}
+.gc-sutun.on .gc-deger{color:var(--acc)}
+.gc-ay{font-size:.68rem;color:var(--mut);padding-top:2px;border-top:1px solid var(--cizgi-ince);width:100%;text-align:center}
+.gc-sutun.on .gc-ay{color:var(--fg);font-weight:700;border-top-color:var(--acc)}
+
+.halka-sar{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.halka{width:148px;height:148px;flex:0 0 auto}
+.halka-orta{font-family:var(--d);font-size:16px;font-weight:700;fill:var(--fg)}
+.halka-alt{font-size:8px;fill:var(--mut)}
+.halka-liste{list-style:none;margin:0;padding:0;flex:1 1 190px;min-width:0;display:flex;flex-direction:column;gap:7px}
+.halka-liste li{display:flex;align-items:center;gap:9px;font-size:.83rem;border-bottom:1px solid var(--cizgi-ince);padding-bottom:6px}
 .halka-liste li:last-child{border-bottom:0}
-.halka-liste i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.halka-liste i{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
 .halka-liste span{flex:1;min-width:0;color:var(--mut)}
-.halka-liste b{font-variant-numeric:tabular-nums;white-space:nowrap}
-.halka-liste small{color:var(--mut);width:40px;text-align:right}
+.halka-liste b{font-variant-numeric:tabular-nums;white-space:nowrap;font-family:var(--d)}
+.halka-liste small{color:var(--mut);width:40px;text-align:right;font-variant-numeric:tabular-nums}
 
+.grafik-ikili{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+@media (max-width:1100px){
+  .rakam-serit{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .rakam:nth-child(n+4){border-top:1px solid var(--cizgi-ince)}
+  .rakam:nth-child(3n+1){border-left:0}
+}
 @media (max-width:899px){
   .grafik-ikili{grid-template-columns:1fr}
   .islem-tablo-sar{display:none}
   .islem-kartlar{display:flex}
-  .ozet b{font-size:1.1rem}
+  .rakam-serit{grid-template-columns:1fr 1fr}
+  .rakam{border-top:1px solid var(--cizgi-ince)}
+  .rakam:nth-child(-n+2){border-top:0}
+  .rakam.kahraman{grid-column:1/-1}
+  .rakam b{font-size:1.15rem}
+  .rakam.kahraman b{font-size:1.75rem}
+  .suzgec-cubugu select{flex:1 1 100%;width:100%}
+}
+
+}
+/* ═══════════════════════════════════════════════════════════════════════════
+   v3.45 — TASARIM TAZELEMESİ
+   Marka (mürekkep lacivert · deniz teal · pirinç) korunur; değişen yüzey dili:
+   çerçeve yerine yumuşak yükseklik, daha geniş yuvarlaklık, belirgin odak halkası,
+   parmakla rahat dokunulan hedefler ve sakin bir renk ekonomisi — renk yalnızca
+   bir şey ifade ettiğinde kullanılır (durum, uyarı, seçim), süs olarak değil.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --r:14px;--r-kucuk:10px;--r-buyuk:20px;
+  /* iki katmanlı gölge: yakın kenar + geniş yumuşak alan (mürekkep tonunda, gri değil) */
+  --g1:0 1px 2px rgba(20,33,61,.06), 0 1px 3px rgba(20,33,61,.05);
+  --g2:0 2px 4px rgba(20,33,61,.06), 0 8px 20px rgba(20,33,61,.08);
+  --g3:0 12px 40px rgba(20,33,61,.18);
+  --cizgi-ince:color-mix(in srgb, var(--line) 70%, transparent);
+  --gecis:140ms cubic-bezier(.2,.6,.3,1);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --g1:0 1px 2px rgba(0,0,0,.4);--g2:0 2px 6px rgba(0,0,0,.45), 0 10px 24px rgba(0,0,0,.35);--g3:0 14px 44px rgba(0,0,0,.6)}}
+:root[data-theme="dark"]{
+  --g1:0 1px 2px rgba(0,0,0,.4);--g2:0 2px 6px rgba(0,0,0,.45), 0 10px 24px rgba(0,0,0,.35);--g3:0 14px 44px rgba(0,0,0,.6)}
+
+/* Tipografi: başlıklar biraz daha iri ve sıkı; gövde okunaklı kalsın */
+h2{font-size:1.45rem;letter-spacing:-.022em}
+h3{font-size:1.02rem;letter-spacing:-.012em}
+.ust-etiket{font-weight:600;font-size:.74rem;color:var(--mut);letter-spacing:0}
+.ipucu{line-height:1.55}
+
+/* Yüzeyler: kart artık çerçeveyle değil yükseklikle ayrılır */
+.kart{border-color:var(--cizgi-ince);box-shadow:var(--g1)}
+.kart.ic{box-shadow:none;border-color:var(--cizgi-ince)}
+button.kart,a.kart{transition:box-shadow var(--gecis), transform var(--gecis), border-color var(--gecis)}
+button.kart:hover,a.kart:hover{box-shadow:var(--g2);border-color:color-mix(in srgb,var(--acc) 35%,var(--line))}
+button.kart:active{transform:translateY(1px)}
+.perde>*{box-shadow:var(--g3)}
+
+/* Düğmeler: ikincil düğme çerçeve yerine dolgu; basınca gerçekten basılıyor */
+.btn{border-radius:var(--r-kucuk);font-weight:550;transition:background var(--gecis), box-shadow var(--gecis), transform var(--gecis);box-shadow:var(--g1)}
+.btn:hover{background:var(--panel2);border-color:color-mix(in srgb,var(--acc) 30%,var(--line))}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.birincil{box-shadow:0 1px 2px rgba(20,33,61,.12), 0 4px 12px color-mix(in srgb,var(--acc) 26%,transparent)}
+.btn.birincil:hover{background:color-mix(in srgb,var(--acc) 88%,#fff);border-color:transparent}
+
+/* Odak halkası: klavyeyle gezinenler nerede olduklarını görsün */
+:where(button,a,input,select,textarea,[tabindex]):focus-visible{
+  outline:2px solid var(--acc);outline-offset:2px;border-radius:var(--r-kucuk)}
+
+/* Alanlar: daha rahat dokunulur, odakta çizgi güçlenir */
+input,select,textarea{border-radius:var(--r-kucuk);border-color:var(--line);transition:border-color var(--gecis), box-shadow var(--gecis)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 18%,transparent)}
+input::placeholder,textarea::placeholder{color:color-mix(in srgb,var(--mut) 75%,transparent)}
+
+/* Rozet ve çipler: biraz daha nefes, daha yumuşak */
+.pill{padding:.2rem .6rem;font-weight:600}
+.cip{border-radius:var(--r-kucuk)}
+.fb{transition:background var(--gecis), color var(--gecis), border-color var(--gecis)}
+.fb:hover{border-color:color-mix(in srgb,var(--acc) 40%,var(--line));color:var(--fg)}
+
+/* Sekmeler: etkin sekme alt çizgi yerine yumuşak dolgu */
+.sekmeler button{border-radius:var(--r-kucuk) var(--r-kucuk) 0 0;transition:color var(--gecis), background var(--gecis)}
+.sekmeler button:hover{color:var(--fg);background:var(--panel2)}
+
+/* Tablolar: başlık koyu bant değil, sakin bir satır; sayılar hizalı */
+th{color:var(--mut);font-weight:600}
+td{line-height:1.5}
+
+/* Hareketi kısıtlayanlara saygı */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}}
+
+/* Parmak hedefleri: telefonda hiçbir düğme 40 pikselden küçük olmasın */
+@media (max-width:899px){
+  .btn,.fb,.sekmeler button{min-height:40px}
+  .btn.kucuk{min-height:34px}
 }
 </style>
 <div id="kok"></div>

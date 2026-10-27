@@ -5,6 +5,24 @@
 > Bu dosya `src/lib/surum.ts`'ten otomatik üretilir (`npm run demo`). Elle düzenlemeyin.
 > Dağıtılan dosyaların adı `ad_v<sürüm>_<gün><Ay><yıl>` biçimindedir (örn. `schema_v3.2_30Eylul2026.prisma`).
 
+## v3.45 · 27 Ekim 2026 — Sohbetten gelen kayıt Emlak grubu olarak işaretlenir; kendi mesajım telefon ve adımdan tanınır
+
+- Sohbet metninden (WhatsApp grubu) içeri alınan TALEP de PORTFÖY de artık "Emlak grubu" kaynağıyla gelir. Eskiden yalnızca sohbet DOSYASINDAN gelen portföye bu kural uygulanıyordu; yapıştırılan metin ve talepler "Kendi portföyüm" görünüyordu — eşleştirmede yanlış havuza düşüyorlardı.
+- Mesaj sizden geldiyse kayıt "Kendi portföyüm" olur. Artık yalnızca dışa aktarmanın "Siz / You / Ben" yazarına bakılmıyor: Ayarlar › paylaşım imzasındaki TELEFON ve TAM AD da tanınıyor (numara biçimi farketmez: 0530…, +90 530…, 90530… aynı sayılır).
+- Yalnızca ilk ad eşleşmesi yetmez ("Özgür" yazan başka biri siz sayılmaz); tam ad gerekir.
+- Grupta paylaşılan "sahibinden" ilanı yine Emlak grubu olur ama ilan sahibinin MALİK olduğu bilgisi korunur — portföy edinme fırsatı listelerinde görünmeye devam eder.
+- Portal ilanlarına (sahibinden.com bağlantısı, portal kanalı) dokunulmaz; onlar web ilanı olarak kalır.
+- Kural tek dosyada toplandı (src/lib/domain/sohbet-kaynagi.ts): yapıştırılan metin, sohbet dosyası ve yapay zekâ okuması artık aynı sonucu veriyor. İçe aktarma ekranında kaynağı elle değiştirmek her zaman mümkün.
+- ARAYÜZ TAZELEMESİ — tüm ekranlar: kartlar çerçeve yerine yumuşak yükseklikle ayrılıyor, köşeler daha geniş, düğmeler basınca gerçekten basılıyor, alanlar odakta belirgin bir halka gösteriyor (klavyeyle gezinenler için), telefonda hiçbir düğme 40 pikselden küçük değil ve "hareketi azalt" ayarı olanlarda geçişler kapanıyor.
+- İşlemler ekranı yeniden düzenlendi: altı renkli kutu yerine tek bir rakam şeridi — yılın net rakamı büyük ve öne çıkan tek öğe, yanındakiler sakin. Renk artık yalnızca bir şey ifade ettiğinde kullanılıyor (hedef açığı pirinç rengi).
+- İşlemler tablosu koyu bantlardan kurtuldu: başlık sakin bir satır, TOTAL defter mantığıyla çift çizgiyle ayrılmış. Aylık grafik yılın 12 ayını birden gösteriyor (boş aylar soluk iz olarak yerini koruyor), halka grafiği marka renklerine geçti.
+
+**Demo'da test edilecekler**
+
+- [ ] Veri Girişi'ne bir grup sohbeti yapıştırın: gelen talep ve portföylerin kaynağı "Emlak grubu" görünmeli.
+- [ ] Kendi yazdığınız bir mesajı içeren sohbet dosyası aktarın: o satırda "Mesaj sizden: Kendi portföyüm olarak işaretlendi" notu çıkmalı.
+- [ ] Ayarlar › paylaşım imzasındaki telefonu kontrol edin — kendi mesajlarınız bu numaradan tanınıyor.
+
 ## v3.44.1 · 27 Ekim 2026 — İşlemlerde iki düzeltme: kişi eklerken yabancı anahtar hatası, bozuk aylık gelir grafiği
 
 - HATA: işleme taraf / paylaşılan kişi / referans eklenince "Foreign key constraint violated: islem_kisi_kisiId_fkey" hatası alınıyor ve işlem hiç kaydedilmiyordu. Sebep: rehbere yeni eklenen kişi arayüzde hemen görünür ama sunucuya birkaç saniye sonra yazılır; o aradaki kişi seçilince veritabanında henüz yoktur.

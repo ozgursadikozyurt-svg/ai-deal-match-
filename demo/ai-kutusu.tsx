@@ -37,6 +37,7 @@ import { telNormalize } from "./form";
 import { ORNEK_TOPLANTI_NOTU } from "./ornek-dosyalar";
 import { ORNEK_PORTAL_SAYFASI, ORNEK_SOHBET } from "./ornek-metinler";
 import { kaynakOf, kaynakUygula, KAYNAK_SECIMLERI, KAYNAK_SECIM_ETIKET, type KaynakSecimi } from "../src/lib/domain/kaynak";
+import { sohbetKaynagiUygula, kimlikKur } from "../src/lib/domain/sohbet-kaynagi";
 import { KaynakSecici } from "./kaynak-secici";
 
 /** Çözücü sonucunu filtre konumuna çevir */
@@ -128,11 +129,20 @@ export function satirKur(p: YorumParca, y: Yorum, secim: TipSecimi, d: any, izle
   if (p.notlar.length) taslak.operasyonNotu = p.notlar.join("\n").slice(0, 4000);
   if (talep) { taslak.havuz = "KENDI_PORTFOY"; delete taslak.portalUrl; delete taslak.portalIlanNo; }
   if (!p.ek.ozet && !aiKayit?.ozet) taslak.baslik = baslikKur(taslak).slice(0, 160) || taslak.baslik;
+  // v3.45 — sohbet metninden gelen kayıt (talep de portföy de) EMLAK GRUBU'dur; mesajı ben attıysam KENDİ.
+  // Kural tek yerde: src/lib/domain/sohbet-kaynagi.ts (yapıştırılan metin, sohbet dosyası ve gelen kutusu aynı sonucu verir).
+  let benimKaydim = false;
+  if (taslak.veriKanali === "WHATSAPP") {
+    const k = sohbetKaynagiUygula(taslak, { gonderen: p.kisiAdi ?? null, telefon: p.telefon ?? null }, kimlikKur(d.ayarlar?.paylasim));
+    Object.assign(taslak, k.taslak);
+    benimKaydim = k.benim;
+  }
   for (const k of Object.keys(taslak)) if (taslak[k] === undefined || taslak[k] === null) delete taslak[k];
 
   const sonuc = KayitCreateSchema.safeParse({ ...taslak, validUntil: varsayilanValidUntil(taslak.tip, taslak.islemTipi, taslak.aciliyet, BUGUN, d.ayarlar.ttl) });
   const veri = sonuc.success ? sonuc.data : null;
   const kontrol: string[] = [];
+  if (benimKaydim) kontrol.push("Mesaj sizden: Kendi portföyüm olarak işaretlendi");
   if (!h.mulkTipi && !aiKayit?.mulkTipi) kontrol.push("Mülk tipi yok");
   if (!taslak.lokasyonlar?.length) kontrol.push("Konum yok");
   if ((talep ? !taslak.maxFiyat && !taslak.minM2 && !taslak.odaSayisi : !taslak.fiyat) && !p.uyarilar.some((u) => /fiyat/i.test(u))) kontrol.push(talep ? "Bütçe / m² / oda yok" : "Fiyat yok");
