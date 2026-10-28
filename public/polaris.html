@@ -20,6 +20,14 @@
 .rpday:first-child{border-top:0;padding-top:0}
 .rpday>b{display:block;font-weight:700;margin-bottom:4px}
 #rpDers .note select{max-width:100%}
+/* P&L hücre notu */
+table.pl td.n{position:relative}
+table.pl td.plhas::after{content:'';position:absolute;top:2px;right:2px;border-top:7px solid var(--brand);border-left:7px solid transparent;border-radius:1px}
+table.pl td.plnot{cursor:pointer}
+table.pl td.plnot:hover{outline:2px solid color-mix(in srgb,var(--brand) 45%,transparent);outline-offset:-2px}
+.pltip{position:fixed;z-index:120;max-width:280px;background:var(--ink);color:var(--surface);border-radius:10px;padding:9px 11px;font-size:13px;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.28);pointer-events:none;white-space:normal}
+.pltip b{display:block;font-size:12px;opacity:.72;font-weight:600;margin-bottom:3px}
+.pltip i{display:block;font-size:11.5px;opacity:.6;font-style:normal;margin-top:5px}
 </style></head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
@@ -673,7 +681,7 @@ dl.gloss dt{font-weight:700;padding-right:14px}
   <section id="tab-pl" hidden>
     <div class="sechead"><div><span class="label">İş planı 2026 · P&amp;L</span><h2>P&amp;L 2026</h2></div><div class="row"><label class="row small" style="gap:6px"><input type="checkbox" id="pEmpty"> Boş satırları göster</label><button class="btn ghost" type="button" id="pCsv">CSV indir</button></div></div>
     <div class="tiles" id="pTiles"></div>
-    <p class="hint" style="margin-bottom:8px">Formüller Excel'deki gibi. Gri satırlar ara toplam. "HİZMET SATIŞLARI" İşlemler sayfasından gelir (işlemler Anahtar CRM'den okunur; ay = tahsilat ayı). Gider girmek için hücreye dokun; tutar otomatik eksi kaydedilir. Bu ayın sütunu turuncu çerçeveli. Grup başlığına dokununca detaylar açılır ya da kapanır.</p>
+    <p class="hint" style="margin-bottom:8px">Formüller Excel'deki gibi. Gri satırlar ara toplam. "HİZMET SATIŞLARI" İşlemler sayfasından gelir (işlemler Anahtar CRM'den okunur; ay = tahsilat ayı). Gider girmek için hücreye dokun; tutar otomatik eksi kaydedilir. Her hücreye not yazılabilir: notu olan hücrenin köşesinde işaret olur, üzerine gelince notu görürsün. Bu ayın sütunu turuncu çerçeveli. Grup başlığına dokununca detaylar açılır ya da kapanır.</p>
     <div class="tbox"><table class="pl" id="plTable"></table></div>
     <div class="card" style="margin-top:16px"><h3>Aylara göre gelir, gider ve GMDA</h3><div id="plChart"></div></div>
   </section>
@@ -792,11 +800,15 @@ dl.gloss dt{font-weight:700;padding-right:14px}
 <div class="modal" id="pModal" hidden>
   <form class="box" id="pForm" role="dialog" aria-modal="true" aria-labelledby="pTitle">
     <span class="label" id="pSub"></span><h3 id="pTitle" style="font-size:19px;margin:4px 0 8px"></h3>
-    <label class="f" for="pf-v">Tutar (TL)</label><input type="number" id="pf-v" step="any" inputmode="decimal">
-    <p class="hint" id="pHint" style="margin-top:6px"></p>
-    <div class="row" style="margin-top:14px"><button class="btn" type="submit">Kaydet</button><button class="btn ghost" type="button" data-close="pModal">Vazgeç</button><span class="spacer"></span><button class="btn ghost" type="button" id="pClear">Boşalt</button></div>
+    <div id="pTutar"><label class="f" for="pf-v">Tutar (TL)</label><input type="number" id="pf-v" step="any" inputmode="decimal">
+    <p class="hint" id="pHint" style="margin-top:6px"></p></div>
+    <label class="f" for="pf-not" style="margin-top:10px">Not</label><textarea id="pf-not" rows="3" placeholder="Bu hücre ne? Örn. Kasım kirası peşin ödendi, faturası elden."></textarea>
+    <p class="hint" style="margin-top:6px">Not kaydedilince hücrenin köşesinde işaret çıkar; fareyle üzerine gelince ya da dokununca görünür. Rakamı değiştirmesen de not kaydedebilirsin.</p>
+    <div class="row" style="margin-top:14px"><button class="btn" type="submit">Kaydet</button><button class="btn ghost" type="button" data-close="pModal">Vazgeç</button><span class="spacer"></span><button class="btn ghost" type="button" id="pNotDel" hidden>Notu sil</button><button class="btn ghost" type="button" id="pClear">Boşalt</button></div>
   </form>
 </div>
+
+<div class="pltip" id="plTip" hidden></div>
 
 <div class="modal" id="apptModal" hidden>
   <form class="box" id="apptForm" role="dialog" aria-modal="true" aria-labelledby="apptTitle">
@@ -2346,7 +2358,8 @@ function plTable(items,{el,cur,showEmpty,id}){
     const ratio=x.type==='ratio';const show=n=>ratio?(n==null?'':Math.round(n*100)+'%'):(n==null?'':tl(n));
     const tot=ratio?'':x.t!=null&&id!=='p26'?tl(x.t):tl(x.v.reduce((a,n)=>a+(+n||0),0));
     const cls=[x.type==='data'?((z++)%2?'zb':''):x.type,x.det?'det':'',x.grp?'grp':''].join(' ');
-    h+=`<tr class="${cls}" ${x.grp?`data-plgrp="${id}${x.grp}"`:''}><td>${esc(x.k)}${x.del&&id==='p26'?`<button class="plbtn del" type="button" data-pldel="${x.key}" aria-label="${esc(x.k)} satırını sil" title="Satırı sil">−</button>`:''}${x.grp?`<span class="tgl">${OPEN[id+x.grp]?'▾ detayı gizle':'▸ detay'}</span>`:''}</td>${x.v.map((n,i)=>`<td class="n ${+n<0?'neg':(x.type==='gm'&&+n>0?'pos':'')} ${i+1===cur?'cur':''} ${x.ed?'ed':''} ${x.auto?'auto':''}" ${x.ed?`data-pl="${x.key}:${i}" tabindex="0" role="button" aria-label="${esc(x.k)} ${TRM[i]}"`:''}>${show(n)}</td>`).join('')}<td class="n ${x.type==='gm'?(+String(tot).replace(/\./g,'')>0?'pos':'neg'):''}">${tot}</td></tr>`;
+    h+=`<tr class="${cls}" ${x.grp?`data-plgrp="${id}${x.grp}"`:''}><td>${esc(x.k)}${x.del&&id==='p26'?`<button class="plbtn del" type="button" data-pldel="${x.key}" aria-label="${esc(x.k)} satırını sil" title="Satırı sil">−</button>`:''}${x.grp?`<span class="tgl">${OPEN[id+x.grp]?'▾ detayı gizle':'▸ detay'}</span>`:''}</td>${x.v.map((n,i)=>{const nk=plnKey(id,x.key,i);const nt=PLN.n[nk];
+      return `<td class="n ${+n<0?'neg':(x.type==='gm'&&+n>0?'pos':'')} ${i+1===cur?'cur':''} ${x.ed?'ed':''} ${x.auto?'auto':''} plnot ${nt?'plhas':''}" data-pln="${esc(nk)}" data-plad="${esc(x.k)}" data-play="${i}" ${x.ed?`data-pl="${x.key}:${i}"`:''} tabindex="0" role="button" aria-label="${esc(x.k)} ${TRM[i]}${nt?' · notu var':''}">${show(n)}</td>`}).join('')}<td class="n ${x.type==='gm'?(+String(tot).replace(/\./g,'')>0?'pos':'neg'):''}">${tot}</td></tr>`;
   });
   el.innerHTML=h+'</tbody>';
 }
@@ -2358,13 +2371,57 @@ function renderPL(){
   plTable(plItems26(),{el:$('#plTable'),cur:mNow,showEmpty:$('#pEmpty').checked,id:'p26'});
   renderPlChart(val,mNow);
 }
+/* Hücre notları — finansal veriye dokunmadan ayrı belgede: pl/notlar
+   anahtar: <tablo>:<satır>:<ay> (ör. p26:12:9, a2025:40:3) */
+let PLN={n:{}};
+const plnKey=(id,key,m)=>id+':'+key+':'+m;
+const plnSave=()=>saveDoc('pl','notlar',PLN,300);
+async function plnLoad(){try{const d=await loadDoc('pl','notlar');if(d&&d.n)PLN=d}catch{}}
 let P_EDIT=null;
-function openPlCell(key){const [r,m]=key.split(':').map(Number);const row=D.pl.satirlar.find(x=>x.r===r);if(!row)return;P_EDIT={r,m};
-  $('#pSub').textContent=TR_M[m]+' 2026';$('#pTitle').textContent=row.k;const v=row.v?.[m];$('#pf-v').value=v==null?'':Math.abs(v);
-  $('#pHint').textContent=plGider(row)?'Gider satırı: yazdığın tutar eksi olarak kaydedilir (Excel\'deki gibi).':'Gelir satırı: tutar artı kaydedilir.';$('#pModal').hidden=false;$('#pf-v').focus()}
+function openPlCell(key,td){const [r,m]=key.split(':').map(Number);const row=D.pl.satirlar.find(x=>x.r===r);if(!row)return;
+  P_EDIT={r,m,ed:true,nk:td?td.dataset.pln:plnKey('p26',r,m),ad:row.k,ay:TR_M[m]+' 2026'};
+  $('#pSub').textContent=P_EDIT.ay;$('#pTitle').textContent=row.k;const v=row.v?.[m];$('#pf-v').value=v==null?'':Math.abs(v);
+  $('#pTutar').hidden=false;$('#pClear').hidden=false;
+  $('#pHint').textContent=plGider(row)?'Gider satırı: yazdığın tutar eksi olarak kaydedilir (Excel\'deki gibi).':'Gelir satırı: tutar artı kaydedilir.';
+  plNotAc();$('#pModal').hidden=false;$('#pf-v').focus()}
+/* Hesaplanan, arşiv ve oran hücreleri: yalnız not */
+function openPlNot(td){
+  const nk=td.dataset.pln;const ay=TRM[+td.dataset.play]||'';const yil=nk.startsWith('p26')?'2026':nk.slice(1,5);
+  P_EDIT={ed:false,nk,ad:td.dataset.plad||'',ay:ay+' '+yil};
+  $('#pSub').textContent=P_EDIT.ay+' · '+(td.textContent.trim()||'boş');$('#pTitle').textContent=P_EDIT.ad;
+  $('#pTutar').hidden=true;$('#pClear').hidden=true;
+  plNotAc();$('#pModal').hidden=false;$('#pf-not').focus();
+}
+function plNotAc(){const nt=PLN.n[P_EDIT.nk];$('#pf-not').value=nt?nt.d:'';$('#pNotDel').hidden=!nt}
+function plNotKaydet(){
+  const v=$('#pf-not').value.trim();const vardi=!!PLN.n[P_EDIT.nk];
+  if(v){PLN.n[P_EDIT.nk]={d:v.slice(0,600),at:TODAY};plnSave();olayYaz('not','P&L notu: '+P_EDIT.ad+' · '+P_EDIT.ay,{n:v.slice(0,300),k:'P&L'})}
+  else if(vardi){delete PLN.n[P_EDIT.nk];plnSave();olayYaz('not','P&L notu silindi: '+P_EDIT.ad+' · '+P_EDIT.ay,{k:'P&L'})}
+  return v!==''||vardi;
+}
 function setPl(v){const row=D.pl.satirlar.find(x=>x.r===P_EDIT.r);row.v=row.v||Array(12).fill(null);row.v[P_EDIT.m]=v;saveDoc('pl','2026',D.pl);$('#pModal').hidden=true;renderPL()}
-$('#pForm').addEventListener('submit',e=>{e.preventDefault();const t=$('#pf-v').value;if(t===''){setPl(null);return}const n=Math.abs(+t);setPl(plGider(D.pl.satirlar.find(x=>x.r===P_EDIT.r))?-n:n);toast('Kaydedildi')});
-$('#pClear').addEventListener('click',()=>setPl(null));
+$('#pForm').addEventListener('submit',e=>{e.preventDefault();if(!P_EDIT)return;
+  const notVar=plNotKaydet();
+  if(!P_EDIT.ed){$('#pModal').hidden=true;plYenile();toast(notVar?'Not kaydedildi':'Değişiklik yok');return}
+  const t=$('#pf-v').value;if(t===''){setPl(null);return}
+  const n=Math.abs(+t);setPl(plGider(D.pl.satirlar.find(x=>x.r===P_EDIT.r))?-n:n);toast('Kaydedildi')});
+$('#pClear').addEventListener('click',()=>{plNotKaydet();setPl(null)});
+$('#pNotDel').addEventListener('click',()=>{if(!P_EDIT)return;delete PLN.n[P_EDIT.nk];plnSave();$('#pf-not').value='';$('#pNotDel').hidden=true;$('#pModal').hidden=true;plYenile();toast('Not silindi')});
+const plYenile=()=>{if(!$('#tab-pl').hidden)renderPL();if(!$('#tab-arsiv').hidden)renderArsiv()};
+/* Not önizleme — fareyle üzerine gelince */
+let PLT=null;
+function plTipGoster(td){
+  const nt=PLN.n[td.dataset.pln];const el=$('#plTip');if(!nt){el.hidden=true;return}
+  el.innerHTML=`<b>${esc(td.dataset.plad||'')} · ${esc(TRM[+td.dataset.play]||'')}</b>${esc(nt.d)}<i>${esc(fmtDay(nt.at))} · düzenlemek için hücreye dokun</i>`;
+  el.hidden=false;
+  const r=td.getBoundingClientRect();const w=el.offsetWidth,h=el.offsetHeight;
+  let x=r.left+r.width/2-w/2;x=Math.max(8,Math.min(x,innerWidth-w-8));
+  let y=r.top-h-8;if(y<8)y=r.bottom+8;
+  el.style.left=x+'px';el.style.top=y+'px';
+}
+document.addEventListener('mouseover',e=>{const td=e.target.closest?.('td.plhas');if(td&&td!==PLT){PLT=td;plTipGoster(td)}});
+document.addEventListener('mouseout',e=>{const td=e.target.closest?.('td.plhas');if(td&&(!e.relatedTarget||!td.contains(e.relatedTarget))){PLT=null;$('#plTip').hidden=true}});
+document.addEventListener('scroll',()=>{if(PLT){PLT=null;$('#plTip').hidden=true}},true);
 
 /* Arşiv */
 let AY='2025';
@@ -2466,7 +2523,8 @@ function showTab(t){
 }
 const closeDrawer=()=>{$('#drawer').hidden=true;K_OPEN=null};
 document.addEventListener('click',async e=>{
-  const pl=e.target.closest('[data-pl]');if(pl){openPlCell(pl.dataset.pl);return}
+  const pl=e.target.closest('[data-pl]');if(pl){openPlCell(pl.dataset.pl,pl);return}
+  const pln=e.target.closest('td[data-pln]');if(pln){openPlNot(pln);return}
   const grp=e.target.closest('[data-plgrp]');if(grp){const k=grp.dataset.plgrp;OPEN[k]=!OPEN[k];if(k.startsWith('p26'))renderPL();else renderArsiv();return}
   const ie=e.target.closest('[data-iedit]');if(ie&&!e.target.closest('button[data-iedit]')){openIslem(ie.dataset.iedit);return}
   if(e.target.matches('[data-ksel]')){const id=e.target.dataset.ksel;e.target.checked?K_SEL.add(id):K_SEL.delete(id);e.target.closest('.krow').classList.toggle('sel',e.target.checked);$('#kCount').textContent=K_FILT.length.toLocaleString('tr-TR')+' kişi'+(K_SEL.size?' · '+K_SEL.size+' seçili':'');renderBulk();return}
@@ -2588,7 +2646,7 @@ $('#apptForm').addEventListener('submit',async e=>{e.preventDefault();const date
   const t={id:uid('g'),baslik:'Gösterim: '+kim,aciklama:'Müşteriye mülkü gezdir. Sonunda net bir sonraki adım al.',tarih:date,saat,sure:60,hat:30,oncelik:'yuksek',kat:'gosterim',durum:'acik',kaynak:'randevu',olusturma:TODAY};
   D.gorev.push(t);saveTask(t);if(date===TODAY){S.day.ci={...(S.day.ci||{}),gosterim:true};saveDay()}olayYaz('randevu','Gösterim randevusu: '+kim,{n:fmtDay(date)+' '+saat,r:t.id});$('#apptModal').hidden=true;refreshTaskViews();toast('Randevu eklendi');if($('#ap-cal').checked)await taskToCal(t)});
 $('#drawer').addEventListener('click',e=>{if(e.target.id==='drawer')closeDrawer()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();$$('.modal').forEach(m=>m.hidden=true)}if(e.key==='Enter'&&e.target.dataset?.pl)openPlCell(e.target.dataset.pl)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();$$('.modal').forEach(m=>m.hidden=true)}if(e.key==='Enter'&&e.target.dataset?.pl)openPlCell(e.target.dataset.pl,e.target);else if(e.key==='Enter'&&e.target.dataset?.pln)openPlNot(e.target)});
 let qi=Math.floor((NOW-new Date(NOW.getFullYear(),0,0))/864e5)%QUOTES.length;
 const renderQuote=()=>{$('#quoteText').textContent=QUOTES[qi][0];$('#quoteSrc').textContent=QUOTES[qi][1]};
 
@@ -3477,6 +3535,10 @@ function rpMetin(){
   L.push('  Saha tespiti: '+v.sahaAy.length+' · kanal teması: '+v.kanalT);
   L.push('');L.push('KANAL KARNESİ');
   KANAL.forEach(x=>{const o=v.kn[x.id]||{};L.push('  '+x.n+'. '+x.ad+': '+(+o.t||0)+' temas / '+(+o.p||0)+' portföy (hedef '+x.t+')'+(o.nx?' — sonraki adım: '+o.nx:''))});
+  const plAy=+v.ay.slice(5,7)-1;
+  const plN=Object.entries(PLN.n||{}).filter(([k])=>k.startsWith('p26:')&&+k.split(':')[2]===plAy);
+  if(plN.length){L.push('');L.push('P&L HÜCRE NOTLARI');
+    plN.forEach(([k,x])=>{const r=+k.split(':')[1];const ad=(D.pl?.satirlar||[]).find(s=>s.r===r)?.k||('satır '+r);L.push('  '+ad+': '+x.d)})}
   L.push('');L.push('GÜNLÜK NOTLAR');
   v.dd.filter(d=>d.note||d.ilk).forEach(d=>L.push('  '+fmtDay(d.date)+': '+(d.note||'')+(d.ilk?' | Yarın ilk iş: '+d.ilk:'')));
   L.push('');L.push('HAFTALIK DEĞERLENDİRMELER');
@@ -3596,6 +3658,7 @@ setInterval(()=>{renderGuide();renderHero()},60000);
   const cur=$('nav.tabs [aria-selected="true"]')?.dataset.tab;if(cur&&cur!=='bugun')showTab(cur);
   pfLoad().then(()=>{renderMentor();if(!$('#tab-portfoy').hidden)renderPf()});
   olayAl(AY_KEY()).then(()=>{if(!$('#tab-rapor').hidden)renderRapor()});
+  plnLoad().then(()=>{if(!$('#tab-pl').hidden)renderPL();if(!$('#tab-arsiv').hidden)renderArsiv()});
   const pd=await loadDoc('meta','plan');if(!pd||pd.uretim!==TODAY)savePlanDoc();
 })();
 (async()=>{try{if(window.claude?.use){DL=await window.claude.use('downloads')}}catch{}if(!DL){$('#backupBtn').hidden=true;$('#iCsv').hidden=true;$('#pCsv').hidden=true}})();
