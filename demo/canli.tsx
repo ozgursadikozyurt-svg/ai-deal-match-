@@ -63,7 +63,7 @@ function Tanitim() {
       <li><b>Müşteri takibi:</b> kişiler, notlar, randevular ve Google Kişiler ile eşitleme.</li>
       <li><b>Ofis ve ekip:</b> danışmanlarınızı davet edin, yetkileri belirleyin; telefondan uygulama gibi kullanın.</li>
     </ul>
-    <p className="ipucu">{DENEME_GUN_YAZI}, kart bilgisi istenmez. · <a href="/">Ayrıntılı tanıtım</a> · <a href="/gizlilik.html">Gizlilik</a> · <a href="/kosullar.html">Koşullar</a></p>
+    <p className="ipucu">{DENEME_GUN_YAZI}, kart bilgisi istenmez. · <a href="/">Ayrıntılı tanıtım</a> · <a href="/gizlilik">Gizlilik</a> · <a href="/kvkk">KVKK</a> · <a href="/kosullar">Koşullar</a></p>
   </section>;
 }
 
@@ -118,7 +118,7 @@ function KayitOl({ o, eposta, bitti }: { o: OturumYoneticisi; eposta?: string; b
     <div className="alan"><label htmlFor="ko-ad">Adınız soyadınız</label><input id="ko-ad" autoComplete="name" value={f.adSoyad} onChange={(e) => set("adSoyad", e.target.value)} maxLength={80} /></div>
     <div className="alan"><label htmlFor="ko-tel">Cep telefonu</label><input id="ko-tel" type="tel" autoComplete="tel" value={f.telefon} onChange={(e) => set("telefon", e.target.value)} placeholder="05XX XXX XX XX" maxLength={20} /></div>
     <div className="alan"><label htmlFor="ko-sehir">Şehir</label><input id="ko-sehir" value={f.sehir} onChange={(e) => set("sehir", e.target.value)} maxLength={40} /></div>
-    <label className="onay-satir"><input type="checkbox" checked={f.onay} onChange={(e) => set("onay", e.target.checked)} /> Kullanım koşullarını ve KVKK aydınlatma metnini okudum, kabul ediyorum.</label>
+    <label className="onay-satir"><input type="checkbox" checked={f.onay} onChange={(e) => set("onay", e.target.checked)} /> <span><a href="/kosullar" target="_blank" rel="noopener">Kullanım koşullarını</a> ve <a href="/kvkk" target="_blank" rel="noopener">KVKK aydınlatma metnini</a> okudum, kabul ediyorum.</span></label>
     <div className="satir sar"><button className="btn birincil" disabled={mesgul || f.ofisAd.trim().length < 2 || f.adSoyad.trim().length < 2 || !f.onay} onClick={gonder}>{mesgul ? "Açılıyor…" : "Ofisimi aç"}</button>
       <button className="btn" onClick={() => { o.cikis(); location.reload(); }}>Başka e-postayla gir</button></div>
     {hata && <div className="hata-kutu" role="alert">{hata}</div>}

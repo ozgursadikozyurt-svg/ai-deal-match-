@@ -1,11 +1,12 @@
 /**
  * Anahtar CRM v3.43 · 25 Ekim 2026
- * Canlı arayüzü derler → dist/canli/ (Cloudflare statik dosyaları): uygulama.html (arayüz + stil + uygulama kodu; / adresi public/index.html tanıtım sayfasıdır), manifest, ikonlar.
+ * Canlı arayüzü derler → dist/canli/ (Cloudflare statik dosyaları): uygulama.html (arayüz + stil + uygulama kodu; / adresi ve diğer tanıtım sayfaları site/ klasöründen scripts/site-uret.mjs ile üretilir), manifest, ikonlar.
  * Demo ile aynı ekranlar; fark: demo/canli.tsx giriş noktası (giriş, sunucudan durum, kaydetme kuyruğu).
  * Çalıştır: npm run canli:arayuz   (npm run canli:build içinde otomatik)
  */
 import { build } from "esbuild";
 import fs from "node:fs";
+import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { SURUM, TARIH } from "../src/lib/surum";
 
@@ -40,12 +41,14 @@ async function main() {
     .replace('<div id="kok"></div>', '<div id="kok" data-canli="1"></div>')
     .replace("Bu demo için JavaScript gereklidir.", "Anahtar CRM için JavaScript gereklidir.");
   const icerik = sablon.replace("/*UYGULAMA*/", () => js);
-  // Uygulama /uygulama adresinde; / adresindeki herkese açık tanıtım sayfası public/index.html'dir (arama motorları onu dizine alır, uygulamayı almaz).
+  // Uygulama /uygulama adresinde; / adresindeki herkese açık tanıtım sayfası site/sayfalar/index.html'dir (arama motorları onu dizine alır, uygulamayı almaz).
   const belge = `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>Anahtar CRM</title><meta name="robots" content="noindex,follow"><meta name="theme-color" content="#14213D"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Anahtar CRM"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48"><link rel="apple-touch-icon" href="/ikon-180.png"></head><body>${icerik}</body></html>`;
   const cikti = path.join(kok, "dist/canli");
   fs.rmSync(cikti, { recursive: true, force: true }); fs.mkdirSync(cikti, { recursive: true });
   fs.writeFileSync(path.join(cikti, "uygulama.html"), belge);
-  for (const f of fs.readdirSync(path.join(kok, "public"))) fs.copyFileSync(path.join(kok, "public", f), path.join(cikti, f));
+  fs.cpSync(path.join(kok, "public"), cikti, { recursive: true }); // ikonlar, yazı tipleri (public/fonts), _headers, _redirects, robots
+  // Tanıtım sitesi (/, /ozellikler, /fiyatlar, yasal sayfalar, 404, sitemap.xml): site/ kaynaklarından üretilir
+  execFileSync(process.execPath, [path.join(kok, "scripts/site-uret.mjs"), cikti], { stdio: "inherit" });
   console.log(`✔ dist/canli/uygulama.html (${(belge.length / 1024).toFixed(0)} KB) · v${SURUM} ${TARIH}`);
 }
 main().catch((e) => { console.error(e); process.exit(1); });
