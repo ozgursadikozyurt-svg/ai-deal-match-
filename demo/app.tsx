@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.43 · 25 Ekim 2026
+ * Anahtar CRM v3.46 · 28 Ekim 2026
  * Demo uygulaması — gerçek uygulamanın kurallarını (doğrulama, konum çözücü + öğrenme, teknik alanlar,
  * eşleştirme önizlemesi, WhatsApp içe aktarma, Gemini şeması) tarayıcıda örnek veriyle çalıştırır.
  * Derleme: npm run demo  →  dist/anahtar-ai-demo_<sürüm>.html
@@ -227,7 +227,10 @@ function Liste({ tip, baslangic }: { tip: "TALEP" | "PORTFOY"; baslangic?: Filtr
       <TopluKaynakSecici sayi={duzeltSecili.size} uygula={(s) => { const n = duzeltSecili.size; guncelle((x) => ({ ...x, kayitlar: x.kayitlar.map((k) => (duzeltSecili.has(k.id) ? { ...k, veri: kaynakUygula(k.veri as any, s) } : k)) })); setDuzeltSecili(new Set()); bildir(`${n} portföyün kaynağı değişti — eşleşmeler yeniden hesaplandı`); }} />
     </div>}
     {liste.map((k) => <KayitKart key={k.id} k={k} sec={duzeltMod ? { on: duzeltSecili.has(k.id), degis: () => { const y = new Set(duzeltSecili); y.has(k.id) ? y.delete(k.id) : y.add(k.id); setDuzeltSecili(y); } } : paylasAcik ? { on: paylasSecili.has(k.id), degis: () => { const y = new Set(paylasSecili); y.has(k.id) ? y.delete(k.id) : y.add(k.id); setPaylasSecili(y); } } : undefined} />)}
-    {!liste.length && <p className="bos">Bu filtrede kayıt yok.</p>}
+    {/* v3.46 — boş liste: kayıtlar süzgeç yüzünden gizliyse tek dokunuşla temizlenir; hiç kayıt yoksa nereden ekleneceği söylenir */}
+    {!liste.length && (hepsi.length
+      ? <div className="bos"><p>Bu filtrede kayıt yok — {hepsi.length} {tip === "TALEP" ? "talep" : "portföy"} süzgeç yüzünden gizli.</p><button className="btn kucuk" onClick={() => setF(bosFiltre({ ara: "" }))}>Süzgeci temizle, tümünü göster</button></div>
+      : <div className="bos"><p>Henüz {tip === "TALEP" ? "talep" : "portföy"} yok.</p><button className="btn kucuk birincil" onClick={() => git({ ad: "form", tip })}>+ Yeni {tip === "TALEP" ? "talep" : "portföy"}</button> <button className="btn kucuk" onClick={() => git({ ad: "veri" })}>Veri Girişi'nden toplu ekle</button></div>)}
   </div>;
 }
 
@@ -490,7 +493,7 @@ function Eslesmeler() {
       <button className="btn kucuk" onClick={() => { setSecimModu(false); setSecili(new Set()); }}>Bitti</button>
     </div>}
     {liste.map((e) => { const a = eKey(e.t.id, e.p.id); return <EslesmeKarti key={a} e={e} sec={secimModu ? { acik: secili.has(a), degis: () => setSecili((x) => { const y = new Set(x); if (y.has(a)) y.delete(a); else y.add(a); return y; }) } : undefined} />; })}
-    {!liste.length && <p className="bos">Bu filtrede eşleşme yok.</p>}
+    {!liste.length && <div className="bos"><p>Bu filtrede eşleşme yok.</p>{hepsi.length > 0 && <button className="btn kucuk" onClick={() => { setF(bosFiltre({ ara: "" })); setMinSkor(0); setTbl(0); setFk(""); setTakip([]); setKimin(""); setU("UYGUN"); }}>Süzgeçleri temizle</button>}</div>}
     {topluAcik && <TopluKoparPenceresi geriAl={topluAcik === "GERI"} ciftler={(secimModu ? liste.filter((e) => secili.has(eKey(e.t.id, e.p.id))) : liste).map((e) => ({ tid: e.t.id, pid: e.p.id }))} onKapat={() => setTopluAcik(null)} onBitti={() => { setTopluAcik(null); setSecimModu(false); setSecili(new Set()); }} />}
   </div>;
 }

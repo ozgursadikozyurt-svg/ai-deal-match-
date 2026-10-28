@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.43 · 25 Ekim 2026
+ * Anahtar CRM v3.46 · 28 Ekim 2026
  * ROLLER VE YETKİLER — tek kaynak.
  *
  * Dört rol var:
@@ -120,7 +120,7 @@ export interface PlanSinirlari {
 export const PLANLAR: Record<Plan, PlanSinirlari> = {
   UCRETSIZ: { etiket: "Ücretsiz", fotoBasinaKayit: 0, kullanici: 1, gunlukAi: 25, entegrasyon: false, paylasimFoyu: false, ortakHavuz: false },
   PRO: { etiket: "Pro", fotoBasinaKayit: 8, kullanici: 25, gunlukAi: 500, entegrasyon: true, paylasimFoyu: true, ortakHavuz: false },
-  PRO_PLUS: { etiket: "Pro+", fotoBasinaKayit: 15, kullanici: 100, gunlukAi: 2000, entegrasyon: true, paylasimFoyu: true, ortakHavuz: true },
+  PRO_PLUS: { etiket: "Pro+", fotoBasinaKayit: 8 /* v3.46 — 15 yazıyordu ama sistem sınırı (domain/foto.ts › FOTO_SINIR) 8; depolama kararı verilene dek ekran gerçeği söyler */, kullanici: 100, gunlukAi: 2000, entegrasyon: true, paylasimFoyu: true, ortakHavuz: true },
 };
 
 /** Sınırsız ofis (Özyurtlar Gayrimenkul): plan PRO + sinirsiz işareti → sınır denetimi uygulanmaz. */

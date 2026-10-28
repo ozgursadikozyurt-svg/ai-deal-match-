@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.43 · 25 Ekim 2026
+ * Anahtar CRM v3.46 · 28 Ekim 2026
  * Ekranda gösterilen Türkçe etiketler. Ana kategori / mülk tipi / işlem / ilan sahibi etiketleri
  * src/lib/domain/kategori.ts'den gelir; burada sadece teknik enum değerleri var.
  * Burada olmayan bir değer eklenirse ekran onu otomatik "Büyük Harf" biçimiyle gösterir.
@@ -57,7 +57,7 @@ export function etiket(v: unknown): string {
   const s = String(v);
   return (MULK_TIPI_META as Record<string, { etiket: string }>)[s]?.etiket
     ?? (ISLEM_TIPI_ETIKET as Record<string, string>)[s]
-    ?? E[s] ?? KRITER_ETIKET[s] ?? buyukHarf(s);
+    ?? E[s] ?? (ANA_KATEGORI_ETIKET as Record<string, string>)[s] /* v3.46 — "Isyeri" yerine "İş Yeri (Ticari / Endüstriyel)" */ ?? KRITER_ETIKET[s] ?? buyukHarf(s);
 }
 
 export { ANA_KATEGORI_ETIKET, ISLEM_TIPI_ETIKET, ILAN_SAHIBI_ETIKET, VERI_KANALI_ETIKET, MULK_TIPI_META, MUSTERI_KAYNAGI_ETIKET, HAVUZ_ETIKET, PORTFOY_ALINABILIRLIK_ETIKET };

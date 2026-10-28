@@ -1,4 +1,4 @@
-// Anahtar CRM v3.43 · 25 Ekim 2026
+// Anahtar CRM v3.46 · 28 Ekim 2026
 // GET  /api/lokasyon/alt-bolgeler?ilId=7          → piyasa bölgeleri (Lara, Altınova, OSB…)
 // POST /api/lokasyon/alt-bolgeler                  → yeni alt bölge + mahalle eşlemesi
 import { z } from "zod";
@@ -6,6 +6,8 @@ import { prisma } from "@/lib/db";
 import { AltBolgeTipi } from "@/generated/prisma/enums";
 import { slug } from "@/lib/lokasyon/normalize";
 import { hata, ok, sorgu } from "@/lib/http/yanit";
+import { ofisBaglami } from "@/lib/kiracilik";
+import { yetkiGerek } from "@/lib/guvenlik/yetki";
 
 export async function GET(req: Request) {
   try {
@@ -31,6 +33,7 @@ const Yeni = z.object({
 
 export async function POST(req: Request) {
   try {
+    yetkiGerek(ofisBaglami().rol, "platform.ofisler"); // v3.46 — alt bölge sözlüğü TÜM ofislerin ortak verisidir
     const v = Yeni.parse(await req.json());
     const ab = await prisma.altBolge.create({
       data: {

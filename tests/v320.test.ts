@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.43 · 25 Ekim 2026
+ * Anahtar CRM v3.46 · 28 Ekim 2026
  * v3.20 — veritabanı gerektirmeyen denetimler: sorgu dönüştürme, roller/yetkiler, plan sınırları,
  * davet kodu ve güvenlik kuralları (ham SQL, test arka kapısı, ebeveyn modeller).
  */
@@ -48,10 +48,12 @@ test("oluşturmaya ofisId yazılır — tek kayıt ve createMany dizisi", () => 
   assert.deepEqual(c.args.data.map((x: { ofisId: string }) => x.ofisId), ["ofis-A", "ofis-A"]);
 });
 
-test("upsert: create tarafına ofisId yazılır, where'e dokunulmaz (bileşik anahtar zaten ofise özgü)", () => {
+test("upsert: create tarafına ve (v3.46) where'e de ofisId yazılır — başka ofisin satırı upsert ile değişmez", () => {
   const d = cagriyiDonustur("ayar", "upsert", { where: { ofisId_anahtar: { ofisId: "ofis-A", anahtar: "ttl" } }, create: { anahtar: "ttl", deger: {} }, update: {} }, A);
   assert.equal(d.args.create.ofisId, "ofis-A");
-  assert.deepEqual(d.args.where, { ofisId_anahtar: { ofisId: "ofis-A", anahtar: "ttl" } });
+  assert.deepEqual(d.args.where, { ofisId_anahtar: { ofisId: "ofis-A", anahtar: "ttl" }, ofisId: "ofis-A" });
+  const k = cagriyiDonustur("kisi", "upsert", { where: { id: "baska-ofisin-kisisi" }, create: { adSoyad: "x" }, update: { adSoyad: "y" } }, A);
+  assert.deepEqual(k.args.where, { id: "baska-ofisin-kisisi", ofisId: "ofis-A" });
 });
 
 test("silme ve güncellemede de süzgeç var → başka ofisin kaydı değiştirilemez", () => {

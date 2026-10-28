@@ -1,4 +1,4 @@
-// Anahtar CRM v3.43 · 25 Ekim 2026
+// Anahtar CRM v3.46 · 28 Ekim 2026
 // POST /api/ai/dene { ai? } — Ayarlar › Yapay zekâ ekranındaki "Bağlantıyı dene" düğmesi.
 //   Gövdede `ai` verilirse KAYDETMEDEN o ayarla, verilmezse kayıtlı ayarla küçük bir deneme çağrısı yapar.
 //   → { tamam: true, model, sureMs } ya da { tamam: false, kod, mesaj }   (anahtar: AI_API_KEY ortam değişkeni)
@@ -7,10 +7,16 @@ import { prisma } from "@/lib/db";
 import { hata, ok } from "@/lib/http/yanit";
 import { AiAyarSchema, aiAyarNormalize } from "@/lib/domain/ayarlar";
 import { aiJsonIste, AiHatasi } from "@/lib/ai/saglayici";
+import { aiHakkiDus } from "@/lib/services/plan";
+import { ofisBaglami } from "@/lib/kiracilik";
+import { yetkiGerek } from "@/lib/guvenlik/yetki";
 
 export async function POST(req: Request) {
   try {
     const g = z.object({ ai: AiAyarSchema.optional() }).parse(await req.json().catch(() => ({})));
+    // v3.46 — ayar denemesi ayar yetkisi ister (adres izin listesi saglayici.ts'te), ve günlük haktan düşer
+    if (g.ai) yetkiGerek(ofisBaglami().rol, "ofis.ayarlar");
+    await aiHakkiDus(prisma);
     const ayar = g.ai ?? aiAyarNormalize((await prisma.ayar.findFirst({ where: { anahtar: "ai" } }))?.deger);
     const t = Date.now();
     try {

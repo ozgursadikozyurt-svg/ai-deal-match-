@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.43 · 25 Ekim 2026
+ * Anahtar CRM v3.46 · 28 Ekim 2026
  * ÇOK OFİSLİ ÇEKİRDEK (kiracılık / multi-tenancy).
  *
  * Tek Supabase veritabanında birden çok emlak ofisi barınır. Her ofise ait satırda "ofisId" vardır.
@@ -206,7 +206,10 @@ export function cagriyiDonustur(
   }
 
   if (islem === "upsert") {
-    // where: zaten ofise özgü benzersiz anahtar (cuid ya da [ofisId, …] bileşik) — dokunulmaz.
+    // v3.46 — GÜVENLİK: where'e de ofisId eklenir (update/delete ile aynı düz alan). Eskiden where'e dokunulmuyordu:
+    // kimliği (cuid) ya da [talepId, portfoyId] çifti bilinen BAŞKA ofisin satırı upsert'in "update" yoluyla değişebiliyordu.
+    // Şimdi başka ofisin satırı where'e uymaz → create denenir → birincil anahtar çakışması → yazma reddedilir (tests/v346-db).
+    yeni.where = { ...(yeni.where ?? {}), ...ofisSuzgeci };
     if (yeni.create !== undefined) yeni.create = { ...yeni.create, ...ofisSuzgeci };
     return { islem, args: yeni };
   }

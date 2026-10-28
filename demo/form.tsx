@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.43 · 25 Ekim 2026
+ * Anahtar CRM v3.46 · 28 Ekim 2026
  * Demo — kayıt formu. Şemadan üretilir; mülk grubuna göre yalnızca anlamlı alanlar,
  * önce "önemli alanlar", gerisi "Tüm alanlar" altında. Bölümler varsayılan kapalı.
  */
@@ -246,6 +246,12 @@ export function KayitFormu({ tip, id, taslak, adayId, geri }: { tip: "TALEP" | "
     // v3.10: eksik telefon kaydı kilitlemesin — kullanıcı Kişiler bölümündeki alandan düzeltir
     const telSorunu = telUyarisi(f.gondeTelefon);
     if (telSorunu) { setHatalar([{ yer: "Telefon", mesaj: `${telSorunu}. Aşağıdaki “Kişiler” bölümünde düzeltin ya da alanı boşaltın.` }]); setKisiAcik(true); ust.current?.scrollIntoView({ behavior: "smooth" }); return false; }
+    // v3.46 — tamamen boş kayıt kaydedilmez: konumu, fiyatı / bütçesi, m²'si, kişisi ve açıklaması olmayan kayıt her şeyle eşleşir ve listeleri kirletir
+    const dolu = (x: unknown) => x != null && x !== "" && !(Array.isArray(x) && !x.length);
+    if (![f.lokasyonlar, f.fiyat, f.minFiyat, f.maxFiyat, f.m2, f.netM2, f.minM2, f.maxM2, f.kisiler, f.gondeTelefon, (f.aciklama ?? "").trim(), (f.baslik ?? "").trim()].some(dolu)) {
+      setHatalar([{ yer: "Kayıt", mesaj: "Kayıt boş görünüyor: en az bir konum, fiyat / bütçe, m², kişi ya da açıklama girin. Boş kayıt her şeyle eşleşir ve listeyi kirletir." }]);
+      ust.current?.scrollIntoView({ behavior: "smooth" }); return false;
+    }
     const tel = telNormalize(f.gondeTelefon);
     const temiz: any = { ...f, gondeTelefon: tel && /^\+90\d{10}$/.test(tel) ? tel : null, ozellik: o, validUntil: vu };
     // Birincil kişi → eski alanlar (listelerde ve dışa aktarımda kullanılıyor)

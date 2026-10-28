@@ -1,4 +1,4 @@
-// Anahtar CRM v3.43 · 25 Ekim 2026
+// Anahtar CRM v3.46 · 28 Ekim 2026
 // POST /api/ai/yorumla { metin, ai?, istem? }  — Akıllı girişin sunucu tarafı.
 //   1) Kural tabanlı (ücretsiz): metnin NE olduğuna karar verir (portal ilan sayfası, WhatsApp sohbet dökümü, toplu liste, tek kayıt,
 //      bağlantı, kişi, soru), parçalara ayırır, her parçanın konum ifadelerini çözer, güven puanını hesaplar. Kayıt AÇMAZ.
@@ -14,6 +14,7 @@ import { aiAyarNormalize, calismaIliNormalize } from "@/lib/domain/ayarlar";
 import { GEMINI_RESPONSE_SCHEMA, GEMINI_SISTEM_TALIMATI } from "@/lib/ai/gemini-cikti-semasi";
 import { aiYanitiniDogrula } from "@/lib/ai/yorum-dogrula";
 import { cokIlliCozumle, cokIlliIndeks } from "@/lib/lokasyon/turkiye";
+import { aiHakkiDus, PlanHatasi } from "@/lib/services/plan";
 
 const Girdi = z.object({ metin: z.string().trim().min(3).max(200_000), ai: z.boolean().optional(), istem: z.boolean().optional() });
 const AI_UST_SINIR = 12_000;
@@ -36,9 +37,11 @@ export async function POST(req: Request) {
     if (ai) {
       if (!gonderilecek) yanit.aiHata = { kod: "UZUN", mesaj: `Metin ${AI_UST_SINIR} karakterden uzun; sohbet dosyası olarak yükleyin` };
       else try {
+        await aiHakkiDus(prisma); // v3.46 — planın günlük yapay zekâ hakkı (dolarsa kural tabanlı sonuç yine döner)
         yanit.aiYorum = aiYanitiniDogrula(await aiJsonIste(ayar, process.env.AI_API_KEY || process.env.GEMINI_API_KEY, gonderilecek));
         yanit.aiModel = `${ayar.saglayici} · ${ayar.model}`;
       } catch (e) {
+        if (e instanceof PlanHatasi) { yanit.aiHata = { kod: "PLAN", mesaj: e.message }; return ok(yanit); }
         if (!(e instanceof AiHatasi)) throw e;
         yanit.aiHata = { kod: e.kod, mesaj: e.message };
       }

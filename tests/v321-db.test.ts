@@ -1,5 +1,5 @@
 /**
- * Anahtar CRM v3.43 · 25 Ekim 2026
+ * Anahtar CRM v3.46 · 28 Ekim 2026
  * v3.21 — VERİTABANLI KANIT: çift yönlü Google Kişiler (PGlite + sahte Google, tests/sahte-google.ts).
  * Kuralların her biri bir testtir:
  *   Google'a eklenen Anahtar'a düşer · Anahtar'a elle eklenen Google'a gider · Anahtar'daki düzeltme Google'a yazılır
@@ -225,6 +225,7 @@ test("BAĞLANMA AKIŞI: 'Google ile bağlan' adresi ofise imzalıdır; dönüş 
   const kok = "https://anahtarcrm.ornek.workers.dev";
   // Yeni bir ofis: hiç bağlanmamış
   const yeni = await icinde(A, () => ofisAc(prisma, { ad: "Bağlanma Deneme Emlak" }));
+  await ciplak.ofis.update({ where: { id: yeni.id }, data: { plan: "PRO" } }); // v3.46 — Google bağlantısı planda olmalı (Ücretsiz'de kapalı)
   const yon = await ciplak.kullanici.create({ data: { ofisId: yeni.id, eposta: "yon@baglanma.com", rol: "OFIS_YONETICISI" } });
   const dan = await ciplak.kullanici.create({ data: { ofisId: yeni.id, eposta: "dan@baglanma.com", rol: "DANISMAN" } });
   const Y: Baglam = { ofisId: yeni.id, kullaniciId: yon.id, rol: "OFIS_YONETICISI", eposta: yon.eposta };

@@ -1,10 +1,10 @@
 /**
- * Anahtar CRM v3.43 · 25 Ekim 2026
+ * Anahtar CRM v3.46 · 28 Ekim 2026
  * Yapay zekâ sağlayıcı istemcisi — tek bir "OpenAI uyumlu" sohbet çağrısı. Gemini, Groq, Cerebras, Mistral, OpenRouter ve OpenAI
  * aynı biçimi kabul ettiği için sağlayıcı değiştirmek kod değişikliği gerektirmez (Ayarlar › Yapay zekâ + AI_API_KEY).
  * Yanıt her zaman JSON nesnesi olarak istenir; doğrulamayı çağıran yapar (AiParseCiktiSchema).
  */
-import type { AiAyar } from "../domain/ayarlar";
+import { AI_SAGLAYICILAR, type AiAyar } from "../domain/ayarlar";
 
 export class AiHatasi extends Error {
   constructor(public kod: "ANAHTAR_YOK" | "AYAR_EKSIK" | "SINIR" | "YETKI" | "SAGLAYICI" | "ZAMAN_ASIMI" | "JSON", mesaj: string, public durum?: number) { super(mesaj); }
@@ -19,9 +19,25 @@ export function jsonCikar(metin: string): unknown {
   try { return JSON.parse(t.slice(a, b + 1)); } catch { throw new AiHatasi("JSON", "Yanıttaki JSON okunamadı"); }
 }
 
+/**
+ * v3.46 — GÜVENLİK: AI_API_KEY (platformun anahtarı) yalnızca bilinen sağlayıcıların adreslerine gönderilir.
+ * Eskiden adres (tabanUrl) ayardan ya da /api/ai/dene gövdesinden olduğu gibi alınıyordu: giriş yapmış herhangi bir kullanıcı
+ * kendi sunucusunun adresini yazıp anahtarı ele geçirebilirdi. Ek adres gerekirse Cloudflare değişkeni AI_IZINLI_ALANLAR
+ * (virgülle ayrılmış alan adları, ör. "api.together.xyz") ile açılır.
+ */
+export function aiAdresiIzinli(tabanUrl: string, ek: string | undefined = (globalThis as any).process?.env?.AI_IZINLI_ALANLAR): boolean {
+  let u: URL;
+  try { u = new URL(tabanUrl); } catch { return false; }
+  if (u.protocol !== "https:" || u.username || u.password) return false;
+  const izinli = new Set(Object.values(AI_SAGLAYICILAR).map((s) => { try { return s.tabanUrl ? new URL(s.tabanUrl).hostname : ""; } catch { return ""; } }).filter(Boolean));
+  for (const a of (ek ?? "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean)) izinli.add(a);
+  return izinli.has(u.hostname.toLowerCase());
+}
+
 export async function aiJsonIste(ayar: AiAyar, anahtar: string | undefined, istem: string, s: { sistem?: string; getir?: Getir; zamanAsimiMs?: number } = {}): Promise<unknown> {
   if (!anahtar) throw new AiHatasi("ANAHTAR_YOK", "AI_API_KEY tanımlı değil");
   if (!ayar.tabanUrl || !ayar.model) throw new AiHatasi("AYAR_EKSIK", "Yapay zekâ adresi ya da model adı boş");
+  if (!aiAdresiIzinli(ayar.tabanUrl)) throw new AiHatasi("AYAR_EKSIK", "Bu yapay zekâ adresi izinli değil: anahtar yalnızca bilinen sağlayıcılara (Gemini, Groq, Cerebras, Mistral, OpenRouter, OpenAI) gönderilir");
   const getir = s.getir ?? (fetch as unknown as Getir);
   const kontrol = new AbortController();
   const zaman = setTimeout(() => kontrol.abort(), s.zamanAsimiMs ?? 30_000);

@@ -1,4 +1,4 @@
-// Anahtar CRM v3.44 · 27 Ekim 2026
+// Anahtar CRM v3.46 · 28 Ekim 2026
 // GET /api/ayarlar → { ttl, ai, paylasim, calismaIli, yilHedefi, aiAnahtarVar }
 // PUT /api/ayarlar { ttl?, ai?, paylasim?, calismaIli?, yilHedefi? } → yalnızca gönderilenler güncellenir.
 //   ttl: varsayılan geçerlilik süreleri (yeni kayıtlara uygulanır; mevcutlar değişmez)
@@ -9,6 +9,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { ayarYaz } from "@/lib/services/ayar";
 import { hata, ok } from "@/lib/http/yanit";
+import { ofisBaglami } from "@/lib/kiracilik";
+import { yetkiGerek } from "@/lib/guvenlik/yetki";
 import { TtlAyarSchema, ttlAyarlari } from "@/lib/services/kayit";
 import { AiAyarSchema, PaylasimAyarSchema, aiAyarNormalize, paylasimNormalize, calismaIliNormalize, yilHedefiNormalize } from "@/lib/domain/ayarlar";
 
@@ -22,6 +24,7 @@ export async function GET() {
 }
 export async function PUT(req: Request) {
   try {
+    yetkiGerek(ofisBaglami().rol, "ofis.ayarlar"); // v3.46 — durum kaydetme yoluyla aynı kural: ayarları yalnızca ofis yöneticisi değiştirir
     const g = z.object({ ttl: TtlAyarSchema.optional(), ai: AiAyarSchema.optional(), paylasim: PaylasimAyarSchema.optional(), calismaIli: z.number().int().min(1).max(81).optional(), yilHedefi: z.number().int().min(1).max(1_000_000_000).optional() }).parse(await req.json());
     if (g.ttl) await yaz("ttl", g.ttl);
     if (g.ai) await yaz("ai", g.ai);

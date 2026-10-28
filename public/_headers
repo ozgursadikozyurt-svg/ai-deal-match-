@@ -1,0 +1,8 @@
+# Anahtar CRM v3.46 · 28 Ekim 2026 — Cloudflare statik dosya başlıkları
+# Tıklama tuzağına (sayfanın başka sitede gizli çerçeveye gömülmesi) ve tür karıştırmaya karşı. Uygulama hiçbir yerde çerçeve içinde açılmaz.
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000
+  Permissions-Policy: geolocation=(), microphone=(), payment=()

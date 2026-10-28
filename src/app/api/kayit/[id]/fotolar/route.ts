@@ -1,4 +1,4 @@
-// Anahtar CRM v3.43 · 25 Ekim 2026
+// Anahtar CRM v3.46 · 28 Ekim 2026
 // Portföy fotoğrafları (en fazla 8; dosyalar Supabase Storage'da özel kovada, veritabanında yalnızca yol + künye)
 // GET    /api/kayit/:id/fotolar                 → [{ id, sira, ad, en, boy, boyut, url }]  (url: 1 saat geçerli imzalı bağlantı)
 // POST   /api/kayit/:id/fotolar  (JSON: ad, en, boy, boyut, tur)  → v3.24 doğrudan yükleme: künye + tek kullanımlık Supabase yükleme bağlantısı
@@ -10,6 +10,7 @@ import { prisma } from "@/lib/db";
 import { hata, ok } from "@/lib/http/yanit";
 import { fotoDenetle, fotoYolu, FOTO_SINIR } from "@/lib/domain/foto";
 import { ofisBaglami } from "@/lib/kiracilik";
+import { fotoPlanDenetle } from "@/lib/services/plan";
 import { dosyaYukle, dosyalariSil, imzaliBaglantilar, yuklemeBaglantisi, DepoHatasi } from "@/lib/depolama/supabase";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -28,6 +29,7 @@ export async function POST(req: Request, { params }: Ctx) {
     const kayit = await prisma.kayit.findUnique({ where: { id: kayitId }, select: { tip: true, _count: { select: { fotolar: true } } } });
     if (!kayit) return ok({ hata: "BULUNAMADI" }, 404);
     if (kayit.tip !== "PORTFOY") return ok({ hata: "DOGRULAMA", mesaj: "Fotoğraf yalnızca portföye eklenir" }, 422);
+    await fotoPlanDenetle(prisma, kayit._count.fotolar); // v3.46 — planın kayıt başına fotoğraf sınırı (ücretsizde kapalı)
     // v3.24 — doğrudan yükleme: gövde JSON künyedir (dosya yok). Kayıt satırı yazılır, tarayıcıya tek kullanımlık yükleme bağlantısı döner;
     // tarayıcı dosyayı Supabase'e kendisi gönderir. Worker'da tek ekleme + tek küçük istek kalır (eskiden 1,5 MB'lık gövde burada işleniyordu → 503).
     if ((req.headers.get("content-type") ?? "").includes("application/json")) {

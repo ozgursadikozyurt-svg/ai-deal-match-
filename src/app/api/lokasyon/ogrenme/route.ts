@@ -1,4 +1,4 @@
-// Anahtar CRM v3.43 · 25 Ekim 2026
+// Anahtar CRM v3.46 · 28 Ekim 2026
 // Konum öğrenme (bkz. src/lib/lokasyon/ogrenme.ts)
 // GET  /api/lokasyon/ogrenme?durum=BEKLIYOR   → adaylar + en olası konum önerisi (güçlü/zayıf)
 // POST /api/lokasyon/ogrenme { ifade, hedef: { ilceId, mahalleId?, altBolgeId? }, tip? }  → onayla: sözlüğe (alias) ekle
@@ -6,6 +6,8 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { hata, ok, sorgu } from "@/lib/http/yanit";
+import { ofisBaglami } from "@/lib/kiracilik";
+import { yetkiGerek } from "@/lib/guvenlik/yetki";
 import { adayOnerisi, aliasTipiTahmin, type KonumAdayi } from "@/lib/lokasyon/ogrenme";
 import { lokasyonIndeksiniYenile } from "@/lib/lokasyon/cozumle";
 
@@ -34,6 +36,7 @@ export async function POST(req: Request) {
       await prisma.lokasyonAday.updateMany({ where: { ilId: g.ilId, ifade: g.ifade }, data: { durum: "REDDEDILDI" } });
       return ok({ reddedildi: g.ifade });
     }
+    yetkiGerek(ofisBaglami().rol, "platform.ofisler"); // v3.46 — konum takma adları TÜM ofislerin ortak verisidir
     const seviye = g.hedef.mahalleId ? "MAHALLE" : g.hedef.altBolgeId ? "ALTBOLGE" : "ILCE";
     const tip = g.tip ?? aliasTipiTahmin(g.ifade);
     const alias = await prisma.lokasyonAlias.upsert({

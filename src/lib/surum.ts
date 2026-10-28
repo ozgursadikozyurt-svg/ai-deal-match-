@@ -1,13 +1,13 @@
 /**
- * Anahtar CRM v3.44.1 · 27 Ekim 2026
+ * Anahtar CRM v3.46 · 28 Ekim 2026
  * Sürüm bilgisinin TEK kaynağı. Demo ekranındaki sürüm etiketi, "Bu sürümde neler var" paneli
  * ve kök dizindeki SURUMLER.md bu dosyadan üretilir (npm run demo).
  * Yeni sürümde: SURUM + TARIH güncellenir, SURUM_GECMISI'nin BAŞINA yeni kayıt eklenir.
  */
-export const SURUM = "3.45";
-export const TARIH = "27 Ekim 2026";
+export const SURUM = "3.46";
+export const TARIH = "28 Ekim 2026";
 /** Dosya adlarında kullanılan biçim: schema_v3.5_30Eylul2026 */
-export const DOSYA_EKI = "v3.45_27Ekim2026";
+export const DOSYA_EKI = "v3.46_28Ekim2026";
 
 export interface SurumKaydi {
   surum: string;
@@ -19,6 +19,28 @@ export interface SurumKaydi {
 }
 
 export const SURUM_GECMISI: SurumKaydi[] = [
+  {
+    surum: "3.46",
+    tarih: "28 Ekim 2026",
+    baslik: "Güvenlik denetimi: yapay zekâ anahtarı sızıntısı ve ofisler arası yazma açığı kapatıldı; plan sınırları sunucuda uygulanıyor",
+    degisenler: [
+      "KRİTİK — yapay zekâ anahtarı: \"Bağlantıyı dene\" (/api/ai/dene) gövdeden gelen adresi kabul ediyordu; giriş yapmış herhangi bir kullanıcı kendi sunucusunun adresini yazıp platformun AI_API_KEY anahtarını ele geçirebilirdi. Anahtar artık yalnızca bilinen sağlayıcılara (Gemini, Groq, Cerebras, Mistral, OpenRouter, OpenAI) gider; ek adres gerekirse Cloudflare değişkeni AI_IZINLI_ALANLAR.",
+      "YÜKSEK — ofisler arası yazma: kimliği bilinen BAŞKA ofisin kişisi ve eşleşme notu, kaydetme yolundaki \"upsert\" ile değiştirilebiliyordu (kiracılık süzgeci upsert'in yalnızca oluşturma kısmına ofis yazıyordu). Artık upsert'in arama kısmına da ofis süzgeci eklenir; başka ofisin satırı değişmez (tests/v346-db, düzeltme olmadan kırmızı).",
+      "PLAN SINIRLARI SUNUCUDA: günlük yapay zekâ hakkı (Ücretsiz 25 · Pro 500 · Pro+ 2.000; TR gece yarısı yenilenir), plana göre fotoğraf (Ücretsiz kapalı) ve Google Kişiler bağlantısı (Ücretsiz kapalı) artık sunucuda denetleniyor. Eskiden yalnızca Yönetim ekranında yazıyordu. Sınırsız ofis (Özyurtlar) etkilenmez.",
+      "Yetki: /api/ayarlar ile ofis ayarını yalnızca ofis yöneticisi değiştirir (danışman / asistan değiştirebiliyordu). Tüm ofislerin ortak konum sözlüğüne (takma ad, alt bölge) yalnızca platform yöneticisi yazar.",
+      "Statik sayfalara güvenlik başlıkları (public/_headers): başka sitede gizli çerçeveye gömülme engeli, tür karıştırma engeli, HTTPS zorunluluğu.",
+      "Boş liste: kayıtlar süzgeç yüzünden gizliyse \"Bu filtrede kayıt yok — 15 talep süzgeç yüzünden gizli\" ve tek dokunuşla \"Süzgeci temizle\". Hiç kayıt yoksa \"+ Yeni talep\" ve \"Veri Girişi'nden toplu ekle\". Eşleşmelerde de \"Süzgeçleri temizle\".",
+      "Formda tamamen boş kayıt (konum, fiyat / bütçe, m², kişi, açıklama hiçbiri yok) kaydedilmez — boş kayıt her şeyle eşleşip listeyi kirletiyordu. İçe aktarma kuralları değişmedi.",
+      "Kayıt detayında \"Ana kategori: Isyeri\" yerine \"İş Yeri (Ticari / Endüstriyel)\".",
+      "Pro+ planı ekranda \"portföy başına 15 fotoğraf\" yazıyordu ama sistem sınırı 8'di; ekran artık 8 yazıyor (15'e çıkarmak depolama kararı — ücretsiz katman 1 GB).",
+    ],
+    testEt: [
+      "Ana Sayfa › \"Ofisin talepleri (0)\" kutusuna dokunun: boş listede \"Süzgeci temizle, tümünü göster\" çıkmalı; basınca tüm talepler gelmeli.",
+      "Talepler › + Yeni talep › hiçbir şey doldurmadan Kaydet: \"Kayıt boş görünüyor\" uyarısı çıkmalı, kayıt açılmamalı.",
+      "Bir talebi açın: Ana kategori \"İş Yeri (Ticari / Endüstriyel)\" yazmalı.",
+      "Canlıda Ayarlar › Yapay zekâ › Bağlantıyı dene: Gemini ile \"tamam\" dönmeli (izin listesindeki adres).",
+    ],
+  },
   {
     surum: "3.45",
     tarih: "27 Ekim 2026",

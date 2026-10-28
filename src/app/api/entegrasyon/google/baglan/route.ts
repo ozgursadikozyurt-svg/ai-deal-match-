@@ -1,4 +1,4 @@
-// Anahtar CRM v3.43 · 25 Ekim 2026 (v3.13'ten)
+// Anahtar CRM v3.46 · 28 Ekim 2026 (v3.13'ten)
 // POST /api/entegrasyon/google/baglan → { url }: arayüz bu adrese gider, kullanıcı Google'da "İzin ver" der.
 //
 // v3.21 — "Google ile bağlan" tek düğme:
@@ -11,11 +11,14 @@ import { ofisBaglami } from "@/lib/kiracilik";
 import { yetkiGerek } from "@/lib/guvenlik/yetki";
 import { yetkiAdresi, yonlendirmeAdresi, uygulamaAdresi } from "@/lib/google/istemci";
 import { durumImzala } from "@/lib/guvenlik/sifre";
+import { prisma } from "@/lib/db";
+import { entegrasyonPlanDenetle } from "@/lib/services/plan";
 
 export async function POST(req: Request) {
   try {
     const b = ofisBaglami();
     yetkiGerek(b.rol, "ofis.entegrasyon");
+    await entegrasyonPlanDenetle(prisma); // v3.46 — Google eşitlemesi planda olmalı
     const id = process.env.GOOGLE_CLIENT_ID;
     if (!id || !process.env.GOOGLE_CLIENT_SECRET) return Response.json({ hata: "AYAR_EKSIK", mesaj: "Google bağlantısı bu kurulumda henüz açılmamış (GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET)" }, { status: 503 });
     const state = durumImzala({ ofisId: b.ofisId, kullaniciId: b.kullaniciId, eposta: b.eposta });
