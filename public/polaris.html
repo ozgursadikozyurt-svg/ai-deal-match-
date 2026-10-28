@@ -1,4 +1,17 @@
-<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Polaris</title><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#2B59F0"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Polaris"><link rel="icon" href="/polaris-ikon.svg" type="image/svg+xml"><link rel="icon" href="/polaris-ikon-32.png" type="image/png" sizes="32x32"><link rel="apple-touch-icon" href="/polaris-ikon-180.png"><link rel="manifest" href="/polaris.webmanifest"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Polaris</title><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#2B59F0"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Polaris"><link rel="icon" href="/polaris-ikon.svg" type="image/svg+xml"><link rel="icon" href="/polaris-ikon-32.png" type="image/png" sizes="32x32"><link rel="apple-touch-icon" href="/polaris-ikon-180.png"><link rel="manifest" href="/polaris.webmanifest"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}/* portföy kanalları */
+.pffam{margin:18px 0 8px}
+.pffam h4{font-family:var(--f-head);font-size:17px;font-weight:800;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pfgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:10px}
+.pfrow{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c,var(--line2));border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-width:0}
+.pfm{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.pfm .lbl{font-size:12.5px;color:var(--muted);font-weight:700}
+.sdrow{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow)}
+.pfk{width:100%;border-collapse:collapse;font-size:13.5px}
+.pfk th{font-size:12px;color:var(--muted);text-align:left;font-weight:700}
+.pfk td,.pfk th{padding:5px 6px;border-top:1px solid var(--line);text-align:left;vertical-align:middle}
+.pfk input{width:100%;min-width:90px;font-size:13px;padding:4px 6px}
+#pfSoru textarea{width:100%;margin-top:4px}
+</style></head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
 <style>
@@ -462,6 +475,7 @@ dl.gloss dt{font-weight:700;padding-right:14px}
     <button type="button" role="tab" data-tab="bugun" aria-selected="true">Bugün</button>
     <button type="button" role="tab" data-tab="gorev" aria-selected="false">Görevler <span class="badge" id="taskBadge" hidden></span></button>
     <button type="button" role="tab" data-tab="kisiler" aria-selected="false">Kişiler</button>
+    <button type="button" role="tab" data-tab="portfoy" aria-selected="false">Portföy</button>
     <button type="button" role="tab" data-tab="hafta" aria-selected="false">Bu hafta</button>
     <button type="button" role="tab" data-tab="notlar" aria-selected="false">Notlarım</button>
     <button type="button" role="tab" data-tab="yol" aria-selected="false">Yol haritası</button>
@@ -537,6 +551,38 @@ dl.gloss dt{font-weight:700;padding-right:14px}
     <div class="row" style="justify-content:center;margin-top:10px"><button class="btn ghost" type="button" id="kMore" hidden>Daha fazla göster</button></div>
     <div class="bulk" id="kBulk" hidden></div>
     <p class="hint" id="kNote" style="margin-top:14px"></p>
+  </section>
+
+  <!-- PORTFÖY -->
+  <section id="tab-portfoy" hidden>
+    <div class="sechead"><div><span class="label">Arz makinesi · 15 kanal</span><h2>Portföy bulma</h2></div><div class="row"><button class="btn ghost sm" type="button" data-pb="saha">Nasıl yapılır?</button></div></div>
+    <div class="tiles" id="pfTiles"></div>
+    <div class="card" id="pfFocus" style="margin-bottom:16px"></div>
+    <div class="sechead" style="margin-bottom:8px"><div><span class="label">Bu ay neredesin</span><h3 style="font-size:19px">Kanal panosu</h3></div><div class="row"><span class="small muted" id="pfAyAd"></span><button class="btn ghost sm" type="button" data-pfay="-1">‹ Önceki ay</button><button class="btn ghost sm" type="button" data-pfay="0">Bu ay</button></div></div>
+    <p class="hint" style="margin-bottom:10px">Her kanalın altındaki ilk sayaç <b>temas</b>, ikincisi <b>portföy</b>. Bugün sekmesinde "Yeni portföy" girip kaynağını seçtiğinde ikinci sayaç kendiliğinden artar. Hedefler kitabın aylık asgarileridir.</p>
+    <div id="pfBoard"></div>
+    <div class="card" style="margin-top:18px">
+      <h3>Saha defteri — boş mülk tespiti</h3>
+      <p class="hint" style="margin-bottom:10px">Tespiti sahadayken gir, sonraya bırakma. İki saat sonra 20 mülkü karıştırırsın. Kayıt eklediğinde ilgili kanalın temas sayacı ve günün "boş mülk tespiti" sonucu da artar.</p>
+      <details class="card" id="sdForm" style="box-shadow:none;margin-bottom:12px"><summary style="font-weight:700;cursor:pointer">+ Yeni tespit ekle</summary>
+        <div class="fbody" style="padding-top:10px">
+          <div class="row"><input type="text" id="sd-ad" placeholder="Adres / cadde" style="flex:2;min-width:200px"><input type="text" id="sd-bl" placeholder="Bölge (Konyaaltı, OSB…)" style="flex:1;min-width:140px"></div>
+          <div class="row" style="margin-top:8px"><select id="sd-tur" aria-label="Mülk türü"><option>Dükkân</option><option>Depo</option><option>Ofis</option><option>Fabrika / atölye</option><option>Arsa</option><option>Otel / apart</option><option>Diğer</option></select><input type="text" id="sd-m2" placeholder="Tahmini m²" style="width:120px"><select id="sd-kat" aria-label="Kat"><option value="">Kat</option><option>Zemin</option><option>Üst</option><option>Bodrum</option></select><select id="sd-kn" aria-label="Kanal"></select></div>
+          <div class="row" style="margin-top:8px"><input type="text" id="sd-bos" placeholder="Ne zamandır boş görünüyor" style="flex:1;min-width:160px"><input type="text" id="sd-sh" placeholder="Sahibin adı (biliyorsan)" style="flex:1;min-width:160px"><input type="tel" id="sd-tel" placeholder="Telefon" style="width:150px"></div>
+          <div class="row" style="margin-top:8px"><input type="text" id="sd-not" placeholder="Not: vitrin durumu, komşunun söylediği, kira beklentisi…" style="flex:1;min-width:220px"></div>
+          <div class="row" style="margin-top:8px"><label class="row small" style="gap:6px"><input type="checkbox" id="sd-ft"> Fotoğraf çektim</label><label class="row small" style="gap:6px"><input type="checkbox" id="sd-ks"> Komşuya sordum</label><span class="spacer"></span><button class="btn" type="button" id="sdAdd">Kaydet</button></div>
+        </div>
+      </details>
+      <div class="chips" id="sdFilt" style="margin-bottom:10px"></div>
+      <div class="tlist" id="sdList"></div>
+    </div>
+    <div class="card" style="margin-top:18px"><h3>Aylık kanal karnesi</h3><p class="hint" style="margin-bottom:8px">Ay sonunda doldur. Hangi kanalın gerçekten portföy ürettiğini görmek, enerjini doğru yere yöneltir.</p><div id="pfKarne"></div></div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card"><h3>Haftalık 4 soru — her Pazar</h3><div id="pfSoru"></div>
+        <div class="row" style="margin-top:10px"><button class="btn" type="button" id="pfAiBtn">AI ile ay değerlendirmesi</button><span class="small muted" id="pfAiState"></span></div>
+        <div class="answer" id="pfAiOut" hidden></div>
+      </div>
+    </div>
   </section>
 
   <!-- BU HAFTA -->
@@ -1010,7 +1056,79 @@ const MET=[
 ];
 const MET_ID=Object.fromEntries(MET.map(m=>[m.id,m]));
 const GOALTXT={sahip:n=>n+' mülk sahibiyle konuş',musteri:n=>n+' müşteriyle konuş',referans:n=>n+' referans görüşmesi yap',tespit:n=>n+' boş mülk bul ve not al',gosterim:n=>n+' gösterim yap',teklif:n=>n+' yazılı teklif hazırla',portfoy:n=>n+' yeni portföy al',icerik:n=>n+' içerik yayınla',islem:n=>n+' işlem kapat'};
-const SOURCES=['Saha turu','Komşu esnaf / bina yöneticisi','Eski müşteri listesi','Muhasebeci / avukat / bankacı','İlan siteleri','Google Haritalar / sosyal medya','Sigortacı / emlakçı','Müteahhit','Banka / icra / TMSF','Reklam / içerik','Diğer'];
+const SOURCES=['Saha turu','Komşu esnaf / bina yöneticisi','Eski müşteri listesi','Muhasebeci / avukat / bankacı','İlan siteleri','Google Haritalar / sosyal medya','Sigortacı / emlakçı','Müteahhit','Banka / icra / TMSF','Reklam / içerik','Diğer','Oda, OSB, belediye, tapu','İcra avukatı / hacizli mülk','Depo ve sanayi firmaları','Yabancı yatırımcı / expat','İçerik (rapor, video, kanal)'];
+
+/* =========================================================
+   PORTFÖY KANALLARI — arz makinesi
+   Kaynak: Portföy Bulma Kitabı (13 kanal) + 1 Numara Olma Kılavuzu Bölüm 3 ve 6.
+   ========================================================= */
+const KANAL_AILE=[
+ ['saha','Saha ve soru ağı','Sokak, ilan sitelerinden 3–8 hafta önce haber verir. En temiz, rakipsiz portföy buradan çıkar.'],
+ ['ref','Referans sistemi','Kurulması aylar sürer. Kurulunca sen aramadan portföy gelir.'],
+ ['kurum','Kurumsal kanallar','Henüz piyasaya düşmemiş bilgiye erken erişim.'],
+ ['dij','Dijital iz takibi','Yorulmuş ilan sahibi ve kapanmış işletme, ekrandan görünür.'],
+ ['rek','Reklam ve yeniden hedefleme','Soğuk kitleyi ısıt, ısınanı forma düşür.'],
+ ['yab','Yabancı yatırımcı ağı','Ülkesine dönmüş ya da dönmek isteyen yabancı mülk sahibi.'],
+ ['fin','Bankalar ve finansal','Teminat olarak alınmış ve el konulmuş ticari mülkler.'],
+ ['end','Endüstriyel ve lojistik','Antalya\'nın en hızlı büyüyen, uzmanı en az segmenti. Senin geçmişin burada.'],
+ ['ice','İçerikle çekim','Uyurken çalışan satıcın. 3 yılda gelen talebin maliyeti düşer.'],
+ ['ag','Kendi ağın','Zaten elinde olan ama aranmayan veri ve ilişki.']
+];
+const KANAL=[
+ {id:'saha',n:1,ai:'saha',ad:'Saha turu ve boş mülk tespiti',tip:'Saha',t:20,p:'2–4 mülk',ilk:'2–4 hafta',pb:'saha',src:0,met:'tespit',
+  bu:'2 gün × 90 dakika saha turu. En az 20 boş ticari mülk fotoğrafla, 5 sahibine ulaş.',
+  not:'Vitrin boş, ışıklar hep kapalı, panjur sabah 10\'da inik, kapıda posta birikmiş, "Kiralık" yazısı sararmış.'},
+ {id:'komsu',n:2,ai:'saha',ad:'Komşu esnaf ve bina yöneticisi',tip:'Saha',t:15,p:'1–3 mülk',ilk:'1–2 hafta',pb:'komsu',src:1,
+  bu:'Tespit ettiğin 5 boş mülkün her birinde 1 komşuyla konuş. 3 plaza/iş hanı yöneticisine "boş kat var mı?" sor.',
+  not:'Her 3 konuşmadan 1\'i bir iletişim bilgisiyle biter. Haftada 15 ziyaret = yılda 260 yeni temas.'},
+ {id:'referans',n:3,ai:'ref',ad:'Referans ağı: muhasebeci, avukat, bankacı',tip:'Kurumsal',t:15,p:'1–2 mülk',ilk:'4–8 hafta',pb:'referans',src:3,met:'referans',
+  bu:'1 muhasebeci, 1 avukat, 1 banka şube müdürüyle randevu al. Her ziyarette yazılı teklif mektubunu bırak.',
+  not:'Pay: muhasebeci ve avukat %15, bankacı ve sigortacı %10, konut emlakçısı %20–25. 30 kişiye bırak, 3 ayda 2–3 kaynak çalışmaya başlar.'},
+ {id:'sigorta',n:4,ai:'ref',ad:'Sigorta acenteleri ve diğer emlakçılar',tip:'Kurumsal',t:8,p:'0–1 mülk',ilk:'4–6 hafta',pb:'ortaklik',src:6,
+  bu:'3 sigorta acentesi, 4 konut emlakçısı ziyaret et ya da ara. Teklifi yazılı bırak, WhatsApp bile olur.',
+  not:'Poliçe yenilenmiyorsa mülk el değiştirecek demektir. Konut emlakçısına "rakip değil ortak" diye git.'},
+ {id:'resmi',n:5,ai:'kurum',ad:'Oda, OSB, belediye, tapu çevresi',tip:'Kurumsal',t:8,p:'0–1 mülk',ilk:'4–8 hafta',pb:'resmi',src:11,
+  bu:'TSO etkinlik takvimine bak, 1 etkinliğe katıl. OSB Müdürlüğü ile görüşme ayarla. Tapu çevresinde 2 esnafla tanış.',
+  not:'Etkinlik işlem yeri değil ilişki yeridir. 3–6 ay sonra "geçen tanıştığımız arkadaş" diye arayan olur.'},
+ {id:'icra',n:6,ai:'kurum',ad:'İcra ve hacizli mülk (distressed)',tip:'Kurumsal',t:4,p:'0–1 mülk',ilk:'6–10 hafta',pb:'banka',src:12,
+  bu:'1 icra avukatıyla yüz yüze görüş. TMSF ihale listesini bir kez tara, uygun olanları not al.',
+  not:'Hacizli ticari mülk piyasa değerinin %20–30 altında el değiştirir. Rekabet az, çünkü süreç bilgisi gerekir.'},
+ {id:'ilan',n:7,ai:'dij',ad:'İlan sitesi ters tarama',tip:'Dijital',t:20,p:'2–4 mülk',ilk:'1–2 hafta',pb:'ilan',src:4,
+  bu:'Sahibinden ve Hepsiemlak\'ta ticari kategoriyi tara. 90+ gündür yayında ya da fiyatı düşmüş 10 ilan listele, 4 sahibini ara.',
+  not:'Fiyatı düşüren herkes "şimdi" sinyali veriyor. İlk mesajda satma, ücretsiz emsal raporu teklif et.'},
+ {id:'harita',n:8,ai:'dij',ad:'Google Haritalar ve sosyal medya taraması',tip:'Dijital',t:10,p:'1–2 mülk',ilk:'2–4 hafta',pb:'harita',src:5,
+  bu:'Hedef bölgende "kalıcı olarak kapatıldı" etiketli 5 işletme bul, sahiplerine ulaş. 1 esnaf grubuna katıl.',
+  not:'LinkedIn\'de "emekli oluyorum", "şirketi devrettik", "yeni şubeye taşındık" paylaşımları mülk hareketi demektir.'},
+ {id:'reklam',n:14,ai:'rek',ad:'Meta ve Google reklamı, yeniden hedefleme',tip:'Dijital',t:8,p:'1–2 mülk',ilk:'2–4 hafta',pb:'reklam',src:9,
+  bu:'Meta Pixel\'i sitene ekle. 1 görsel + 1 metinle 500 TL test reklamı aç, 7 gün bekle. Video izleyenleri ayrı kitle yap.',
+  not:'3 katman: soğuk kitleye reels (%60), izleyene vaka çalışması (%30), tıklayana WhatsApp daveti (%10).'},
+ {id:'yabanci',n:13,ai:'yab',ad:'Yabancı yatırımcı ve expat ağı',tip:'Ağ',t:6,p:'0–1 mülk',ilk:'6–10 hafta',pb:'yabanci',src:14,
+  bu:'1 expat Facebook grubuna katıl ve kısa İngilizce bir tanıtım paylaş. 1 tercüman ya da expat danışmanıyla tanış.',
+  not:'Dil engeli yüzünden mülkünü değerlendiremeyen yabancı sahip, güvenilir yerel danışman için hazır portföydür.'},
+ {id:'banka',n:11,ai:'fin',ad:'Bankalar, TMSF ve portföy yönetim şirketleri',tip:'Kurumsal',t:4,p:'0–1 mülk',ilk:'6–12 hafta',pb:'banka',src:8,
+  bu:'1 banka şube müdürüyle öğle yemeği ayarla, varlık yönetim birimi bağlantısı iste. TMSF ihale listesini kontrol et.',
+  not:'Banka gayrimenkulü asıl işi olarak tutmaz; hızlı ve makul fiyata çıkarmak ister.'},
+ {id:'sanayi',n:12,ai:'end',ad:'Depo, lojistik ve OSB firmaları',tip:'Saha',t:6,p:'1–2 mülk',ilk:'3–6 hafta',pb:'sanayi',src:13,
+  bu:'2 nakliyat/lojistik, 1 soğuk zincir firmasını ara ya da ziyaret et. OSB\'de 3 firma gez.',
+  not:'OSB\'de üç grup üç fırsattır: büyüyen (kiracı), küçülen (portföy), taşınan (ikisi birden).'},
+ {id:'inbound',n:15,ai:'ice',ad:'İçerikle çekim: rapor, video, WhatsApp kanalı',tip:'İçerik',t:8,p:'1–2 mülk',ilk:'8–12 hafta',pb:'inbound',src:15,met:'icerik',
+  bu:'Aylık piyasa raporunu yayınla. 1 bölge analizi videosu çek. "Antalya Ticari Gayrimenkul Piyasa Notu" kanalına 1 not gir.',
+  not:'Ücretsiz emsal raporu, kendi satmaya çalışan mülk sahibini açan en güçlü tek cümledir.'},
+ {id:'liste',n:9,ai:'ag',ad:'Mevcut yatırımcı ve mal sahibi listesi',tip:'Ağ',t:10,p:'2–3 mülk',ilk:'Bu hafta',pb:'eskiliste',src:2,met:'sahip',
+  bu:'Son 6 ayda aranmamış 10 kişiyi seç ve bu hafta ara. Her aramayı aynı gün kişiye işle.',
+  not:'Kapanan işlemlerin %70\'i zaten tanıdığın ya da onların yönlendirdiği kişilerden çıkar. En hızlı kanal budur.'},
+ {id:'muteahhit',n:10,ai:'ag',ad:'Müteahhit ve geliştirici ağı',tip:'Ağ',t:4,p:'0–1 mülk',ilk:'4–8 hafta',pb:'muteahhit',src:7,
+  bu:'Bölgende devam eden 2 ticari/karma projeyi tespit et, geliştiricisiyle 1 görüşme ayarla.',
+  not:'Tek anlaşma, onlarca birim portföy demektir. Müteahhit inşaat yapar, pazarlama yapmaz.'}
+];
+const KANAL_BY=Object.fromEntries(KANAL.map(k=>[k.id,k]));
+const SRC_KANAL=Object.fromEntries(KANAL.filter(k=>k.src!=null).map(k=>[String(k.src),k.id]));
+/* Haftalık dağılım — kitabın uygulama takvimi. 0=Pazar */
+const KANAL_GUN={1:['saha','komsu'],2:['referans','sigorta'],3:['ilan','harita','reklam'],4:['liste','muteahhit'],5:['resmi','yabanci','inbound'],6:['icra','banka','sanayi'],0:[]};
+const AY_KEY=()=>TODAY.slice(0,7);
+const ayAdi=a=>{const[y,m]=String(a).split('-');return TR_M[+m-1]+' '+y};
+const KANAL_DURUM=[['yeni','Yeni tespit'],['komsu','Çevreye soruldu'],['ulasildi','Sahibine ulaşıldı'],['gorusme','Görüşme yapıldı'],['portfoy','Portföye girdi'],['kapali','Vazgeçildi']];
+const SD_RENK={yeni:'',komsu:'mid',ulasildi:'warn',gorusme:'now',portfoy:'ok',kapali:'bad'};
 
 /* =========================================================
    NASIL YAPILIR — rehberlerden sade dille
@@ -1116,6 +1234,41 @@ yabanci:{grp:'Portföy bulma',t:'Yabancı mülk sahipleri ve yatırımcılar',sr
  soz:[['Facebook grubunda (İngilizce)','Hello everyone, I\'m Özgür from Özyurtlar Gayrimenkul. I work only with commercial property in Antalya. If you own a shop, warehouse, office or land and want to sell or rent it, I can find the right buyer or tenant and handle the paperwork.'],
   ['Tercümana','Yabancı müşterilerinizden Antalya\'daki ticari mülkünü satmak ya da kiralamak isteyen olursa bana yönlendirin. Tüm evrak işlerinde yardımcı olurum. İşlem olursa komisyonu paylaşırız.']],
  kaydet:['Kişi, ülke, mülkü'],hedef:'Ayda 1 grup paylaşımı ve 1 yeni aracı.'},
+komsu:{grp:'Portföy bulma',t:'Komşu esnaf ve bina yöneticisinden sahip bulma',src:'Portföy Bulma Kitabı · Bölüm 2',
+ amac:'Bir sokaktaki boş mülkü çevresindeki 3–5 kişi zaten bilir: yan dükkânın sahibi, karşıdaki kasap, aynı binadaki kiracı, kapıcı. Hiçbiri ilan sitesine bakmaz ama mülkün kimin olduğunu, neden boş kaldığını ve sahibin ne istediğini bilir. Tek konuşma, haftalarca sürecek araştırmayı dakikaya indirir.',
+ hazirlik:['Kartvizitin cebinde olsun.','Boş mülkün fotoğrafını önce çek; konuşurken "şu köşedeki" demek yerine gösterirsin.'],
+ adim:['Boş mülkü tespit ettikten sonra yan ya da karşı işletmeye gir.','Kendini bir cümlede tanıt: adın, firman, bu bölgede ticari mülkle çalıştığın.','Tek ve kısa soruyu sor. Uzun anlatma.','Öğrendiğini hemen not al: sahibin adı, telefonu, mülk hakkında bilgi, sahip nerede oturuyor.','Kartvizitini bırak, teşekkür et.','Bu esnafı kişilere ekle. Bir dahaki gelişinde selam ver; zamanla sana kendisi haber verir.','Plazada ve iş hanında önce bina yöneticisine ya da kapıcıya git: boş kat, sahip bilgisi, kira beklentisi, önceki kiracı neden çıktı — hepsini bilir.'],
+ soz:[['Standart açılış','Merhaba, ben Özgür, Özyurtlar Gayrimenkul\'den. Şu boş dükkânı görüyorum, sahibini tanıyor musunuz? Profesyonel bir kiracı ya da alıcı bulma konusunda yardımcı olmak istiyorum.'],
+  ['Sohbet açıcı','Selam, bu caddenin esnafıyla tanışmak istiyorum. Ben Özgür, ticari gayrimenkul danışmanıyım. Şu köşedeki boş dükkânı biliyor musunuz, kim kiraya veriyor acaba?'],
+  ['Sahip hakkında bir şey duyduysan','O boş dükkânın sahibinin Ahmet Bey olduğunu duydum, doğru mu? Görüşmek istiyorum, iletişim bilgisi sizde var mı?'],
+  ['Esnafı kaynak yapmak için','Abi, ben bu bölgede düzenli çalışıyorum. Bir yerin boşalacağını ya da komşunun satmak istediğini duyarsan beni arar mısın? Bilgi verirsen ve iş olursa seni unutmam. Kartımı bırakayım.'],
+  ['Bina yöneticisine','Merhaba, ben Özgür, Özyurtlar Gayrimenkul. Bu binada boş kat ya da ofis var mı? Aktif kiracı arayan firmalarım var. Sahiple görüşmek istiyorum, yönlendirebilir misiniz?'],
+  ['Daha önce geldiğin binaya','Geçen ay gelmiştim, o zaman 3. kat doluydu. Hâlâ öyle mi? Yeni boşalan oldu mu? Bir gelişme olursa beni arayın, sizin için de kolaylık olur.'],
+  ['Kapıcıya','Merhaba, bu binada boş daire veya kat var mı? Kiralamak isteyen müşterim var. Kat sahibinin telefonu sende var mı? Bir çay içelim, anlat bakalım.'],
+  ['"Bilmiyorum, işim değil" derse','Anlarım, sizden bir şey istemiyorum, sadece bilgi. Bir isim ya da yönetim telefonu bile yeterli. Yardımcı olursanız unutmam.'],
+  ['"Bana ne, kendi işime bakarım" derse','Haklısınız, meşgul etmeyeyim. Kartımı bırakayım; bir gün bilgi gelirse beni hatırlarsınız.'],
+  ['"Sahip bilgi vermek istemez" derse','Anladım. Peki mesajımı ona iletebilir misiniz? "Biri ilgileniyor" demeniz yeter, gerisini ben hallederim.']],
+ kaydet:['Konuştuğun esnafın adı ve dükkânı','Sahibin adı, telefonu, öğrendiğin her şey','Mülk ne zamandır boş, önceki kiracı neden çıkmış'],
+ hedef:'Haftada 15 komşu/yönetici teması. Her 3 konuşmadan 1\'i bir iletişim bilgisiyle bitsin.'},
+reklam:{grp:'Görünürlük',t:'Reklam ve yeniden hedefleme',src:'1 Numara Olma Kılavuzu · Bölüm 6',
+ amac:'Reklam, seni tanımayan mülk sahibini önce tanıştırır, sonra ısıtır, en sonunda mesaj attırır. Tek bir reklamla portföy gelmez; üç katman üst üste çalışınca gelir. 2025\'te reklamdan gelen 4 işlem 420 binin üzerinde komisyon üretti, yani kanal sende zaten çalıştı.',
+ hazirlik:['Meta Pixel kodunu sitenin her sayfasına ekle. Siteyi ziyaret eden herkes böylece takip edilir.','Hedef kitle: Antalya ve 40 km çevresi, 38–65 yaş, ilgi alanı işletme sahipliği, yatırım, gayrimenkul.','Aylık bütçe: Meta 5.000 TL ile başla, geri dönüş pozitifse her ay %20 artır. Google Ads için ayrı 3.000 TL.'],
+ adim:['Katman 1 — soğuk kitle (bütçenin %60\'ı): 60 saniyelik reels. Amaç tanınmak. Mesaj: hazır alıcı portföyü, eşleştirme, ortalama satış süresi.','Katman 2 — ılık kitle (%30): videoyu izleyen ya da profili ziyaret edenlere vaka çalışması. Mesaj: "X mülkü Y günde kapattık, sizinki de kapanır."','Katman 3 — sıcak kitle (%10): tıklayan ve mesaj atanlara tek davet: "Ücretsiz ticari mülk analizi için şimdi yazın."','Reklam metni kuralı: problem + çözüm + kanıt + çağrı. Dördü de olsun.','Her reklam grubunda 2 görsel ve 2 metin dene. 7 gün sonra düşük olanı durdur.','Google Ads\'te arama niyetine gir: "antalya kiralık depo", "antalya fabrika satılık", "antalya osb kiralık". Arayan kişi zaten alıcıdır.','Ayda bir: hangi reklam kaç mesaj getirdi, kaç tanesi portföye döndü — Portföy sekmesindeki karneye yaz.'],
+ soz:[['Reklam metni — ticari portföy için','Başlık: Antalya\'da ticari mülkünüzü 28 günde satıyoruz. Metin: Ticari mülkünüz aylardır ilgi görmüyor mu? 5.000+ hazır alıcıdan oluşan portföyde eşleştirme yapıyoruz. Drone ve profesyonel fotoğraf ücretsiz. Ortalama satış süresi 28 gün. Geçen ay: Sarampol\'de dükkân 12 günde satıldı, Fettahlı\'da depo 19 günde kiralandı. Ücretsiz mülk analizi için WhatsApp\'tan yazın.'],
+  ['Soğuk kitleye video konusu','Ticari mülkünü kendin satarken yapılan 5 pahalı hata. Bu videoyu izleyenleri ayrı bir kitle olarak kaydet; onlara form reklamı göster.'],
+  ['Sıcak kitleye tek cümle','Mülkünüz için bölgenizdeki son 6 ayın gerçek kira ve satış emsallerini çıkarıyorum. Ücretsiz, bağlayıcı değil. Adresi yazmanız yeterli.']],
+ kaydet:['Hangi reklam kaç mesaj getirdi','Gelen mesajların kaçı mülk sahibi, kaçı alıcı','Bir portföyün reklamdan geldiğini Bugün sekmesinde kaynak olarak işaretle'],
+ hedef:'Ayda en az 8 gelen talep. Bunların 1–2\'si portföye dönsün. Dönmüyorsa metni değil hedef kitleyi değiştir.'},
+inbound:{grp:'Görünürlük',t:'İçerikle portföy çekme',src:'Portföy Bulma Kitabı · Bölüm 7 eki · 1 Numara Olma Kılavuzu Bölüm 3 ve 5',
+ amac:'Aradığın portföy yerine sana gelen portföy. Rapor, video ve kanal; sen uyurken çalışan satıcındır. İlk aylarda yavaş görünür, üçüncü yılda gelen talebin maliyetini %90 düşürür. "Antalya\'da ticari gayrimenkulde en tanınan isim" hedefinin asıl aracı budur.',
+ hazirlik:['Aylık piyasa raporu şablonu: bu ay hangi bölgede ne kiralandı, hangi fiyata, kaç günde. Tek sayfa yeter.','"Kendin Sat Kiti" PDF\'i hazırla: ilan metni şablonu, fotoğraf kontrol listesi, tapu süreci, kira sözleşmesi taslağı.','WhatsApp Kanalı aç: "Antalya Ticari Gayrimenkul Piyasa Notu". İki haftada bir yayın.'],
+ adim:['Ayda 1 piyasa raporu yayınla. LinkedIn\'de yazı, Instagram\'da carousel, WhatsApp kanalında kısa not olarak üç yere birden koy.','Ayda 1 bölge analizi videosu çek: OSB, Altıntaş, Konyaaltı sırayla. "Bu bölgede depo kaça kiralanıyor?" sorusunu cevapla.','Haftada 2 kısa video: kapanan bir işlemin hikâyesi, bir itirazın cevabı, bir rakam.','Ücretsiz emsal raporunu kapı aralığı olarak kullan: kendi satmaya çalışan mülk sahibine ilk mesajda satış yapma, sadece izin iste.','Emsal raporunu basıp elle yazılmış kısa bir notla mülke bırak ya da postala. Rakiplerinin neredeyse hiçbiri bunu yapmıyor.','Gelen her talebi kişilere ekle ve nereden geldiğini yaz.'],
+ soz:[['İlan sahibine ücretsiz emsal teklifi','İlanınızı gördüm. Bölgenizdeki son 6 ayın ticari kira ve satış emsallerini derledim. İsterseniz ücretsiz göndereyim, bağlayıcı bir şey değil. Göndereyim mi?'],
+  ['Kendin Sat Kiti teklifi','Kendiniz satmaya çalışıyorsunuz, saygı duyarım. Size yardımcı olsun diye hazırladığım ücretsiz bir dosya var: ilan metni şablonu, fotoğraf listesi, tapu süreci ve sözleşme taslağı. Göndereyim mi?'],
+  ['WhatsApp kanalına davet','İki haftada bir Antalya\'daki ticari kira ve satış hareketlerini kısa bir not olarak paylaşıyorum. Satış yok, sadece rakam. Kanala eklemem ister misiniz?'],
+  ['Aylık rapor paylaşımının açılışı','Ekim ayında Antalya\'da ticari tarafta ne oldu: OSB\'de depo metrekare kiraları şu seviyede, Konyaaltı\'nda dükkân devirleri şu yönde. Rakamlar aşağıda.']],
+ kaydet:['Hangi içerik kaç mesaj getirdi','Emsal raporu kaç kişiye gönderildi, kaçı görüşmeye döndü'],
+ hedef:'Ayda 1 rapor, 1 bölge videosu, 8 kısa içerik. Ayda en az 8 gelen talep, 1–2 portföy.'},
 randevu:{grp:'Müşteri ve satış',t:'Gösterim randevusu oluşturma',src:'Excel Perşembe sayfası · CRM Rehberi Bölüm 2 ve 6 · AI eşleştirme',
  amac:'Bugün gösterim randevun yoksa bu blok boş geçmez. Bu blokta gelecek günler için randevu üretirsin. Gösterim yapılmadan işlem kapanmaz.',
  adim:['Sıcak müşterilerini aç: 30 gün içinde karar verecek, bütçesi belli olanlar.','Her biri için portföyündeki en uygun 1–2 mülkü seç. Gerekirse ihtiyacı ve portföy listeni yapay zekâya verip eşleştirme iste.','Fotoğraf ve kısa bilgiyle WhatsApp\'tan gönder.','Aynı mesajda iki gün öner: "Çarşamba 10:00 mı, Perşembe 15:00 mi?" Seçenek vermek evet demeyi kolaylaştırır.','Cevap gelmezse ertesi gün kısa bir arama yap.','Sıcak müşterin yoksa ılık müşterilerine bu hafta yeni çıkan mülkleri gönder.'],
@@ -1697,6 +1850,12 @@ function mentorNotes(){
   if(v<h.wa){const left=Math.max(1,Math.ceil((1-f)*5));out.push({c:v>=Math.floor(h.wa*f)?'warn':'bad',h:'Mülk sahibi görüşmesi: '+v+'/'+h.wa,t:'Haftalık asgari '+h.wa+'. Kalan yaklaşık '+left+' iş gününde günde '+Math.ceil((h.wa-v)/left)+' görüşme yeterli.',pb:'eskiliste'})}
   else out.push({c:'ok',h:'Mülk sahibi görüşmesinde asgari tamam.',t:'Bu hafta '+v+' görüşme. İyi hedef '+h.wh+'.'});
   const ref=D.loaded?refDue().length:0;if(ref&&(wd===2||wd===5))out.push({c:'',h:ref+' tanıdık referansın ziyaret bekliyor.',t:'Yeni referansa randevu alamazsan bunlardan birine uğra. Düzenli ziyaret güveni korur.',tab:'kisiler'});
+  const kg=pfGun();
+  if(kg.length&&PF.yuklu&&PF.ay===AY_KEY()){
+    const az=kg.filter(x=>(+pfK(x.id).t||0)<Math.floor(x.t*Math.min(1,NOW.getDate()/30)));
+    if(az.length)out.push({c:az.length===kg.length?'bad':'warn',h:'Bugünün odak kanalı: '+az.map(x=>x.ad).join(' + '),t:az.map(x=>x.ad.split(' ')[0]+' '+(+pfK(x.id).t||0)+'/'+x.t).join(' · ')+'. '+az[0].bu,tab:'portfoy',pb:az[0].pb});
+    else out.push({c:'ok',h:'Bugünün odak kanallarında hedeftesin.',t:kg.map(x=>x.ad+' '+(+pfK(x.id).t||0)+'/'+x.t).join(' · '),tab:'portfoy'});
+  }
   if(!S.week?.bigDone)out.push({c:'',h:'Haftanın büyük işi',t:w.big+(w.note?' Not: '+w.note:''),tab:'hafta'});
   const ds=dersOk();if(ds.length){const x=ds[(Math.floor(NOW/864e5))%ds.length];out.splice(Math.min(2,out.length),0,{c:'',h:'Kendi dersin',t:x.d,pb:x.pb&&PB[x.pb]?x.pb:undefined})}
   return out.slice(0,4);
@@ -2259,12 +2418,12 @@ function savePlanDoc(){try{saveDoc('meta','plan',buildPlan(),1500)}catch{}}
 /* =========================================================
    OLAYLAR
    ========================================================= */
-const TABS=['bugun','gorev','kisiler','hafta','notlar','yol','islemler','pl','arsiv','rehber','ayar'];
+const TABS=['bugun','gorev','kisiler','portfoy','hafta','notlar','yol','islemler','pl','arsiv','rehber','ayar'];
 function showTab(t){
   if(LOCKED.has(t)&&!UNLOCK){askPin(t);return}
   $$('nav.tabs [data-tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t?'true':'false'));
   TABS.forEach(x=>$('#tab-'+x).hidden=x!==t);
-  ({gorev:renderTasks,kisiler:renderKisiler,hafta:()=>loadWeek(S.wk),notlar:renderNotes,yol:renderRoad,islemler:renderIslemler,pl:renderPL,arsiv:renderArsiv,ayar:()=>{AD=JSON.parse(JSON.stringify(A));renderSettings()}})[t]?.();
+  ({gorev:renderTasks,kisiler:renderKisiler,portfoy:renderPf,hafta:()=>loadWeek(S.wk),notlar:renderNotes,yol:renderRoad,islemler:renderIslemler,pl:renderPL,arsiv:renderArsiv,ayar:()=>{AD=JSON.parse(JSON.stringify(A));renderSettings()}})[t]?.();
   try{localStorage.setItem('pus:tab',t)}catch{}
 }
 const closeDrawer=()=>{$('#drawer').hidden=true;K_OPEN=null};
@@ -2288,7 +2447,7 @@ document.addEventListener('click',async e=>{
   if(d.rinc){bump(d.rinc,1,S.rDate);return}
   if(d.rdec){bump(d.rdec,-1,S.rDate);return}
   if(d.rdate){setResDate(d.rdate);return}
-  if(d.src){const doc=S.rDate===TODAY?S.day:S.rDay;doc.src[d.src]=(doc.src[d.src]||0)+1;pendingSrc=false;saveDoc('days',S.rDate,doc);renderResults();toast('Kaynak kaydedildi: '+SOURCES[d.src]);return}
+  if(d.src){const doc=S.rDate===TODAY?S.day:S.rDay;doc.src[d.src]=(doc.src[d.src]||0)+1;pendingSrc=false;saveDoc('days',S.rDate,doc);renderResults();if(SRC_KANAL[d.src])kanalAdd(SRC_KANAL[d.src],'p',1);toast('Kaynak kaydedildi: '+SOURCES[d.src]);return}
   if(d.ci){S.day.ci={...(S.day.ci||{}),[d.ci]:d.v==='1'};saveDay();renderToday();return}
   if(d.appt){$('#ap-tarih').value=TODAY;$('#ap-saat').value=fromMin(Math.min(1080,Math.ceil((nowMin()+30)/30)*30));$('#ap-kim').value='';$('#apptModal').hidden=false;$('#ap-kim').focus();return}
   if(d.tarihsiz){TF='tarihsiz';showTab('gorev');renderTasks();return}
@@ -2416,6 +2575,7 @@ function context(){
    acik_gorevler:sortTasks(openTasks()).slice(0,12).map(t=>(isoOk(t.tarih)?t.tarih+' ':'')+t.baslik+(taskLate(t)?' (gecikmiş)':'')),bugunun_sonuclari:S.day?.m||{},
    bu_hafta:Object.fromEntries(MET.filter(x=>x.wa).map(x=>{const h=hw(x.id);return [x.ad,(wk[x.id]||0)+' (asgari '+h.wa+', hedef '+h.wh+')']})),
    bu_haftanin_arama_listesi:(S.week?.picks||[]).map(i=>K_BY[i]).filter(Boolean).map(k=>k.a+' – '+roleText(k)+(calledSince(k,WEEK_KEY)?' (arandı)':'')),
+   portfoy_kanallari:PF.yuklu?{ay:PF.ay,toplam_temas:pfTopla().t+'/'+pfTopla().hedef,yeni_portfoy:pfTopla().p,bugunun_odagi:pfGun().map(x=>x.ad),dokunulmayan_kanallar:KANAL.filter(x=>!(+pfK(x.id).t||+pfK(x.id).p)).map(x=>x.ad),saha_defteri_takip:sdAcik().length}:null,
    yil:D.islemler.length?yearNumbers():null,derslerim:dersOk().slice(0,10).map(x=>x.d),yol_haritasi:'Hafta '+(WI+1)+': '+W()[WI].th+'. Büyük iş: '+W()[WI].big};
 }
 async function ask(){
@@ -2942,6 +3102,174 @@ Ertelenen ve iptal edilenler: ${JSON.stringify(logs)}
 }
 loadDers();
 
+
+/* =========================================================
+   PORTFÖY — kanal panosu, saha defteri, aylık karne
+   ========================================================= */
+let PF={ay:null,doc:null,sd:null,filt:'acik',yuklu:false};
+const pfBos=ay=>({ay,k:{},s:{},ai:null});
+async function pfLoad(force){
+  if(PF.yuklu&&!force)return;
+  const ay=PF.ay||AY_KEY();PF.ay=ay;
+  const [k,s]=await Promise.all([loadDoc('kanal',ay),loadDoc('saha','liste')]);
+  PF.doc={...pfBos(ay),...(k||{})};PF.doc.k=PF.doc.k||{};PF.doc.s=PF.doc.s||{};
+  PF.sd=s&&Array.isArray(s.items)?s:{items:[]};PF.yuklu=true;
+}
+async function pfAy(d){
+  const ay=PF.ay||AY_KEY();
+  if(d===0)PF.ay=AY_KEY();
+  else{const[y,m]=ay.split('-').map(Number);const dt=new Date(Date.UTC(y,m-1+d,1));PF.ay=dt.toISOString().slice(0,7)}
+  const k=await loadDoc('kanal',PF.ay);PF.doc={...pfBos(PF.ay),...(k||{})};PF.doc.k=PF.doc.k||{};PF.doc.s=PF.doc.s||{};renderPf();
+}
+const pfK=id=>(PF.doc.k[id]=PF.doc.k[id]||{t:0,p:0});
+const pfSave=()=>saveDoc('kanal',PF.ay,PF.doc);
+const sdSave=()=>saveDoc('saha','liste',PF.sd,700);
+async function kanalAdd(id,f,n){
+  const ay=AY_KEY();
+  if(PF.yuklu&&PF.ay===ay){const o=pfK(id);o[f]=Math.max(0,(+o[f]||0)+n);pfSave();if(!$('#tab-portfoy')?.hidden)renderPf();return}
+  const d={...pfBos(ay),...(await loadDoc('kanal',ay)||{})};d.k=d.k||{};
+  const o=d.k[id]=d.k[id]||{t:0,p:0};o[f]=Math.max(0,(+o[f]||0)+n);saveDoc('kanal',ay,d);
+}
+const pfGun=()=>(KANAL_GUN[NOW.getDay()]||[]).map(id=>KANAL_BY[id]).filter(Boolean);
+const sdAcik=()=>(PF.sd?.items||[]).filter(x=>x.dr!=='portfoy'&&x.dr!=='kapali');
+function pfTopla(){
+  const k=PF.doc?.k||{};let t=0,p=0,aktif=0;
+  KANAL.forEach(x=>{const o=k[x.id]||{};t+=+o.t||0;p+=+o.p||0;if(+o.t||+o.p)aktif++});
+  return {t,p,aktif,hedef:KANAL.reduce((s,x)=>s+x.t,0)};
+}
+function pfDurum(x,o){
+  const t=+o.t||0;const f=PF.ay===AY_KEY()?Math.min(1,(NOW.getDate())/30):1;
+  if(t>=x.t)return['ok','Hedefte'];
+  if(t>=Math.floor(x.t*f))return['warn','Yolunda'];
+  if(t>0)return['bad','Geride'];
+  return['','Başlamadın'];
+}
+function renderPf(){
+  if(!PF.yuklu){pfLoad().then(renderPf);return}
+  renderPfTiles();renderPfFocus();renderPfBoard();renderSd();renderPfKarne();renderPfSoru();
+  $('#pfAyAd').textContent=ayAdi(PF.ay)+(PF.ay===AY_KEY()?'':' · geçmiş ay');
+}
+function renderPfTiles(){
+  const s=pfTopla();const bek=sdAcik().length;
+  const yuzde=s.hedef?Math.round(s.t/s.hedef*100):0;
+  $('#pfTiles').innerHTML=[
+   ['Bu ay temas',s.t+' / '+s.hedef,yuzde+'% · 15 kanalın toplamı',yuzde>=80?'var(--ok)':yuzde>=40?'var(--warn)':'var(--bad)'],
+   ['Bu ay yeni portföy',String(s.p),'Kitabın beklentisi ayda 10–26',s.p>=10?'var(--ok)':s.p>=4?'var(--warn)':'var(--bad)'],
+   ['Dokunulan kanal',s.aktif+' / '+KANAL.length,'Tek kanala bağımlılık en büyük risk',s.aktif>=8?'var(--ok)':s.aktif>=4?'var(--warn)':'var(--bad)'],
+   ['Saha defteri',String(bek),'takip bekleyen boş mülk',bek?'var(--now)':'var(--line)']
+  ].map(([a,b,c,col])=>`<div class="tile" style="--c:${col}"><span>${esc(a)}</span><b>${esc(b)}</b><span>${esc(c)}</span></div>`).join('');
+}
+function renderPfFocus(){
+  const g=pfGun();const box=$('#pfFocus');
+  if(!g.length){box.innerHTML=`<h3>Bugün değerlendirme günü</h3><p class="hint">Pazar: haftanın portföy sayısını ve hangi kanalın sonuç verdiğini gözden geçir. Aşağıdaki 4 soruyu cevapla.</p>`;return}
+  box.innerHTML=`<span class="label">Bugünün odak kanalları · ${esc(TR_D[NOW.getDay()])}</span><h3 style="margin:6px 0 10px">${g.map(x=>esc(x.ad)).join(' + ')}</h3>`+
+   g.map(x=>{const o=pfK(x.id);return `<div class="bubble" style="margin-bottom:8px"><b>${esc(x.ad)}</b><div style="margin:4px 0 8px">${esc(x.bu)}</div><div class="row"><span class="small muted">Bu ay ${(+o.t||0)}/${x.t} temas</span><button class="howto" type="button" data-pft="${x.id}">Temas +1</button><button class="howto" type="button" data-pb="${x.pb}">Nasıl yapılır?</button><button class="howto" type="button" data-pfgorev="${x.id}" style="--c:var(--muted)">Görev ekle</button></div></div>`}).join('')+
+   `<p class="hint">Dağıtım kitabın haftalık takviminden geliyor: Pazartesi saha ve komşu esnaf, Salı referans, Çarşamba dijital ve reklam, Perşembe kendi ağın, Cuma kurumsal ve yabancı, Cumartesi finansal ve lojistik.</p>`;
+}
+function renderPfBoard(){
+  $('#pfBoard').innerHTML=KANAL_AILE.map(([aid,ad,aciklama])=>{
+    const list=KANAL.filter(x=>x.ai===aid);if(!list.length)return '';
+    const at=list.reduce((s,x)=>s+(+pfK(x.id).t||0),0),ah=list.reduce((s,x)=>s+x.t,0);
+    return `<div class="pffam"><h4>${esc(ad)} <span class="tag ${at>=ah?'ok':at?'warn':''}">${at}/${ah} temas</span></h4><p class="hint" style="margin:2px 0 8px">${esc(aciklama)}</p>
+    <div class="pfgrid">${list.map(x=>{
+      const o=pfK(x.id);const[c,dur]=pfDurum(x,o);const col=c?`var(--${c})`:'var(--line2)';
+      return `<div class="pfrow" style="--c:${col}">
+        <div><b>${x.n}. ${esc(x.ad)}</b> <span class="tag">${esc(x.tip)}</span> <span class="tag ${c}">${esc(dur)}</span></div>
+        <div class="small muted">${esc(x.not)}</div>
+        <div class="pfm"><span class="lbl">Temas</span><span class="stepper"><button type="button" data-pfdt="${x.id}" aria-label="temas azalt">−</button><span class="v">${+o.t||0}</span><button type="button" data-pft="${x.id}" aria-label="temas artır">+</button></span><span class="small muted">hedef ${x.t}</span>
+        <span class="lbl">Portföy</span><span class="stepper"><button type="button" data-pfdp="${x.id}" aria-label="portföy azalt">−</button><span class="v">${+o.p||0}</span><button type="button" data-pfp="${x.id}" aria-label="portföy artır">+</button></span><span class="small muted">beklenen ${esc(x.p)}</span></div>
+        <div class="small"><b>Bu ay uygula:</b> ${esc(x.bu)}</div>
+        <div class="row"><span class="small muted">İlk portföy: ${esc(x.ilk)}</span><span class="spacer"></span><button class="howto" type="button" data-pb="${x.pb}">Nasıl yapılır?</button><button class="howto" type="button" data-pfgorev="${x.id}" style="--c:var(--muted)">Görev ekle</button></div>
+      </div>`}).join('')}</div></div>`}).join('');
+}
+function renderSd(){
+  const sel=$('#sd-kn');
+  if(sel&&!sel.options.length)sel.innerHTML=KANAL.map(x=>`<option value="${x.id}"${x.id==='saha'?' selected':''}>${esc(x.ad)}</option>`).join('');
+  const items=(PF.sd?.items||[]).slice().sort((a,b)=>(b.t||'').localeCompare(a.t||''));
+  const say=d=>items.filter(x=>x.dr===d).length;
+  $('#sdFilt').innerHTML=[['acik','Takip bekleyen',sdAcik().length]].concat(KANAL_DURUM.map(([d,a])=>[d,a,say(d)])).concat([['hepsi','Hepsi',items.length]])
+    .map(([d,a,n])=>`<button class="chip" aria-pressed="${PF.filt===d}" type="button" data-sdf="${d}">${esc(a)} <span class="tag">${n}</span></button>`).join('');
+  const list=PF.filt==='hepsi'?items:PF.filt==='acik'?items.filter(x=>x.dr!=='portfoy'&&x.dr!=='kapali'):items.filter(x=>x.dr===PF.filt);
+  $('#sdList').innerHTML=list.length?list.map(x=>{
+    const d=KANAL_DURUM.find(z=>z[0]===x.dr)||KANAL_DURUM[0];
+    const alt=[x.bl,x.tur,x.m2?x.m2+' m²':'',x.kat,x.bos?'Boş: '+x.bos:'',x.sh||'',x.ft?'fotoğraf var':'',x.ks?'komşuya soruldu':''].filter(Boolean).join(' · ');
+    return `<div class="sdrow">
+      <div><b>${esc(x.ad||'Adressiz tespit')}</b> <span class="tag ${SD_RENK[x.dr]||''}">${esc(d[1])}</span> <span class="tag">${esc(KANAL_BY[x.kn]?.ad.split(' ')[0]||'Saha')}</span></div>
+      <div class="small muted">${esc(alt)}${x.not?' — '+esc(x.not):''}</div>
+      <div class="row"><select data-sdst="${esc(x.id)}" aria-label="durum">${KANAL_DURUM.map(([v,a])=>`<option value="${v}"${x.dr===v?' selected':''}>${esc(a)}</option>`).join('')}</select>${x.tel?`<a class="btn ghost sm" href="tel:${esc(String(x.tel).replace(/\s/g,''))}">Ara</a>`:''}<button class="btn ghost sm" type="button" data-sdtask="${esc(x.id)}">Görev ekle</button><span class="spacer"></span><button class="link small" type="button" data-sddel="${esc(x.id)}">Sil</button></div>
+    </div>`}).join(''):'<p class="hint">Bu süzgeçte kayıt yok. Saha turunda bulduğun her boş mülkü oracıkta ekle.</p>';
+}
+function renderPfKarne(){
+  const rows=KANAL.map(x=>{const o=pfK(x.id);const t=+o.t||0,p=+o.p||0;const dn=t?Math.round(p/t*100):0;
+    return `<tr><td>${x.n}. ${esc(x.ad.split(':')[0])}</td><td class="n">${t}</td><td class="n">${p}</td><td class="n">${t?dn+'%':'—'}</td><td><input type="text" data-pfn="${x.id}:one" value="${esc(o.one||'')}" placeholder="öne çıkan mülk"></td><td><input type="text" data-pfn="${x.id}:nx" value="${esc(o.nx||'')}" placeholder="sonraki adım"></td></tr>`}).join('');
+  const s=pfTopla();
+  $('#pfKarne').innerHTML=`<div style="overflow-x:auto"><table class="pfk"><thead><tr><th>Kanal</th><th>Temas</th><th>Portföy</th><th>Dönüşüm</th><th>Öne çıkan</th><th>Sonraki adım</th></tr></thead><tbody>${rows}<tr><td><b>Toplam</b></td><td class="n"><b>${s.t}</b></td><td class="n"><b>${s.p}</b></td><td class="n">${s.t?Math.round(s.p/s.t*100)+'%':'—'}</td><td></td><td></td></tr></tbody></table></div>`;
+}
+const PF_SORU=['Bu hafta kaç yeni mülk sahibiyle ilk temas kurdum?','Hangi kanal bu hafta en çok portföy getirdi? Neden?','Hangi kanalda hiç ilerleme olmadı? Gelecek hafta nasıl değiştireceğim?','Aktif portföy listem bu hafta kaç mülk arttı?'];
+function renderPfSoru(){
+  $('#pfSoru').innerHTML=PF_SORU.map((q,i)=>`<div class="note"><b>${i+1}. ${esc(q)}</b><textarea rows="2" data-pfs="${i}" placeholder="Kısa yaz">${esc(PF.doc.s?.['q'+i]||'')}</textarea></div>`).join('')+
+   (PF.doc.ai?`<div class="answer" style="margin-top:10px"><b class="small muted">${esc(ayAdi(PF.ay))} değerlendirmesi</b><br>${esc(PF.doc.ai)}</div>`:'');
+}
+function pfGorev(id){
+  const x=KANAL_BY[id];if(!x)return;
+  const t={id:uid('g'),baslik:'Portföy kanalı: '+x.ad,aciklama:x.bu,tarih:TODAY,saat:null,sure:60,hat:0,oncelik:'orta',kat:'portfoy',durum:'acik',kaynak:'kanal',olusturma:TODAY};
+  D.gorev.push(t);saveTask(t);refreshTaskViews();toast('Göreve eklendi: '+x.ad);
+}
+function sdEkle(){
+  const ad=$('#sd-ad').value.trim();if(!ad){toast('En azından adres yaz');return}
+  const kn=$('#sd-kn').value||'saha';
+  const it={id:uid('s'),t:TODAY,ad,bl:$('#sd-bl').value.trim(),tur:$('#sd-tur').value,m2:$('#sd-m2').value.trim(),kat:$('#sd-kat').value,bos:$('#sd-bos').value.trim(),sh:$('#sd-sh').value.trim(),tel:$('#sd-tel').value.trim(),not:$('#sd-not').value.trim(),ft:$('#sd-ft').checked?1:0,ks:$('#sd-ks').checked?1:0,kn,dr:$('#sd-ks').checked?'komsu':'yeni'};
+  PF.sd.items=[it,...(PF.sd.items||[])];sdSave();
+  kanalAdd(kn,'t',1);
+  try{if(S.day)bump('tespit',1)}catch{}
+  ['sd-ad','sd-bl','sd-m2','sd-bos','sd-sh','sd-tel','sd-not'].forEach(i=>$('#'+i).value='');
+  $('#sd-ft').checked=false;$('#sd-ks').checked=false;
+  renderPf();toast('Tespit kaydedildi');
+}
+function sdGorev(id){
+  const x=(PF.sd.items||[]).find(z=>z.id===id);if(!x)return;
+  const t={id:uid('g'),baslik:(x.ad||'Boş mülk')+' — sahibine ulaş',aciklama:[x.bl,x.tur,x.m2?x.m2+' m²':'',x.sh,x.tel,x.not].filter(Boolean).join(' · ')||null,tarih:nextWorkday(TODAY),saat:null,sure:30,hat:0,oncelik:'orta',kat:'portfoy',durum:'acik',kaynak:'saha',olusturma:TODAY};
+  D.gorev.push(t);saveTask(t);refreshTaskViews();toast('Görev eklendi');
+}
+async function pfAi(){
+  const out=$('#pfAiOut');out.hidden=false;
+  if(!SAMPLE){out.textContent='Yapay zekâ bu görünümde kapalı.';return}
+  $('#pfAiBtn').disabled=true;$('#pfAiState').textContent='Düşünüyor…';out.textContent='';
+  const veri=KANAL.map(x=>{const o=pfK(x.id);return {kanal:x.ad,tip:x.tip,temas:+o.t||0,hedef_temas:x.t,portfoy:+o.p||0,beklenen:x.p}});
+  const prompt=`Sen Özgür'ün mentorusun. Özgür Antalya'da sadece ticari ve sanayi mülkleriyle çalışan bir gayrimenkul danışmanı.
+Kurallar: Türkçe, sade ve kısa cümleler. Seçenek sunma, tek ve net karar ver. En fazla 160 kelime. Kısaltma ve İngilizce terim kullanma.
+Aşağıda ${ayAdi(PF.ay)} ayının portföy kanalı karnesi var. Şunları yaz:
+1) En çok portföy üreten kanal hangisi, neden.
+2) Temas hedefi tutmayan ve hiç dokunulmayan kanallardan hangi ikisine gelecek hafta ağırlık vermeli — gerekçesiyle.
+3) Gelecek hafta için üç somut aksiyon: kime, ne zaman, ne yapacak.
+Karne (JSON): ${JSON.stringify(veri)}
+Saha defterinde takip bekleyen boş mülk sayısı: ${sdAcik().length}
+Haftalık cevapları: ${JSON.stringify(PF.doc.s||{})}`;
+  try{const r=await SAMPLE(prompt,{cache:false});PF.doc.ai=r.text;PF.doc.aiAt=TODAY;pfSave();out.textContent=r.text;$('#pfAiState').textContent=''}
+  catch(e){$('#pfAiState').textContent='';out.textContent=e&&e.code==='rate_limited'?'Biraz bekleyip tekrar dene.':(e&&e.text)||'Cevap alınamadı.'}
+  $('#pfAiBtn').disabled=false;
+}
+document.addEventListener('click',e=>{
+  const a=e.target.closest('button,a');if(!a)return;const d=a.dataset;
+  if(d.pft){kanalAdd(d.pft,'t',1);toast('Temas kaydedildi: '+KANAL_BY[d.pft].ad);return}
+  if(d.pfdt){kanalAdd(d.pfdt,'t',-1);return}
+  if(d.pfp){kanalAdd(d.pfp,'p',1);toast('Portföy kaydedildi: '+KANAL_BY[d.pfp].ad);return}
+  if(d.pfdp){kanalAdd(d.pfdp,'p',-1);return}
+  if(d.pfgorev){pfGorev(d.pfgorev);return}
+  if(d.pfay!=null){pfAy(+d.pfay);return}
+  if(d.sdf){PF.filt=d.sdf;renderSd();return}
+  if(d.sdtask){sdGorev(d.sdtask);return}
+  if(d.sddel){if(confirm('Bu tespit silinsin mi?')){PF.sd.items=(PF.sd.items||[]).filter(z=>z.id!==d.sddel);sdSave();renderPf()}return}
+  if(a.id==='sdAdd'){sdEkle();return}
+  if(a.id==='pfAiBtn'){pfAi();return}
+});
+document.addEventListener('change',e=>{
+  const d=e.target.dataset;
+  if(d.sdst){const x=(PF.sd.items||[]).find(z=>z.id===d.sdst);if(x){x.dr=e.target.value;if(x.dr==='portfoy')kanalAdd(x.kn||'saha','p',1);sdSave();renderPf();toast('Durum güncellendi')}return}
+  if(d.pfn){const[id,f]=d.pfn.split(':');pfK(id)[f]=e.target.value;pfSave();return}
+  if(d.pfs!=null){PF.doc.s=PF.doc.s||{};PF.doc.s['q'+d.pfs]=e.target.value;pfSave();return}
+});
+
 /* =========================================================
    BAŞLANGIÇ
    ========================================================= */
@@ -2969,6 +3297,7 @@ setInterval(()=>{renderGuide();renderHero()},60000);
   renderYear();renderToday();
   await anLoad();
   const cur=$('nav.tabs [aria-selected="true"]')?.dataset.tab;if(cur&&cur!=='bugun')showTab(cur);
+  pfLoad().then(()=>{renderMentor();if(!$('#tab-portfoy').hidden)renderPf()});
   const pd=await loadDoc('meta','plan');if(!pd||pd.uretim!==TODAY)savePlanDoc();
 })();
 (async()=>{try{if(window.claude?.use){DL=await window.claude.use('downloads')}}catch{}if(!DL){$('#backupBtn').hidden=true;$('#iCsv').hidden=true;$('#pCsv').hidden=true}})();
