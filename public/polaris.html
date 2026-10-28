@@ -11,6 +11,15 @@
 .pfk td,.pfk th{padding:5px 6px;border-top:1px solid var(--line);text-align:left;vertical-align:middle}
 .pfk input{width:100%;min-width:90px;font-size:13px;padding:4px 6px}
 #pfSoru textarea{width:100%;margin-top:4px}
+/* aylık rapor */
+.rpskor{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
+.rpbig{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);min-width:240px;flex:0 1 280px;border-top:4px solid var(--c,var(--line))}
+.rpbig b{display:block;font-family:var(--f-head);font-size:46px;font-weight:800;line-height:1.05}
+.rpbig.st-ok{--c:var(--ok)}.rpbig.st-warn{--c:var(--warn)}.rpbig.st-bad{--c:var(--bad)}
+.rpday{border-top:1px solid var(--line);padding:10px 0}
+.rpday:first-child{border-top:0;padding-top:0}
+.rpday>b{display:block;font-weight:700;margin-bottom:4px}
+#rpDers .note select{max-width:100%}
 </style></head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
@@ -477,6 +486,7 @@ dl.gloss dt{font-weight:700;padding-right:14px}
     <button type="button" role="tab" data-tab="kisiler" aria-selected="false">Kişiler</button>
     <button type="button" role="tab" data-tab="portfoy" aria-selected="false">Portföy</button>
     <button type="button" role="tab" data-tab="hafta" aria-selected="false">Bu hafta</button>
+    <button type="button" role="tab" data-tab="rapor" aria-selected="false">Rapor</button>
     <button type="button" role="tab" data-tab="notlar" aria-selected="false">Notlarım</button>
     <button type="button" role="tab" data-tab="yol" aria-selected="false">Yol haritası</button>
     <button type="button" role="tab" data-tab="islemler" aria-selected="false">İşlemler</button>
@@ -582,6 +592,31 @@ dl.gloss dt{font-weight:700;padding-right:14px}
         <div class="row" style="margin-top:10px"><button class="btn" type="button" id="pfAiBtn">AI ile ay değerlendirmesi</button><span class="small muted" id="pfAiState"></span></div>
         <div class="answer" id="pfAiOut" hidden></div>
       </div>
+    </div>
+  </section>
+
+  <!-- RAPOR -->
+  <section id="tab-rapor" hidden>
+    <div class="sechead"><div><span class="label">Her hareket kayıt altında</span><h2>Aylık rapor ve skor</h2></div><div class="row"><span class="small muted" id="rpAyAd"></span><button class="btn ghost sm" type="button" data-rpay="-1">‹ Önceki ay</button><button class="btn ghost sm" type="button" data-rpay="0">Bu ay</button></div></div>
+    <div id="rpSkor" style="margin-bottom:16px"></div>
+    <div class="tiles" id="rpOzet"></div>
+    <div class="card" style="margin-bottom:16px"><h3>Kanal karnesi</h3><p class="hint" style="margin-bottom:8px">Portföy sekmesindeki sayaçların ay sonu görüntüsü. Portföy üretmeyen kanal, enerjini boşa alıyor demektir.</p><div id="rpKanal"></div></div>
+    <div class="card" style="margin-bottom:16px">
+      <h3>Yapay zekâ ile ay değerlendirmesi ve ders çıkarma</h3>
+      <p class="hint" style="margin-bottom:8px">Ayın bütün kaydını okur: skor tablosu, kanal karnesi, görevler, ertelenen ve iptal edilenler, saha tespitleri, günlük notlar, haftalık değerlendirmeler ve olay günlüğü. Önce ayı değerlendirir, sonra ders ve karar önerir. Her öneride hangi rehbere işleneceğini seçersin; onayladığın ders o "Nasıl yapılır?" sayfasına, mentor notlarına ve mentor cevaplarına kalıcı girer. Onaylamadığın hiçbir şey sisteme girmez.</p>
+      <div class="row"><button class="btn" type="button" id="rpAiBtn">Ayı değerlendir ve ders çıkar</button><span class="small muted" id="rpAiState"></span></div>
+      <div id="rpAiOut"></div><div id="rpDers"></div>
+    </div>
+    <div class="grid2" style="margin-bottom:16px">
+      <div class="card"><h3>Önümüzdeki işler</h3><p class="hint" style="margin-bottom:8px">Gelecek tarihli açık görevler, gecikmişler ve tarihi olmayanlar. Hiçbiri kaybolmaz.</p><div id="rpIleri"></div></div>
+      <div class="card"><h3>Raporu dışarı al</h3><p class="hint" style="margin-bottom:8px">Skor tablosu, özet, kanal karnesi, notlar, haftalık değerlendirmeler, dersler ve olay günlüğünün tamamı tek metin dosyası olur. Arşivlemek, danışmana ya da ekibe göndermek için.</p><div class="row"><button class="btn" type="button" id="rpIndir">Metin olarak indir</button><button class="btn ghost" type="button" id="rpKopya">Panoya kopyala</button></div></div>
+    </div>
+    <div class="card">
+      <h3>Olay günlüğü</h3>
+      <p class="hint" style="margin-bottom:10px">Bu ay yapılan her hareket: biten adım ve görev, girilen sonuç, erteleme ve iptal, kanal teması, saha tespiti, görüşme kaydı, not, haftalık değerlendirme, ders onayı ve yapay zekâ kullanımı. Silinmez; ay bittiğinde olduğu gibi kalır.</p>
+      <div class="row" style="margin-bottom:8px"><input type="search" id="rpAra" placeholder="Günlükte ara" style="flex:1;min-width:200px"></div>
+      <div class="chips" id="rpFilt" style="margin-bottom:10px"></div>
+      <div id="rpLog"></div>
     </div>
   </section>
 
@@ -1677,6 +1712,8 @@ function todayItems(){
 function isDone(item){return item.done}
 function markItem(key,val){
   const [k,id]=key.includes(':')?key.split(/:(.+)/):['b',key];
+  try{const ad=(ITEMS.find(i=>i.key===key)||{}).t||(k==='t'?(D.gorev.find(x=>x.id===id)||{}).baslik:key);
+    olayYaz(val?'bitti':'geri',ad||key,{k:k==='t'?'görev':k==='r'?'tekrarlayan görev':'günün adımı'})}catch{}
   if(k==='t'){const t=D.gorev.find(x=>x.id===id);if(t){t.durum=val?'bitti':'acik';t.bitis=val?TODAY:null;saveTask(t)}}
   else{const dk=k==='r'?key:id;if(val)S.day.done[dk]=true;else delete S.day.done[dk];saveDay()}
   renderToday();
@@ -1835,6 +1872,7 @@ function bump(id,d,date){
   if(id==='portfoy'&&d>0)pendingSrc=true;
   saveDoc('days',date,doc);
   if(date!==TODAY){const i=WEEK_DAYS.findIndex(x=>x.date===date);if(date>=WEEK_KEY){if(i>=0)WEEK_DAYS[i]=doc;else WEEK_DAYS.push(doc)}}
+  try{olayYaz(d>0?'sonuc':'geri',MET_ID[id].ad+(d>0?' +1':' −1'),{n:'Gün toplamı: '+doc.m[id],k:date!==TODAY?fmtDay(date):''})}catch{}
   renderToday();if(d>0)toast(MET_ID[id].ad+': '+doc.m[id]+(date!==TODAY?' ('+fmtDay(date)+')':''));
 }
 
@@ -1916,10 +1954,10 @@ function openTask(id,preset){
 $('#taskForm').addEventListener('submit',async e=>{e.preventDefault();
   const t=T_EDIT?D.gorev.find(x=>x.id===T_EDIT):{id:uid('g'),durum:'acik',kaynak:'elle',olusturma:TODAY};
   Object.assign(t,{baslik:$('#tf-baslik').value.trim(),aciklama:$('#tf-aciklama').value.trim()||null,tarih:$('#tf-tarih').value||null,saat:$('#tf-saat').value||null,sure:+$('#tf-sure').value||30,hat:+$('#tf-hat').value,oncelik:$('#tf-oncelik').value,kat:$('#tf-kat').value});
-  if(!T_EDIT)D.gorev.push(t);saveTask(t);$('#taskModal').hidden=true;refreshTaskViews();toast(T_EDIT?'Görev güncellendi':'Görev eklendi');
+  if(!T_EDIT)D.gorev.push(t);saveTask(t);olayYaz('gorev',(T_EDIT?'Görev güncellendi: ':'Görev açıldı: ')+t.baslik,{n:(isoOk(t.tarih)?fmtDay(t.tarih):'tarihsiz')+(t.saat?' '+t.saat:''),k:CATS[t.kat]?.[0]||'',r:t.id});$('#taskModal').hidden=true;refreshTaskViews();toast(T_EDIT?'Görev güncellendi':'Görev eklendi');
   if($('#tf-cal').checked)await taskToCal(t);
 });
-$('#tf-del').addEventListener('click',e=>{const b=e.currentTarget;if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Emin misin? Sil';return}const t=D.gorev.find(x=>x.id===T_EDIT);if(t){t.silindi=true;saveTask(t)}$('#taskModal').hidden=true;refreshTaskViews();toast('Görev silindi')});
+$('#tf-del').addEventListener('click',e=>{const b=e.currentTarget;if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Emin misin? Sil';return}const t=D.gorev.find(x=>x.id===T_EDIT);if(t){t.silindi=true;t.silinme=TODAY;saveTask(t);olayYaz('sil','Görev silindi: '+t.baslik,{n:t.aciklama||'',r:t.id})}$('#taskModal').hidden=true;refreshTaskViews();toast('Görev silindi')});
 function refreshTaskViews(){renderToday();if(!$('#tab-gorev').hidden)renderTasks()}
 function addQuickTask(txt,saat,kat){const t={id:uid('g'),baslik:txt,tarih:TODAY,saat:saat||null,sure:30,hat:saat?15:0,oncelik:'orta',kat:kat||'ofis',durum:'acik',kaynak:'plan-disi',olusturma:TODAY};D.gorev.push(t);saveTask(t);return t}
 
@@ -2418,12 +2456,12 @@ function savePlanDoc(){try{saveDoc('meta','plan',buildPlan(),1500)}catch{}}
 /* =========================================================
    OLAYLAR
    ========================================================= */
-const TABS=['bugun','gorev','kisiler','portfoy','hafta','notlar','yol','islemler','pl','arsiv','rehber','ayar'];
+const TABS=['bugun','gorev','kisiler','portfoy','rapor','hafta','notlar','yol','islemler','pl','arsiv','rehber','ayar'];
 function showTab(t){
   if(LOCKED.has(t)&&!UNLOCK){askPin(t);return}
   $$('nav.tabs [data-tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t?'true':'false'));
   TABS.forEach(x=>$('#tab-'+x).hidden=x!==t);
-  ({gorev:renderTasks,kisiler:renderKisiler,portfoy:renderPf,hafta:()=>loadWeek(S.wk),notlar:renderNotes,yol:renderRoad,islemler:renderIslemler,pl:renderPL,arsiv:renderArsiv,ayar:()=>{AD=JSON.parse(JSON.stringify(A));renderSettings()}})[t]?.();
+  ({gorev:renderTasks,kisiler:renderKisiler,portfoy:renderPf,rapor:renderRapor,hafta:()=>loadWeek(S.wk),notlar:renderNotes,yol:renderRoad,islemler:renderIslemler,pl:renderPL,arsiv:renderArsiv,ayar:()=>{AD=JSON.parse(JSON.stringify(A));renderSettings()}})[t]?.();
   try{localStorage.setItem('pus:tab',t)}catch{}
 }
 const closeDrawer=()=>{$('#drawer').hidden=true;K_OPEN=null};
@@ -2447,7 +2485,7 @@ document.addEventListener('click',async e=>{
   if(d.rinc){bump(d.rinc,1,S.rDate);return}
   if(d.rdec){bump(d.rdec,-1,S.rDate);return}
   if(d.rdate){setResDate(d.rdate);return}
-  if(d.src){const doc=S.rDate===TODAY?S.day:S.rDay;doc.src[d.src]=(doc.src[d.src]||0)+1;pendingSrc=false;saveDoc('days',S.rDate,doc);renderResults();if(SRC_KANAL[d.src])kanalAdd(SRC_KANAL[d.src],'p',1);toast('Kaynak kaydedildi: '+SOURCES[d.src]);return}
+  if(d.src){const doc=S.rDate===TODAY?S.day:S.rDay;doc.src[d.src]=(doc.src[d.src]||0)+1;pendingSrc=false;saveDoc('days',S.rDate,doc);renderResults();if(SRC_KANAL[d.src])kanalAdd(SRC_KANAL[d.src],'p',1);olayYaz('portfoy','Yeni portföy kaynağı: '+SOURCES[d.src],{k:S.rDate!==TODAY?fmtDay(S.rDate):''});toast('Kaynak kaydedildi: '+SOURCES[d.src]);return}
   if(d.ci){S.day.ci={...(S.day.ci||{}),[d.ci]:d.v==='1'};saveDay();renderToday();return}
   if(d.appt){$('#ap-tarih').value=TODAY;$('#ap-saat').value=fromMin(Math.min(1080,Math.ceil((nowMin()+30)/30)*30));$('#ap-kim').value='';$('#apptModal').hidden=false;$('#ap-kim').focus();return}
   if(d.tarihsiz){TF='tarihsiz';showTab('gorev');renderTasks();return}
@@ -2479,6 +2517,7 @@ document.addEventListener('click',async e=>{
     if(d.klog){openKisi(k.i,true);return}
     if(d.klogcancel){openKisi(k.i,false);return}
     if(d.klogsave){const not=$('#lf-not').value.trim();k.lg=[...(k.lg||[]),{t:TODAY,not}];if(!k.g||k.ga){k.g='sicak';delete k.ga}saveK(k);
+      olayYaz('gorusme',k.a,{n:not||'',k:roleText(k)||''});
       if($('#lf-say').checked)bump($('#lf-met').value,1);else toast('Görüşme kaydedildi');
       if($('#lf-task').checked){const t={id:uid('g'),baslik:k.a+' ile takip',aciklama:not||null,tarih:$('#lf-date').value||addDays(TODAY,7),saat:null,sure:15,hat:0,oncelik:'orta',kat:defaultMet(k)==='referans'?'referans':defaultMet(k)==='musteri'?'musteri':'portfoy',durum:'acik',kaynak:'kisi',kisi:k.i,olusturma:TODAY};D.gorev.push(t);saveTask(t)}
       openKisi(k.i,false);if(!$('#tab-kisiler').hidden)renderKisiler();renderToday();return}
@@ -2509,7 +2548,7 @@ document.addEventListener('change',e=>{
   if(bulk==='bGrp'&&e.target.value){const g=e.target.value;bulkApply(k=>{k.g=g==='-'?null:g;delete k.ga});toast('Grup güncellendi');return}
 });
 document.addEventListener('input',e=>{
-  if(e.target.id==='dayNote'){S.day.note=e.target.value;saveDay();return}
+  if(e.target.id==='dayNote'){S.day.note=e.target.value;saveDay();clearTimeout(window._dn);window._dn=setTimeout(()=>{if(S.day.note)olayYaz('not','Bugün ne öğrendim',{n:S.day.note})},4000);return}
   if(e.target.id==='kSearch'){KF.q=e.target.value;K_SHOW=60;clearTimeout(window._ks);window._ks=setTimeout(renderKisiler,200);return}
   if(e.target.id==='tSearch'){renderTasks();return}
   if(e.target.id==='iSearch'){IF.q=e.target.value;renderIslemler();return}
@@ -2535,7 +2574,7 @@ document.addEventListener('click',e=>{
   if(id==='wPrev')loadWeek(addDays(S.wk,-7));
   if(id==='wNext')loadWeek(addDays(S.wk,7));
   if(id==='wNow')loadWeek(WEEK_KEY);
-  if(id==='reviewSave'){const a={};REVIEW_Q.forEach(q=>a[q[0]]=$('#rv-'+q[0]).value);S.wkDoc={...(S.wkDoc||{}),week:S.wk,answers:a,not:$('#rv-not').value,kaydedildi:TODAY};if(S.wk===WEEK_KEY)S.week=S.wkDoc;saveDoc('weeks',S.wk,S.wkDoc);$('#reviewState').textContent='Kaydedildi';toast('Değerlendirme kaydedildi')}
+  if(id==='reviewSave'){const a={};REVIEW_Q.forEach(q=>a[q[0]]=$('#rv-'+q[0]).value);S.wkDoc={...(S.wkDoc||{}),week:S.wk,answers:a,not:$('#rv-not').value,kaydedildi:TODAY};if(S.wk===WEEK_KEY)S.week=S.wkDoc;saveDoc('weeks',S.wk,S.wkDoc);$('#reviewState').textContent='Kaydedildi';olayYaz('hafta',fmtDay(S.wk)+' haftasının değerlendirmesi',{n:Object.values(a).filter(Boolean).join(' · ').slice(0,300)});toast('Değerlendirme kaydedildi')}
   if(id==='setSave')saveSettings();
   if(id==='recAdd')openRec(-1);
   if(id==='wkAdd'){const last=AD.weeks[AD.weeks.length-1];AD.weeks.push({s:last?addDays(last.s,7):WEEK_KEY,th:'Yeni hafta',big:'',note:''});renderSettings()}
@@ -2543,11 +2582,11 @@ document.addEventListener('click',e=>{
   if(id==='iAdd')openIslem(null);
   if(id==='quoteNext'){qi=(qi+1)%QUOTES.length;renderQuote()}
 });
-function addQuickTaskOn(txt,date,kat,w){const t={id:uid('g'),baslik:txt,aciklama:w||null,tarih:date,saat:null,sure:30,hat:0,oncelik:'orta',kat:kat||'ofis',durum:'acik',kaynak:'tasinan',olusturma:TODAY};D.gorev.push(t);saveTask(t)}
+function addQuickTaskOn(txt,date,kat,w){const t={id:uid('g'),baslik:txt,aciklama:w||null,tarih:date,saat:null,sure:30,hat:0,oncelik:'orta',kat:kat||'ofis',durum:'acik',kaynak:'tasinan',olusturma:TODAY};D.gorev.push(t);saveTask(t);try{olayYaz('gorev','Görev açıldı: '+txt,{n:isoOk(date)?fmtDay(date):'tarihsiz',k:'taşınan',r:t.id})}catch{}}
 $('#kAddForm').addEventListener('submit',e=>{e.preventDefault();const k={i:uid('p'),a:$('#na-ad').value.trim(),t:$('#na-tel').value.trim()||undefined,u:$('#na-u').value.trim()||undefined,n:$('#na-n').value.trim()||undefined,r:$$('#na-rol [aria-pressed="true"]').map(b=>b.dataset.narol),k:['uygulama'],ek:TODAY};if(!k.a)return;Object.keys(k).forEach(x=>k[x]===undefined&&delete k[x]);addContact(k);$('#kAddModal').hidden=true;renderKisiler();toast('Kişi eklendi')});
 $('#apptForm').addEventListener('submit',async e=>{e.preventDefault();const date=$('#ap-tarih').value,saat=$('#ap-saat').value,kim=$('#ap-kim').value.trim();
   const t={id:uid('g'),baslik:'Gösterim: '+kim,aciklama:'Müşteriye mülkü gezdir. Sonunda net bir sonraki adım al.',tarih:date,saat,sure:60,hat:30,oncelik:'yuksek',kat:'gosterim',durum:'acik',kaynak:'randevu',olusturma:TODAY};
-  D.gorev.push(t);saveTask(t);if(date===TODAY){S.day.ci={...(S.day.ci||{}),gosterim:true};saveDay()}$('#apptModal').hidden=true;refreshTaskViews();toast('Randevu eklendi');if($('#ap-cal').checked)await taskToCal(t)});
+  D.gorev.push(t);saveTask(t);if(date===TODAY){S.day.ci={...(S.day.ci||{}),gosterim:true};saveDay()}olayYaz('randevu','Gösterim randevusu: '+kim,{n:fmtDay(date)+' '+saat,r:t.id});$('#apptModal').hidden=true;refreshTaskViews();toast('Randevu eklendi');if($('#ap-cal').checked)await taskToCal(t)});
 $('#drawer').addEventListener('click',e=>{if(e.target.id==='drawer')closeDrawer()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();$$('.modal').forEach(m=>m.hidden=true)}if(e.key==='Enter'&&e.target.dataset?.pl)openPlCell(e.target.dataset.pl)});
 let qi=Math.floor((NOW-new Date(NOW.getFullYear(),0,0))/864e5)%QUOTES.length;
@@ -2591,7 +2630,7 @@ Kurallar:
 - En fazla 180 kelime.
 Özgür'ün bugünkü durumu (JSON): ${JSON.stringify(context())}
 Soru: ${q}`;
-  try{const r=await SAMPLE(prompt,{cache:false,onText:({text})=>{out.textContent=text}});out.textContent=r.text;$('#askState').textContent=''}
+  try{const r=await SAMPLE(prompt,{cache:false,onText:({text})=>{out.textContent=text}});out.textContent=r.text;$('#askState').textContent='';olayYaz('ai','Mentora soruldu',{n:q.slice(0,200),k:'mentor'})}
   catch(e){$('#askState').textContent='';out.textContent=e&&e.code==='not_granted'?'Mentor için izin verilmedi.':e&&e.code==='rate_limited'?'Biraz bekleyip tekrar sor.':(e&&e.text)||'Cevap alınamadı. Biraz sonra tekrar dene.'}
   $('#askBtn').disabled=false;
 }
@@ -2959,17 +2998,17 @@ function dayLog(rec){S.day.log=[...(S.day.log||[]),{...rec,t:fromMin(nowMin())}]
 $('#postForm').addEventListener('submit',async e=>{
   e.preventDefault();if(!POST)return;const p=POST;const why=$('#po-why').value+($('#po-note').value.trim()?' · '+$('#po-note').value.trim():'');
   if(p.mode==='cancel'){
-    if(p.task){const prev={durum:p.task.durum};p.task.durum='iptal';p.task.iptal={t:TODAY,n:why};saveTask(p.task);dayLog({tip:'iptal',k:p.t,key:p.key,n:why,prev})}
-    else{S.day.iptal={...(S.day.iptal||{}),[p.key]:{n:why}};saveDay();dayLog({tip:'iptal',k:p.t,key:p.key,n:why})}
+    if(p.task){const prev={durum:p.task.durum};p.task.durum='iptal';p.task.iptal={t:TODAY,n:why};saveTask(p.task);dayLog({tip:'iptal',k:p.t,key:p.key,n:why,prev});olayYaz('iptal',p.t,{n:why,r:p.task.id})}
+    else{S.day.iptal={...(S.day.iptal||{}),[p.key]:{n:why}};saveDay();dayLog({tip:'iptal',k:p.t,key:p.key,n:why});olayYaz('iptal',p.t,{n:why})}
     $('#postModal').hidden=true;POST=null;refreshTaskViews();toast('İptal edildi'+(p.cat==='gosterim'?'. Karşı tarafa haber vermeyi unutma.':'.'));return;
   }
   const s=postState();if(!s){toast('Bir tarih seç');return}
   if((s.conf.length||s.past||s.L.off)&&!$('#po-force').checked){toast('Çakışma var. Başka saat seç ya da "yine de ertele" kutusunu işaretle');return}
   const saat=s.saat||p.saat||null;
-  if(p.task){const t=p.task;const prev={tarih:t.tarih,saat:t.saat,cal:t.cal};t.tarih=s.date;if(s.saat)t.saat=s.saat;t.sure=s.sure;t.cal=false;t.ert=(t.ert||0)+1;saveTask(t);dayLog({tip:'ertele',k:p.t,key:p.key,n:why,to:s.date,saat:t.saat||'',prev});
+  if(p.task){const t=p.task;const prev={tarih:t.tarih,saat:t.saat,cal:t.cal};t.tarih=s.date;if(s.saat)t.saat=s.saat;t.sure=s.sure;t.cal=false;t.ert=(t.ert||0)+1;saveTask(t);dayLog({tip:'ertele',k:p.t,key:p.key,n:why,to:s.date,saat:t.saat||'',prev});olayYaz('ertele',p.t,{n:why+' → '+fmtDay(s.date)+(t.saat?' '+t.saat:''),r:t.id});
     if($('#po-cal').checked)await taskToCal(t)}
   else{const nt={id:uid('g'),baslik:p.t,aciklama:p.w||null,tarih:s.date,saat:s.saat||null,sure:s.sure,hat:s.saat?15:0,oncelik:'orta',kat:p.cat||'ofis',durum:'acik',kaynak:'ertelenen',olusturma:TODAY};D.gorev.push(nt);saveTask(nt);
-    S.day.ertele={...(S.day.ertele||{}),[p.key]:{to:s.date,saat:s.saat||'',tid:nt.id}};saveDay();dayLog({tip:'ertele',k:p.t,key:p.key,n:why,to:s.date,saat:s.saat||'',tid:nt.id})}
+    S.day.ertele={...(S.day.ertele||{}),[p.key]:{to:s.date,saat:s.saat||'',tid:nt.id}};saveDay();dayLog({tip:'ertele',k:p.t,key:p.key,n:why,to:s.date,saat:s.saat||'',tid:nt.id});olayYaz('ertele',p.t,{n:why+' → '+fmtDay(s.date)+(s.saat?' '+s.saat:''),r:nt.id})}
   $('#postModal').hidden=true;POST=null;refreshTaskViews();toast('Ertelendi: '+fmtDay(s.date)+(saat?' '+saat:''));
 });
 function undoLog(i){
@@ -2977,7 +3016,7 @@ function undoLog(i){
   const t=r.key.startsWith('t:')?D.gorev.find(x=>'t:'+x.id===r.key):null;
   if(t){if(r.tip==='iptal'){t.durum=r.prev?.durum||'acik';delete t.iptal}else if(r.prev){t.tarih=r.prev.tarih;t.saat=r.prev.saat||null;t.cal=!!r.prev.cal}saveTask(t)}
   else{if(r.tip==='iptal')delete (S.day.iptal||{})[r.key];else delete (S.day.ertele||{})[r.key];const nt=r.tid&&D.gorev.find(x=>x.id===r.tid);if(nt){nt.silindi=true;saveTask(nt)}}
-  L[i]={...r,geri:true};S.day.log=L;saveDay();refreshTaskViews();toast('Geri alındı');
+  L[i]={...r,geri:true};S.day.log=L;saveDay();olayYaz('geri',(r.tip==='iptal'?'İptal geri alındı: ':'Erteleme geri alındı: ')+r.k,{n:r.n||''});refreshTaskViews();toast('Geri alındı');
 }
 function logBox(){
   const L=(S.day?.log||[]).map((r,i)=>({...r,i})).filter(r=>!r.geri);if(!L.length)return '';
@@ -3013,7 +3052,7 @@ document.addEventListener('submit',e=>{
   if(e.target.id!=='tomAdd')return;e.preventDefault();const v=$('#tmText').value.trim();if(!v)return;
   const first=$('#tmFirst').checked;const saat=$('#tmTime').value||null;
   const t={id:uid('g'),baslik:v,aciklama:null,tarih:TOM(),saat,sure:30,hat:saat?15:0,oncelik:first?'yuksek':'orta',kat:'ofis',durum:'acik',kaynak:first?'ilkis':'yarin',olusturma:TODAY};
-  D.gorev.push(t);saveTask(t);S.day.ilk=v;saveDay();renderToday();toast('Yarına eklendi'+(saat?' · '+saat:''))
+  D.gorev.push(t);saveTask(t);S.day.ilk=v;saveDay();olayYaz('gorev','Yarına iş yazıldı: '+v,{n:fmtDay(TOM())+(saat?' '+saat:'')+(first?' · yarının ilk işi':''),r:t.id});renderToday();toast('Yarına eklendi'+(saat?' · '+saat:''))
 });
 document.addEventListener('change',e=>{if(e.target.dataset?.hazir){S.day.hazir={...(S.day.hazir||{}),[e.target.dataset.hazir]:e.target.checked};saveDay();renderToday()}});
 
@@ -3030,7 +3069,7 @@ async function renderNotes(){
   NT.weeks=weeks.filter(w=>w.answers&&Object.values(w.answers).some(Boolean)||w.not||w.ai).sort((a,b)=>String(b.week||b.id).localeCompare(String(a.week||a.id)));NT.loaded=true;
   const pend=D.ders.items.filter(x=>x.durum==='oneri'),ok=dersOk();
   const pbName=k=>PB[k]?PB[k].t:'Genel';
-  const dcard=(x,pending)=>`<div class="note"><b><span class="dot" style="--c:var(--brand)"></span>${esc(x.t)} ${x.tur==='karar'?'<span class="tag now">Karar</span>':'<span class="tag">Ders</span>'} <span class="tag">${esc(pbName(x.pb))}</span>${x.kay==='ai'?'<span class="tag mid">AI önerdi</span>':''}</b>${esc(x.d)}${x.gorev?`<div class="small" style="margin-top:4px"><span class="muted">${pending?'Önerilen görev':'Görev'}:</span> ${esc(x.gorev)}${x.gorevId?' <span class="tag ok">Görevlere eklendi</span>':''}</div>`:''}<div class="row" style="margin-top:6px">${pending?`${x.gorev?`<button class="btn sm ok" type="button" data-dders="${esc(x.id)}" data-v="kayit" data-gorev="1">Onayla + görev ekle</button>`:''}<button class="btn sm ${x.gorev?'ghost':'ok'}" type="button" data-dders="${esc(x.id)}" data-v="kayit">${x.gorev?'Yalnızca onayla':'Onayla ve kaydet'}</button><button class="btn sm ghost" type="button" data-dders="${esc(x.id)}" data-v="sil">Gerek yok</button>`:`<button class="link small" type="button" data-pb="${esc(x.pb||'')}" ${PB[x.pb]?'':'hidden'}>Rehberde gör</button><button class="link small" type="button" data-dders="${esc(x.id)}" data-v="sil" style="color:var(--bad)">Sil</button>`}</div></div>`;
+  const dcard=dersKart;
   const wl=NT.weeks.map(w=>`<div class="note"><b>${w.week?fmtDay(w.week)+' haftası':esc(w.id)}</b>${REVIEW_Q.map(q=>w.answers&&w.answers[q[0]]?`<div class="small"><span class="muted">${esc(q[1])}</span><br>${esc(w.answers[q[0]])}</div>`:'').join('')}${w.not?`<div class="small"><span class="muted">Not</span><br>${esc(w.not)}</div>`:''}${w.ai?`<div class="answer"><b>AI yorumu</b>\n${esc(w.ai.text||w.ai)}</div>`:''}</div>`).join('')||'<div class="empty">Henüz haftalık değerlendirme yok.</div>';
   const dl=NT.days.map(d=>`<div class="note"><b>${esc(TR_D[parseIso(d.date).getDay()])}, ${fmtDay(d.date)}</b>${d.note?`<div class="small"><span class="muted">Ne öğrendim</span><br>${esc(d.note)}</div>`:''}${d.ilk?`<div class="small"><span class="muted">Yarın için ilk iş</span><br>${esc(d.ilk)}</div>`:''}${(d.log||[]).filter(r=>!r.geri).map(r=>`<div class="small"><span class="tag ${r.tip==='iptal'?'bad':'warn'}">${r.tip==='iptal'?'İptal':'Ertelendi'}</span> ${esc(r.k)} · ${esc(r.n||'')}${r.to?' → '+fmtDay(r.to):''}</div>`).join('')}</div>`).join('')||'<div class="empty">Henüz günlük not yok. Akşam "Yarını bugünden hazırla" adımındaki kutuya yazabilirsin.</div>';
   box.innerHTML=`<div class="grid2"><div class="card"><h3>Derslerim <span class="spacer"></span><button class="btn sm" type="button" id="aiLessons">AI ile ders çıkar</button></h3><p class="hint" style="margin-bottom:8px">Notların, haftalık değerlendirmelerin, ertelediğin ve iptal ettiğin işlerden yapay zekâ (Gemini) <b>ders</b> ve <b>karar</b> önerir; gerekirse bir <b>görev</b> de önerir. Onayladığın her şey kalıcı kaydedilir: ilgili "Nasıl yapılır?" sayfasına, Mentor notlarına ve mentor cevaplarına girer; görev önerisini onaylarsan Görevler'e eklenir. Onaylamadığın hiçbir şey sisteme girmez.</p><div id="aiState" class="small muted"></div>
@@ -3049,29 +3088,37 @@ async function aiLessons(){
     const weeks=NT.weeks.slice(0,8).map(w=>({hafta:w.week,cevaplar:w.answers,not:w.not}));
     const ex=D.ders.items.map(x=>x.t+' — '+x.d);
     const guides=Object.entries(PB).map(([k,p])=>k+' = '+p.t);
-    const prompt=`Sen Özgür'ün mentorusun. Özgür Antalya'da ticari ve sanayi gayrimenkulü danışmanı. Aşağıda kendi yazdığı günlük notlar, haftalık değerlendirmeler ve erteleyip iptal ettiği işler var. Bunlardan tekrar eden kalıpları bul; en fazla 5 kısa ders ya da karar çıkar. "Ders" bir davranış kalıbıdır; "karar" Özgür'ün notlarında açıkça verdiği bir karardır (örneğin "artık sahada boş mülk arayacağım").
+    const olay=(OLAY_C[AY_KEY()]?.items||[]).slice(-200).map(x=>x.t+' '+(x.s||'')+' ['+(OLAY_TIP[x.tip]?.[0]||x.tip)+'] '+x.b+(x.n?' — '+x.n:''));
+    const gorevOzet={acik:openTasks().length,gecikmis:openTasks().filter(taskLate).length,
+      bu_ay_biten:D.gorev.filter(t=>t.durum==='bitti'&&String(t.bitis||'').slice(0,7)===AY_KEY()).length,
+      cok_ertelenenler:D.gorev.filter(t=>(t.ert||0)>=2).map(t=>t.baslik+' ('+t.ert+' kez ertelendi)').slice(0,10)};
+    const kanalOzet=PF.yuklu?KANAL.map(x=>x.ad+': '+(+pfK(x.id).t||0)+'/'+x.t+' temas, '+(+pfK(x.id).p||0)+' portföy'):[];
+    const prompt=`Sen Özgür'ün mentorusun. Özgür Antalya'da ticari ve sanayi gayrimenkulü danışmanı. Aşağıda kendi yazdığı günlük notlar, haftalık değerlendirmeler, erteleyip iptal ettiği işler, görev durumu, portföy kanallarının sayıları ve bu ayın bütün hareket günlüğü var. Bunlardan tekrar eden kalıpları bul; en fazla 5 kısa ders ya da karar çıkar. "Ders" bir davranış kalıbıdır; "karar" Özgür'ün notlarında açıkça verdiği bir karardır (örneğin "artık sahada boş mülk arayacağım").
 Kurallar: Türkçe, sade cümle, kısaltma ve İngilizce terim yok. Sadece verideki kanıta dayan; veri azsa daha az ders yaz, uydurma. Her ders somut bir davranış önermeli ("Cuma öğleden sonra arama yapma, saha işi planla" gibi). Zaten kayıtlı olan derslerin aynısını yazma.
 Her ders için aşağıdaki rehber anahtarlarından en uygun birini "pb" olarak seç; uygun yoksa boş bırak.
 Rehber anahtarları: ${guides.join(' | ')}
 Kayıtlı dersler: ${JSON.stringify(ex)}
 Günlük veri: ${JSON.stringify(days)}
 Haftalık değerlendirmeler: ${JSON.stringify(weeks)}
+Görev durumu: ${JSON.stringify(gorevOzet)}
+Portföy kanalları (bu ay): ${JSON.stringify(kanalOzet)}
+Bu ayın hareket günlüğü: ${JSON.stringify(olay)}
 Bir ders ya da karar somut bir iş gerektiriyorsa "gorev" alanına tek cümlelik bir görev yaz (örn. "Perşembe öğleden sonrasını saha ziyaretine ayır"); gerekmiyorsa boş bırak.
 Sadece şu JSON'u döndür, başka metin yazma: {"dersler":[{"tur":"ders ya da karar","baslik":"en fazla 8 kelime","ders":"1-2 cümle, neye dayandığını da söyle","pb":"anahtar ya da boş","gorev":"tek cümle ya da boş"}]}`;
     const r=await SAMPLE(prompt,{cache:false,json:true});const o=dersParse(r.text);
     const add=(o.dersler||[]).filter(x=>x&&x.ders).slice(0,5).map(x=>({id:uid('d'),t:String(x.baslik||'Ders').slice(0,80),d:String(x.ders).slice(0,400),pb:PB[x.pb]?x.pb:'',tur:x.tur==='karar'?'karar':'ders',gorev:x.gorev?String(x.gorev).slice(0,160):'',durum:'oneri',kay:'ai',tarih:TODAY}));
-    D.ders.items.push(...add);D.ders.at=TODAY;saveDers();
+    D.ders.items.push(...add);D.ders.at=TODAY;saveDers();olayYaz('ai','Notlardan ders çıkarıldı',{n:add.length+' öneri',k:'ders'});
     $('#aiState').textContent=add.length?add.length+' öneri geldi. Beğendiklerini onayla; onaylanan her şey kalıcı kaydedilir.':'Şimdilik yeni bir kalıp göremedi. Birkaç gün not yazıp tekrar dene.';NT.busy=false;
     if(add.length)renderNotes();else $('#aiLessons').disabled=false;
   }catch(e){NT.busy=false;$('#aiLessons').disabled=false;$('#aiState').textContent=e&&e.code==='not_granted'?'İzin verilmedi.':e&&e.code==='rate_limited'?'Biraz bekleyip tekrar dene.':(e&&e.text)||'Ders çıkarılamadı. Tekrar dene.'}
 }
 document.addEventListener('click',e=>{
   if(e.target.id==='aiLessons'){aiLessons();return}
-  const b=e.target.closest('[data-dders]');if(b){const x=D.ders.items.find(i=>i.id===b.dataset.dders);if(!x)return;if(b.dataset.v==='sil')D.ders.items=D.ders.items.filter(i=>i!==x);else{x.durum='kayit';x.onay=TODAY;if(b.dataset.gorev&&x.gorev&&!x.gorevId){const t={id:uid('g'),baslik:x.gorev,aciklama:(x.tur==='karar'?'Karardan: ':'Dersten: ')+x.t,tarih:nextWorkday(TODAY),saat:null,sure:30,hat:0,oncelik:'orta',kat:'ofis',durum:'acik',kaynak:'ders',olusturma:TODAY};D.gorev.push(t);saveTask(t);refreshTaskViews();x.gorevId=t.id}}saveDers();renderNotes();renderMentor();toast(b.dataset.v==='sil'?'Silindi':'Rehbere eklendi')}
+  const b=e.target.closest('[data-dders]');if(b){const x=D.ders.items.find(i=>i.id===b.dataset.dders);if(!x)return;if(b.dataset.v==='sil')D.ders.items=D.ders.items.filter(i=>i!==x);else{x.durum='kayit';x.onay=TODAY;if(b.dataset.gorev&&x.gorev&&!x.gorevId){const t={id:uid('g'),baslik:x.gorev,aciklama:(x.tur==='karar'?'Karardan: ':'Dersten: ')+x.t,tarih:nextWorkday(TODAY),saat:null,sure:30,hat:0,oncelik:'orta',kat:'ofis',durum:'acik',kaynak:'ders',olusturma:TODAY};D.gorev.push(t);saveTask(t);refreshTaskViews();x.gorevId=t.id}}saveDers();olayYaz('ders',(b.dataset.v==='sil'?'Ders önerisi reddedildi: ':'Ders rehbere eklendi: ')+x.t,{n:x.d,k:PB[x.pb]?PB[x.pb].t:'Genel'});renderNotes();renderMentor();toast(b.dataset.v==='sil'?'Silindi':'Rehbere eklendi')}
   if(e.target.id==='reviewAi')aiWeek();
-  if(e.target.dataset?.dersadd){const v=$('#pbDersIn').value.trim();if(!v)return;D.ders.items.push({id:uid('d'),t:v.slice(0,60),d:v,pb:e.target.dataset.dersadd,durum:'kayit',kay:'elle',tarih:TODAY});saveDers();openPb(e.target.dataset.dersadd);toast('Derse eklendi')}
+  if(e.target.dataset?.dersadd){const v=$('#pbDersIn').value.trim();if(!v)return;D.ders.items.push({id:uid('d'),t:v.slice(0,60),d:v,pb:e.target.dataset.dersadd,durum:'kayit',kay:'elle',tarih:TODAY,onay:TODAY});saveDers();olayYaz('ders','Ders yazıldı: '+v.slice(0,60),{k:PB[e.target.dataset.dersadd]?PB[e.target.dataset.dersadd].t:'Genel'});openPb(e.target.dataset.dersadd);toast('Derse eklendi')}
 });
-document.addEventListener('submit',e=>{if(e.target.id!=='dersAdd')return;e.preventDefault();const v=$('#dsText').value.trim();if(!v)return;D.ders.items.push({id:uid('d'),t:v.slice(0,60),d:v,pb:$('#dsPb').value,durum:'kayit',kay:'elle',tarih:TODAY});saveDers();renderNotes();toast('Ders eklendi')});
+document.addEventListener('submit',e=>{if(e.target.id!=='dersAdd')return;e.preventDefault();const v=$('#dsText').value.trim();if(!v)return;D.ders.items.push({id:uid('d'),t:v.slice(0,60),d:v,pb:$('#dsPb').value,durum:'kayit',kay:'elle',tarih:TODAY,onay:TODAY});saveDers();olayYaz('ders','Ders yazıldı: '+v.slice(0,60),{k:PB[$('#dsPb').value]?PB[$('#dsPb').value].t:'Genel'});renderNotes();toast('Ders eklendi')});
 
 /* ---- Haftalık değerlendirmeyi Claude yorumlasın ---- */
 function renderReviewAi(){
@@ -3213,7 +3260,7 @@ function renderPfSoru(){
 function pfGorev(id){
   const x=KANAL_BY[id];if(!x)return;
   const t={id:uid('g'),baslik:'Portföy kanalı: '+x.ad,aciklama:x.bu,tarih:TODAY,saat:null,sure:60,hat:0,oncelik:'orta',kat:'portfoy',durum:'acik',kaynak:'kanal',olusturma:TODAY};
-  D.gorev.push(t);saveTask(t);refreshTaskViews();toast('Göreve eklendi: '+x.ad);
+  D.gorev.push(t);saveTask(t);olayYaz('gorev','Kanal görevi açıldı: '+x.ad,{n:x.bu,r:t.id});refreshTaskViews();toast('Göreve eklendi: '+x.ad);
 }
 function sdEkle(){
   const ad=$('#sd-ad').value.trim();if(!ad){toast('En azından adres yaz');return}
@@ -3224,12 +3271,13 @@ function sdEkle(){
   try{if(S.day)bump('tespit',1)}catch{}
   ['sd-ad','sd-bl','sd-m2','sd-bos','sd-sh','sd-tel','sd-not'].forEach(i=>$('#'+i).value='');
   $('#sd-ft').checked=false;$('#sd-ks').checked=false;
+  olayYaz('saha','Boş mülk tespiti: '+it.ad,{n:[it.bl,it.tur,it.m2?it.m2+' m²':'',it.bos].filter(Boolean).join(' · '),k:KANAL_BY[kn]?.ad||'',r:it.id});
   renderPf();toast('Tespit kaydedildi');
 }
 function sdGorev(id){
   const x=(PF.sd.items||[]).find(z=>z.id===id);if(!x)return;
   const t={id:uid('g'),baslik:(x.ad||'Boş mülk')+' — sahibine ulaş',aciklama:[x.bl,x.tur,x.m2?x.m2+' m²':'',x.sh,x.tel,x.not].filter(Boolean).join(' · ')||null,tarih:nextWorkday(TODAY),saat:null,sure:30,hat:0,oncelik:'orta',kat:'portfoy',durum:'acik',kaynak:'saha',olusturma:TODAY};
-  D.gorev.push(t);saveTask(t);refreshTaskViews();toast('Görev eklendi');
+  D.gorev.push(t);saveTask(t);olayYaz('gorev','Saha takip görevi: '+t.baslik,{n:fmtDay(t.tarih),r:t.id});refreshTaskViews();toast('Görev eklendi');
 }
 async function pfAi(){
   const out=$('#pfAiOut');out.hidden=false;
@@ -3245,30 +3293,279 @@ Aşağıda ${ayAdi(PF.ay)} ayının portföy kanalı karnesi var. Şunları yaz:
 Karne (JSON): ${JSON.stringify(veri)}
 Saha defterinde takip bekleyen boş mülk sayısı: ${sdAcik().length}
 Haftalık cevapları: ${JSON.stringify(PF.doc.s||{})}`;
-  try{const r=await SAMPLE(prompt,{cache:false});PF.doc.ai=r.text;PF.doc.aiAt=TODAY;pfSave();out.textContent=r.text;$('#pfAiState').textContent=''}
+  try{const r=await SAMPLE(prompt,{cache:false});PF.doc.ai=r.text;PF.doc.aiAt=TODAY;pfSave();out.textContent=r.text;$('#pfAiState').textContent='';olayYaz('ai','Kanal karnesi değerlendirildi',{k:'portföy'})}
   catch(e){$('#pfAiState').textContent='';out.textContent=e&&e.code==='rate_limited'?'Biraz bekleyip tekrar dene.':(e&&e.text)||'Cevap alınamadı.'}
   $('#pfAiBtn').disabled=false;
 }
 document.addEventListener('click',e=>{
   const a=e.target.closest('button,a');if(!a)return;const d=a.dataset;
-  if(d.pft){kanalAdd(d.pft,'t',1);toast('Temas kaydedildi: '+KANAL_BY[d.pft].ad);return}
+  if(d.pft){kanalAdd(d.pft,'t',1);olayYaz('kanal','Temas: '+KANAL_BY[d.pft].ad,{k:KANAL_BY[d.pft].tip});toast('Temas kaydedildi: '+KANAL_BY[d.pft].ad);return}
   if(d.pfdt){kanalAdd(d.pfdt,'t',-1);return}
-  if(d.pfp){kanalAdd(d.pfp,'p',1);toast('Portföy kaydedildi: '+KANAL_BY[d.pfp].ad);return}
+  if(d.pfp){kanalAdd(d.pfp,'p',1);olayYaz('portfoy','Portföy: '+KANAL_BY[d.pfp].ad,{k:'kanal panosu'});toast('Portföy kaydedildi: '+KANAL_BY[d.pfp].ad);return}
   if(d.pfdp){kanalAdd(d.pfdp,'p',-1);return}
   if(d.pfgorev){pfGorev(d.pfgorev);return}
   if(d.pfay!=null){pfAy(+d.pfay);return}
   if(d.sdf){PF.filt=d.sdf;renderSd();return}
   if(d.sdtask){sdGorev(d.sdtask);return}
-  if(d.sddel){if(confirm('Bu tespit silinsin mi?')){PF.sd.items=(PF.sd.items||[]).filter(z=>z.id!==d.sddel);sdSave();renderPf()}return}
+  if(d.sddel){const x=(PF.sd.items||[]).find(z=>z.id===d.sddel);if(x&&confirm('Bu tespit listeden kaldırılsın mı? Kayıt silinmez, "Vazgeçildi" olarak arşivde kalır.')){x.dr='kapali';x.kapandi=TODAY;sdSave();olayYaz('saha','Tespit arşive alındı: '+x.ad,{k:x.bl||''});renderPf()}return}
   if(a.id==='sdAdd'){sdEkle();return}
   if(a.id==='pfAiBtn'){pfAi();return}
 });
 document.addEventListener('change',e=>{
   const d=e.target.dataset;
-  if(d.sdst){const x=(PF.sd.items||[]).find(z=>z.id===d.sdst);if(x){x.dr=e.target.value;if(x.dr==='portfoy')kanalAdd(x.kn||'saha','p',1);sdSave();renderPf();toast('Durum güncellendi')}return}
+  if(d.sdst){const x=(PF.sd.items||[]).find(z=>z.id===d.sdst);if(x){x.dr=e.target.value;if(x.dr==='portfoy')kanalAdd(x.kn||'saha','p',1);sdSave();olayYaz(x.dr==='portfoy'?'portfoy':'saha',(KANAL_DURUM.find(z=>z[0]===x.dr)||[])[1]+': '+x.ad,{k:x.bl||''});renderPf();toast('Durum güncellendi')}return}
   if(d.pfn){const[id,f]=d.pfn.split(':');pfK(id)[f]=e.target.value;pfSave();return}
   if(d.pfs!=null){PF.doc.s=PF.doc.s||{};PF.doc.s['q'+d.pfs]=e.target.value;pfSave();return}
 });
+
+/* =========================================================
+   OLAY GÜNLÜĞÜ — her hareket kayıt altında
+   olay/<YYYY-AA> = {ay, items:[{i,t,s,tip,b,n,k,r}], ai, aiAt}
+   ========================================================= */
+const OLAY_TIP={
+ gorev:['Görev',''],bitti:['Tamamlandı','ok'],ertele:['Ertelendi','warn'],iptal:['İptal','bad'],sil:['Silindi','bad'],
+ adim:['Günün adımı','ok'],sonuc:['Sonuç','mid'],portfoy:['Yeni portföy','ok'],kanal:['Kanal teması','mid'],
+ saha:['Saha defteri',''],gorusme:['Görüşme','now'],not:['Not',''],hafta:['Haftalık değerlendirme',''],
+ ders:['Ders',''],ai:['Yapay zekâ','mid'],randevu:['Randevu','now'],takvim:['Takvim',''],geri:['Geri alındı','warn']
+};
+const OLAY_C={};let OLAY_Q=Promise.resolve();
+function olayYaz(tip,b,ek){
+  ek=ek||{};const ay=TODAY.slice(0,7);
+  const it={i:uid('o'),t:TODAY,s:fromMin(nowMin()),tip,b:String(b||'').slice(0,160)};
+  if(ek.n)it.n=String(ek.n).slice(0,400);
+  if(ek.k)it.k=String(ek.k).slice(0,60);
+  if(ek.r)it.r=String(ek.r).slice(0,40);
+  OLAY_Q=OLAY_Q.then(async()=>{
+    if(!OLAY_C[ay])OLAY_C[ay]=(await loadDoc('olay',ay))||{ay,items:[]};
+    const d=OLAY_C[ay];d.items=d.items||[];d.items.push(it);
+    if(d.items.length>5000)d.items=d.items.slice(-5000);
+    saveDoc('olay',ay,d,900);
+    try{if(!$('#tab-rapor').hidden&&RP.ay===ay)renderRapor()}catch{}
+  }).catch(()=>{});
+  return it;
+}
+async function olayAl(ay){
+  if(!OLAY_C[ay])OLAY_C[ay]=(await loadDoc('olay',ay))||{ay,items:[]};
+  OLAY_C[ay].items=OLAY_C[ay].items||[];return OLAY_C[ay];
+}
+
+/* =========================================================
+   AYLIK RAPOR VE SKOR TABLOSU
+   ========================================================= */
+const SKOR=[
+ {id:'komisyon',ad:'Komisyon (bana kalan)',ag:25,tip:'tl',ac:'Yıl hedefinin aylık payı'},
+ {id:'portfoy',ad:'Yeni portföy',ag:15,met:'portfoy',ac:'Mülk sahibinin seninle çalışmayı kabul etmesi'},
+ {id:'sahip',ad:'Mülk sahibi görüşmesi',ag:10,met:'sahip'},
+ {id:'kanal',ad:'Portföy kanalı teması',ag:10,ac:'15 kanalın aylık temas hedefi'},
+ {id:'musteri',ad:'Alıcı / kiracı görüşmesi',ag:5,met:'musteri'},
+ {id:'referans',ad:'Referans görüşmesi',ag:5,met:'referans'},
+ {id:'tespit',ad:'Boş mülk tespiti',ag:5,met:'tespit'},
+ {id:'gosterim',ad:'Mülk gösterimi',ag:5,met:'gosterim'},
+ {id:'teklif',ad:'Yazılı teklif',ag:5,met:'teklif'},
+ {id:'icerik',ad:'İçerik yayını',ag:5,met:'icerik'},
+ {id:'gorev',ad:'Görev tamamlama',ag:5,tip:'oran',ac:'Tarihi bu aya düşen görevlerin bitme oranı'},
+ {id:'not',ad:'Günlük not disiplini',ag:5,tip:'oran',ac:'İş gününün kaçında not yazıldı'}
+];
+let RP={ay:null,yuklu:false,v:null,filt:'hepsi',ara:'',busy:false};
+const ayBas=a=>a+'-01';
+const aySon=a=>{const[y,m]=a.split('-').map(Number);return iso(new Date(y,m,0))};
+function isGunu(a){const[y,m]=a.split('-').map(Number);const son=new Date(y,m,0).getDate();let n=0;
+  for(let g=1;g<=son;g++){const d=new Date(y,m-1,g);const ds=iso(d);if(a===AY_KEY()&&ds>TODAY)break;if(d.getDay()!==0&&!HOLIDAYS[ds])n++}
+  return Math.max(1,n)}
+async function rpYukle(ay){
+  RP.ay=ay;RP.yuklu=false;
+  const [days,weeks,kanal,olay]=await Promise.all([queryDays(ayBas(ay),aySon(ay)),loadCol('weeks'),loadDoc('kanal',ay),olayAl(ay)]);
+  const dd=merged(days).filter(d=>d.date>=ayBas(ay)&&d.date<=aySon(ay));
+  const m=sumM(dd).m;
+  const gor=D.gorev.filter(t=>!t.silindi);
+  const ayda=t=>String(t.tarih||'').slice(0,7)===ay;
+  const bitenler=gor.filter(t=>t.durum==='bitti'&&String(t.bitis||'').slice(0,7)===ay);
+  const planli=gor.filter(ayda);
+  const isl=(D.islemler||[]).filter(x=>!x.silindi&&String(x.tarih||'').slice(0,7)===ay);
+  const kom=isl.reduce((a,x)=>a+(+x.banaKalan||0),0);
+  const kn=kanal&&kanal.k?kanal.k:{};
+  const kanalT=KANAL.reduce((s,x)=>s+(+(kn[x.id]||{}).t||0),0);
+  const kanalP=KANAL.reduce((s,x)=>s+(+(kn[x.id]||{}).p||0),0);
+  const sahaAy=(PF.sd?.items||[]).filter(x=>String(x.t||'').slice(0,7)===ay);
+  const notGun=dd.filter(d=>d.note||d.ilk).length;
+  const wk=weeks.filter(w=>String(w.week||w.id||'').slice(0,7)===ay&&(w.kaydedildi||w.not||(w.answers&&Object.values(w.answers).some(Boolean))));
+  const ders=(D.ders.items||[]).filter(x=>String(x.onay||x.tarih||'').slice(0,7)===ay);
+  const ig=isGunu(ay);
+  const hedefMet=id=>Math.round((hw(id).wh||0)*4.3);
+  const satir=SKOR.map(s=>{
+    let g=0,h=0;
+    if(s.id==='komisyon'){g=kom;h=Math.round((+A.yilHedef||1000000)/12)}
+    else if(s.id==='kanal'){g=kanalT;h=KANAL.reduce((a,x)=>a+x.t,0)}
+    else if(s.id==='gorev'){g=planli.filter(t=>t.durum==='bitti').length;h=Math.max(1,planli.length)}
+    else if(s.id==='not'){g=notGun;h=ig}
+    else{g=+m[s.met]||0;h=hedefMet(s.met)}
+    const o=h?Math.min(100,Math.round(g/h*100)):0;
+    return {...s,g,h,o,puan:Math.round(o*s.ag/100)};
+  });
+  const skor=satir.reduce((a,s)=>a+s.puan,0);
+  RP.v={ay,dd,m,isl,kom,kn,kanalT,kanalP,sahaAy,wk,ders,satir,skor,olay,ig,notGun,
+    gorAcilan:gor.filter(t=>String(t.olusturma||'').slice(0,7)===ay).length,
+    gorBiten:bitenler.length,
+    gorErtelenen:dd.reduce((a,d)=>a+(d.log||[]).filter(r=>!r.geri&&r.tip==='ertele').length,0),
+    gorIptal:dd.reduce((a,d)=>a+(d.log||[]).filter(r=>!r.geri&&r.tip==='iptal').length,0),
+    acik:gor.filter(t=>t.durum!=='bitti'&&t.durum!=='iptal'),
+    kaynak:dd.reduce((o,d)=>{Object.entries(d.src||{}).forEach(([k,v])=>o[k]=(o[k]||0)+v);return o},{})};
+  RP.yuklu=true;
+}
+function renderRapor(){
+  if(!RP.ay)RP.ay=AY_KEY();
+  if(!RP.yuklu||RP.v?.ay!==RP.ay){$('#rpSkor').innerHTML='<p class="hint">Yükleniyor…</p>';rpYukle(RP.ay).then(renderRapor);return}
+  const v=RP.v;
+  $('#rpAyAd').textContent=ayAdi(RP.ay)+(RP.ay===AY_KEY()?' · devam ediyor':'');
+  const c=v.skor>=80?'ok':v.skor>=55?'warn':'bad';
+  $('#rpSkor').innerHTML=`<div class="rpskor"><div class="rpbig st-${c}"><span class="label">Ay skoru</span><b>${v.skor}</b><span class="small muted">100 üzerinden · ${ayAdi(RP.ay)}</span>
+   <div class="meter st-${c}" style="height:12px;margin-top:8px"><i style="width:${v.skor}%"></i></div>
+   <p class="small" style="margin-top:8px">${v.skor>=80?'Ay hedefte gidiyor.':v.skor>=55?'Orta. En düşük iki satıra bak, haftaya onlara yüklen.':'Geride. Aşağıdaki tabloda kırmızı satırlar ayın gerçek sorunu.'}</p></div>
+   <div style="overflow-x:auto;flex:1;min-width:280px"><table class="pfk"><thead><tr><th>Ölçüt</th><th class="n">Gerçekleşen</th><th class="n">Hedef</th><th class="n">%</th><th class="n">Puan</th></tr></thead><tbody>
+   ${v.satir.map(s=>{const sc=s.o>=100?'ok':s.o>=60?'warn':'bad';return `<tr><td>${esc(s.ad)}${s.ac?`<br><span class="small muted">${esc(s.ac)}</span>`:''}</td><td class="n">${s.tip==='tl'?tlx(s.g):s.g}</td><td class="n">${s.tip==='tl'?tlx(s.h):s.h}</td><td class="n"><span class="tag ${sc}">${s.o}%</span></td><td class="n">${s.puan}/${s.ag}</td></tr>`}).join('')}
+   </tbody></table></div></div>`;
+  const kutu=(a,b,c2,col)=>`<div class="tile" style="--c:${col||'var(--line2)'}"><span>${esc(a)}</span><b>${esc(String(b))}</b><span>${esc(c2)}</span></div>`;
+  $('#rpOzet').innerHTML=[
+   kutu('Komisyon',tlx(v.kom),v.isl.length+' işlem','var(--ok)'),
+   kutu('Yeni portföy',String(v.m.portfoy||0),'kanal karnesinde '+v.kanalP,'var(--brand)'),
+   kutu('Görüşme',String((v.m.sahip||0)+(v.m.musteri||0)+(v.m.referans||0)),'sahip '+(v.m.sahip||0)+' · müşteri '+(v.m.musteri||0)+' · referans '+(v.m.referans||0),'var(--now)'),
+   kutu('Görev',v.gorBiten+' bitti',v.gorAcilan+' açıldı · '+v.gorErtelenen+' ertelendi · '+v.gorIptal+' iptal','var(--mid)'),
+   kutu('Saha tespiti',String(v.sahaAy.length),'kanal teması '+v.kanalT,'var(--warn)'),
+   kutu('Kayıt',String((v.olay.items||[]).length),'olay günlüğünde satır','var(--line2)')
+  ].join('');
+  const krows=KANAL.map(x=>{const o=v.kn[x.id]||{};return {x,t:+o.t||0,p:+o.p||0,one:o.one||'',nx:o.nx||''}}).sort((a,b)=>b.p-a.p||b.t-a.t);
+  $('#rpKanal').innerHTML=`<div style="overflow-x:auto"><table class="pfk"><thead><tr><th>Kanal</th><th class="n">Temas</th><th class="n">Portföy</th><th class="n">Dönüşüm</th><th>Öne çıkan</th><th>Sonraki adım</th></tr></thead><tbody>${krows.map(r=>`<tr><td>${r.x.n}. ${esc(r.x.ad)}</td><td class="n">${r.t}</td><td class="n">${r.p}</td><td class="n">${r.t?Math.round(r.p/r.t*100)+'%':'—'}</td><td class="small">${esc(r.one)}</td><td class="small">${esc(r.nx)}</td></tr>`).join('')}<tr><td><b>Toplam</b></td><td class="n"><b>${v.kanalT}</b></td><td class="n"><b>${v.kanalP}</b></td><td class="n">${v.kanalT?Math.round(v.kanalP/v.kanalT*100)+'%':'—'}</td><td colspan="2"></td></tr></tbody></table></div>
+   ${Object.keys(v.kaynak).length?`<p class="small" style="margin-top:8px"><b>Portföy kaynakları:</b> ${Object.entries(v.kaynak).sort((a,b)=>b[1]-a[1]).map(([i,n])=>esc(SOURCES[i]||'Diğer')+' ('+n+')').join(' · ')}</p>`:''}`;
+  // gelecek işler
+  const ileri=v.acik.filter(t=>isoOk(t.tarih)&&t.tarih>TODAY).sort((a,b)=>a.tarih.localeCompare(b.tarih)).slice(0,20);
+  const tarihsiz=v.acik.filter(t=>!isoOk(t.tarih));
+  const gec=v.acik.filter(t=>isoOk(t.tarih)&&t.tarih<TODAY);
+  $('#rpIleri').innerHTML=`<div class="small" style="margin-bottom:8px">${gec.length?`<span class="tag bad">${gec.length} gecikmiş</span> `:''}<span class="tag">${ileri.length} planlı</span> <span class="tag">${tarihsiz.length} tarihsiz</span></div>
+   ${ileri.length?`<ul class="mini">${ileri.map(t=>`<li><span class="num" style="min-width:92px"><b>${fmtDay(t.tarih)}</b></span><span class="t">${esc(t.baslik)}<span class="sub">${esc(CATS[t.kat]?.[0]||'')}${t.saat?' · '+t.saat:''}</span></span></li>`).join('')}</ul>`:'<p class="hint">İleri tarihli açık görev yok.</p>'}
+   ${tarihsiz.length?`<p class="small" style="margin-top:8px">Tarihsiz: ${tarihsiz.slice(0,8).map(t=>esc(t.baslik)).join(' · ')}${tarihsiz.length>8?' …':''} <button class="link small" type="button" data-tarihsiz="1">Tarih ver</button></p>`:''}`;
+  renderRpLog();renderRpAi();
+}
+function rpOlaylar(){
+  const it=((RP.v?.olay?.items)||[]).slice().reverse();
+  const q=RP.ara.trim().toLocaleLowerCase('tr');
+  return it.filter(x=>(RP.filt==='hepsi'||x.tip===RP.filt)&&(!q||((x.b||'')+' '+(x.n||'')+' '+(x.k||'')).toLocaleLowerCase('tr').includes(q)));
+}
+function renderRpLog(){
+  const all=((RP.v?.olay?.items)||[]);
+  const say={};all.forEach(x=>say[x.tip]=(say[x.tip]||0)+1);
+  $('#rpFilt').innerHTML=[`<button class="chip" type="button" data-rpf="hepsi" aria-pressed="${RP.filt==='hepsi'}">Hepsi <span class="c">${all.length}</span></button>`]
+   .concat(Object.keys(OLAY_TIP).filter(t=>say[t]).map(t=>`<button class="chip" type="button" data-rpf="${t}" aria-pressed="${RP.filt===t}">${esc(OLAY_TIP[t][0])} <span class="c">${say[t]}</span></button>`)).join('');
+  const list=rpOlaylar();
+  if(!list.length){$('#rpLog').innerHTML=all.length?'<p class="hint">Bu süzgeçte kayıt yok.</p>':'<p class="hint">Bu ay için kayıt yok. Polaris, bugünden sonra yaptığın her hareketi (biten adım, girilen sonuç, görev, görüşme, saha tespiti, not, yapay zekâ kullanımı) buraya yazar.</p>';return}
+  const gun={};list.forEach(x=>(gun[x.t]=gun[x.t]||[]).push(x));
+  $('#rpLog').innerHTML=Object.entries(gun).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,40).map(([t,xs])=>`<div class="rpday"><b>${esc(TR_D[parseIso(t).getDay()])}, ${fmtDay(t)} <span class="tag">${xs.length}</span></b>
+   <ul class="mini">${xs.map(x=>`<li><span class="num" style="min-width:52px">${esc(x.s||'')}</span><span class="t"><span class="tag ${OLAY_TIP[x.tip]?.[1]||''}">${esc(OLAY_TIP[x.tip]?.[0]||x.tip)}</span> ${esc(x.b)}${x.n?`<span class="sub">${esc(x.n)}</span>`:''}${x.k?`<span class="sub">${esc(x.k)}</span>`:''}</span></li>`).join('')}</ul></div>`).join('')
+   +(list.length>0?`<p class="hint" style="margin-top:8px">${list.length} kayıt gösteriliyor.</p>`:'');
+}
+function rpMetin(){
+  const v=RP.v;if(!v)return '';
+  const L=[];
+  L.push('POLARIS AYLIK RAPOR — '+ayAdi(v.ay));
+  L.push('Üretim: '+fmtDay(TODAY));L.push('');
+  L.push('SKOR: '+v.skor+'/100');
+  v.satir.forEach(s=>L.push('  '+s.ad+': '+(s.tip==='tl'?tlx(s.g)+' / '+tlx(s.h):s.g+' / '+s.h)+'  (%'+s.o+', '+s.puan+'/'+s.ag+' puan)'));
+  L.push('');L.push('ÖZET');
+  L.push('  Komisyon: '+tlx(v.kom)+' ('+v.isl.length+' işlem)');
+  L.push('  Yeni portföy: '+(v.m.portfoy||0)+' · kanal karnesi: '+v.kanalP);
+  L.push('  Görüşme: sahip '+(v.m.sahip||0)+', müşteri '+(v.m.musteri||0)+', referans '+(v.m.referans||0));
+  L.push('  Görev: '+v.gorBiten+' bitti, '+v.gorAcilan+' açıldı, '+v.gorErtelenen+' ertelendi, '+v.gorIptal+' iptal');
+  L.push('  Saha tespiti: '+v.sahaAy.length+' · kanal teması: '+v.kanalT);
+  L.push('');L.push('KANAL KARNESİ');
+  KANAL.forEach(x=>{const o=v.kn[x.id]||{};L.push('  '+x.n+'. '+x.ad+': '+(+o.t||0)+' temas / '+(+o.p||0)+' portföy (hedef '+x.t+')'+(o.nx?' — sonraki adım: '+o.nx:''))});
+  L.push('');L.push('GÜNLÜK NOTLAR');
+  v.dd.filter(d=>d.note||d.ilk).forEach(d=>L.push('  '+fmtDay(d.date)+': '+(d.note||'')+(d.ilk?' | Yarın ilk iş: '+d.ilk:'')));
+  L.push('');L.push('HAFTALIK DEĞERLENDİRMELER');
+  v.wk.forEach(w=>{L.push('  '+(w.week?fmtDay(w.week)+' haftası':w.id));REVIEW_Q.forEach(q=>{if(w.answers&&w.answers[q[0]])L.push('    '+q[1]+' → '+w.answers[q[0]])});if(w.not)L.push('    Not: '+w.not)});
+  L.push('');L.push('DERSLER');
+  v.ders.forEach(x=>L.push('  ['+(x.tur||'ders')+'] '+x.t+' — '+x.d+(PB[x.pb]?' (rehber: '+PB[x.pb].t+')':'')));
+  L.push('');L.push('OLAY GÜNLÜĞÜ ('+(v.olay.items||[]).length+' kayıt)');
+  (v.olay.items||[]).forEach(x=>L.push('  '+x.t+' '+(x.s||'')+' ['+(OLAY_TIP[x.tip]?.[0]||x.tip)+'] '+x.b+(x.n?' — '+x.n:'')+(x.k?' ('+x.k+')':'')));
+  if(v.olay.ai){L.push('');L.push('YAPAY ZEKÂ AY DEĞERLENDİRMESİ');L.push('  '+String(v.olay.ai).split('\n').join('\n  '))}
+  return L.join('\n');
+}
+function renderRpAi(){
+  const v=RP.v;const pend=(D.ders.items||[]).filter(x=>x.durum==='oneri');
+  $('#rpAiOut').innerHTML=v.olay.ai?`<div class="answer"><b class="small muted">${esc(ayAdi(v.ay))} değerlendirmesi${v.olay.aiAt?' · '+fmtDay(v.olay.aiAt):''}</b>\n${esc(v.olay.ai)}</div>`:'';
+  $('#rpDers').innerHTML=pend.length?`<span class="label" style="display:block;margin:12px 0 4px">Onayını bekleyen ders ve kararlar (${pend.length})</span>`+pend.map(x=>dersKart(x,true)).join(''):
+   (v.ders.length?`<span class="label" style="display:block;margin:12px 0 4px">Bu ay rehbere eklenen dersler (${v.ders.length})</span>`+v.ders.map(x=>dersKart(x,false)).join(''):'<p class="hint" style="margin-top:10px">Bu ay henüz ders kaydedilmedi.</p>');
+}
+async function raporAi(){
+  if(!SAMPLE){toast('Yapay zekâ şu an kullanılamıyor');return}
+  if(RP.busy)return;RP.busy=true;$('#rpAiBtn').disabled=true;$('#rpAiState').textContent='AI ayın tamamını okuyor…';
+  const v=RP.v;
+  try{
+    const ol=(v.olay.items||[]);
+    const ozet={};ol.forEach(x=>ozet[OLAY_TIP[x.tip]?.[0]||x.tip]=(ozet[OLAY_TIP[x.tip]?.[0]||x.tip]||0)+1);
+    const saatDagilim={};ol.forEach(x=>{const h=+String(x.s||'').slice(0,2);if(!isNaN(h))saatDagilim[h+':00']=(saatDagilim[h+':00']||0)+1});
+    const veri={
+      ay:ayAdi(v.ay),skor:v.skor,
+      olcutler:v.satir.map(s=>({olcut:s.ad,gerceklesen:s.g,hedef:s.h,yuzde:s.o})),
+      komisyon:v.kom,islem_sayisi:v.isl.length,
+      kanal_karnesi:KANAL.map(x=>({kanal:x.ad,temas:+(v.kn[x.id]||{}).t||0,hedef:x.t,portfoy:+(v.kn[x.id]||{}).p||0})),
+      portfoy_kaynaklari:Object.fromEntries(Object.entries(v.kaynak).map(([i,n])=>[SOURCES[i]||'Diğer',n])),
+      gorevler:{acilan:v.gorAcilan,biten:v.gorBiten,ertelenen:v.gorErtelenen,iptal:v.gorIptal,gecikmis:v.acik.filter(t=>isoOk(t.tarih)&&t.tarih<TODAY).length},
+      saha_tespitleri:v.sahaAy.map(x=>({bolge:x.bl,tur:x.tur,durum:(KANAL_DURUM.find(z=>z[0]===x.dr)||[])[1],not:x.not})),
+      gunluk_notlar:v.dd.filter(d=>d.note||d.ilk).map(d=>({tarih:d.date,not:d.note,yarin_ilk_is:d.ilk})),
+      haftalik_degerlendirmeler:v.wk.map(w=>({hafta:w.week,cevaplar:w.answers,not:w.not})),
+      ertelenen_iptal:v.dd.flatMap(d=>(d.log||[]).filter(r=>!r.geri).map(r=>({tarih:d.date,tip:r.tip,is:r.k,sebep:r.n}))),
+      hareket_dagilimi:ozet,saat_dagilimi:saatDagilim,
+      olaylar:ol.slice(-220).map(x=>x.t+' '+(x.s||'')+' ['+(OLAY_TIP[x.tip]?.[0]||x.tip)+'] '+x.b+(x.n?' — '+x.n:''))
+    };
+    const guides=Object.entries(PB).map(([k,p])=>k+' = '+p.t);
+    const ex=(D.ders.items||[]).map(x=>x.t+' — '+x.d);
+    const prompt=`Sen Özgür'ün mentorusun. Özgür Antalya'da sadece ticari ve sanayi gayrimenkulüyle çalışan bir danışman. Aşağıda bir ayın tamamı var: skor tablosu, kanal karnesi, görevler, saha tespitleri, günlük notlar, haftalık değerlendirmeler, ertelenen ve iptal edilen işler ve bütün hareketlerin günlüğü.
+Kurallar: Türkçe, sade ve kısa cümleler. Kısaltma ve İngilizce terim yok. Seçenek listesi sunma, net konuş. Sadece verideki kanıta dayan, uydurma; veri azsa az yaz.
+Önce "degerlendirme" alanına en fazla 180 kelimelik bir ay değerlendirmesi yaz: ne iyi gitti, asıl darboğaz ne, gelecek ay neye yüklenmeli. Rakam ver.
+Sonra en fazla 5 ders ya da karar çıkar. "Ders" tekrar eden bir davranış kalıbıdır (örneğin ertelenen işlerin hep aynı saatte olması). "Karar" Özgür'ün notlarında açıkça verdiği karardır. Her biri somut bir davranış önermeli.
+Her ders için aşağıdaki rehber anahtarlarından en uygun birini "pb" olarak seç; uygun yoksa boş bırak. Zaten kayıtlı olan dersin aynısını yazma.
+Rehber anahtarları: ${guides.join(' | ')}
+Kayıtlı dersler: ${JSON.stringify(ex)}
+Ay verisi (JSON): ${JSON.stringify(veri)}
+Bir ders somut bir iş gerektiriyorsa "gorev" alanına tek cümlelik görev yaz; gerekmiyorsa boş bırak.
+Sadece şu JSON'u döndür, başka metin yazma: {"degerlendirme":"...","dersler":[{"tur":"ders ya da karar","baslik":"en fazla 8 kelime","ders":"1-2 cümle, neye dayandığını söyle","pb":"anahtar ya da boş","gorev":"tek cümle ya da boş"}]}`;
+    const r=await SAMPLE(prompt,{cache:false,json:true});const o=dersParse(r.text);
+    const d=await olayAl(v.ay);d.ai=String(o.degerlendirme||'').slice(0,2000);d.aiAt=TODAY;saveDoc('olay',v.ay,d,300);v.olay=d;
+    const add=(o.dersler||[]).filter(x=>x&&x.ders).slice(0,5).map(x=>({id:uid('d'),t:String(x.baslik||'Ders').slice(0,80),d:String(x.ders).slice(0,400),pb:PB[x.pb]?x.pb:'',tur:x.tur==='karar'?'karar':'ders',gorev:x.gorev?String(x.gorev).slice(0,160):'',durum:'oneri',kay:'ai',tarih:TODAY,ayKaynak:v.ay}));
+    if(add.length){D.ders.items.push(...add);D.ders.at=TODAY;saveDers()}
+    olayYaz('ai','Aylık rapor değerlendirmesi',{n:ayAdi(v.ay)+' · '+add.length+' ders önerisi',k:'rapor'});
+    $('#rpAiState').textContent=add.length?add.length+' ders önerisi geldi. Onayladıkların ilgili rehbere işlenir.':'Değerlendirme hazır. Yeni bir ders önerisi çıkmadı.';
+    renderRapor();
+  }catch(e){$('#rpAiState').textContent=e&&e.code==='not_granted'?'İzin verilmedi.':e&&e.code==='rate_limited'?'Biraz bekleyip tekrar dene.':(e&&e.text)||'Değerlendirme alınamadı.'}
+  RP.busy=false;$('#rpAiBtn').disabled=false;
+}
+async function rpAy(d){
+  const ay=RP.ay||AY_KEY();
+  if(d===0)RP.ay=AY_KEY();
+  else{const[y,m]=ay.split('-').map(Number);RP.ay=new Date(Date.UTC(y,m-1+d,1)).toISOString().slice(0,7)}
+  RP.yuklu=false;RP.filt='hepsi';RP.ara='';renderRapor();
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+  if(d.rpay!=null){rpAy(+d.rpay);return}
+  if(d.rpf){RP.filt=d.rpf;renderRpLog();return}
+  if(b.id==='rpAiBtn'){raporAi();return}
+  if(b.id==='rpIndir'){offer('polaris-rapor-'+RP.ay+'.txt',rpMetin());olayYaz('not','Aylık rapor indirildi',{k:ayAdi(RP.ay)});return}
+  if(b.id==='rpKopya'){navigator.clipboard.writeText(rpMetin()).then(()=>toast('Rapor panoya kopyalandı')).catch(()=>toast('Kopyalanamadı'));return}
+  if(d.dders){setTimeout(()=>{if(!$('#tab-rapor').hidden)renderRapor()},60);return}
+});
+document.addEventListener('input',e=>{if(e.target.id==='rpAra'){RP.ara=e.target.value;clearTimeout(window._rpa);window._rpa=setTimeout(renderRpLog,200)}});
+document.addEventListener('change',e=>{
+  if(e.target.dataset?.dpb){const x=(D.ders.items||[]).find(i=>i.id===e.target.dataset.dpb);if(x){x.pb=e.target.value;saveDers();toast(PB[x.pb]?'Rehber seçildi: '+PB[x.pb].t:'Genel ders')}}
+});
+/* Ders kartı — Notlarım ve Rapor sekmesinde ortak kullanılır.
+   Onay beklerken hangi rehbere (kılavuza) işleneceği buradan değiştirilebilir. */
+function dersKart(x,pending){
+  const pbName=k=>PB[k]?PB[k].t:'Genel';
+  return `<div class="note"><b><span class="dot" style="--c:var(--brand)"></span>${esc(x.t)} ${x.tur==='karar'?'<span class="tag now">Karar</span>':'<span class="tag">Ders</span>'} <span class="tag">${esc(pbName(x.pb))}</span>${x.kay==='ai'?'<span class="tag mid">AI önerdi</span>':''}${x.ayKaynak?`<span class="tag">${esc(ayAdi(x.ayKaynak))}</span>`:''}</b>${esc(x.d)}
+  ${x.gorev?`<div class="small" style="margin-top:4px"><span class="muted">${pending?'Önerilen görev':'Görev'}:</span> ${esc(x.gorev)}${x.gorevId?' <span class="tag ok">Görevlere eklendi</span>':''}</div>`:''}
+  ${pending?`<div class="row" style="margin-top:6px"><span class="small muted">Hangi rehbere işlensin?</span><select data-dpb="${esc(x.id)}"><option value="">Genel</option>${Object.entries(PB).map(([k,p])=>`<option value="${k}"${x.pb===k?' selected':''}>${esc(p.t.slice(0,44))}</option>`).join('')}</select></div>`:''}
+  <div class="row" style="margin-top:6px">${pending?`${x.gorev?`<button class="btn sm ok" type="button" data-dders="${esc(x.id)}" data-v="kayit" data-gorev="1">Onayla + görev ekle</button>`:''}<button class="btn sm ${x.gorev?'ghost':'ok'}" type="button" data-dders="${esc(x.id)}" data-v="kayit">${x.gorev?'Yalnızca onayla':'Onayla ve rehbere ekle'}</button><button class="btn sm ghost" type="button" data-dders="${esc(x.id)}" data-v="sil">Gerek yok</button>`:`<button class="link small" type="button" data-pb="${esc(x.pb||'')}" ${PB[x.pb]?'':'hidden'}>Rehberde gör</button><button class="link small" type="button" data-dders="${esc(x.id)}" data-v="sil" style="color:var(--bad)">Sil</button>`}</div></div>`;
+}
 
 /* =========================================================
    BAŞLANGIÇ
@@ -3298,6 +3595,7 @@ setInterval(()=>{renderGuide();renderHero()},60000);
   await anLoad();
   const cur=$('nav.tabs [aria-selected="true"]')?.dataset.tab;if(cur&&cur!=='bugun')showTab(cur);
   pfLoad().then(()=>{renderMentor();if(!$('#tab-portfoy').hidden)renderPf()});
+  olayAl(AY_KEY()).then(()=>{if(!$('#tab-rapor').hidden)renderRapor()});
   const pd=await loadDoc('meta','plan');if(!pd||pd.uretim!==TODAY)savePlanDoc();
 })();
 (async()=>{try{if(window.claude?.use){DL=await window.claude.use('downloads')}}catch{}if(!DL){$('#backupBtn').hidden=true;$('#iCsv').hidden=true;$('#pCsv').hidden=true}})();
