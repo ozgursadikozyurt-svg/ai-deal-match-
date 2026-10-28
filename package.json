@@ -19,13 +19,14 @@
     "canli:build": "npm run canli:rotalar && npm run canli:gomulu && npm run canli:arayuz",
     "canli:dene": "wrangler dev",
     "canli:test": "tsx scripts/canli-uctan-uca.ts",
-    "canli:yayinla": "npm run canli:build && wrangler deploy",
+    "canli:yayinla": "npm run canli:build && wrangler deploy && node scripts/seo-bildir.mjs",
     "canli:istemci": "prisma generate",
     "canli:test:depo": "tsx scripts/canli-depo-testi.ts",
     "canli:test:google": "tsx scripts/canli-google-testi.ts",
     "canli:test:giris": "tsx scripts/canli-jwks-testi.ts",
     "canli:test:arayuz": "tsx scripts/canli-yedek-uret.ts && node scripts/canli-arayuz-testi.mjs",
-    "fonksiyon:paketle": "npm run canli:rotalar && npm run canli:gomulu && tsx scripts/fonksiyon-paketle.ts"
+    "fonksiyon:paketle": "npm run canli:rotalar && npm run canli:gomulu && tsx scripts/fonksiyon-paketle.ts",
+    "seo:bildir": "node scripts/seo-bildir.mjs"
   },
   "license": "UNLICENSED",
   "devDependencies": {
